@@ -1,0 +1,114 @@
+import { Stack, Typography } from '@mui/material';
+import { formOptions } from '@tanstack/react-form';
+import { z } from 'zod/v4';
+import { withForm } from '../hooks';
+
+const authSchema = z.object({
+  node: z.string(),
+  port: z.string(), // z.coerce.number(),
+  protocol: z.enum(['http', 'https']),
+  apiKey: z.string(),
+  remember: z.boolean(),
+});
+
+export const authFormOpts = formOptions({
+  defaultValues: {
+    node: '',
+    port: '',
+    protocol: '',
+    apiKey: '',
+    remember: false,
+  },
+  validators: {
+    onChange: authSchema,
+  },
+});
+
+export const AuthForm = withForm({
+  ...authFormOpts,
+  // Optional, but adds props to the `render` function outside of `form`
+  props: {
+    title: 'Login',
+  },
+  render: ({ form, title }) => {
+    return (
+      <>
+        <Typography
+          component='h1'
+          variant='h4'
+          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+        >
+          {title}
+        </Typography>
+        <form.AppField name='node'>
+          {({ TextField, state }) => (
+            <TextField
+              id='node'
+              type='node'
+              label='Node'
+              placeholder='localhost or [CLUSTER_ID]-1.a1.typesense.net'
+              autoFocus
+              required
+              fullWidth
+              variant='outlined'
+              color={state.meta.errors.length ? 'error' : 'primary'}
+            />
+          )}
+        </form.AppField>
+        <Stack direction='row' spacing={3}>
+          <form.AppField name='protocol'>
+            {({ Select, state }) => (
+              <Select
+                id='protocol'
+                type='protocol'
+                label='Protocol'
+                placeholder='http'
+                options={['https', 'http']}
+                required
+                fullWidth
+                variant='outlined'
+                color={state.meta.errors.length ? 'error' : 'primary'}
+              />
+            )}
+          </form.AppField>
+          <form.AppField name='port'>
+            {({ TextField, state }) => (
+              <TextField
+                id='port'
+                type='port'
+                label='Port'
+                placeholder='443'
+                required
+                fullWidth
+                variant='outlined'
+                color={state.meta.errors.length ? 'error' : 'primary'}
+              />
+            )}
+          </form.AppField>
+        </Stack>
+
+        <form.AppField name='apiKey'>
+          {({ TextField, state }) => (
+            <TextField
+              id='apiKey'
+              type='apiKey'
+              label='API Key'
+              // placeholder='443'
+              required
+              fullWidth
+              variant='outlined'
+              color={state.meta.errors.length ? 'error' : 'primary'}
+            />
+          )}
+        </form.AppField>
+
+        <form.AppField name='remember'>
+          {({ Checkbox }) => <Checkbox label='Remember me' />}
+        </form.AppField>
+        <form.AppForm>
+          <form.SubmitButton label='Submit' fullWidth />
+        </form.AppForm>
+      </>
+    );
+  },
+});
