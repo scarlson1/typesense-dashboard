@@ -1,0 +1,6 @@
+services:
+  typesense-dashboard:
+    # env_file: .env.local
+    build: .
+    ports:
+      - '5173:5173'

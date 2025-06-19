@@ -28,3 +28,5 @@ export function TextField(props: TextFieldProps) {
     />
   );
 }
+
+export default TextField;

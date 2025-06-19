@@ -4,6 +4,7 @@ import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { Toaster } from '../components';
 import { AppTheme } from '../context';
+import { dataGridCustomizations } from '../theme/customizations';
 
 export interface RouterAppContext {
   // trpcQueryUtils: typeof trpcQueryUtils;
@@ -26,7 +27,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 const xThemeComponents = {
   // ...chartsCustomizations,
-  // ...dataGridCustomizations,
+  ...dataGridCustomizations,
   // ...datePickersCustomizations,
   // ...treeViewCustomizations,
 };

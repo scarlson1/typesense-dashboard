@@ -10,7 +10,7 @@ type TextFieldProps = Omit<
   'onChange' | 'onBlur' | 'helperText' | 'error' | 'select'
 > & { options: Array<string | number | Option> };
 
-export function Select({ label, options, ...props }: TextFieldProps) {
+export function Select({ label, options, id, ...props }: TextFieldProps) {
   // Use the context returned from `createFormHookContexts`
   // The `Field` infers that it should have a `value` type of `string`
   const { state, store, handleBlur, handleChange } = useFieldContext<string>();

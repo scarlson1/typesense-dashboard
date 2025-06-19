@@ -44,7 +44,6 @@ export const AuthForm = withForm({
           {({ TextField, state }) => (
             <TextField
               id='node'
-              type='node'
               label='Node'
               placeholder='localhost or [CLUSTER_ID]-1.a1.typesense.net'
               autoFocus
@@ -60,7 +59,6 @@ export const AuthForm = withForm({
             {({ Select, state }) => (
               <Select
                 id='protocol'
-                type='protocol'
                 label='Protocol'
                 placeholder='http'
                 options={['https', 'http']}
@@ -75,7 +73,6 @@ export const AuthForm = withForm({
             {({ TextField, state }) => (
               <TextField
                 id='port'
-                type='port'
                 label='Port'
                 placeholder='443'
                 required
@@ -91,7 +88,6 @@ export const AuthForm = withForm({
           {({ TextField, state }) => (
             <TextField
               id='apiKey'
-              type='apiKey'
               label='API Key'
               // placeholder='443'
               required

@@ -15,6 +15,8 @@ import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as DashboardKeysRouteImport } from './routes/_dashboard/keys'
 import { Route as DashboardAliasRouteImport } from './routes/_dashboard/alias'
 import { Route as DashboardCollectionsIndexRouteImport } from './routes/_dashboard/collections/index'
+import { Route as DashboardCollectionsNewRouteImport } from './routes/_dashboard/collections/new'
+import { Route as DashboardCollectionsCollectionIdRouteImport } from './routes/_dashboard/collections/$collectionId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -46,12 +48,25 @@ const DashboardCollectionsIndexRoute =
     path: '/collections/',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardCollectionsNewRoute = DashboardCollectionsNewRouteImport.update({
+  id: '/collections/new',
+  path: '/collections/new',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCollectionsCollectionIdRoute =
+  DashboardCollectionsCollectionIdRouteImport.update({
+    id: '/collections/$collectionId',
+    path: '/collections/$collectionId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/alias': typeof DashboardAliasRoute
   '/keys': typeof DashboardKeysRoute
   '/': typeof DashboardIndexRoute
+  '/collections/$collectionId': typeof DashboardCollectionsCollectionIdRoute
+  '/collections/new': typeof DashboardCollectionsNewRoute
   '/collections': typeof DashboardCollectionsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -59,6 +74,8 @@ export interface FileRoutesByTo {
   '/alias': typeof DashboardAliasRoute
   '/keys': typeof DashboardKeysRoute
   '/': typeof DashboardIndexRoute
+  '/collections/$collectionId': typeof DashboardCollectionsCollectionIdRoute
+  '/collections/new': typeof DashboardCollectionsNewRoute
   '/collections': typeof DashboardCollectionsIndexRoute
 }
 export interface FileRoutesById {
@@ -68,13 +85,29 @@ export interface FileRoutesById {
   '/_dashboard/alias': typeof DashboardAliasRoute
   '/_dashboard/keys': typeof DashboardKeysRoute
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/collections/$collectionId': typeof DashboardCollectionsCollectionIdRoute
+  '/_dashboard/collections/new': typeof DashboardCollectionsNewRoute
   '/_dashboard/collections/': typeof DashboardCollectionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/alias' | '/keys' | '/' | '/collections'
+  fullPaths:
+    | '/auth'
+    | '/alias'
+    | '/keys'
+    | '/'
+    | '/collections/$collectionId'
+    | '/collections/new'
+    | '/collections'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/alias' | '/keys' | '/' | '/collections'
+  to:
+    | '/auth'
+    | '/alias'
+    | '/keys'
+    | '/'
+    | '/collections/$collectionId'
+    | '/collections/new'
+    | '/collections'
   id:
     | '__root__'
     | '/_dashboard'
@@ -82,6 +115,8 @@ export interface FileRouteTypes {
     | '/_dashboard/alias'
     | '/_dashboard/keys'
     | '/_dashboard/'
+    | '/_dashboard/collections/$collectionId'
+    | '/_dashboard/collections/new'
     | '/_dashboard/collections/'
   fileRoutesById: FileRoutesById
 }
@@ -134,6 +169,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCollectionsIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/collections/new': {
+      id: '/_dashboard/collections/new'
+      path: '/collections/new'
+      fullPath: '/collections/new'
+      preLoaderRoute: typeof DashboardCollectionsNewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/collections/$collectionId': {
+      id: '/_dashboard/collections/$collectionId'
+      path: '/collections/$collectionId'
+      fullPath: '/collections/$collectionId'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -141,6 +190,8 @@ interface DashboardRouteChildren {
   DashboardAliasRoute: typeof DashboardAliasRoute
   DashboardKeysRoute: typeof DashboardKeysRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardCollectionsCollectionIdRoute: typeof DashboardCollectionsCollectionIdRoute
+  DashboardCollectionsNewRoute: typeof DashboardCollectionsNewRoute
   DashboardCollectionsIndexRoute: typeof DashboardCollectionsIndexRoute
 }
 
@@ -148,6 +199,8 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAliasRoute: DashboardAliasRoute,
   DashboardKeysRoute: DashboardKeysRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardCollectionsCollectionIdRoute: DashboardCollectionsCollectionIdRoute,
+  DashboardCollectionsNewRoute: DashboardCollectionsNewRoute,
   DashboardCollectionsIndexRoute: DashboardCollectionsIndexRoute,
 }
 

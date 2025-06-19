@@ -1,5 +1,6 @@
 import { Client } from 'typesense';
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface TypesenseCreds {
   node: string;
@@ -12,20 +13,27 @@ type State = { credentials: TypesenseCreds | null; client: any | null };
 
 type Actions = {
   setCredentials: (creds: State['credentials']) => void; // TypesenseClient
-  // client: () => any // TypesenseClient
 };
 
 type TypesenseStore = State & Actions;
 
-export const typesenseStore = create<TypesenseStore>()((set) => ({
-  credentials: null,
-  client: null,
-  setCredentials: (creds) =>
-    set({
-      credentials: creds,
-      client: creds ? getTypesenseClient(creds) : null,
+export const typesenseStore = create<TypesenseStore>()(
+  persist(
+    (set) => ({
+      credentials: null,
+      client: null,
+      setCredentials: (creds) =>
+        set({
+          credentials: creds,
+          // client: creds ? getTypesenseClient(creds) : null,
+        }),
     }),
-}));
+    {
+      name: 'typesense-store',
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
+    }
+  )
+);
 
 export function getTypesenseClient(creds: TypesenseCreds) {
   return new Client({

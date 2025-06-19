@@ -3,9 +3,12 @@ import { Checkbox } from '../components/forms/Checkbox';
 // import { MaskInput } from '../components/forms/MaskInput';
 import { Select } from '../components/forms/Select';
 import { SubmitButton } from '../components/forms/SubmitButton';
-import { TextField } from '../components/forms/TextField';
+// import { TextField } from '../components/forms/TextField';
 // import { WizardNavButtons } from '../components/forms/WizardNavButtons';
+import { lazy } from 'react';
 import { fieldContext, formContext } from './formContext';
+
+const TextField = lazy(() => import('../components/forms/TextField.tsx'));
 
 // TODO: create other reusable input types (number input, select, masked fields etc.)
 
