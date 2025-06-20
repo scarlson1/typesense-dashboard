@@ -13,6 +13,7 @@ import { z } from 'zod/v4';
 import { useStore } from 'zustand';
 import { AuthForm, authFormOpts } from '../components/AuthForm';
 import { useAppForm, useAsyncToast } from '../hooks';
+import type { Environment } from '../types';
 import { getTypesenseClient, typesenseStore } from '../utils';
 
 // https://github.com/bfritscher/typesense-dashboard/blob/1258005f0ba99790de943a5c3b17c1ae7e915987/src/stores/node.ts#L132
@@ -82,12 +83,13 @@ function AuthComponent() {
 
   const form = useAppForm({
     ...authFormOpts,
-    onSubmit: async ({ value: { node, port, protocol, apiKey } }) => {
+    onSubmit: async ({ value: { node, port, protocol, apiKey, env } }) => {
       let creds = {
         node,
         port: Number(port),
         protocol,
         apiKey,
+        env: env as Environment,
       };
       const client = getTypesenseClient(creds);
       toast.loading('authenticating...', { id: 'auth' });
@@ -95,6 +97,7 @@ function AuthComponent() {
         await client.collections().retrieve();
 
         setCredentials(creds);
+        // TODO: set credentials in context
         toast.success(`Authentication successful`, { id: 'auth' });
         navigate({ to: search?.redirect || '/', replace: true });
       } catch (err) {

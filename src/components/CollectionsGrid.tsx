@@ -51,11 +51,11 @@ function fetchCollections(client: Client, query?: CollectionsRetrieveOptions) {
 
 export function CollectionsGrid() {
   const navigate = useNavigate();
-  const client = useTypesenseClient();
+  const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
 
   const { data, isFetching, isLoading, isError, error } = useQuery({
-    queryKey: collectionQueryKeys.list({}),
+    queryKey: collectionQueryKeys.list(clusterId, {}),
     queryFn: () => fetchCollections(client),
   });
 
@@ -71,15 +71,15 @@ export function CollectionsGrid() {
     mutationFn: (colName: string) => client.collections(colName).delete(),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: collectionQueryKeys.list({}),
+        queryKey: collectionQueryKeys.list(clusterId, {}),
       });
 
       const collections: CollectionSchema[] | undefined =
-        queryClient.getQueryData(collectionQueryKeys.list({}));
+        queryClient.getQueryData(collectionQueryKeys.list(clusterId, {}));
       const prevCollection = collections?.find((c) => c.name === variables);
 
       queryClient.setQueryData(
-        collectionQueryKeys.list({}),
+        collectionQueryKeys.list(clusterId, {}),
         (data: CollectionSchema[]) => data.filter((c) => c.name !== variables)
       );
 
@@ -104,13 +104,17 @@ export function CollectionsGrid() {
 
       if (context?.prevCollection) {
         queryClient.setQueryData(
-          collectionQueryKeys.list({}),
+          collectionQueryKeys.list(clusterId, {}),
           (data: CollectionSchema[]) => [...data, context?.prevCollection]
         );
       }
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) }),
+    onSettled: () => {
+      // queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
+      queryClient.invalidateQueries({
+        queryKey: collectionQueryKeys.all(clusterId),
+      });
+    },
   });
 
   const columns = useMemo<GridColDef<CollectionSchema>[]>(

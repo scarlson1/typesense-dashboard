@@ -1,5 +1,7 @@
 export const collectionQueryKeys = {
-  all: ['collections'] as const,
-  list: (filters: any) => [...collectionQueryKeys.all, filters] as const, // [string, any],
-  detail: (id: string) => [...collectionQueryKeys.all, id] as const,
+  all: (clusterId: string) => [clusterId, 'collections'] as const,
+  list: (clusterId: string, filters: any) =>
+    [...collectionQueryKeys.all(clusterId), filters] as const, // [string, any],
+  detail: (clusterId: string, id: string) =>
+    [...collectionQueryKeys.all(clusterId), id] as const,
 };

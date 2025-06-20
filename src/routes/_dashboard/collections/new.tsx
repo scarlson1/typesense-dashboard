@@ -6,6 +6,9 @@ import { NewCollectionEditor, NewCollectionForm } from '../../../components';
 
 export const Route = createFileRoute('/_dashboard/collections/new')({
   component: NewCollection,
+  staticData: {
+    crumb: 'New',
+  },
 });
 
 function NewCollection() {

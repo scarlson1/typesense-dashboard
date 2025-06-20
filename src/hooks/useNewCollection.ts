@@ -14,7 +14,7 @@ type UseNewCollectionProps = Omit<
 
 export const useNewCollection = (props?: UseNewCollectionProps) => {
   const navigate = useNavigate();
-  const client = useTypesenseClient();
+  const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
 
   const { onSuccess, onError, ...rest } = props || {};
@@ -25,7 +25,9 @@ export const useNewCollection = (props?: UseNewCollectionProps) => {
       client.collections().create(values),
     onSuccess: (data, vars) => {
       toast.success('collection created', { id: 'new-collection' });
-      queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
+      queryClient.invalidateQueries({
+        queryKey: collectionQueryKeys.all(clusterId),
+      });
 
       onSuccess && onSuccess(data, vars, {});
       navigate({ from: '/collections/new', to: '..' });

@@ -1,13 +1,12 @@
 import {
-  AddRounded,
-  ConstructionRounded,
+  BugReportRounded,
+  ChecklistRounded,
+  CodeRounded,
   DevicesRounded,
-  SmartphoneRounded,
+  SupervisedUserCircleRounded,
 } from '@mui/icons-material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
-  Divider,
-  ListItemIcon,
   ListItemText,
   ListSubheader,
   MenuItem,
@@ -17,11 +16,13 @@ import {
   selectClasses,
   styled,
 } from '@mui/material';
-import { useState } from 'react';
+import { useMemo } from 'react';
+import { useStore } from 'zustand';
+import { getCredsKey, queryClient, typesenseStore } from '../utils';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
-  width: 28,
-  height: 28,
+  width: 24,
+  height: 24,
   backgroundColor: (theme.vars || theme).palette.background.paper,
   color: (theme.vars || theme).palette.text.secondary,
   border: `1px solid ${(theme.vars || theme).palette.divider}`,
@@ -33,20 +34,44 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
 });
 
 export function SelectContent() {
-  const [company, setCompany] = useState('');
+  // TODO: allow multiple sets of credentials & add context provider
+  const credentials = useStore(typesenseStore, (state) => state.credentials);
+  const cluster = useStore(typesenseStore, (state) => state.currentCredsKey);
+  const setCluster = useStore(typesenseStore, (state) => state.setCredsKey);
+  // const [cluster, setCluster] = useState<string>(credKey || '');
 
+  // BUG: clearing query client not working - need to add cluster in query key ??
   const handleChange = (event: SelectChangeEvent) => {
-    setCompany(event.target.value as string);
+    setCluster(event.target.value);
+    queryClient.clear();
+    queryClient.refetchQueries();
   };
+
+  const { prodCreds, devCreds, stagingCreds, testingCreds, ciCreds } =
+    useMemo(() => {
+      let creds = Object.values(credentials);
+
+      let prodCreds = creds.filter((c) => c.env === 'production');
+      let devCreds = creds.filter((c) => c.env === 'development');
+      let stagingCreds = creds.filter((c) => c.env === 'staging');
+      let testingCreds = creds.filter((c) => c.env === 'testing');
+      let ciCreds = creds.filter((c) => c.env === 'ci');
+
+      // return [prodCreds, devCreds, stagingCreds, testingCreds, ciCreds].filter(
+      //   (c) => c.length
+      // );
+      return { prodCreds, devCreds, stagingCreds, testingCreds, ciCreds };
+    }, [credentials]);
 
   return (
     <Select
-      labelId='company-select'
-      id='company-simple-select'
-      value={company}
+      labelId='env-select-label'
+      id='env-select'
+      value={cluster}
+      // @ts-ignore
       onChange={handleChange}
       displayEmpty
-      inputProps={{ 'aria-label': 'Select company' }}
+      inputProps={{ 'aria-label': 'Select cluster' }}
       fullWidth
       sx={{
         maxHeight: 56,
@@ -61,51 +86,198 @@ export function SelectContent() {
           pl: 1,
         },
       }}
+      MenuProps={{
+        sx: { maxWidth: 300 },
+      }}
     >
-      <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
       <MenuItem value=''>
         <ListItemAvatar>
-          <Avatar alt='Typesense web'>
+          <Avatar alt='No Cluster'>
             <DevicesRounded sx={{ fontSize: '1rem' }} />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary='Typesense-web' secondary='Web app' />
+        <ListItemText primary='No selection' secondary='choose a cluster' />
       </MenuItem>
-      <MenuItem value={10}>
-        <ListItemAvatar>
-          <Avatar alt='Typesense App'>
-            <SmartphoneRounded sx={{ fontSize: '1rem' }} />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText
-          primary='Typesense-mobile'
-          secondary='Mobile application'
-        />
-      </MenuItem>
-      <MenuItem value={20}>
-        <ListItemAvatar>
-          <Avatar alt='Typesense Store'>
-            <DevicesRounded sx={{ fontSize: '1rem' }} />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary='Typesense-Store' secondary='Web app' />
-      </MenuItem>
-      <ListSubheader>Development</ListSubheader>
-      <MenuItem value={30}>
-        <ListItemAvatar>
-          <Avatar alt='Typesense Store'>
-            <ConstructionRounded sx={{ fontSize: '1rem' }} />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary='Typesense-Admin' secondary='Web app' />
-      </MenuItem>
-      <Divider sx={{ mx: -1 }} />
-      <MenuItem value={40}>
-        <ListItemIcon>
-          <AddRounded />
-        </ListItemIcon>
-        <ListItemText primary='Add product' secondary='Web app' />
-      </MenuItem>
+
+      {prodCreds.length ? (
+        <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
+      ) : null}
+      {prodCreds.length
+        ? prodCreds.map((i) => (
+            // <RenderOption option={i} />
+            <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
+              <ListItemAvatar>
+                <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
+                  <DevicesRounded sx={{ fontSize: '1rem' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={i.name ?? i.env ?? 'no name'}
+                secondary={`${i.protocol}:${i.node}:${i.port}`}
+                sx={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+                slotProps={{
+                  secondary: {
+                    sx: {
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    },
+                  },
+                }}
+              />
+            </MenuItem>
+          ))
+        : null}
+      {stagingCreds.length ? (
+        <ListSubheader sx={{ pt: 0 }}>Staging</ListSubheader>
+      ) : null}
+      {stagingCreds.length
+        ? stagingCreds.map((i) => (
+            // <RenderOption option={i} />
+            <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
+              <ListItemAvatar>
+                <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
+                  <SupervisedUserCircleRounded sx={{ fontSize: '1rem' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={i.name ?? i.env ?? 'no name'}
+                secondary={`${i.protocol}:${i.node}:${i.port}`}
+                sx={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+                slotProps={{
+                  secondary: {
+                    sx: {
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    },
+                  },
+                }}
+              />
+            </MenuItem>
+          ))
+        : null}
+      {devCreds.length ? (
+        <ListSubheader sx={{ pt: 0 }}>Development</ListSubheader>
+      ) : null}
+      {devCreds.length
+        ? devCreds.map((i) => (
+            // <RenderOption option={i} />
+            <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
+              <ListItemAvatar>
+                <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
+                  <CodeRounded sx={{ fontSize: '1rem' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={i.name ?? i.env ?? 'no name'}
+                secondary={`${i.protocol}:${i.node}:${i.port}`}
+                sx={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+                slotProps={{
+                  secondary: {
+                    sx: {
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    },
+                  },
+                }}
+              />
+            </MenuItem>
+          ))
+        : null}
+      {testingCreds.length ? (
+        <ListSubheader sx={{ pt: 0 }}>Testing</ListSubheader>
+      ) : null}
+      {testingCreds.length
+        ? testingCreds.map((i) => (
+            // <RenderOption option={i} />
+            <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
+              <ListItemAvatar>
+                <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
+                  <BugReportRounded sx={{ fontSize: '1rem' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={i.name ?? i.env ?? 'no name'}
+                secondary={`${i.protocol}:${i.node}:${i.port}`}
+                sx={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+                slotProps={{
+                  secondary: {
+                    sx: {
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    },
+                  },
+                }}
+              />
+            </MenuItem>
+          ))
+        : null}
+      {ciCreds.length ? <ListSubheader sx={{ pt: 0 }}>CI</ListSubheader> : null}
+      {ciCreds.length
+        ? ciCreds.map((i) => (
+            // <RenderOption option={i} />
+            <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
+              <ListItemAvatar>
+                <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
+                  <ChecklistRounded sx={{ fontSize: '1rem' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={i.name ?? i.env ?? 'no name'}
+                secondary={`${i.protocol}:${i.node}:${i.port}`}
+                sx={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+                slotProps={{
+                  secondary: {
+                    sx: {
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    },
+                  },
+                }}
+              />
+            </MenuItem>
+          ))
+        : null}
     </Select>
   );
 }
+
+// function RenderOption({ option }: { option: TypesenseCreds }) {
+//   return (
+//     <MenuItem value={getCredsKey(option)}>
+//       <ListItemAvatar>
+//         <Avatar alt={`${option.protocol}:${option.node}:${option.port}`}>
+//           <DevicesRounded sx={{ fontSize: '1rem' }} />
+//         </Avatar>
+//       </ListItemAvatar>
+//       <ListItemText
+//         primary={option.name ?? option.env ?? 'no name'}
+//         secondary={`${option.protocol}:${option.node}:${option.port}`}
+//       />
+//     </MenuItem>
+//   );
+// }

@@ -12,11 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
+import { Route as DashboardPresetsRouteImport } from './routes/_dashboard/presets'
 import { Route as DashboardKeysRouteImport } from './routes/_dashboard/keys'
+import { Route as DashboardAnalyticsRouteImport } from './routes/_dashboard/analytics'
 import { Route as DashboardAliasRouteImport } from './routes/_dashboard/alias'
 import { Route as DashboardCollectionsIndexRouteImport } from './routes/_dashboard/collections/index'
 import { Route as DashboardCollectionsNewRouteImport } from './routes/_dashboard/collections/new'
-import { Route as DashboardCollectionsCollectionIdRouteImport } from './routes/_dashboard/collections/$collectionId'
+import { Route as DashboardCollectionsCollectionIdIndexRouteImport } from './routes/_dashboard/collections/$collectionId/index'
+import { Route as DashboardCollectionsCollectionIdSearchRouteImport } from './routes/_dashboard/collections/$collectionId/search'
+import { Route as DashboardCollectionsCollectionIdConfigRouteImport } from './routes/_dashboard/collections/$collectionId/config'
+import { Route as DashboardCollectionsCollectionIdDocumentsIndexRouteImport } from './routes/_dashboard/collections/$collectionId/documents/index'
+import { Route as DashboardCollectionsCollectionIdDocumentsNewRouteImport } from './routes/_dashboard/collections/$collectionId/documents/new'
+import { Route as DashboardCollectionsCollectionIdDocumentsDocumentIdRouteImport } from './routes/_dashboard/collections/$collectionId/documents/$documentId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -32,9 +39,19 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPresetsRoute = DashboardPresetsRouteImport.update({
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardKeysRoute = DashboardKeysRouteImport.update({
   id: '/keys',
   path: '/keys',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAliasRoute = DashboardAliasRouteImport.update({
@@ -53,71 +70,143 @@ const DashboardCollectionsNewRoute = DashboardCollectionsNewRouteImport.update({
   path: '/collections/new',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardCollectionsCollectionIdRoute =
-  DashboardCollectionsCollectionIdRouteImport.update({
-    id: '/collections/$collectionId',
-    path: '/collections/$collectionId',
+const DashboardCollectionsCollectionIdIndexRoute =
+  DashboardCollectionsCollectionIdIndexRouteImport.update({
+    id: '/collections/$collectionId/',
+    path: '/collections/$collectionId/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardCollectionsCollectionIdSearchRoute =
+  DashboardCollectionsCollectionIdSearchRouteImport.update({
+    id: '/collections/$collectionId/search',
+    path: '/collections/$collectionId/search',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardCollectionsCollectionIdConfigRoute =
+  DashboardCollectionsCollectionIdConfigRouteImport.update({
+    id: '/collections/$collectionId/config',
+    path: '/collections/$collectionId/config',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardCollectionsCollectionIdDocumentsIndexRoute =
+  DashboardCollectionsCollectionIdDocumentsIndexRouteImport.update({
+    id: '/collections/$collectionId/documents/',
+    path: '/collections/$collectionId/documents/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardCollectionsCollectionIdDocumentsNewRoute =
+  DashboardCollectionsCollectionIdDocumentsNewRouteImport.update({
+    id: '/collections/$collectionId/documents/new',
+    path: '/collections/$collectionId/documents/new',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardCollectionsCollectionIdDocumentsDocumentIdRoute =
+  DashboardCollectionsCollectionIdDocumentsDocumentIdRouteImport.update({
+    id: '/collections/$collectionId/documents/$documentId',
+    path: '/collections/$collectionId/documents/$documentId',
     getParentRoute: () => DashboardRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/alias': typeof DashboardAliasRoute
+  '/analytics': typeof DashboardAnalyticsRoute
   '/keys': typeof DashboardKeysRoute
+  '/presets': typeof DashboardPresetsRoute
   '/': typeof DashboardIndexRoute
-  '/collections/$collectionId': typeof DashboardCollectionsCollectionIdRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
   '/collections': typeof DashboardCollectionsIndexRoute
+  '/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
+  '/collections/$collectionId/search': typeof DashboardCollectionsCollectionIdSearchRoute
+  '/collections/$collectionId': typeof DashboardCollectionsCollectionIdIndexRoute
+  '/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
+  '/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
+  '/collections/$collectionId/documents': typeof DashboardCollectionsCollectionIdDocumentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/alias': typeof DashboardAliasRoute
+  '/analytics': typeof DashboardAnalyticsRoute
   '/keys': typeof DashboardKeysRoute
+  '/presets': typeof DashboardPresetsRoute
   '/': typeof DashboardIndexRoute
-  '/collections/$collectionId': typeof DashboardCollectionsCollectionIdRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
   '/collections': typeof DashboardCollectionsIndexRoute
+  '/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
+  '/collections/$collectionId/search': typeof DashboardCollectionsCollectionIdSearchRoute
+  '/collections/$collectionId': typeof DashboardCollectionsCollectionIdIndexRoute
+  '/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
+  '/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
+  '/collections/$collectionId/documents': typeof DashboardCollectionsCollectionIdDocumentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_dashboard': typeof DashboardRouteWithChildren
   '/auth': typeof AuthRoute
   '/_dashboard/alias': typeof DashboardAliasRoute
+  '/_dashboard/analytics': typeof DashboardAnalyticsRoute
   '/_dashboard/keys': typeof DashboardKeysRoute
+  '/_dashboard/presets': typeof DashboardPresetsRoute
   '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/collections/$collectionId': typeof DashboardCollectionsCollectionIdRoute
   '/_dashboard/collections/new': typeof DashboardCollectionsNewRoute
   '/_dashboard/collections/': typeof DashboardCollectionsIndexRoute
+  '/_dashboard/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
+  '/_dashboard/collections/$collectionId/search': typeof DashboardCollectionsCollectionIdSearchRoute
+  '/_dashboard/collections/$collectionId/': typeof DashboardCollectionsCollectionIdIndexRoute
+  '/_dashboard/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
+  '/_dashboard/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
+  '/_dashboard/collections/$collectionId/documents/': typeof DashboardCollectionsCollectionIdDocumentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/auth'
     | '/alias'
+    | '/analytics'
     | '/keys'
+    | '/presets'
     | '/'
-    | '/collections/$collectionId'
     | '/collections/new'
     | '/collections'
+    | '/collections/$collectionId/config'
+    | '/collections/$collectionId/search'
+    | '/collections/$collectionId'
+    | '/collections/$collectionId/documents/$documentId'
+    | '/collections/$collectionId/documents/new'
+    | '/collections/$collectionId/documents'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
     | '/alias'
+    | '/analytics'
     | '/keys'
+    | '/presets'
     | '/'
-    | '/collections/$collectionId'
     | '/collections/new'
     | '/collections'
+    | '/collections/$collectionId/config'
+    | '/collections/$collectionId/search'
+    | '/collections/$collectionId'
+    | '/collections/$collectionId/documents/$documentId'
+    | '/collections/$collectionId/documents/new'
+    | '/collections/$collectionId/documents'
   id:
     | '__root__'
     | '/_dashboard'
     | '/auth'
     | '/_dashboard/alias'
+    | '/_dashboard/analytics'
     | '/_dashboard/keys'
+    | '/_dashboard/presets'
     | '/_dashboard/'
-    | '/_dashboard/collections/$collectionId'
     | '/_dashboard/collections/new'
     | '/_dashboard/collections/'
+    | '/_dashboard/collections/$collectionId/config'
+    | '/_dashboard/collections/$collectionId/search'
+    | '/_dashboard/collections/$collectionId/'
+    | '/_dashboard/collections/$collectionId/documents/$documentId'
+    | '/_dashboard/collections/$collectionId/documents/new'
+    | '/_dashboard/collections/$collectionId/documents/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -148,11 +237,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/presets': {
+      id: '/_dashboard/presets'
+      path: '/presets'
+      fullPath: '/presets'
+      preLoaderRoute: typeof DashboardPresetsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/keys': {
       id: '/_dashboard/keys'
       path: '/keys'
       fullPath: '/keys'
       preLoaderRoute: typeof DashboardKeysRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/analytics': {
+      id: '/_dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/alias': {
@@ -176,11 +279,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCollectionsNewRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/collections/$collectionId': {
-      id: '/_dashboard/collections/$collectionId'
+    '/_dashboard/collections/$collectionId/': {
+      id: '/_dashboard/collections/$collectionId/'
       path: '/collections/$collectionId'
       fullPath: '/collections/$collectionId'
-      preLoaderRoute: typeof DashboardCollectionsCollectionIdRouteImport
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/collections/$collectionId/search': {
+      id: '/_dashboard/collections/$collectionId/search'
+      path: '/collections/$collectionId/search'
+      fullPath: '/collections/$collectionId/search'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdSearchRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/collections/$collectionId/config': {
+      id: '/_dashboard/collections/$collectionId/config'
+      path: '/collections/$collectionId/config'
+      fullPath: '/collections/$collectionId/config'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdConfigRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/collections/$collectionId/documents/': {
+      id: '/_dashboard/collections/$collectionId/documents/'
+      path: '/collections/$collectionId/documents'
+      fullPath: '/collections/$collectionId/documents'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/collections/$collectionId/documents/new': {
+      id: '/_dashboard/collections/$collectionId/documents/new'
+      path: '/collections/$collectionId/documents/new'
+      fullPath: '/collections/$collectionId/documents/new'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsNewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/collections/$collectionId/documents/$documentId': {
+      id: '/_dashboard/collections/$collectionId/documents/$documentId'
+      path: '/collections/$collectionId/documents/$documentId'
+      fullPath: '/collections/$collectionId/documents/$documentId'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRouteImport
       parentRoute: typeof DashboardRoute
     }
   }
@@ -188,20 +326,40 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardAliasRoute: typeof DashboardAliasRoute
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardKeysRoute: typeof DashboardKeysRoute
+  DashboardPresetsRoute: typeof DashboardPresetsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardCollectionsCollectionIdRoute: typeof DashboardCollectionsCollectionIdRoute
   DashboardCollectionsNewRoute: typeof DashboardCollectionsNewRoute
   DashboardCollectionsIndexRoute: typeof DashboardCollectionsIndexRoute
+  DashboardCollectionsCollectionIdConfigRoute: typeof DashboardCollectionsCollectionIdConfigRoute
+  DashboardCollectionsCollectionIdSearchRoute: typeof DashboardCollectionsCollectionIdSearchRoute
+  DashboardCollectionsCollectionIdIndexRoute: typeof DashboardCollectionsCollectionIdIndexRoute
+  DashboardCollectionsCollectionIdDocumentsDocumentIdRoute: typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
+  DashboardCollectionsCollectionIdDocumentsNewRoute: typeof DashboardCollectionsCollectionIdDocumentsNewRoute
+  DashboardCollectionsCollectionIdDocumentsIndexRoute: typeof DashboardCollectionsCollectionIdDocumentsIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAliasRoute: DashboardAliasRoute,
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardKeysRoute: DashboardKeysRoute,
+  DashboardPresetsRoute: DashboardPresetsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardCollectionsCollectionIdRoute: DashboardCollectionsCollectionIdRoute,
   DashboardCollectionsNewRoute: DashboardCollectionsNewRoute,
   DashboardCollectionsIndexRoute: DashboardCollectionsIndexRoute,
+  DashboardCollectionsCollectionIdConfigRoute:
+    DashboardCollectionsCollectionIdConfigRoute,
+  DashboardCollectionsCollectionIdSearchRoute:
+    DashboardCollectionsCollectionIdSearchRoute,
+  DashboardCollectionsCollectionIdIndexRoute:
+    DashboardCollectionsCollectionIdIndexRoute,
+  DashboardCollectionsCollectionIdDocumentsDocumentIdRoute:
+    DashboardCollectionsCollectionIdDocumentsDocumentIdRoute,
+  DashboardCollectionsCollectionIdDocumentsNewRoute:
+    DashboardCollectionsCollectionIdDocumentsNewRoute,
+  DashboardCollectionsCollectionIdDocumentsIndexRoute:
+    DashboardCollectionsCollectionIdDocumentsIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

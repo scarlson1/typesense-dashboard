@@ -2,6 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
 import { z } from 'zod/v4';
 import { withForm } from '../hooks';
+import { environment } from '../types';
 
 const authSchema = z.object({
   node: z.string(),
@@ -9,6 +10,7 @@ const authSchema = z.object({
   protocol: z.enum(['http', 'https']),
   apiKey: z.string(),
   remember: z.boolean(),
+  env: environment,
 });
 
 export const authFormOpts = formOptions({
@@ -18,6 +20,7 @@ export const authFormOpts = formOptions({
     protocol: '',
     apiKey: '',
     remember: false,
+    env: '',
   },
   validators: {
     onChange: authSchema,
@@ -84,20 +87,39 @@ export const AuthForm = withForm({
           </form.AppField>
         </Stack>
 
-        <form.AppField name='apiKey'>
-          {({ TextField, state }) => (
-            <TextField
-              id='apiKey'
-              label='API Key'
-              // placeholder='443'
-              required
-              fullWidth
-              variant='outlined'
-              color={state.meta.errors.length ? 'error' : 'primary'}
-            />
-          )}
-        </form.AppField>
-
+        <Stack
+          direction='row'
+          spacing={3}
+          // sx={{ justifyContent: 'space-between' }}
+        >
+          <form.AppField name='apiKey'>
+            {({ TextField, state }) => (
+              <TextField
+                id='apiKey'
+                label='API Key'
+                // placeholder='443'
+                type='password'
+                required
+                fullWidth
+                variant='outlined'
+                color={state.meta.errors.length ? 'error' : 'primary'}
+              />
+            )}
+          </form.AppField>
+          <form.AppField name='env'>
+            {({ Select, state }) => (
+              <Select
+                id='env'
+                label='Environment'
+                placeholder='development'
+                options={environment.options}
+                fullWidth
+                variant='outlined'
+                color={state.meta.errors.length ? 'error' : 'primary'}
+              />
+            )}
+          </form.AppField>
+        </Stack>
         <form.AppField name='remember'>
           {({ Checkbox }) => <Checkbox label='Remember me' />}
         </form.AppField>

@@ -5,7 +5,9 @@ import { typesenseStore } from '../utils';
 
 function isAuthenticated() {
   const creds = typesenseStore.getState().credentials;
-  return Boolean(creds);
+  const credsKey = typesenseStore.getState().currentCredsKey;
+
+  return Boolean(credsKey && creds[credsKey]);
 }
 
 export const Route = createFileRoute('/_dashboard')({

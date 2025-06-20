@@ -82,7 +82,8 @@ export function CollectionJsonDialog({
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.detail(context.name),
       });
-      queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
+      // queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
+      queryClient.invalidateQueries({ queryKey: collectionQueryKeys.all });
       setOptions((o) => ({ ...o, readOnly: true }));
     },
     onError(error) {
