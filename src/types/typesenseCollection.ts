@@ -117,3 +117,4 @@ export const collectionSchema = createCollectionSchema.extend({
   created_at: z.number().optional(),
   num_documents: z.number().optional(),
 });
+export type CollectionSchema = z.infer<typeof collectionSchema>;

@@ -11,6 +11,8 @@ export * from './LoadingSpinner';
 export * from './MenuButton';
 export * from './MenuContent';
 export * from './NavbarBreadcrumbs';
+export * from './NewCollectionEditor';
+export * from './NewCollectionForm';
 export * from './OptionsMenu';
 export * from './SelectContent';
 export * from './SideMenu';

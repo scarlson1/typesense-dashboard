@@ -59,7 +59,7 @@ export const CollectionForm = withForm({
           <CollectionFieldsForm form={form} />
         </Grid>
         <form.AppForm>
-          <form.SubmitButton label='Submit' fullWidth />
+          <form.SubmitButton label='Create Collection' />
         </form.AppForm>
       </Grid>
     );

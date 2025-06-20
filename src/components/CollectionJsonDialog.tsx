@@ -98,7 +98,6 @@ export function CollectionJsonDialog({
     monacoRef.current = monaco;
     setTimeout(() => {
       editor.getAction('editor.action.formatDocument')?.run();
-      // TODO: use zod to json (zod method) to get collection schema
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
         schemas: [

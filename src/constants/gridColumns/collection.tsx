@@ -40,7 +40,8 @@ export const collectionColumns: GridColDef<CollectionSchema>[] = [
     flex: 0.5,
     sortable: true,
     filterable: true,
-    valueGetter: (_, row) => (row.created_at ? new Date(row.created_at) : null),
+    valueGetter: (_, row) =>
+      row.created_at ? new Date(row.created_at * 1000) : null,
     valueFormatter: (val) => (val ? format(val, 'MM/dd/yy') : null),
     // renderCell: ({ value }) =>
     //   value ? <Typography>{format(value, 'MM/dd/yy')}</Typography> : null,

@@ -5,5 +5,6 @@ export * from './useBoolean';
 export * from './useCountdown';
 export * from './useCounter';
 export * from './useInterval';
+export * from './useNewCollection';
 export * from './usePrevious';
 export * from './useTypesenseClient';
