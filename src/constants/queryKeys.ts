@@ -5,3 +5,7 @@ export const collectionQueryKeys = {
   detail: (clusterId: string, id: string) =>
     [...collectionQueryKeys.all(clusterId), id] as const,
 };
+
+export const apiKeyQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'keys'] as const,
+};

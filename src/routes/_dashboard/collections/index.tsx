@@ -25,8 +25,12 @@ function RouteComponent() {
           alignItems: 'center',
         }}
       >
-        <Typography variant='h3'>Collections</Typography>
-        <ButtonLink to={'/collections/new'}>New Collection</ButtonLink>
+        <Typography variant='h3' gutterBottom>
+          Collections
+        </Typography>
+        <ButtonLink to={'/collections/new'} variant='contained'>
+          New Collection
+        </ButtonLink>
       </Stack>
 
       <Box sx={{ py: { xs: 1, sm: 2 } }}>

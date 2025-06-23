@@ -26,12 +26,15 @@ import { useAsyncToast } from '../hooks';
 import { collectionSchema } from '../types';
 import { diffArraysOfObjects, queryClient } from '../utils';
 
+// TODO: rewrite component using useDialog context ??
+
 interface CollectionDialogProps extends DialogProps {
   title?: string;
   value: string;
   handleClose: () => void;
   initialOptions: EditorProps['options'];
   client: Client;
+  clusterId: string;
 }
 
 // TODO: abstract components (use: create collection, edit collection, edit document, etc.)
@@ -46,6 +49,7 @@ export function CollectionJsonDialog({
   handleClose,
   initialOptions,
   client,
+  clusterId,
   ...props
 }: CollectionDialogProps) {
   const { mode, systemMode } = useColorScheme();
@@ -80,10 +84,12 @@ export function CollectionJsonDialog({
       // TODO: need to handle stale state of initialSchema
       toast.success(`listing updated`);
       queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.detail(context.name),
+        queryKey: collectionQueryKeys.detail(clusterId, context.name), // collectionQueryKeys.detail(context.name),
       });
       // queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
-      queryClient.invalidateQueries({ queryKey: collectionQueryKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: collectionQueryKeys.all(clusterId),
+      });
       setOptions((o) => ({ ...o, readOnly: true }));
     },
     onError(error) {

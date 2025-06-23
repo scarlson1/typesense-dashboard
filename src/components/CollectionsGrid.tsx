@@ -8,41 +8,17 @@ import type {
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { editor } from 'monaco-editor';
 import { useMemo, useState } from 'react';
 import { Client } from 'typesense';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionsRetrieveOptions } from 'typesense/lib/Typesense/Collections';
-import { collectionQueryKeys } from '../constants';
+import { collectionQueryKeys, DEFAULT_MONACO_OPTIONS } from '../constants';
 import { collectionColumns } from '../constants/gridColumns';
 import { useAsyncToast, useTypesenseClient } from '../hooks';
 import { queryClient } from '../utils';
 import { CollectionJsonDialog } from './CollectionJsonDialog';
 
 // TODO: add confirmation before deleting collection (force typing collection name)
-
-const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
-  readOnly: true,
-  tabSize: 2,
-  minimap: { enabled: false },
-  // lineNumbers: true,
-  quickSuggestions: true, // Auto-completion
-  // autoIndent: true,
-  automaticLayout: true,
-  // validate: true,
-  folding: true,
-  hover: {
-    enabled: true,
-  },
-  suggest: {
-    // insertMode: 'insert',
-    showInlineDetails: true,
-    // showDetails: true,
-    preview: true,
-    // previewMode: 'prefix',
-    // maxVisibleSuggestions: 12,
-  },
-};
 
 // need to use REST api instead of sdk in order to use limit & offset ??
 function fetchCollections(client: Client, query?: CollectionsRetrieveOptions) {
@@ -83,7 +59,7 @@ export function CollectionsGrid() {
         (data: CollectionSchema[]) => data.filter((c) => c.name !== variables)
       );
 
-      toast.loading(`removing ${variables} collection`, {
+      toast.loading(`dropping ${variables} collection`, {
         id: 'delete-collection',
       });
 
@@ -119,7 +95,9 @@ export function CollectionsGrid() {
 
   const columns = useMemo<GridColDef<CollectionSchema>[]>(
     () => [
+      ...collectionColumns,
       {
+        headerName: 'Actions',
         field: 'actions',
         type: 'actions',
         width: 80,
@@ -151,7 +129,6 @@ export function CollectionsGrid() {
           />,
         ],
       },
-      ...collectionColumns,
     ],
     []
   );
@@ -190,6 +167,8 @@ export function CollectionsGrid() {
         initialState={{
           columns: {
             columnVisibilityModel: {
+              default_sorting_field: false,
+              enable_nested_fields: false,
               symbols_to_index: false,
               token_separators: false,
               metadata: false,
@@ -205,6 +184,7 @@ export function CollectionsGrid() {
         open={open}
         initialOptions={DEFAULT_MONACO_OPTIONS}
         client={client}
+        clusterId={clusterId}
       />
     </Box>
   );

@@ -4,6 +4,7 @@ export * from './useAsyncToast';
 export * from './useBoolean';
 export * from './useCountdown';
 export * from './useCounter';
+export * from './useDialog';
 export * from './useInterval';
 export * from './useNewCollection';
 export * from './usePrevious';
