@@ -1,20 +1,28 @@
 import { DataObjectRounded, DeleteRounded } from '@mui/icons-material';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Button, DialogActions, Tooltip, Typography } from '@mui/material';
 import type {
   GridCellParams,
   GridColDef,
   GridRowParams,
 } from '@mui/x-data-grid';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import { formOptions } from '@tanstack/react-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { Client } from 'typesense';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionsRetrieveOptions } from 'typesense/lib/Typesense/Collections';
+import { z } from 'zod/v4';
 import { collectionQueryKeys, DEFAULT_MONACO_OPTIONS } from '../constants';
 import { collectionColumns } from '../constants/gridColumns';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
+import {
+  useAppForm,
+  useAsyncToast,
+  useDialog,
+  useTypesenseClient,
+  withForm,
+} from '../hooks';
 import { queryClient } from '../utils';
 import { CollectionJsonDialog } from './CollectionJsonDialog';
 
@@ -29,6 +37,7 @@ export function CollectionsGrid() {
   const navigate = useNavigate();
   const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
+  const dialog = useDialog();
 
   const { data, isFetching, isLoading, isError, error } = useQuery({
     queryKey: collectionQueryKeys.list(clusterId, {}),
@@ -121,8 +130,28 @@ export function CollectionsGrid() {
                 <DeleteRounded fontSize='small' />
               </Tooltip>
             }
-            onClick={() => {
-              mutation.mutate(params.row.name);
+            onClick={async () => {
+              try {
+                await dialog.prompt({
+                  variant: 'danger',
+                  catchOnCancel: true,
+                  title: `Confirm Collection Deletion [ID: ${params.id.toString()}]`,
+                  description: `THIS ACTION CANNOT BE UNDONE. Type the collection name to confirm deletion.`,
+                  content: (
+                    <ConfirmDeletionForm correctValue={params.row.name} />
+                  ),
+                  slots: {
+                    actions: undefined,
+                  },
+                  slotProps: {
+                    dialog: {
+                      maxWidth: 'sm',
+                      fullWidth: true,
+                    },
+                  },
+                });
+                mutation.mutate(params.row.name);
+              } catch (error) {}
             }}
             label='Delete Collection'
             disabled={mutation.isPending}
@@ -185,6 +214,87 @@ export function CollectionsGrid() {
         initialOptions={DEFAULT_MONACO_OPTIONS}
         client={client}
         clusterId={clusterId}
+      />
+    </Box>
+  );
+}
+
+export const deleteFormOpts = formOptions({
+  defaultValues: {
+    deleteName: '',
+  },
+});
+
+const DeleteForm = withForm({
+  ...deleteFormOpts,
+  props: {
+    correctValue: '',
+    handleClose: () => {},
+  },
+  render: ({ form, handleClose, correctValue }) => (
+    <>
+      <form.AppField
+        name='deleteName'
+        validators={{
+          onChange: z.literal(correctValue),
+        }}
+      >
+        {({ TextField }) => (
+          <TextField
+            id='deleteName'
+            autoFocus
+            required
+            fullWidth
+            variant='outlined'
+          />
+        )}
+      </form.AppField>
+      <DialogActions>
+        <Button onClick={() => handleClose()}>Cancel</Button>
+        <form.AppForm>
+          <form.SubmitButton label='Submit' />
+        </form.AppForm>
+      </DialogActions>
+    </>
+  ),
+});
+
+interface Test {
+  correctValue: string;
+}
+
+function ConfirmDeletionForm({ correctValue }: Test) {
+  const dialog = useDialog();
+
+  const form = useAppForm({
+    ...deleteFormOpts,
+    onSubmit: ({ value: { deleteName } }) => {
+      // const { success } = z.literal(correctValue).safeParse(deleteName);
+      // if (success)
+      dialog.handleAccept(deleteName);
+    },
+  });
+
+  return (
+    <Box
+      component='form'
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+      noValidate
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        gap: 2,
+      }}
+    >
+      <DeleteForm
+        form={form}
+        handleClose={() => dialog.handleClose()}
+        correctValue={correctValue}
       />
     </Box>
   );
