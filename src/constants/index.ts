@@ -1,3 +1,4 @@
+export * from './analyticsRulesForm';
 export * from './collectionForm';
 export * from './dialog';
 export * from './monaco';

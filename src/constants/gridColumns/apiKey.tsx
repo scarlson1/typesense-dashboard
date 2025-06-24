@@ -59,8 +59,7 @@ export const apiKeyColumns: GridColDef<KeySchema>[] = [
     flex: 1,
     sortable: false,
     filterable: false,
-    valueFormatter: (_, row) =>
-      row.collections ? row.collections.join(', ') : '',
+    valueFormatter: (_, row) => (row.actions ? row.actions.join(', ') : ''),
   },
   {
     field: 'autodelete',
