@@ -3,10 +3,14 @@ import {
   ChecklistRounded,
   CodeRounded,
   DevicesRounded,
+  LogoutRounded,
+  PlaylistAddRounded,
   SupervisedUserCircleRounded,
 } from '@mui/icons-material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
+  Divider,
+  IconButton,
   ListItemText,
   ListSubheader,
   MenuItem,
@@ -16,7 +20,8 @@ import {
   selectClasses,
   styled,
 } from '@mui/material';
-import { useMemo } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useCallback, useMemo } from 'react';
 import { useStore } from 'zustand';
 import { getCredsKey, queryClient, typesenseStore } from '../utils';
 
@@ -33,19 +38,36 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
   marginRight: 12,
 });
 
+const ADD_CLUSTER_VALUE = 'nav';
+
 export function SelectContent() {
+  const navigate = useNavigate();
   // TODO: allow multiple sets of credentials & add context provider
   const credentials = useStore(typesenseStore, (state) => state.credentials);
   const cluster = useStore(typesenseStore, (state) => state.currentCredsKey);
   const setCluster = useStore(typesenseStore, (state) => state.setCredsKey);
-  // const [cluster, setCluster] = useState<string>(credKey || '');
+  const logout = useStore(typesenseStore, (state) => state.logout);
 
   // BUG: clearing query client not working - need to add cluster in query key ??
-  const handleChange = (event: SelectChangeEvent) => {
-    setCluster(event.target.value);
-    queryClient.clear();
-    queryClient.refetchQueries();
-  };
+  const handleChange = useCallback(
+    (event: SelectChangeEvent) => {
+      if (event.target.value === ADD_CLUSTER_VALUE) {
+        navigate({ to: '/auth' });
+      } else {
+        setCluster(event.target.value);
+        queryClient.clear();
+        queryClient.refetchQueries();
+      }
+    },
+    [navigate]
+  );
+
+  const handleLogout = useCallback(
+    (key: string) => {
+      logout(key);
+    },
+    [logout]
+  );
 
   const { prodCreds, devCreds, stagingCreds, testingCreds, ciCreds } =
     useMemo(() => {
@@ -129,6 +151,23 @@ export function SelectContent() {
                   },
                 }}
               />
+              <IconButton
+                aria-label='logout'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout(
+                    getCredsKey({
+                      protocol: i.protocol,
+                      node: i.node,
+                      port: i.port,
+                    })
+                  );
+                }}
+                size='small'
+              >
+                <LogoutRounded fontSize='inherit' />
+              </IconButton>
             </MenuItem>
           ))
         : null}
@@ -195,6 +234,23 @@ export function SelectContent() {
                   },
                 }}
               />
+              <IconButton
+                aria-label='logout'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout(
+                    getCredsKey({
+                      protocol: i.protocol,
+                      node: i.node,
+                      port: i.port,
+                    })
+                  );
+                }}
+                size='small'
+              >
+                <LogoutRounded fontSize='inherit' />
+              </IconButton>
             </MenuItem>
           ))
         : null}
@@ -262,6 +318,15 @@ export function SelectContent() {
             </MenuItem>
           ))
         : null}
+      <Divider />
+      <MenuItem value={ADD_CLUSTER_VALUE}>
+        <ListItemAvatar>
+          <Avatar alt='Add Cluster'>
+            <PlaylistAddRounded sx={{ fontSize: '1rem' }} />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText primary='Add new Cluster' />
+      </MenuItem>
     </Select>
   );
 }

@@ -1,5 +1,4 @@
 import {
-  Editor,
   type EditorProps,
   type Monaco,
   type OnMount,
@@ -10,7 +9,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  useColorScheme,
   useMediaQuery,
   useTheme,
   type DialogProps,
@@ -20,11 +18,10 @@ import { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import { Client } from 'typesense';
 import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
-import { z } from 'zod/v4';
-import { collectionQueryKeys } from '../constants';
+import { COLLECTION_SCHEMA, collectionQueryKeys } from '../constants';
 import { useAsyncToast } from '../hooks';
-import { collectionSchema } from '../types';
 import { diffArraysOfObjects, queryClient } from '../utils';
+import { JsonEditor } from './JsonEditor';
 
 // TODO: rewrite component using useDialog context ??
 
@@ -52,8 +49,8 @@ export function CollectionJsonDialog({
   clusterId,
   ...props
 }: CollectionDialogProps) {
-  const { mode, systemMode } = useColorScheme();
-  const themeMode = mode === 'system' ? systemMode : mode;
+  // const { mode, systemMode } = useColorScheme();
+  // const themeMode = mode === 'system' ? systemMode : mode;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
@@ -103,19 +100,19 @@ export function CollectionJsonDialog({
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    setTimeout(() => {
-      editor.getAction('editor.action.formatDocument')?.run();
-      monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-        validate: true,
-        schemas: [
-          {
-            uri: '',
-            fileMatch: ['*'], // associate with any file
-            schema: z.toJSONSchema(collectionSchema),
-          },
-        ],
-      });
-    }, 200);
+    // setTimeout(() => {
+    //   editor.getAction('editor.action.formatDocument')?.run();
+    //   monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+    //     validate: true,
+    //     schemas: [
+    //       {
+    //         uri: '',
+    //         fileMatch: ['*'], // associate with any file
+    //         schema: z.toJSONSchema(collectionSchema),
+    //       },
+    //     ],
+    //   });
+    // }, 200);
   };
 
   const toggleEditMode = () => {
@@ -174,7 +171,18 @@ export function CollectionJsonDialog({
     <Dialog fullScreen={fullScreen} maxWidth={'md'} fullWidth={true} {...props}>
       {title ? <DialogTitle>{title}</DialogTitle> : null}
       <DialogContent sx={{ minWidth: 240 }}>
-        <Editor
+        <JsonEditor
+          height='90vh'
+          options={options}
+          onMount={handleEditorDidMount}
+          value={value}
+          onValidate={(m) => {
+            console.log(JSON.stringify(m, null, 2));
+            setMarkers(m);
+          }}
+          schema={COLLECTION_SCHEMA}
+        />
+        {/* <Editor
           height='90vh'
           defaultLanguage='json'
           theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
@@ -185,7 +193,7 @@ export function CollectionJsonDialog({
             console.log(JSON.stringify(m, null, 2));
             setMarkers(m);
           }}
-        />
+        /> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>

@@ -9,6 +9,7 @@ export * from './ContextDialog';
 export * from './CustomToast';
 export * from './ErrorFallback';
 export * from './Header';
+export * from './JsonEditor';
 export * from './LoadingSpinner';
 export * from './MenuButton';
 export * from './MenuContent';

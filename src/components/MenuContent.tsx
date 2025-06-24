@@ -29,7 +29,13 @@ import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import type { LinkComponent, LinkProps } from '@tanstack/react-router';
-import { createLink, useLocation, useMatchRoute } from '@tanstack/react-router';
+import {
+  createLink,
+  useLocation,
+  useMatches,
+  useMatchRoute,
+  useNavigate,
+} from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import {
   forwardRef,
@@ -75,22 +81,17 @@ export const RouterListItemButton: LinkComponent<
   return <CreatedLinkComponent preload={'intent'} {...props} />;
 };
 
-// const useCollections = () => {
-//   const [typesense, clusterId] = useTypesenseClient();
-
-//   return useSuspenseQuery({
-//     // queryKey: [credKey, ...collectionQueryKeys.all],
-//     queryKey: collectionQueryKeys.all(clusterId),
-//     queryFn: () => typesense.collections().retrieve(),
-//   });
-// };
-
 export function MenuContent() {
   const matchRoute = useMatchRoute();
+  const matches = useMatches();
+  const navigate = useNavigate();
   const location = useLocation();
-  // const { data: collections } = useCollections();
   const [open, setOpen] = useState<string | null>('Collections');
+
   const [typesense, clusterId] = useTypesenseClient();
+  // const currentCollection = useStore(typesenseStore, (state) => state.currentCollection);
+  // const setCurrentCollection = useStore(typesenseStore, (state) => state.setCurrentCollection);
+
   const { data: collections } = useSuspenseQuery({
     queryKey: collectionQueryKeys.all(clusterId),
     queryFn: () => typesense.collections().retrieve(),
@@ -99,6 +100,26 @@ export function MenuContent() {
   const [selectedCollection, setSelectedCollection] = useState<string>(() =>
     Boolean(collections.length) ? collections[0].name : ''
   );
+
+  const prevCollection = usePrevious(selectedCollection);
+  useEffect(() => {
+    // only navigate if current path includes collectionId param
+    let match = matches.find((m) => m.fullPath.includes('$collectionId'));
+
+    if (
+      selectedCollection &&
+      prevCollection !== null &&
+      selectedCollection !== prevCollection &&
+      match?.fullPath && // @ts-ignore
+      match?.params?.collectionId !== selectedCollection
+    ) {
+      console.log('NAVIGATING...');
+      navigate({
+        to: match.fullPath,
+        params: { collectionId: selectedCollection },
+      });
+    }
+  }, [navigate, prevCollection, matches, selectedCollection]);
 
   const prevClusterId = usePrevious(clusterId);
   useEffect(() => {
@@ -140,6 +161,17 @@ export function MenuContent() {
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/documents/new' as LinkProps['to'],
+              params: { collectionId: selectedCollection },
+            }
+          : { to: location.pathname as LinkProps['to'] },
+        disabled: !Boolean(selectedCollection),
+      },
+      {
+        text: 'Collection Settings',
+        icon: <SettingsRounded />,
+        route: selectedCollection
+          ? {
+              to: '/collections/$collectionId/config' as LinkProps['to'],
               params: { collectionId: selectedCollection },
             }
           : { to: location.pathname as LinkProps['to'] },

@@ -2,6 +2,7 @@ import { z } from 'zod/v4';
 
 export * from './typesenseApiKeyActions';
 export * from './typesenseCollection';
+export * from './utils';
 
 export const environment = z.enum([
   'development',

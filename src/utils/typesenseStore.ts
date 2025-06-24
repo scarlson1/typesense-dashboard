@@ -1,7 +1,7 @@
 import { Client } from 'typesense';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Environment } from '../types';
+import type { Environment, OptionalProperty } from '../types';
 
 export interface TypesenseCreds {
   name?: string;
@@ -12,23 +12,25 @@ export interface TypesenseCreds {
   env?: Environment | null; // ['development', 'production', 'staging', '']
 }
 
-// use map for credentials instead ??
-// type State = { credentials: TypesenseCreds[]; client: any | null };
 type State = {
   credentials: Record<string, TypesenseCreds>;
   currentCredsKey: string | null;
-  // client: any | null
 };
 
 type Actions = {
   // setCredentials: (creds: State['credentials']) => void; // TypesenseClient
   setCredentials: (creds: TypesenseCreds) => void; // TypesenseClient
   setCredsKey: (key: string) => void;
+  logout: (key?: string) => void;
 };
 
 type TypesenseStore = State & Actions;
 
-export function getCredsKey({ node, port, protocol }: TypesenseCreds) {
+export function getCredsKey({
+  node,
+  port,
+  protocol,
+}: OptionalProperty<TypesenseCreds, 'apiKey'>) {
   return `${protocol}:${node}:${port}`;
 }
 
@@ -48,12 +50,19 @@ export const typesenseStore = create<TypesenseStore>()(
           }, // state.credentials.set(getCredsKey(creds), creds),
         }));
       },
-      // setCredentials: (creds) =>
-      //   set((state) => ({
-      //     ...state,
-      //     credentials: [...state.creds, creds],
-      //     // client: creds ? getTypesenseClient(creds) : null,
-      //   })),
+      logout: (cluster?: string) =>
+        set((state) => {
+          let creds = {};
+          if (cluster) {
+            let { [cluster]: _, ...rest } = state.credentials;
+            creds = rest;
+          }
+          return {
+            credentials: creds,
+            currentCredsKey:
+              state.currentCredsKey === cluster ? null : state.currentCredsKey,
+          };
+        }),
     }),
     {
       name: 'typesense-store',
@@ -74,7 +83,3 @@ export function getTypesenseClient(creds: TypesenseCreds) {
     apiKey: creds.apiKey,
   });
 }
-
-// in component:
-// const client = useStore(typesenseStore, (state) => state.client)
-// const setCredentials = useStore(typesenseStore, (state) => state.setCredentials)

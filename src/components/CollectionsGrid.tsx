@@ -117,7 +117,7 @@ export function CollectionsGrid() {
                 <DataObjectRounded fontSize='small' />
               </Tooltip>
             }
-            onClick={() => {
+            onClick={(e) => {
               setTempDialogData(JSON.stringify(params.row, null, 2));
               setOpen(true);
             }}
@@ -131,6 +131,9 @@ export function CollectionsGrid() {
               </Tooltip>
             }
             onClick={async () => {
+              let focusedEl = document.activeElement as HTMLElement;
+              if (focusedEl) focusedEl.blur();
+
               try {
                 await dialog.prompt({
                   variant: 'danger',

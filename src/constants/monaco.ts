@@ -1,4 +1,6 @@
 import { editor } from 'monaco-editor';
+import { z } from 'zod/v4';
+import { collectionSchema } from '../types';
 
 export const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions =
   {
@@ -22,3 +24,5 @@ export const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions
       // maxVisibleSuggestions: 12,
     },
   };
+
+export const COLLECTION_SCHEMA = z.toJSONSchema(collectionSchema);
