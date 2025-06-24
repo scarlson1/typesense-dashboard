@@ -5,6 +5,7 @@ import {
   DevicesRounded,
   LogoutRounded,
   PlaylistAddRounded,
+  PriorityHigh,
   SupervisedUserCircleRounded,
 } from '@mui/icons-material';
 import type { SelectChangeEvent } from '@mui/material';
@@ -21,8 +22,9 @@ import {
   styled,
 } from '@mui/material';
 import { useNavigate } from '@tanstack/react-router';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
+import type { Environment } from '../types';
 import { getCredsKey, queryClient, typesenseStore } from '../utils';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
@@ -39,6 +41,22 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
 });
 
 const ADD_CLUSTER_VALUE = 'nav';
+function getEnvAvatar(env?: Environment | null) {
+  switch (env) {
+    case 'production':
+      return <DevicesRounded sx={{ fontSize: '1rem' }} />;
+    case 'ci':
+      return <ChecklistRounded sx={{ fontSize: '1rem' }} />;
+    case 'development':
+      return <CodeRounded sx={{ fontSize: '1rem' }} />;
+    case 'staging':
+      return <SupervisedUserCircleRounded sx={{ fontSize: '1rem' }} />;
+    case 'testing':
+      return <BugReportRounded sx={{ fontSize: '1rem' }} />;
+    default:
+      return <PriorityHigh sx={{ fontSize: '1rem' }} />;
+  }
+}
 
 export function SelectContent() {
   const navigate = useNavigate();
@@ -47,6 +65,7 @@ export function SelectContent() {
   const cluster = useStore(typesenseStore, (state) => state.currentCredsKey);
   const setCluster = useStore(typesenseStore, (state) => state.setCredsKey);
   const logout = useStore(typesenseStore, (state) => state.logout);
+  const [open, setOpen] = useState(false);
 
   // BUG: clearing query client not working - need to add cluster in query key ??
   const handleChange = useCallback(
@@ -62,12 +81,15 @@ export function SelectContent() {
     [navigate]
   );
 
-  const handleLogout = useCallback(
-    (key: string) => {
-      logout(key);
-    },
-    [logout]
-  );
+  const handleOpen = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleLogout = useCallback((key: string) => logout(key), [logout]);
 
   const { prodCreds, devCreds, stagingCreds, testingCreds, ciCreds } =
     useMemo(() => {
@@ -92,7 +114,43 @@ export function SelectContent() {
       value={cluster}
       // @ts-ignore
       onChange={handleChange}
+      open={open}
+      onClose={handleClose}
+      onOpen={handleOpen}
       displayEmpty
+      renderValue={(val) => {
+        let cred = val ? credentials[val] : null;
+
+        return (
+          <MenuItem disableGutters>
+            <ListItemAvatar sx={{ px: 1, mr: 0 }}>
+              <Avatar alt={cred ? cred.env || cred.node : 'No Cluster'}>
+                {getEnvAvatar(cred?.env)}
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+              primary={
+                cred ? cred.name || cred.env || cred.node : 'No selection'
+              }
+              secondary={cred ? val : 'choose a cluster'}
+              sx={{
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+              slotProps={{
+                secondary: {
+                  sx: {
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                  },
+                },
+              }}
+            />
+          </MenuItem>
+        );
+      }}
       inputProps={{ 'aria-label': 'Select cluster' }}
       fullWidth
       sx={{
@@ -112,14 +170,14 @@ export function SelectContent() {
         sx: { maxWidth: 300 },
       }}
     >
-      <MenuItem value=''>
+      {/* <MenuItem value=''>
         <ListItemAvatar>
           <Avatar alt='No Cluster'>
             <DevicesRounded sx={{ fontSize: '1rem' }} />
           </Avatar>
         </ListItemAvatar>
         <ListItemText primary='No selection' secondary='choose a cluster' />
-      </MenuItem>
+      </MenuItem> */}
 
       {prodCreds.length ? (
         <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
@@ -165,6 +223,7 @@ export function SelectContent() {
                   );
                 }}
                 size='small'
+                sx={{ visibility: open ? 'visible' : 'hidden' }}
               >
                 <LogoutRounded fontSize='inherit' />
               </IconButton>
@@ -201,6 +260,24 @@ export function SelectContent() {
                   },
                 }}
               />
+              <IconButton
+                aria-label='logout'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout(
+                    getCredsKey({
+                      protocol: i.protocol,
+                      node: i.node,
+                      port: i.port,
+                    })
+                  );
+                }}
+                size='small'
+                sx={{ visibility: open ? 'visible' : 'hidden' }}
+              >
+                <LogoutRounded fontSize='inherit' />
+              </IconButton>
             </MenuItem>
           ))
         : null}
@@ -248,6 +325,7 @@ export function SelectContent() {
                   );
                 }}
                 size='small'
+                sx={{ visibility: open ? 'visible' : 'hidden' }}
               >
                 <LogoutRounded fontSize='inherit' />
               </IconButton>
@@ -284,6 +362,24 @@ export function SelectContent() {
                   },
                 }}
               />
+              <IconButton
+                aria-label='logout'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout(
+                    getCredsKey({
+                      protocol: i.protocol,
+                      node: i.node,
+                      port: i.port,
+                    })
+                  );
+                }}
+                size='small'
+                sx={{ visibility: open ? 'visible' : 'hidden' }}
+              >
+                <LogoutRounded fontSize='inherit' />
+              </IconButton>
             </MenuItem>
           ))
         : null}
@@ -315,6 +411,24 @@ export function SelectContent() {
                   },
                 }}
               />
+              <IconButton
+                aria-label='logout'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout(
+                    getCredsKey({
+                      protocol: i.protocol,
+                      node: i.node,
+                      port: i.port,
+                    })
+                  );
+                }}
+                size='small'
+                sx={{ visibility: open ? 'visible' : 'hidden' }}
+              >
+                <LogoutRounded fontSize='inherit' />
+              </IconButton>
             </MenuItem>
           ))
         : null}

@@ -4,6 +4,8 @@ export const collectionQueryKeys = {
     [...collectionQueryKeys.all(clusterId), filters] as const, // [string, any],
   detail: (clusterId: string, id: string) =>
     [...collectionQueryKeys.all(clusterId), id] as const,
+  names: (clusterId: string) =>
+    [...collectionQueryKeys.all(clusterId), 'names'] as const,
   schemas: (clusterId: string) =>
     [...collectionQueryKeys.all(clusterId), 'schemas'] as const,
   schema: (clusterId: string, id: string) =>
@@ -12,4 +14,8 @@ export const collectionQueryKeys = {
 
 export const apiKeyQueryKeys = {
   all: (clusterId: string) => [clusterId, 'keys'] as const,
+};
+
+export const aliasQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'aliases'] as const,
 };

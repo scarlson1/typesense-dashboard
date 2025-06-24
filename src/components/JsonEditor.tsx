@@ -24,7 +24,7 @@ export function JsonEditor({ schema, ...props }: CollectionEditorProps) {
             },
           ],
         });
-      }, 200);
+      }, 50);
       props.onMount && props.onMount(editor, monaco);
     },
     [schema, props.onMount]

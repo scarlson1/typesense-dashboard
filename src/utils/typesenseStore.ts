@@ -31,7 +31,7 @@ export function getCredsKey({
   port,
   protocol,
 }: OptionalProperty<TypesenseCreds, 'apiKey'>) {
-  return `${protocol}:${node}:${port}`;
+  return `${protocol}://${node}:${port}`;
 }
 
 export const typesenseStore = create<TypesenseStore>()(
