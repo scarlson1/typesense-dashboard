@@ -1,7 +1,6 @@
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Card, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { useTypesenseClient } from '../../../../hooks';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/search'
@@ -42,7 +41,7 @@ function SearchCollection() {
 }
 
 function SearchParameters() {
-  const [client, clusterId] = useTypesenseClient();
+  // const [client, clusterId] = useTypesenseClient();
 
   return (
     <Box>

@@ -65,10 +65,6 @@ export const CurationForm = withForm({
       effective_to_ts_bool,
     ]);
 
-    // useEffect(() => {
-    //   console.log('ERRORS: ', form.state.errors);
-    // }, [form.state.errors]);
-
     return (
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6, md: 5 }}>

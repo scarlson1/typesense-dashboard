@@ -69,7 +69,7 @@ export const NewCollectionEditor = ({
           },
         ],
       });
-    }, 200);
+    }, 50);
   };
 
   const handleSave = async () => {
@@ -88,7 +88,7 @@ export const NewCollectionEditor = ({
 
   return (
     <Box>
-      <Paper>
+      <Paper sx={{ borderRadius: 1, overflow: 'hidden' }}>
         <Editor
           height='60vh'
           defaultLanguage='json'

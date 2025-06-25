@@ -44,8 +44,6 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
       setExpanded(isExpanded ? panel : null);
     };
 
-  console.log('overrides: ', overrides);
-
   return (
     <>
       {overrides.map((override) => (
@@ -146,39 +144,6 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
     </>
   );
 };
-
-// let x = {
-//   effective_from_ts
-// :
-// 1750879624
-// effective_to_ts
-// :
-// 1753990024
-// excludes
-// :
-// []
-// filter_curated_hits
-// :
-// false
-// id
-// :
-// "curate-songs"
-// includes
-// :
-// []
-// remove_matched_tokens
-// :
-// false
-// rule
-// :
-// {match: 'exact', query: 'pop'}
-// sort_by
-// :
-// "title:asc"
-// stop_processing
-// :
-// true
-// }
 
 interface CurationFormComponentProps {
   collectionId: string;

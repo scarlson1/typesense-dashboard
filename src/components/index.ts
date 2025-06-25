@@ -27,5 +27,6 @@ export * from './SelectContent';
 export * from './SideMenu';
 export * from './SideMenuMobile';
 export * from './StopwordsForm';
+export * from './SynonymsGrid';
 export * from './Toaster';
 export * from './UpdateAnalyticsRule';

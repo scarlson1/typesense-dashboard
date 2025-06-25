@@ -10,6 +10,11 @@ export const collectionQueryKeys = {
     [...collectionQueryKeys.all(clusterId), 'schemas'] as const,
   schema: (clusterId: string, id: string) =>
     [...collectionQueryKeys.schemas(clusterId), id] as const,
+  synonyms: (clusterId: string, collectionId: string) =>
+    [
+      ...collectionQueryKeys.detail(clusterId, collectionId),
+      'synonyms',
+    ] as const,
   curation: (clusterId: string, collectionId: string) =>
     [
       ...collectionQueryKeys.detail(clusterId, collectionId),

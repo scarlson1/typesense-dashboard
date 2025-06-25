@@ -53,7 +53,7 @@ export const ApiKeyGrid = () => {
       });
     },
     onError: (err, _, ctx) => {
-      let msg = err.message || 'failed to delete collection';
+      let msg = err.message || 'failed to delete key';
       toast.error(msg, { id: 'delete-key' });
 
       if (ctx?.prevKeyData) {

@@ -13,6 +13,7 @@ import {
   InfoRounded,
   InsightsRounded,
   KeyRounded,
+  LeakAddRounded,
   SearchRounded,
   SettingsRounded,
   TroubleshootRounded,
@@ -153,6 +154,17 @@ export function MenuContent() {
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/curation' as LinkProps['to'],
+              params: { collectionId: selectedCollection },
+            }
+          : { to: location.pathname as LinkProps['to'] },
+        disabled: !Boolean(selectedCollection),
+      },
+      {
+        text: 'Synonyms',
+        icon: <LeakAddRounded fontSize='small' />,
+        route: selectedCollection
+          ? {
+              to: '/collections/$collectionId/synonyms' as LinkProps['to'],
               params: { collectionId: selectedCollection },
             }
           : { to: location.pathname as LinkProps['to'] },

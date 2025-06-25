@@ -20,6 +20,7 @@ import { Route as DashboardAliasRouteImport } from './routes/_dashboard/alias'
 import { Route as DashboardCollectionsIndexRouteImport } from './routes/_dashboard/collections/index'
 import { Route as DashboardCollectionsNewRouteImport } from './routes/_dashboard/collections/new'
 import { Route as DashboardCollectionsCollectionIdIndexRouteImport } from './routes/_dashboard/collections/$collectionId/index'
+import { Route as DashboardCollectionsCollectionIdSynonymsRouteImport } from './routes/_dashboard/collections/$collectionId/synonyms'
 import { Route as DashboardCollectionsCollectionIdSearchRouteImport } from './routes/_dashboard/collections/$collectionId/search'
 import { Route as DashboardCollectionsCollectionIdCurationRouteImport } from './routes/_dashboard/collections/$collectionId/curation'
 import { Route as DashboardCollectionsCollectionIdConfigRouteImport } from './routes/_dashboard/collections/$collectionId/config'
@@ -84,6 +85,12 @@ const DashboardCollectionsCollectionIdIndexRoute =
     path: '/collections/$collectionId/',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardCollectionsCollectionIdSynonymsRoute =
+  DashboardCollectionsCollectionIdSynonymsRouteImport.update({
+    id: '/collections/$collectionId/synonyms',
+    path: '/collections/$collectionId/synonyms',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardCollectionsCollectionIdSearchRoute =
   DashboardCollectionsCollectionIdSearchRouteImport.update({
     id: '/collections/$collectionId/search',
@@ -140,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
   '/collections/$collectionId/curation': typeof DashboardCollectionsCollectionIdCurationRoute
   '/collections/$collectionId/search': typeof DashboardCollectionsCollectionIdSearchRoute
+  '/collections/$collectionId/synonyms': typeof DashboardCollectionsCollectionIdSynonymsRoute
   '/collections/$collectionId': typeof DashboardCollectionsCollectionIdIndexRoute
   '/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
   '/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
@@ -159,6 +167,7 @@ export interface FileRoutesByTo {
   '/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
   '/collections/$collectionId/curation': typeof DashboardCollectionsCollectionIdCurationRoute
   '/collections/$collectionId/search': typeof DashboardCollectionsCollectionIdSearchRoute
+  '/collections/$collectionId/synonyms': typeof DashboardCollectionsCollectionIdSynonymsRoute
   '/collections/$collectionId': typeof DashboardCollectionsCollectionIdIndexRoute
   '/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
   '/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
@@ -180,6 +189,7 @@ export interface FileRoutesById {
   '/_dashboard/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
   '/_dashboard/collections/$collectionId/curation': typeof DashboardCollectionsCollectionIdCurationRoute
   '/_dashboard/collections/$collectionId/search': typeof DashboardCollectionsCollectionIdSearchRoute
+  '/_dashboard/collections/$collectionId/synonyms': typeof DashboardCollectionsCollectionIdSynonymsRoute
   '/_dashboard/collections/$collectionId/': typeof DashboardCollectionsCollectionIdIndexRoute
   '/_dashboard/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
   '/_dashboard/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/collections/$collectionId/config'
     | '/collections/$collectionId/curation'
     | '/collections/$collectionId/search'
+    | '/collections/$collectionId/synonyms'
     | '/collections/$collectionId'
     | '/collections/$collectionId/documents/$documentId'
     | '/collections/$collectionId/documents/export'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/collections/$collectionId/config'
     | '/collections/$collectionId/curation'
     | '/collections/$collectionId/search'
+    | '/collections/$collectionId/synonyms'
     | '/collections/$collectionId'
     | '/collections/$collectionId/documents/$documentId'
     | '/collections/$collectionId/documents/export'
@@ -240,6 +252,7 @@ export interface FileRouteTypes {
     | '/_dashboard/collections/$collectionId/config'
     | '/_dashboard/collections/$collectionId/curation'
     | '/_dashboard/collections/$collectionId/search'
+    | '/_dashboard/collections/$collectionId/synonyms'
     | '/_dashboard/collections/$collectionId/'
     | '/_dashboard/collections/$collectionId/documents/$documentId'
     | '/_dashboard/collections/$collectionId/documents/export'
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCollectionsCollectionIdIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/collections/$collectionId/synonyms': {
+      id: '/_dashboard/collections/$collectionId/synonyms'
+      path: '/collections/$collectionId/synonyms'
+      fullPath: '/collections/$collectionId/synonyms'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdSynonymsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/collections/$collectionId/search': {
       id: '/_dashboard/collections/$collectionId/search'
       path: '/collections/$collectionId/search'
@@ -395,6 +415,7 @@ interface DashboardRouteChildren {
   DashboardCollectionsCollectionIdConfigRoute: typeof DashboardCollectionsCollectionIdConfigRoute
   DashboardCollectionsCollectionIdCurationRoute: typeof DashboardCollectionsCollectionIdCurationRoute
   DashboardCollectionsCollectionIdSearchRoute: typeof DashboardCollectionsCollectionIdSearchRoute
+  DashboardCollectionsCollectionIdSynonymsRoute: typeof DashboardCollectionsCollectionIdSynonymsRoute
   DashboardCollectionsCollectionIdIndexRoute: typeof DashboardCollectionsCollectionIdIndexRoute
   DashboardCollectionsCollectionIdDocumentsDocumentIdRoute: typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
   DashboardCollectionsCollectionIdDocumentsExportRoute: typeof DashboardCollectionsCollectionIdDocumentsExportRoute
@@ -417,6 +438,8 @@ const DashboardRouteChildren: DashboardRouteChildren = {
     DashboardCollectionsCollectionIdCurationRoute,
   DashboardCollectionsCollectionIdSearchRoute:
     DashboardCollectionsCollectionIdSearchRoute,
+  DashboardCollectionsCollectionIdSynonymsRoute:
+    DashboardCollectionsCollectionIdSynonymsRoute,
   DashboardCollectionsCollectionIdIndexRoute:
     DashboardCollectionsCollectionIdIndexRoute,
   DashboardCollectionsCollectionIdDocumentsDocumentIdRoute:

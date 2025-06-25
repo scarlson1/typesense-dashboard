@@ -9,7 +9,10 @@ export const Route = createFileRoute('/_dashboard/presets')({
 function RouteComponent() {
   return (
     <>
-      <Typography>
+      <Typography variant='h3' gutterBottom>
+        Presets
+      </Typography>
+      <Typography sx={{ maxWidth: 760, textAlign: 'justify' }}>
         Presets allow you to manage search parameters in Typesense, and
         reference just the preset name in your application. This way, you can
         change search parameters without having to make code changes.{' '}

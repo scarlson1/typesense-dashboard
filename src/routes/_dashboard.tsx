@@ -49,7 +49,7 @@ function RouteComponent() {
           }}
         >
           <Header />
-          <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
+          <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1600px' } }}>
             <Outlet />
           </Box>
         </Stack>
