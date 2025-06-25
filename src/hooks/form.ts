@@ -9,6 +9,7 @@ import { lazy } from 'react';
 import { fieldContext, formContext } from './formContext';
 
 const TextField = lazy(() => import('../components/forms/TextField.tsx'));
+const DatePicker = lazy(() => import('../components/forms/DatePicker.tsx'));
 
 // TODO: create other reusable input types (number input, select, masked fields etc.)
 
@@ -18,6 +19,7 @@ const { useAppForm, withForm } = createFormHook({
     TextField,
     Checkbox,
     Select,
+    DatePicker,
     // MaskInput,
   },
   formComponents: {

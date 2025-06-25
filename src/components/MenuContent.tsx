@@ -1,10 +1,13 @@
 import {
   AddRounded,
+  AutoFixHighRounded,
   BackupTableRounded,
   CompareArrowsRounded,
   DatasetRounded,
+  DownloadRounded,
   ExpandLessRounded,
   ExpandMoreRounded,
+  FrontHandRounded,
   HelpRounded,
   HomeRounded,
   InfoRounded,
@@ -135,7 +138,7 @@ export function MenuContent() {
     let collectionChildren = [
       {
         text: 'Search',
-        icon: <SearchRounded />,
+        icon: <SearchRounded fontSize='small' />,
         route: selectedCollection
           ? {
               to: `/collections/$collectionId/search` as LinkProps['to'],
@@ -145,8 +148,19 @@ export function MenuContent() {
         disabled: !Boolean(selectedCollection),
       },
       {
+        text: 'Curation',
+        icon: <AutoFixHighRounded fontSize='small' />,
+        route: selectedCollection
+          ? {
+              to: '/collections/$collectionId/curation' as LinkProps['to'],
+              params: { collectionId: selectedCollection },
+            }
+          : { to: location.pathname as LinkProps['to'] },
+        disabled: !Boolean(selectedCollection),
+      },
+      {
         text: 'Documents',
-        icon: <BackupTableRounded />,
+        icon: <BackupTableRounded fontSize='small' />,
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/documents' as LinkProps['to'],
@@ -157,7 +171,7 @@ export function MenuContent() {
       },
       {
         text: 'Add Documents',
-        icon: <AddRounded />,
+        icon: <AddRounded fontSize='small' />,
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/documents/new' as LinkProps['to'],
@@ -167,8 +181,19 @@ export function MenuContent() {
         disabled: !Boolean(selectedCollection),
       },
       {
+        text: 'Export Documents',
+        icon: <DownloadRounded fontSize='small' />,
+        route: selectedCollection
+          ? {
+              to: '/collections/$collectionId/documents/export' as LinkProps['to'],
+              params: { collectionId: selectedCollection },
+            }
+          : { to: location.pathname as LinkProps['to'] },
+        disabled: !Boolean(selectedCollection),
+      },
+      {
         text: 'Collection Settings',
-        icon: <SettingsRounded />,
+        icon: <SettingsRounded fontSize='small' />,
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/config' as LinkProps['to'],
@@ -184,25 +209,34 @@ export function MenuContent() {
       // { text: 'Server Status', icon: <AnalyticsRounded />, route: '/status' },
       {
         text: 'Collections',
-        icon: <DatasetRounded />,
+        icon: <DatasetRounded fontSize='small' />,
         route: { to: '/collections' },
         children: collectionChildren,
       },
       {
         text: 'Aliases',
-        icon: <CompareArrowsRounded />,
+        icon: <CompareArrowsRounded fontSize='small' />,
         route: { to: '/alias' },
       },
-      { text: 'API Keys', icon: <KeyRounded />, route: { to: '/keys' } },
+      {
+        text: 'API Keys',
+        icon: <KeyRounded fontSize='small' />,
+        route: { to: '/keys' },
+      },
       {
         text: 'Analytics Rules',
-        icon: <InsightsRounded />,
+        icon: <InsightsRounded fontSize='small' />,
         route: { to: '/analytics' },
       },
       {
         text: 'Search Presets',
-        icon: <TroubleshootRounded />,
+        icon: <TroubleshootRounded fontSize='small' />,
         route: { to: '/presets' },
+      },
+      {
+        text: 'Stopwords',
+        icon: <FrontHandRounded fontSize='small' />,
+        route: { to: '/stopwords' },
       },
       // { text: 'Stop Words', icon: <AssessmentRounded />, route: '/stop-words' },
     ];
@@ -230,7 +264,7 @@ export function MenuContent() {
                 selected={Boolean(matchRoute({ to: item.route.to }))}
                 disabled={item.disabled}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.text} />
                 {Boolean(item.children?.length) ? (
                   open === item.text ? (
@@ -275,7 +309,8 @@ export function MenuContent() {
                     unmountOnExit
                     key={`${item.text}-${child.text}-${i}-${j}`}
                   >
-                    <List component='div' disablePadding>
+                    {/* <List component='div' disablePadding> */}
+                    <ListItem disablePadding sx={{ display: 'block' }}>
                       <RouterListItemButton
                         from={child.route.from}
                         to={child.route.to}
@@ -291,14 +326,14 @@ export function MenuContent() {
                         )}
                         disabled={item.disabled}
                         sx={{ pl: 4 }}
-                        // {...child.route}
                       >
-                        <ListItemIcon sx={{ minWidth: 40 }}>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
                           {child.icon}
                         </ListItemIcon>
                         <ListItemText primary={child.text} />
                       </RouterListItemButton>
-                    </List>
+                    </ListItem>
+                    {/* </List> */}
                   </Collapse>
                 ))
               : null}
@@ -309,7 +344,7 @@ export function MenuContent() {
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
             <ListItemButton>
-              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>

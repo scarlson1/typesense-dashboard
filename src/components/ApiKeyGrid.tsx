@@ -113,7 +113,7 @@ export const ApiKeyGrid = () => {
         ],
       },
     ],
-    []
+    [mutation.isPending, mutation.mutate]
   );
 
   if (isError)

@@ -7,10 +7,12 @@ import {
   Typography,
 } from '@mui/material';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { useState, type SyntheticEvent } from 'react';
+import { Suspense, useState, type SyntheticEvent } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { analyticsFormDefaultValues, analyticsQueryKeys } from '../constants';
 import { useAsyncToast, useTypesenseClient } from '../hooks';
 import { queryClient } from '../utils';
+import { ErrorFallback } from './ErrorFallback';
 import { UpdateAnalyticsRule } from './UpdateAnalyticsRule';
 
 // TODO: fix UI not updating when listing is updated or deleted (form name will show old index name, but accordion title will update correctly)
@@ -71,32 +73,36 @@ export function AnalyticsRulesList() {
             <Typography variant='h6'>{r.name}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <UpdateAnalyticsRule
-              defaultValues={{
-                name: r.name,
-                type: r.type,
-                params: {
-                  source: {
-                    collections: r.params.source.collections,
-                  },
-                  destination: {
-                    collection: r.params.destination.collection,
-                  },
-                  enable_auto_aggregation:
-                    r.params.enable_auto_aggregation || false,
-                  expand_query: r.params.expand_query || false,
-                  limit: r.params.limit ? String(r.params.limit) : '',
-                },
-              }}
-            />
-            <Button
-              onClick={() => handleDeleteRule(r.name)}
-              loading={mutation.isPending && mutation.variables === r.name}
-              disabled={mutation.isPending}
-              sx={{ my: 1 }}
-            >
-              Delete
-            </Button>
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Suspense>
+                <UpdateAnalyticsRule
+                  defaultValues={{
+                    name: r.name,
+                    type: r.type,
+                    params: {
+                      source: {
+                        collections: r.params.source.collections,
+                      },
+                      destination: {
+                        collection: r.params.destination.collection,
+                      },
+                      enable_auto_aggregation:
+                        r.params.enable_auto_aggregation || false,
+                      expand_query: r.params.expand_query || false,
+                      limit: r.params.limit ? String(r.params.limit) : '',
+                    },
+                  }}
+                />
+                <Button
+                  onClick={() => handleDeleteRule(r.name)}
+                  loading={mutation.isPending && mutation.variables === r.name}
+                  disabled={mutation.isPending}
+                  sx={{ my: 1 }}
+                >
+                  Delete
+                </Button>
+              </Suspense>
+            </ErrorBoundary>
           </AccordionDetails>
         </Accordion>
       ))}
@@ -113,10 +119,14 @@ export function AnalyticsRulesList() {
           <Typography variant='h6'>Add New Analytics Rule</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <UpdateAnalyticsRule
-            defaultValues={analyticsFormDefaultValues}
-            submitButtonText='Add Analytics Rule'
-          />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Suspense>
+              <UpdateAnalyticsRule
+                defaultValues={analyticsFormDefaultValues}
+                submitButtonText='Add Analytics Rule'
+              />
+            </Suspense>
+          </ErrorBoundary>
         </AccordionDetails>
       </Accordion>
     </>

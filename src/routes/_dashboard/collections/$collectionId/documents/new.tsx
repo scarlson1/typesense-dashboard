@@ -3,6 +3,7 @@ import { OpenInNewRounded } from '@mui/icons-material';
 import { Alert, Box, Link, Paper, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import type { ReactNode } from 'react';
 import { useStore } from 'zustand';
 import { JsonEditor } from '../../../../../components';
 import {
@@ -71,37 +72,23 @@ function RouteComponent() {
           Create a file named documents.jsonl with your documents and then run
           the following commands in your terminal:
         </Typography>
-        <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
-          <Typography
-            variant='body2'
-            color='textSecondary'
-            component='pre'
-            sx={{
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
-              wordBreak: 'keep-all',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            <code>{`export TYPESENSE_API_KEY=YOUR_API_KEY`}</code>
-            <br />
-            <br />
-            <code>{`curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\`}</code>
-            <br />
-            <code style={{ paddingLeft: '24px' }}>{`-X POST \\`}</code>
-            <br />
-            <code
-              style={{ paddingLeft: '24px' }}
-            >{`-T documents.jsonl \\`}</code>
-            <br />
-            {/* <code
+        <Code>
+          <code>{`export TYPESENSE_API_KEY=YOUR_API_KEY`}</code>
+          <br />
+          <br />
+          <code>{`curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\`}</code>
+          <br />
+          <code style={{ paddingLeft: '24px' }}>{`-X POST \\`}</code>
+          <br />
+          <code style={{ paddingLeft: '24px' }}>{`-T documents.jsonl \\`}</code>
+          <br />
+          {/* <code
               style={{ paddingLeft: '24px' }}
             >{`"https://qby6512jgsvrwim7p-1.a1.typesense.net/collections/orders/documents/import?action=create"`}</code> */}
-            <code
-              style={{ paddingLeft: '24px' }}
-            >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
-          </Typography>
-        </Paper>
+          <code
+            style={{ paddingLeft: '24px' }}
+          >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
+        </Code>
         <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
           <Editor
             language='shell'
@@ -127,42 +114,28 @@ function RouteComponent() {
           and then run the following commands in your terminal:
         </Typography>
 
-        <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
-          <Typography
-            variant='body2'
-            color='textSecondary'
-            component='pre'
-            sx={{
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
-              wordBreak: 'keep-all',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            <code>{`# Convert from JSON to JSONL before importing.`}</code>
-            <br />
-            <code>{`# Make sure you have \`jq\` installed.`}</code>
-            <br />
-            <br />
-            <code>{`jq -c '.[]' documents.json > documents.jsonl`}</code>
-            <br />
-            <br />
-            <code>{`export TYPESENSE_API_KEY=YOUR_API_KEY`}</code>
-            <br />
-            <br />
-            <code>{`curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\`}</code>
-            <br />
-            <code style={{ paddingLeft: '24px' }}>{`-X POST \\`}</code>
-            <br />
-            <code
-              style={{ paddingLeft: '24px' }}
-            >{`-T documents.jsonl \\`}</code>
-            <br />
-            <code
-              style={{ paddingLeft: '24px' }}
-            >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
-          </Typography>
-        </Paper>
+        <Code>
+          <code>{`# Convert from JSON to JSONL before importing.`}</code>
+          <br />
+          <code>{`# Make sure you have \`jq\` installed.`}</code>
+          <br />
+          <br />
+          <code>{`jq -c '.[]' documents.json > documents.jsonl`}</code>
+          <br />
+          <br />
+          <code>{`export TYPESENSE_API_KEY=YOUR_API_KEY`}</code>
+          <br />
+          <br />
+          <code>{`curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\`}</code>
+          <br />
+          <code style={{ paddingLeft: '24px' }}>{`-X POST \\`}</code>
+          <br />
+          <code style={{ paddingLeft: '24px' }}>{`-T documents.jsonl \\`}</code>
+          <br />
+          <code
+            style={{ paddingLeft: '24px' }}
+          >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
+        </Code>
       </Box>
 
       <Box sx={{ py: 2 }}>
@@ -173,42 +146,29 @@ function RouteComponent() {
           Create a file named documents.csv with your documents (including a
           header row) and run the following commands in your terminal
         </Typography>
-        <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
-          <Typography
-            variant='body2'
-            color='textSecondary'
-            component='pre'
-            sx={{
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
-              wordBreak: 'keep-all',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            <code>{`# Convert from JSON to JSONL before importing.`}</code>
-            <br />
-            <code>{`# Make sure you have miller installed: https://github.com/johnkerl/miller`}</code>
-            <br />
-            <br />
-            <code>{`mlr --icsv --ojsonl cat documents.csv > documents.jsonl`}</code>
-            <br />
-            <br />
-            <code>{`export TYPESENSE_API_KEY=YOUR_API_KEY`}</code>
-            <br />
-            <br />
-            <code>{`curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\`}</code>
-            <br />
-            <code style={{ paddingLeft: '24px' }}>{`-X POST \\`}</code>
-            <br />
-            <code
-              style={{ paddingLeft: '24px' }}
-            >{`-T documents.jsonl \\`}</code>
-            <br />
-            <code
-              style={{ paddingLeft: '24px' }}
-            >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
-          </Typography>
-        </Paper>
+
+        <Code>
+          <code>{`# Convert from JSON to JSONL before importing.`}</code>
+          <br />
+          <code>{`# Make sure you have miller installed: https://github.com/johnkerl/miller`}</code>
+          <br />
+          <br />
+          <code>{`mlr --icsv --ojsonl cat documents.csv > documents.jsonl`}</code>
+          <br />
+          <br />
+          <code>{`export TYPESENSE_API_KEY=YOUR_API_KEY`}</code>
+          <br />
+          <br />
+          <code>{`curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\`}</code>
+          <br />
+          <code style={{ paddingLeft: '24px' }}>{`-X POST \\`}</code>
+          <br />
+          <code style={{ paddingLeft: '24px' }}>{`-T documents.jsonl \\`}</code>
+          <br />
+          <code
+            style={{ paddingLeft: '24px' }}
+          >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
+        </Code>
       </Box>
 
       <Box sx={{ py: 2 }}>
@@ -251,5 +211,25 @@ function NewDocumentEditor() {
         />
       </Box>
     </>
+  );
+}
+
+function Code({ children }: { children: ReactNode }) {
+  return (
+    <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
+      <Typography
+        variant='body2'
+        color='textSecondary'
+        component='pre'
+        sx={{
+          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+          wordBreak: 'keep-all',
+          whiteSpace: 'pre-wrap',
+        }}
+      >
+        {children}
+      </Typography>
+    </Paper>
   );
 }
