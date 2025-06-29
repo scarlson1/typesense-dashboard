@@ -6,6 +6,9 @@ export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/search'
 )({
   component: SearchCollection,
+  staticData: {
+    crumb: 'Search',
+  },
 });
 
 function SearchCollection() {
@@ -20,7 +23,7 @@ function SearchCollection() {
       <Typography variant='h5' gutterBottom>
         Search Parameters
       </Typography>
-      <Typography component='div'>
+      <Typography component='div' gutterBottom>
         These settings control ranking, relevance and search fine-tuning. Use a
         preset to save your configuration, and recall in your application.{' '}
         <Link

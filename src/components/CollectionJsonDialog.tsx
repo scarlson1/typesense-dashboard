@@ -13,17 +13,16 @@ import {
   useTheme,
   type DialogProps,
 } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
 import { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import { Client } from 'typesense';
 import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
-import { COLLECTION_SCHEMA, collectionQueryKeys } from '../constants';
-import { useAsyncToast } from '../hooks';
-import { diffArraysOfObjects, queryClient } from '../utils';
+import { COLLECTION_SCHEMA } from '../constants';
+import { useAsyncToast, useUpdateCollection } from '../hooks';
+import { diffArraysOfObjects } from '../utils';
 import { JsonEditor } from './JsonEditor';
 
-// TODO: rewrite component using useDialog context ??
+// TODO: delete ?? in favor of hook
 
 interface CollectionDialogProps extends DialogProps {
   title?: string;
@@ -34,12 +33,8 @@ interface CollectionDialogProps extends DialogProps {
   clusterId: string;
 }
 
-// TODO: abstract components (use: create collection, edit collection, edit document, etc.)
-
 // TODO: reference documentation on modifying fields (https://typesense.org/docs/28.0/api/collections.html#modifying-an-existing-field)
 
-// TODO: dialog context --> pass data directly in action handler (instead of setting data as state)
-// TODO: how to updates be processed ? calc diff in fields and convert to drop/add ??
 export function CollectionJsonDialog({
   value,
   title,
@@ -49,8 +44,6 @@ export function CollectionJsonDialog({
   clusterId,
   ...props
 }: CollectionDialogProps) {
-  // const { mode, systemMode } = useColorScheme();
-  // const themeMode = mode === 'system' ? systemMode : mode;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
@@ -61,58 +54,22 @@ export function CollectionJsonDialog({
     useState<EditorProps['options']>(initialOptions);
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
 
-  useEffect(() => {
-    initialSchema.current = value;
-  }, [value]);
-
-  const mutation = useMutation({
-    mutationFn: ({
-      colName,
-      updates,
-    }: {
-      colName: string;
-      updates: CollectionUpdateSchema;
-    }) => client.collections(colName).update(updates),
-    onMutate: (variables) => {
-      toast.loading('saving...', { id: 'update-schema' });
-      return { name: variables.colName }; // before mutation - can set "context"
-    },
-    onSuccess: (_, __, context) => {
-      // TODO: need to handle stale state of initialSchema
-      toast.success(`listing updated`);
-      queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.detail(clusterId, context.name), // collectionQueryKeys.detail(context.name),
-      });
-      // queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
-      queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.all(clusterId),
-      });
+  const mutation = useUpdateCollection({
+    onSuccess: () => {
       setOptions((o) => ({ ...o, readOnly: true }));
     },
-    onError(error) {
-      console.log('ERROR: ', error);
-      let msg = error.message ?? 'failed to update collection schema';
-      toast.error(msg, { id: 'update-schema' });
+    onError: () => {
       setOptions((o) => ({ ...o, readOnly: false }));
     },
   });
 
+  useEffect(() => {
+    initialSchema.current = value;
+  }, [value]);
+
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    // setTimeout(() => {
-    //   editor.getAction('editor.action.formatDocument')?.run();
-    //   monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-    //     validate: true,
-    //     schemas: [
-    //       {
-    //         uri: '',
-    //         fileMatch: ['*'], // associate with any file
-    //         schema: z.toJSONSchema(collectionSchema),
-    //       },
-    //     ],
-    //   });
-    // }, 200);
   };
 
   const toggleEditMode = () => {
@@ -182,18 +139,6 @@ export function CollectionJsonDialog({
           }}
           schema={COLLECTION_SCHEMA}
         />
-        {/* <Editor
-          height='90vh'
-          defaultLanguage='json'
-          theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
-          options={options}
-          onMount={handleEditorDidMount}
-          value={value}
-          onValidate={(m) => {
-            console.log(JSON.stringify(m, null, 2));
-            setMarkers(m);
-          }}
-        /> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>

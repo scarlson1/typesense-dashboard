@@ -8,6 +8,9 @@ export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/export'
 )({
   component: RouteComponent,
+  staticData: {
+    crumb: 'Export',
+  },
 });
 
 function RouteComponent() {

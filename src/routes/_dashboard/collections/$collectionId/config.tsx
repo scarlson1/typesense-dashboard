@@ -50,7 +50,7 @@ function CollectionSettings() {
       </Stack>
       <Box sx={{ borderRadius: 1, overflow: 'hidden' }}>
         <JsonEditor
-          height='60vh'
+          height='70vh'
           schema={COLLECTION_SCHEMA}
           options={DEFAULT_MONACO_OPTIONS}
           value={JSON.stringify(data)}

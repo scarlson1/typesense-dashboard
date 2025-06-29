@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { Toaster } from '../components';
-import { AppTheme } from '../context';
+import { AppTheme, DialogProvider } from '../context';
 import { dataGridCustomizations } from '../theme/customizations';
 
 export interface RouterAppContext {
@@ -39,7 +39,9 @@ function RootComponent(props: { disableCustomTheme?: boolean }) {
     <>
       <AppTheme {...props} themeComponents={xThemeComponents}>
         <CssBaseline enableColorScheme />
-        <Outlet />
+        <DialogProvider>
+          <Outlet />
+        </DialogProvider>
         <Toaster />
       </AppTheme>
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}

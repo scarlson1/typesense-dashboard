@@ -1,5 +1,5 @@
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Link, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { AnalyticsRulesList } from '../../components';
 
@@ -26,7 +26,9 @@ function RouteComponent() {
           Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
         </Link>
       </Typography>
-      <AnalyticsRulesList />
+      <Box sx={{ maxWidth: 800 }}>
+        <AnalyticsRulesList />
+      </Box>
     </>
   );
 }

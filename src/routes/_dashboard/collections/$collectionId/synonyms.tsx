@@ -20,6 +20,9 @@ export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/synonyms'
 )({
   component: RouteComponent,
+  staticData: {
+    crumb: 'Synonyms',
+  },
 });
 
 function RouteComponent() {

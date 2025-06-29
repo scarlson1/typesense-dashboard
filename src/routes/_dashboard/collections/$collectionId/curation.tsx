@@ -7,6 +7,9 @@ export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/curation'
 )({
   component: RouteComponent,
+  staticData: {
+    crumb: 'Curation',
+  },
 });
 
 function RouteComponent() {
@@ -29,7 +32,7 @@ function RouteComponent() {
           <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
         </Link>
       </Typography>
-      <Box sx={{ py: { xs: 1.5, md: 2 } }}>
+      <Box sx={{ py: { xs: 1.5, md: 2 }, maxWidth: 800 }}>
         <CurationList collectionId={collectionId} />
       </Box>
 

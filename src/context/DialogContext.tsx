@@ -51,10 +51,11 @@ export interface DialogSlotProps {
 
 export type DialogVariant = 'danger' | 'info';
 export interface DialogOptions {
-  onSubmit?: (values?: any, helpers?: any) => void;
+  onSubmit?: (values?: any, helpers?: any) => void; // update to tanstack form (from formik) ??
+  onCancel?: () => void; // intercepts handleCancel
   catchOnCancel?: boolean;
   variant: DialogVariant;
-  title?: ReactNode; // TODO: add description (might want text above form)
+  title?: ReactNode;
   description?: ReactNode;
   content?: ReactNode;
   // successView?: ReactNode;
@@ -72,6 +73,7 @@ export interface DialogCtx extends DialogOptions {
   slots: DialogSlotsComponents;
   slotProps: DialogSlotProps;
   // showSuccessView: boolean;
+  updateSlotProps: (updates: Partial<DialogOptions['slotProps']>) => void;
 }
 
 interface AwaitingPromise {
@@ -133,6 +135,19 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
     [dialogOptions]
   );
 
+  const updateSlotProps = useCallback(
+    (updates: Partial<DialogOptions['slotProps']>) => {
+      setDialogOptions((o) => {
+        if (!o) return null;
+        return {
+          ...(o as DialogOptions),
+          slotProps: merge(o?.slotProps || [], updates),
+        };
+      });
+    },
+    [dialogOptions?.slotProps]
+  );
+
   const slots = useMemo(
     () => ({
       ...CONTEXT_DIALOG_DEFAULT_SLOTS_COMPONENTS,
@@ -160,6 +175,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       ...(dialogOptions || {}),
       slots,
       slotProps,
+      updateSlotProps,
     }),
     [
       openDialog,
@@ -170,6 +186,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       slots,
       slotProps,
       handleSubmitDisabled,
+      updateSlotProps,
     ]
   );
 

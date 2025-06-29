@@ -17,6 +17,9 @@ import { queryClient } from '../../utils';
 
 export const Route = createFileRoute('/_dashboard/stopwords')({
   component: RouteComponent,
+  staticData: {
+    crumb: 'Stopwords',
+  },
 });
 
 function RouteComponent() {

@@ -1,30 +1,29 @@
 import { DataObjectRounded, DeleteRounded } from '@mui/icons-material';
-import { Box, Button, DialogActions, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import type {
   GridCellParams,
   GridColDef,
   GridRowParams,
 } from '@mui/x-data-grid';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { formOptions } from '@tanstack/react-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Client } from 'typesense';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionsRetrieveOptions } from 'typesense/lib/Typesense/Collections';
-import { z } from 'zod/v4';
 import { collectionQueryKeys, DEFAULT_MONACO_OPTIONS } from '../constants';
 import { collectionColumns } from '../constants/gridColumns';
 import {
-  useAppForm,
   useAsyncToast,
+  useCollectionEditorDialog,
   useDialog,
   useTypesenseClient,
-  withForm,
 } from '../hooks';
 import { queryClient } from '../utils';
-import { CollectionJsonDialog } from './CollectionJsonDialog';
+import { ConfirmDeletionForm } from './ConfirmDeletionForm';
+
+const DEFAULT_VIEW_OPTIONS = { ...DEFAULT_MONACO_OPTIONS, readOnly: true };
 
 // TODO: add confirmation before deleting collection (force typing collection name)
 
@@ -43,14 +42,6 @@ export function CollectionsGrid() {
     queryKey: collectionQueryKeys.list(clusterId, {}),
     queryFn: () => fetchCollections(client),
   });
-
-  const [open, setOpen] = useState(false);
-  const [tempDialogData, setTempDialogData] = useState<string>('');
-
-  const handleClose = () => {
-    setTempDialogData('');
-    setOpen(false);
-  };
 
   const mutation = useMutation({
     mutationFn: (colName: string) => client.collections(colName).delete(),
@@ -102,6 +93,10 @@ export function CollectionsGrid() {
     },
   });
 
+  const viewSchema = useCollectionEditorDialog({
+    initialOptions: DEFAULT_VIEW_OPTIONS,
+  });
+
   const columns = useMemo<GridColDef<CollectionSchema>[]>(
     () => [
       ...collectionColumns,
@@ -109,7 +104,7 @@ export function CollectionsGrid() {
         headerName: 'Actions',
         field: 'actions',
         type: 'actions',
-        width: 80,
+        width: 160,
         getActions: (params: GridRowParams<CollectionSchema>) => [
           <GridActionsCellItem
             icon={
@@ -117,12 +112,13 @@ export function CollectionsGrid() {
                 <DataObjectRounded fontSize='small' />
               </Tooltip>
             }
-            onClick={(e) => {
-              setTempDialogData(JSON.stringify(params.row, null, 2));
-              setOpen(true);
+            onClick={() => {
+              viewSchema({
+                title: params.id.toString(),
+                value: JSON.stringify(params.row, null, 2),
+              });
             }}
             label='View JSON'
-            // disabled={!params.row.asin}
           />,
           <GridActionsCellItem
             icon={
@@ -209,95 +205,6 @@ export function CollectionsGrid() {
           },
           pagination: { paginationModel: { pageSize: 20, page: 0 } },
         }}
-      />
-      <CollectionJsonDialog
-        value={tempDialogData}
-        handleClose={handleClose}
-        open={open}
-        initialOptions={DEFAULT_MONACO_OPTIONS}
-        client={client}
-        clusterId={clusterId}
-      />
-    </Box>
-  );
-}
-
-export const deleteFormOpts = formOptions({
-  defaultValues: {
-    deleteName: '',
-  },
-});
-
-const DeleteForm = withForm({
-  ...deleteFormOpts,
-  props: {
-    correctValue: '',
-    handleClose: () => {},
-  },
-  render: ({ form, handleClose, correctValue }) => (
-    <>
-      <form.AppField
-        name='deleteName'
-        validators={{
-          onChange: z.literal(correctValue),
-        }}
-      >
-        {({ TextField }) => (
-          <TextField
-            id='deleteName'
-            autoFocus
-            required
-            fullWidth
-            variant='outlined'
-          />
-        )}
-      </form.AppField>
-      <DialogActions>
-        <Button onClick={() => handleClose()}>Cancel</Button>
-        <form.AppForm>
-          <form.SubmitButton label='Submit' />
-        </form.AppForm>
-      </DialogActions>
-    </>
-  ),
-});
-
-interface Test {
-  correctValue: string;
-}
-
-function ConfirmDeletionForm({ correctValue }: Test) {
-  const dialog = useDialog();
-
-  const form = useAppForm({
-    ...deleteFormOpts,
-    onSubmit: ({ value: { deleteName } }) => {
-      // const { success } = z.literal(correctValue).safeParse(deleteName);
-      // if (success)
-      dialog.handleAccept(deleteName);
-    },
-  });
-
-  return (
-    <Box
-      component='form'
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        form.handleSubmit();
-      }}
-      noValidate
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        gap: 2,
-      }}
-    >
-      <DeleteForm
-        form={form}
-        handleClose={() => dialog.handleClose()}
-        correctValue={correctValue}
       />
     </Box>
   );

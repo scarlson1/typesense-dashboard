@@ -42,8 +42,8 @@ function RouteComponent() {
           Option 1: Typesense client libraries
         </Typography>
         <Typography component='div'>
-          Use one of our client libraries to import data into your collection
-          from any programming language of your choice.{' '}
+          Use one of Typesense's client libraries to import data into your
+          collection.{' '}
           <Link
             href='https://typesense.org/docs/28.0/api/documents.html#index-a-single-document'
             target='_blank'

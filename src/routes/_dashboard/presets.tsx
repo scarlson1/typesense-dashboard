@@ -4,6 +4,9 @@ import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboard/presets')({
   component: RouteComponent,
+  staticData: {
+    crumb: 'Presets',
+  },
 });
 
 function RouteComponent() {

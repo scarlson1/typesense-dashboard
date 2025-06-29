@@ -98,6 +98,7 @@ export function AnalyticsRulesList() {
                   loading={mutation.isPending && mutation.variables === r.name}
                   disabled={mutation.isPending}
                   sx={{ my: 1 }}
+                  color='error'
                 >
                   Delete
                 </Button>

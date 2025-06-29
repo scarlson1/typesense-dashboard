@@ -8,7 +8,6 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
-import { DialogProvider } from './context';
 import { routeTree } from './routeTree.gen';
 import { queryClient } from './utils';
 
@@ -60,9 +59,9 @@ if (!rootElement.innerHTML) {
           console.error(err);
         }}
       >
-        <DialogProvider>
-          <RouterProvider router={router} />
-        </DialogProvider>
+        {/* <DialogProvider> */}
+        <RouterProvider router={router} />
+        {/* </DialogProvider> */}
       </ErrorBoundary>
     </StrictMode>
   );

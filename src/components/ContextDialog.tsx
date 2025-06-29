@@ -1,4 +1,4 @@
-import { type ButtonProps, DialogContentText } from '@mui/material';
+import { DialogContentText } from '@mui/material';
 import { type ReactNode, useCallback } from 'react';
 
 import { useDialog } from '../hooks';
@@ -45,6 +45,12 @@ CtxDialog.Title = Title;
 const Content = () => {
   const { slots, slotProps, description, content } = useDialog();
 
+  // need to clone element to inject props (if props change after dialog is opened)??
+  // let clone = content
+  //   ? cloneElement(content as ReactElement, slotProps.content || {})
+  //   : null;
+
+  // TODO: fix naming for "content" (different than slots.content)
   return slots.content ? (
     <slots.content {...slotProps?.content}>
       {description ? (
@@ -53,6 +59,7 @@ const Content = () => {
         </DialogContentText>
       ) : null}
       {content ?? null}
+      {/* {clone ?? null} */}
     </slots.content>
   ) : null;
 };
@@ -68,17 +75,16 @@ CtxDialog.Content = Content;
 
 // CtxDialog.SuccessView = SuccessView;
 
-interface ActionsProps {
-  confirmButtonProps?: Omit<ButtonProps, 'onClick'>;
-  confirmButtonText?: string;
-}
+// interface ActionsProps {
+//   // confirmButtonProps?: Omit<ButtonProps, 'onClick'>;
+//   confirmButtonText?: string; // TODO: use children instead ?? can pass via slotProps
+// }
 
-const Actions = ({
-  confirmButtonProps,
-  confirmButtonText = 'submit',
-}: ActionsProps) => {
+// const Actions = ({ confirmButtonText = 'submit' }: ActionsProps) => {
+const Actions = () => {
   const {
     onSubmit,
+    onCancel,
     handleAccept,
     handleClose,
     slots,
@@ -93,26 +99,31 @@ const Actions = ({
     fn && fn();
   }, [onSubmit, handleAccept]);
 
+  const handleCancel = useCallback(() => {
+    let fn = onCancel ?? handleClose();
+    fn && fn();
+  }, []);
+
   return slots.actions ? (
     <slots.actions {...slotProps.actions}>
       {variant === 'danger' && (
         <>
           {slots.cancelButton && (
             <slots.cancelButton
-              onClick={handleClose}
+              // onClick={handleClose}
+              onClick={handleCancel}
               {...slotProps.cancelButton}
             >
-              Cancel
+              {slotProps.cancelButton?.children || 'Cancel'}
             </slots.cancelButton>
           )}
           {slots.acceptButton && (
             <slots.acceptButton
               onClick={handleSubmit}
               disabled={submitDisabled ?? false}
-              {...(confirmButtonProps || {})} // TODO: remove confirmButtonProps (action can be handled with onSubmit ??)
               {...(slotProps.acceptButton || {})}
             >
-              {confirmButtonText}
+              {slotProps.acceptButton?.children || 'Confirm'}
             </slots.acceptButton>
           )}
         </>
@@ -121,10 +132,9 @@ const Actions = ({
         <slots.acceptButton
           onClick={handleSubmit}
           disabled={submitDisabled || false}
-          {...(confirmButtonProps || {})}
           {...(slotProps.acceptButton || {})}
         >
-          OK
+          {slotProps.acceptButton?.children || 'OK'}
         </slots.acceptButton>
       )}
     </slots.actions>

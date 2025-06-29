@@ -2,11 +2,11 @@ import { Editor, type EditorProps, type OnMount } from '@monaco-editor/react';
 import { useColorScheme } from '@mui/material';
 import { useCallback } from 'react';
 
-interface CollectionEditorProps extends EditorProps {
+export interface JsonEditorProps extends EditorProps {
   schema?: any;
 }
 
-export function JsonEditor({ schema, ...props }: CollectionEditorProps) {
+export function JsonEditor({ schema, ...props }: JsonEditorProps) {
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
 
@@ -29,6 +29,8 @@ export function JsonEditor({ schema, ...props }: CollectionEditorProps) {
     },
     [schema, props.onMount]
   );
+
+  console.log('COMPONENT OPTIONS: ', props?.options);
 
   return (
     <Editor
