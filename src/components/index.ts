@@ -23,6 +23,7 @@ export * from './NewApiKeyEditor';
 export * from './NewCollectionEditor';
 export * from './NewCollectionForm';
 export * from './OptionsMenu';
+export * from './PresetsForm';
 export * from './SelectContent';
 export * from './SideMenu';
 export * from './SideMenuMobile';

@@ -8,13 +8,13 @@ import {
 } from '../../../components';
 
 export const Route = createFileRoute('/_dashboard/collections/')({
-  component: RouteComponent,
+  component: CollectionsComponent,
   staticData: {
     crumb: 'Collections',
   },
 });
 
-function RouteComponent() {
+function CollectionsComponent() {
   return (
     <Box>
       <Stack

@@ -21,13 +21,11 @@ import {
   useTypesenseClient,
 } from '../hooks';
 import { queryClient } from '../utils';
-import { ConfirmDeletionForm } from './ConfirmDeletionForm';
+import { ConfirmDeletionDialog } from './ConfirmDeletionDialog';
 
 const DEFAULT_VIEW_OPTIONS = { ...DEFAULT_MONACO_OPTIONS, readOnly: true };
 
-// TODO: add confirmation before deleting collection (force typing collection name)
-
-// need to use REST api instead of sdk in order to use limit & offset ??
+// need to use REST api instead of sdk in order to use limit & offset (server grid pagination) ??
 function fetchCollections(client: Client, query?: CollectionsRetrieveOptions) {
   return client.collections().retrieve(query);
 }
@@ -137,7 +135,7 @@ export function CollectionsGrid() {
                   title: `Confirm Collection Deletion [ID: ${params.id.toString()}]`,
                   description: `THIS ACTION CANNOT BE UNDONE. Type the collection name to confirm deletion.`,
                   content: (
-                    <ConfirmDeletionForm correctValue={params.row.name} />
+                    <ConfirmDeletionDialog correctValue={params.row.name} />
                   ),
                   slots: {
                     actions: undefined,
@@ -178,7 +176,6 @@ export function CollectionsGrid() {
       }}
     >
       <DataGrid
-        // {...gridProps}
         rows={data || []}
         columns={columns}
         getRowId={(row) => row.name}

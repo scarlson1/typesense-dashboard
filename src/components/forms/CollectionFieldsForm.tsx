@@ -1,4 +1,4 @@
-import { AddRounded } from '@mui/icons-material';
+import { AddRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Grid,
   IconButton,
@@ -18,11 +18,11 @@ export const CollectionFieldsForm = withForm({
   render: ({ form }) => {
     return (
       <form.AppField name='fields' mode='array'>
-        {({ state, pushValue }) => (
+        {({ state, pushValue, removeValue }) => (
           <>
             {state.value.map((_, i) => (
               <Grid container spacing={2} key={`${i}`}>
-                <Grid size={{ xs: 8 }}>
+                <Grid size={{ xs: 7, md: 8 }}>
                   <form.Field name={`fields[${i}].name`}>
                     {({ state, handleChange, handleBlur }) => (
                       <MuiTextField
@@ -39,7 +39,7 @@ export const CollectionFieldsForm = withForm({
                     )}
                   </form.Field>
                 </Grid>
-                <Grid size={{ xs: 4 }}>
+                <Grid size={{ xs: 3, md: 3 }}>
                   <form.Field name={`fields[${i}].type`}>
                     {({ state, handleChange, handleBlur }) => (
                       <MuiTextField
@@ -63,6 +63,14 @@ export const CollectionFieldsForm = withForm({
                       </MuiTextField>
                     )}
                   </form.Field>
+                </Grid>
+                <Grid size={{ xs: 2, md: 1 }}>
+                  <IconButton
+                    onClick={() => removeValue(i)}
+                    aria-label='remove'
+                  >
+                    <RemoveRounded />
+                  </IconButton>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <Stack direction='row' spacing={2}>
@@ -167,15 +175,14 @@ export const CollectionFieldsForm = withForm({
                           </AccordionDetails>
                         </Accordion>
                       </Grid> */}
-
-                <IconButton
-                  onClick={() => pushValue(NEW_EMPTY_FIELD)}
-                  aria-label='add another field'
-                >
-                  <AddRounded />
-                </IconButton>
               </Grid>
             ))}
+            <IconButton
+              onClick={() => pushValue(NEW_EMPTY_FIELD)}
+              aria-label='add another field'
+            >
+              <AddRounded />
+            </IconButton>
           </>
         )}
       </form.AppField>

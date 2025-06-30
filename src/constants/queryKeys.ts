@@ -1,3 +1,8 @@
+import type {
+  SearchParams,
+  SearchParamsWithPreset,
+} from 'typesense/lib/Typesense/Documents';
+
 export const collectionQueryKeys = {
   all: (clusterId: string) => [clusterId, 'collections'] as const,
   list: (clusterId: string, filters: any) =>
@@ -10,6 +15,18 @@ export const collectionQueryKeys = {
     [...collectionQueryKeys.all(clusterId), 'schemas'] as const,
   schema: (clusterId: string, id: string) =>
     [...collectionQueryKeys.schemas(clusterId), id] as const,
+  search: (
+    clusterId: string,
+    collectionId: string,
+    params: SearchParams | SearchParamsWithPreset,
+    q: string
+  ) =>
+    [
+      ...collectionQueryKeys.schema(clusterId, collectionId),
+      'search',
+      params,
+      q,
+    ] as const,
   synonyms: (clusterId: string, collectionId: string) =>
     [
       ...collectionQueryKeys.detail(clusterId, collectionId),

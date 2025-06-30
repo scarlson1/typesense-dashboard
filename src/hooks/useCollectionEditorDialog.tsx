@@ -92,8 +92,8 @@ export function useCollectionEditorDialog(
     let parsed = JSON.parse(value);
     setOptions((o) => ({ ...o, readOnly: true }));
 
-    // TODO: handle no changes made
     // typesense only supports updating metadata & fields ??
+    // TODO: need to validate metadata ??
     const { fields, metadata = {} } = parsed;
 
     const initialVal = JSON.parse(initialSchema.current || '{}');
@@ -104,6 +104,8 @@ export function useCollectionEditorDialog(
       'name'
     );
 
+    console.log({ added, removed, updated });
+
     let fieldUpdates = [];
     for (let a of added) fieldUpdates.push(a);
     for (let r of removed) fieldUpdates.push({ name: r.name, drop: true });
@@ -111,6 +113,14 @@ export function useCollectionEditorDialog(
       fieldUpdates.push({ name: u.name, drop: true });
       fieldUpdates.push(u);
     }
+
+    if (!fieldUpdates.length) {
+      toast.info(`no changes made`);
+      setOptions((o) => ({ ...o, readOnly: false }));
+      return;
+    }
+
+    // TODO: changes to other properties ??
     let updates: CollectionUpdateSchema = {
       // default_sorting_field,
       // symbols_to_index,

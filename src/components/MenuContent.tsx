@@ -241,7 +241,7 @@ export function MenuContent() {
         route: { to: '/analytics' },
       },
       {
-        text: 'Search Presets',
+        text: 'Presets',
         icon: <TroubleshootRounded fontSize='small' />,
         route: { to: '/presets' },
       },

@@ -43,13 +43,13 @@ const DeleteForm = withForm({
   ),
 });
 
-interface ConfirmDeletionFormProps {
+interface ConfirmDeletionDialogProps {
   correctValue: string;
 }
 
-export function ConfirmDeletionForm({
+export function ConfirmDeletionDialog({
   correctValue,
-}: ConfirmDeletionFormProps) {
+}: ConfirmDeletionDialogProps) {
   const dialog = useDialog();
 
   const form = useAppForm({

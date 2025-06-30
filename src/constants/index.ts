@@ -3,6 +3,7 @@ export * from './collectionForm';
 export * from './curationForm';
 export * from './dialog';
 export * from './monaco';
+export * from './presetsForm';
 export * from './queryKeys';
 export * from './stopwordsForm';
 export * from './toastTheme';

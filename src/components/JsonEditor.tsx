@@ -30,8 +30,6 @@ export function JsonEditor({ schema, ...props }: JsonEditorProps) {
     [schema, props.onMount]
   );
 
-  console.log('COMPONENT OPTIONS: ', props?.options);
-
   return (
     <Editor
       height='90vh'

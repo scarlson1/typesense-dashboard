@@ -35,10 +35,6 @@ function RouteComponent() {
       <Box sx={{ py: { xs: 1.5, md: 2 }, maxWidth: 800 }}>
         <CurationList collectionId={collectionId} />
       </Box>
-
-      {/* <Paper sx={{ p: { xs: 1.5, sm: 2, md: 3 }, my: { xs: 2, sm: 3 } }}>
-        <CurationList collectionId={collectionId} />
-      </Paper> */}
     </>
   );
 }
