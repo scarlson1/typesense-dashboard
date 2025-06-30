@@ -1,10 +1,10 @@
 import { AddRounded, CloseRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Autocomplete,
+  Box,
   Grid,
   IconButton,
   TextField as MuiTextField,
-  Paper,
   Stack,
   Typography,
 } from '@mui/material';
@@ -64,12 +64,9 @@ export const PresetsForm = withForm({
                   {({ state, pushValue, removeValue }) => (
                     <>
                       {state.value.map((_, i) => (
-                        <Paper
+                        <Box
                           key={`multi-searchParam-${i}`}
                           sx={{
-                            px: { xs: 2, sm: 3 },
-                            pt: { xs: 1, sm: 1.5 },
-                            pb: { xs: 2.5, sm: 3 },
                             width: '100%',
                           }}
                         >
@@ -217,7 +214,7 @@ export const PresetsForm = withForm({
                               </>
                             )}
                           </form.AppField>
-                        </Paper>
+                        </Box>
                       ))}
                       {/* <Grid size={{ xs: 12 }}> */}
                       <IconButton
@@ -234,11 +231,8 @@ export const PresetsForm = withForm({
               ) : (
                 <form.AppField name='searchParameters' mode='array'>
                   {({ state, pushValue, removeValue }) => (
-                    <Paper
+                    <Box
                       sx={{
-                        px: { xs: 2, sm: 3 },
-                        pt: { xs: 2, sm: 3 },
-                        pb: { xs: 1, sm: 1.5 },
                         width: '100%',
                       }}
                     >
@@ -329,7 +323,7 @@ export const PresetsForm = withForm({
                           </IconButton>
                         </Grid>
                       </Grid>
-                    </Paper>
+                    </Box>
                   )}
                 </form.AppField>
               )}

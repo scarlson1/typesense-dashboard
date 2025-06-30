@@ -2,7 +2,9 @@ import { formOptions } from '@tanstack/react-form';
 import { z } from 'zod/v4';
 import { multiSearchRequestSchema, searchParams } from '../types';
 
-export const parameterKeys = searchParams.keyof();
+export const parameterKeys = searchParams
+  .extend({ collection: z.string() })
+  .keyof();
 export type ParameterKeys = z.infer<typeof parameterKeys>;
 export const multiParameterKeys = multiSearchRequestSchema.keyof();
 export type MultiParameterKeys = z.infer<typeof multiParameterKeys>;
