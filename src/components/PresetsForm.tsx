@@ -20,7 +20,10 @@ import { withForm } from '../hooks';
 
 export const PresetsForm = withForm({
   ...presetsFormOpts,
-  render: ({ form }) => {
+  props: {
+    submitButtonText: 'Submit',
+  },
+  render: ({ form, submitButtonText }) => {
     return (
       <Stack direction='column' spacing={2} sx={{ alignItems: 'flex-start' }}>
         <form.AppField name='presetId'>
@@ -137,31 +140,15 @@ export const PresetsForm = withForm({
                                                 }
                                               />
                                             )}
+                                            slotProps={{
+                                              paper: {
+                                                sx: {
+                                                  border: (theme) =>
+                                                    `1px solid ${theme.palette.divider}`,
+                                                },
+                                              },
+                                            }}
                                           />
-                                          // <MuiTextField
-                                          //   id={`multiSearchParams[${i}][${j}].name`}
-                                          //   value={nameState.value}
-                                          //   onChange={(e) =>
-                                          //     handleChange(e.target.value)
-                                          //   }
-                                          //   onBlur={handleBlur}
-                                          //   label='Parameter Name'
-                                          //   required
-                                          //   fullWidth
-                                          //   variant='outlined'
-                                          //   error={
-                                          //     nameState.meta.isTouched &&
-                                          //     Boolean(
-                                          //       nameState.meta.errors.length
-                                          //     )
-                                          //   }
-                                          //   color={
-                                          //     nameState.meta.errors.length
-                                          //       ? 'error'
-                                          //       : 'primary'
-                                          //   }
-                                          //   sx={{ maxWidth: 300 }}
-                                          // />
                                         )}
                                       </form.Field>
                                     </Grid>
@@ -217,16 +204,6 @@ export const PresetsForm = withForm({
                                         <RemoveRounded fontSize='inherit' />
                                       </IconButton>
                                     </Grid>
-                                    {/* <Grid size={{ xs: 12 }}>
-                                    <IconButton
-                                      onClick={() =>
-                                        pushParamVal(EMPTY_PRESET_PARAMS)
-                                      }
-                                      aria-label='add another search parameter'
-                                    >
-                                      <AddRounded />
-                                    </IconButton>
-                                  </Grid> */}
                                   </Grid>
                                 ))}
                                 <IconButton
@@ -259,14 +236,16 @@ export const PresetsForm = withForm({
                   {({ state, pushValue, removeValue }) => (
                     <Paper
                       sx={{
-                        p: { xs: 2, sm: 3 },
+                        px: { xs: 2, sm: 3 },
+                        pt: { xs: 2, sm: 3 },
+                        pb: { xs: 1, sm: 1.5 },
                         width: '100%',
                       }}
                     >
                       <Grid container spacing={1.5}>
                         {state.value.map((_, i) => (
                           <Fragment key={`searchParam-${i}`}>
-                            <Grid size={{ xs: 5 }}>
+                            <Grid size={{ xs: 5, sm: 4 }}>
                               <form.Field name={`searchParameters[${i}].name`}>
                                 {({ state, handleChange, handleBlur }) => (
                                   <Autocomplete
@@ -285,33 +264,19 @@ export const PresetsForm = withForm({
                                         label='Parameter Name'
                                       />
                                     )}
+                                    slotProps={{
+                                      paper: {
+                                        sx: {
+                                          border: (theme) =>
+                                            `1px solid ${theme.palette.divider}`,
+                                        },
+                                      },
+                                    }}
                                   />
-                                  // <MuiTextField
-                                  //   id={`searchParameters[${i}].name`}
-                                  //   value={state.value}
-                                  //   onChange={(e) =>
-                                  //     handleChange(e.target.value)
-                                  //   }
-                                  //   onBlur={handleBlur}
-                                  //   label='Parameter Name'
-                                  //   required
-                                  //   fullWidth
-                                  //   variant='outlined'
-                                  //   error={
-                                  //     state.meta.isTouched &&
-                                  //     !state.meta.isValid
-                                  //   }
-                                  //   color={
-                                  //     state.meta.errors.length
-                                  //       ? 'error'
-                                  //       : 'primary'
-                                  //   }
-                                  //   sx={{ maxWidth: 300 }}
-                                  // />
                                 )}
                               </form.Field>
                             </Grid>
-                            <Grid size={{ xs: 5 }}>
+                            <Grid size={{ xs: 5, sm: 6 }}>
                               <form.Field name={`searchParameters[${i}].value`}>
                                 {({ state, handleChange, handleBlur }) => (
                                   <MuiTextField
@@ -372,12 +337,9 @@ export const PresetsForm = withForm({
           )}
         />
 
-        {/* <Grid size={{ xs: 12 }}> */}
         <form.AppForm>
-          <form.SubmitButton label='Add' />
+          <form.SubmitButton label={submitButtonText} />
         </form.AppForm>
-        {/* </Grid>
-      </Grid> */}
       </Stack>
     );
   },

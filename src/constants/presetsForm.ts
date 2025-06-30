@@ -3,7 +3,9 @@ import { z } from 'zod/v4';
 import { multiSearchRequestSchema, searchParams } from '../types';
 
 export const parameterKeys = searchParams.keyof();
+export type ParameterKeys = z.infer<typeof parameterKeys>;
 export const multiParameterKeys = multiSearchRequestSchema.keyof();
+export type MultiParameterKeys = z.infer<typeof multiParameterKeys>;
 
 export const presetType = z.enum(['Single-Collection', 'Multi-Search']);
 
@@ -45,13 +47,15 @@ const presetsValues = z.discriminatedUnion('presetType', [
   presetsValuesMulti,
 ]);
 
+export const DEFAULT_PRESET_VALUES = {
+  presetId: '',
+  presetType: presetType.enum['Single-Collection'] as string,
+  searchParameters: [EMPTY_PRESET_PARAMS],
+  multiSearchParams: [[EMPTY_PRESET_PARAMS], [EMPTY_PRESET_PARAMS]],
+};
+
 export const presetsFormOpts = formOptions({
-  defaultValues: {
-    presetId: '',
-    presetType: presetType.enum['Single-Collection'] as string,
-    searchParameters: [EMPTY_PRESET_PARAMS],
-    multiSearchParams: [[EMPTY_PRESET_PARAMS], [EMPTY_PRESET_PARAMS]],
-  },
+  defaultValues: DEFAULT_PRESET_VALUES,
   validators: {
     onChange: presetsValues,
   },

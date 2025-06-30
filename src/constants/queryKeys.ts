@@ -62,3 +62,7 @@ export const analyticsQueryKeys = {
   rules: (clusterId: string) =>
     [...analyticsQueryKeys.all(clusterId), 'rules'] as const,
 };
+
+export const presetQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'presets'] as const,
+};
