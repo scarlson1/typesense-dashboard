@@ -8,7 +8,6 @@ import {
   styled,
   Typography,
 } from '@mui/material';
-// import { useUser } from '../hooks';
 import { MenuContent } from './MenuContent';
 import OptionsMenu from './OptionsMenu';
 import { SelectContent } from './SelectContent';

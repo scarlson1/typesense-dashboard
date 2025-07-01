@@ -13,7 +13,6 @@ import type { SearchParams } from 'typesense/lib/Typesense/Documents';
 import type {
   MultiSearchRequestSchema,
   MultiSearchRequestsSchema,
-  MultiSearchRequestWithPresetSchema,
 } from 'typesense/lib/Typesense/MultiSearch';
 import { EMPTY_PRESET_PARAMS, presetQueryKeys, presetType } from '../constants';
 import { useAsyncToast, useTypesenseClient } from '../hooks';
@@ -30,7 +29,6 @@ export function PresetsList() {
       return presets;
     },
   });
-  console.log('PRESETS: ', presets);
 
   const deleteMutation = useDeletePreset();
 
@@ -50,8 +48,6 @@ export function PresetsList() {
       {presets.map((preset, i) => {
         let isMulti = isMultiSearch(preset.value);
 
-        console.log('VAL: ', preset.value);
-
         const defaultValues = {
           presetId: preset.name,
           presetType: isMulti
@@ -63,22 +59,15 @@ export function PresetsList() {
                 name: k,
                 value: v,
               })),
-          multiSearchParams: isMulti // @ts-ignore
-            ? (preset.value as MultiSearchRequestSchema).searches.map(
-                (
-                  x: (
-                    | MultiSearchRequestSchema
-                    | MultiSearchRequestWithPresetSchema
-                  )[]
-                ) =>
-                  Object.entries(x).map(([k, v]) => ({
-                    name: k,
-                    value: v,
-                  }))
+          multiSearchParams: isMulti
+            ? (preset.value as MultiSearchRequestsSchema).searches.map((x) =>
+                Object.entries(x).map(([k, v]) => ({
+                  name: k,
+                  value: v,
+                }))
               )
             : [[EMPTY_PRESET_PARAMS], [EMPTY_PRESET_PARAMS]],
         };
-        console.log('DEFAULT VALUES: ', defaultValues);
 
         return (
           <Accordion
@@ -132,10 +121,7 @@ export function PresetsList() {
         <AccordionDetails>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <Suspense>
-              <UpdatePreset
-                // defaultValues={analyticsFormDefaultValues}
-                submitButtonText='Add Preset'
-              />
+              <UpdatePreset submitButtonText='Add Preset' />
             </Suspense>
           </ErrorBoundary>
         </AccordionDetails>

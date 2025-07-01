@@ -14,6 +14,7 @@ export * from './CurationList';
 export * from './CustomToast';
 export * from './ErrorFallback';
 export * from './Header';
+export * from './InstantSearch';
 export * from './JsonEditor';
 export * from './LoadingSpinner';
 export * from './MenuButton';

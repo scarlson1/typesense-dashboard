@@ -142,7 +142,7 @@ function AuthComponent() {
               justifyContent: 'center',
             }}
           >
-            Typesense <OpenInNewRounded fontSize='inherit' />
+            Typesense <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
           </Link>
         </Stack>
       </Card>

@@ -15,6 +15,7 @@ import {
   KeyRounded,
   LeakAddRounded,
   SearchRounded,
+  SettingsInputSvideoRounded,
   SettingsRounded,
   TroubleshootRounded,
 } from '@mui/icons-material';
@@ -249,6 +250,11 @@ export function MenuContent() {
         text: 'Stopwords',
         icon: <FrontHandRounded fontSize='small' />,
         route: { to: '/stopwords' },
+      },
+      {
+        text: 'Cluster Config',
+        icon: <SettingsInputSvideoRounded fontSize='small' />,
+        route: { to: '/server' },
       },
       // { text: 'Stop Words', icon: <AssessmentRounded />, route: '/stop-words' },
     ];

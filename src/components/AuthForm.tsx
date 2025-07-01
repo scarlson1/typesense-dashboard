@@ -4,12 +4,14 @@ import { z } from 'zod/v4';
 import { withForm } from '../hooks';
 import { environment } from '../types';
 
+// TODO: implement "remember" - use localStorage instead of sessionStorage ??
+
 const authSchema = z.object({
   node: z.string(),
-  port: z.string(), // z.coerce.number(),
+  port: z.string(),
   protocol: z.enum(['http', 'https']),
   apiKey: z.string(),
-  remember: z.boolean(),
+  // remember: z.boolean(),
   env: environment,
 });
 
@@ -19,7 +21,7 @@ export const authFormOpts = formOptions({
     port: '',
     protocol: '',
     apiKey: '',
-    remember: false,
+    // remember: false,
     env: '',
   },
   validators: {
@@ -29,7 +31,6 @@ export const authFormOpts = formOptions({
 
 export const AuthForm = withForm({
   ...authFormOpts,
-  // Optional, but adds props to the `render` function outside of `form`
   props: {
     title: 'Login',
   },
@@ -97,7 +98,6 @@ export const AuthForm = withForm({
               <TextField
                 id='apiKey'
                 label='API Key'
-                // placeholder='443'
                 type='password'
                 required
                 fullWidth
@@ -120,9 +120,9 @@ export const AuthForm = withForm({
             )}
           </form.AppField>
         </Stack>
-        <form.AppField name='remember'>
+        {/* <form.AppField name='remember'>
           {({ Checkbox }) => <Checkbox label='Remember me' />}
-        </form.AppField>
+        </form.AppField> */}
         <form.AppForm>
           <form.SubmitButton label='Submit' fullWidth />
         </form.AppForm>

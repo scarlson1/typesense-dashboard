@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as DashboardStopwordsRouteImport } from './routes/_dashboard/stopwords'
+import { Route as DashboardServerRouteImport } from './routes/_dashboard/server'
 import { Route as DashboardPresetsRouteImport } from './routes/_dashboard/presets'
 import { Route as DashboardKeysRouteImport } from './routes/_dashboard/keys'
 import { Route as DashboardAnalyticsRouteImport } from './routes/_dashboard/analytics'
@@ -46,6 +47,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 const DashboardStopwordsRoute = DashboardStopwordsRouteImport.update({
   id: '/stopwords',
   path: '/stopwords',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardServerRoute = DashboardServerRouteImport.update({
+  id: '/server',
+  path: '/server',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPresetsRoute = DashboardPresetsRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof DashboardAnalyticsRoute
   '/keys': typeof DashboardKeysRoute
   '/presets': typeof DashboardPresetsRoute
+  '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
   '/': typeof DashboardIndexRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/analytics': typeof DashboardAnalyticsRoute
   '/keys': typeof DashboardKeysRoute
   '/presets': typeof DashboardPresetsRoute
+  '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
   '/': typeof DashboardIndexRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/_dashboard/analytics': typeof DashboardAnalyticsRoute
   '/_dashboard/keys': typeof DashboardKeysRoute
   '/_dashboard/presets': typeof DashboardPresetsRoute
+  '/_dashboard/server': typeof DashboardServerRoute
   '/_dashboard/stopwords': typeof DashboardStopwordsRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/collections/new': typeof DashboardCollectionsNewRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/keys'
     | '/presets'
+    | '/server'
     | '/stopwords'
     | '/'
     | '/collections/new'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/keys'
     | '/presets'
+    | '/server'
     | '/stopwords'
     | '/'
     | '/collections/new'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/_dashboard/analytics'
     | '/_dashboard/keys'
     | '/_dashboard/presets'
+    | '/_dashboard/server'
     | '/_dashboard/stopwords'
     | '/_dashboard/'
     | '/_dashboard/collections/new'
@@ -293,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/stopwords'
       fullPath: '/stopwords'
       preLoaderRoute: typeof DashboardStopwordsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/server': {
+      id: '/_dashboard/server'
+      path: '/server'
+      fullPath: '/server'
+      preLoaderRoute: typeof DashboardServerRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/presets': {
@@ -408,6 +427,7 @@ interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardKeysRoute: typeof DashboardKeysRoute
   DashboardPresetsRoute: typeof DashboardPresetsRoute
+  DashboardServerRoute: typeof DashboardServerRoute
   DashboardStopwordsRoute: typeof DashboardStopwordsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardCollectionsNewRoute: typeof DashboardCollectionsNewRoute
@@ -428,6 +448,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardKeysRoute: DashboardKeysRoute,
   DashboardPresetsRoute: DashboardPresetsRoute,
+  DashboardServerRoute: DashboardServerRoute,
   DashboardStopwordsRoute: DashboardStopwordsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardCollectionsNewRoute: DashboardCollectionsNewRoute,

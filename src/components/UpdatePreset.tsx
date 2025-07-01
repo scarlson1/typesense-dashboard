@@ -1,16 +1,13 @@
 import { Box } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
 import type { PresetCreateSchema } from 'typesense/lib/Typesense/Presets';
 import {
   DEFAULT_PRESET_VALUES,
-  presetQueryKeys,
   presetsFormOpts,
   presetType,
   type MultiParameterKeys,
   type ParameterKeys,
 } from '../constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
+import { useAppForm, useUpsertPreset } from '../hooks';
 import { PresetsForm } from './PresetsForm';
 
 interface UpdatePresetProps {
@@ -22,38 +19,7 @@ export function UpdatePreset({
   defaultValues = DEFAULT_PRESET_VALUES,
   submitButtonText = 'Submit',
 }: UpdatePresetProps) {
-  const toast = useAsyncToast();
-  const [client, clusterId] = useTypesenseClient();
-  const mutation = useMutation({
-    mutationFn: ({
-      presetId,
-      params,
-    }: {
-      presetId: string;
-      params: PresetCreateSchema;
-    }) => client.presets().upsert(presetId, params),
-    onMutate: (vars) => {
-      queryClient.cancelQueries({
-        queryKey: presetQueryKeys.all(clusterId),
-      });
-      toast.loading(`saving stopword set [${vars.presetId}]`, {
-        id: 'save-presets',
-      });
-      return vars;
-    },
-    onSuccess: (data) => {
-      toast.success(`presets saved [${data.name}]`, { id: 'save-presets' });
-    },
-    onError: (err, vars) => {
-      let msg = err.message || `error saving presets [${vars.presetId}]`;
-      toast.error(msg, { id: 'save-presets' });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: presetQueryKeys.all(clusterId),
-      });
-    },
-  });
+  const mutation = useUpsertPreset();
 
   const form = useAppForm({
     ...presetsFormOpts,

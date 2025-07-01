@@ -18,7 +18,7 @@ export function TextField(props: TextFieldProps) {
       defaultValue={state.value}
       onChange={(e) => handleChange(e.target.value)}
       onBlur={handleBlur}
-      error={Boolean(state.meta.errors.length)}
+      error={state.meta.isTouched && !state.meta.isValid} // Boolean(state.meta.errors.length)
       helperText={
         errors.length
           ? errors.map((e) => e?.message).join(', ')

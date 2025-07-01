@@ -216,7 +216,6 @@ export const PresetsForm = withForm({
                           </form.AppField>
                         </Box>
                       ))}
-                      {/* <Grid size={{ xs: 12 }}> */}
                       <IconButton
                         onClick={() => pushValue([EMPTY_PRESET_PARAMS])}
                         aria-label='add another search parameter'
@@ -224,7 +223,6 @@ export const PresetsForm = withForm({
                       >
                         <AddRounded />
                       </IconButton>
-                      {/* </Grid> */}
                     </>
                   )}
                 </form.AppField>
@@ -251,6 +249,8 @@ export const PresetsForm = withForm({
                                       handleChange(newVal || '')
                                     }
                                     blurOnSelect
+                                    autoHighlight
+                                    autoSelect
                                     renderInput={(params: object) => (
                                       <MuiTextField
                                         {...params}

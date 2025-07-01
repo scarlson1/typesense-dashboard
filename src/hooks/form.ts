@@ -10,6 +10,7 @@ import { fieldContext, formContext } from './formContext';
 
 const TextField = lazy(() => import('../components/forms/TextField.tsx'));
 const DatePicker = lazy(() => import('../components/forms/DatePicker.tsx'));
+const Autocomplete = lazy(() => import('../components/forms/Autocomplete.tsx'));
 
 // TODO: create other reusable input types (number input, select, masked fields etc.)
 
@@ -20,6 +21,7 @@ const { useAppForm, withForm } = createFormHook({
     Checkbox,
     Select,
     DatePicker,
+    Autocomplete,
     // MaskInput,
   },
   formComponents: {
