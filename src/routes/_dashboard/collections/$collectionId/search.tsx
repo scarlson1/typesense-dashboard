@@ -9,11 +9,13 @@ import {
   type TextFieldProps,
 } from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useCallback, type ChangeEventHandler } from 'react';
+import { useCallback, useMemo, type ChangeEventHandler } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import { z } from 'zod/v4';
 import { InstantSearch } from '../../../../components';
+import { collectionQueryKeys } from '../../../../constants';
 import {
   useAppForm,
   useHits,
@@ -107,7 +109,7 @@ function SearchCollection() {
       </Typography>
 
       <Paper sx={{ p: 3, my: 2 }}>
-        <SearchParameters />
+        <SearchParameters collectionId={collectionId} />
       </Paper>
     </>
   );
@@ -164,10 +166,12 @@ function Hits({ hits }: HitsProps) {
 
 export const searchParamValues = z.object({
   query_by: z.array(z.string()),
+  sort_by: z.array(z.string()),
 });
 
 export const DEFAULT_SEARCH_PARAMS_VALUES = {
-  query_by: [''],
+  query_by: [] as string[],
+  sort_by: [] as string[],
 };
 
 export const searchParamsFormOpts = formOptions({
@@ -181,9 +185,10 @@ const SearchParamsForm = withForm({
   ...searchParamsFormOpts,
   props: {
     queryByOptions: [] as string[],
+    sortByOptions: [] as string[],
     submitButtonText: 'Save as Preset',
   },
-  render: ({ form, queryByOptions, submitButtonText }) => {
+  render: ({ form, queryByOptions, sortByOptions, submitButtonText }) => {
     return (
       <Grid container columnSpacing={3} rowSpacing={3}>
         <Grid
@@ -209,6 +214,29 @@ const SearchParamsForm = withForm({
             )}
           </form.AppField>
         </Grid>
+        <Grid
+          size={{ xs: 12, sm: 4 }}
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}
+        >
+          <Typography>Sort By</Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 8 }}>
+          <form.AppField name='sort_by' mode='array'>
+            {({ Autocomplete }) => (
+              <Autocomplete
+                disablePortal
+                label='Sort By'
+                multiple
+                options={sortByOptions}
+                sx={{ maxWidth: 600 }}
+              />
+            )}
+          </form.AppField>
+        </Grid>
         <Grid size={{ xs: 12 }}>
           <form.AppForm>
             <form.SubmitButton label={submitButtonText} />
@@ -221,8 +249,10 @@ const SearchParamsForm = withForm({
 
 function SearchParamsFormComponent({
   queryByOptions,
+  sortByOptions,
 }: {
   queryByOptions: string[];
+  sortByOptions: string[];
 }) {
   const mutation = useUpsertPreset();
 
@@ -248,19 +278,39 @@ function SearchParamsFormComponent({
       <SearchParamsForm
         form={form}
         queryByOptions={queryByOptions}
+        sortByOptions={sortByOptions}
         submitButtonText='Save as preset'
       />
     </Box>
   );
 }
 
-function SearchParameters() {
+function SearchParameters({ collectionId }: { collectionId: string }) {
   // const [client, clusterId] = useTypesenseClient();
+  const [client, clusterId] = useTypesenseClient();
+  const { data } = useSuspenseQuery({
+    queryKey: collectionQueryKeys.schema(clusterId, collectionId),
+    queryFn: () => client.collections(collectionId).retrieve(),
+  });
+
+  const queryByOptions = useMemo(
+    () => data.fields.filter((field) => field.store).map((field) => field.name),
+    [data?.fields]
+  );
+
+  const sortByOptions = useMemo(
+    () =>
+      data.fields
+        .filter((field) => field.store && field.sort)
+        .map((field) => field.name),
+    [data?.fields]
+  );
 
   return (
     <>
       <SearchParamsFormComponent
-        queryByOptions={['test', 'field1', 'field2']}
+        queryByOptions={queryByOptions}
+        sortByOptions={sortByOptions}
       />
 
       <Box sx={{ py: 3 }}>

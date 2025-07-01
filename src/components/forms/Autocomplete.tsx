@@ -27,7 +27,7 @@ function Autocomplete<
   Value,
   Multiple extends boolean | undefined,
   DisableClearable extends boolean | undefined,
-  FreeSolo extends boolean | undefined,
+  FreeSolo extends false | undefined,
   ChipComponent extends React.ElementType = 'div',
 >({
   label,
@@ -40,7 +40,7 @@ function Autocomplete<
   FreeSolo,
   ChipComponent
 >) {
-  const { state, store, handleBlur, handleChange } = useFieldContext<Value>();
+  const { state, store, handleBlur, handleChange } = useFieldContext();
   const errors = useStore(store, (state) => state.meta.errors);
 
   console.log('STATE: ', state);
