@@ -7,19 +7,25 @@ import {
   type MultiParameterKeys,
   type ParameterKeys,
 } from '../constants';
-import { useAppForm, useUpsertPreset } from '../hooks';
+import {
+  useAppForm,
+  useUpsertPreset,
+  type UseUpsertPresetProps,
+} from '../hooks';
 import { PresetsForm } from './PresetsForm';
 
 interface UpdatePresetProps {
   defaultValues?: any;
   submitButtonText?: string;
+  mutationProps?: UseUpsertPresetProps;
 }
 
 export function UpdatePreset({
   defaultValues = DEFAULT_PRESET_VALUES,
   submitButtonText = 'Submit',
+  mutationProps,
 }: UpdatePresetProps) {
-  const mutation = useUpsertPreset();
+  const mutation = useUpsertPreset(mutationProps);
 
   const form = useAppForm({
     ...presetsFormOpts,
@@ -55,10 +61,7 @@ export function UpdatePreset({
             value: presetValue,
           },
         });
-
-        setTimeout(() => {
-          form.reset();
-        }, 100);
+        setTimeout(form.reset, 100);
       } catch (err) {
         console.log(err);
       }

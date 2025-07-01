@@ -5,5 +5,6 @@ export * from './dialog';
 export * from './monaco';
 export * from './presetsForm';
 export * from './queryKeys';
+export * from './searchParamsForm';
 export * from './stopwordsForm';
 export * from './toastTheme';

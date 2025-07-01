@@ -1,14 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import type { Client } from 'typesense';
-import type {
-  DocumentSchema,
-  SearchParams,
-  SearchParamsWithPreset,
-} from 'typesense/lib/Typesense/Documents';
+import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import { collectionQueryKeys } from '../constants';
-import { SearchContext, type SearchContextValues } from '../context';
+import {
+  SearchContext,
+  type SearchContextParams,
+  type SearchContextValues,
+} from '../context';
 import { useDebounce } from '../hooks';
+import { CollectionProvider } from './CollectionProvider';
 
 export type InstantSearchProps = {
   // SearchContextValues & {
@@ -16,7 +17,7 @@ export type InstantSearchProps = {
   client: Client;
   collectionId: string;
   children?: ReactNode;
-  initialParams?: Omit<SearchParams, 'q'> | Omit<SearchParamsWithPreset, 'q'>;
+  initialParams?: SearchContextParams;
   debounceMs?: number;
   // TODO: extends UseQueryOptions ??
   staleTime?: number;
@@ -55,8 +56,11 @@ export function InstantSearch<T extends DocumentSchema>({
       staleTime,
     });
 
+  const setPreset = useCallback((presetId: string | null) => {
+    setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
+  }, []);
+
   // TODO:
-  // presets
   // search params
   // create hooks for specific types of updates to context (presets, search params, etc.)
 
@@ -69,8 +73,10 @@ export function InstantSearch<T extends DocumentSchema>({
       error,
       isPlaceholderData,
       collectionId,
+      params,
       setParams,
       setQuery,
+      setPreset,
     }),
     [
       data,
@@ -80,83 +86,26 @@ export function InstantSearch<T extends DocumentSchema>({
       error,
       isPlaceholderData,
       collectionId,
+      params,
       setParams,
       setQuery,
+      setPreset,
     ]
   );
 
   return (
     <SearchContext.Provider value={memoizedValue}>
+      TODO: index context to store current index info (schema, default query_by,
+      etc.)
       {/* <IndexContext.Provider value={search.mainIndex}> */}
-      {children}
+      <CollectionProvider
+        client={client}
+        collectionId={collectionId}
+        clusterId={clusterId}
+      >
+        {children}
+      </CollectionProvider>
       {/* </IndexContext.Provider> */}
     </SearchContext.Provider>
   );
 }
-
-// interface UseInstantSearchApiProps {
-//   clusterId: string;
-//   client: Client;
-//   indexName: string;
-
-// Function called when the state changes.
-// Using this function makes the instance controlled. This means that you become in charge of updating the UI state with the `setUiState` function.
-// onStateChange?: (params: {
-//   uiState: TUiState;
-//   setUiState: (
-//     uiState: TUiState | ((previousUiState: TUiState) => TUiState)
-//   ) => void;
-// }) => void;
-
-// initialUiState?: NoInfer<TUiState>;
-
-// Time before a search is considered stalled. The default is 200ms
-// stalledSearchDelay?: number;
-
-// Router configuration used to save the UI State into the URL or any other client side persistence.
-// routing?: RouterProps<TUiState, TRouteState> | boolean;
-// }
-
-// import { IndexContext } from '../lib/IndexContext';
-// import { InstantSearchContext } from '../lib/InstantSearchContext';
-// import { useInstantSearchApi } from '../lib/useInstantSearchApi';
-
-// import type {
-//   InternalInstantSearch,
-//   UseInstantSearchApiProps,
-// } from '../lib/useInstantSearchApi';
-// import type {
-//   InstantSearch as InstantSearchType,
-//   UiState,
-// } from 'instantsearch.js';
-
-// export type InstantSearchProps<
-//   TUiState extends UiState = UiState,
-//   TRouteState = TUiState
-// > = UseInstantSearchApiProps<TUiState, TRouteState> & {
-//   children?: ReactNode
-// };
-
-// export function InstantSearch<
-//   TUiState extends UiState = UiState,
-//   TRouteState = TUiState>
-// ({ children, ...props }: InstantSearchProps<TUiState, TRouteState>) {
-//   const search = useInstantSearchApi<TUiState, TRouteState>(props);
-
-//   if (!search.started) {
-//     return null;
-//   }
-
-//   return (
-//     <InstantSearchContext.Provider
-//       value={search as unknown as InstantSearchType<UiState, UiState>}
-//     >
-//       <IndexContext.Provider value={search.mainIndex}>
-//         {children}
-//         <ResetScheduleSearch
-//           search={search as unknown as InternalInstantSearch<UiState, UiState>}
-//         />
-//       </IndexContext.Provider>
-//     </InstantSearchContext.Provider>
-//   );
-// }

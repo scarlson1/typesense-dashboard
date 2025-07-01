@@ -7,6 +7,10 @@ import type {
   SearchResponse,
 } from 'typesense/lib/Typesense/Documents';
 
+export type SearchContextParams =
+  | Omit<SearchParams, 'q'>
+  | Omit<SearchParamsWithPreset, 'q'>;
+
 export type SearchContextValues<
   TData extends DocumentSchema,
   TError = Error,
@@ -22,10 +26,10 @@ export type SearchContextValues<
   // clusterId: string;
   // client: Client;
   collectionId: string;
-  setParams: Dispatch<
-    SetStateAction<Omit<SearchParams, 'q'> | Omit<SearchParamsWithPreset, 'q'>>
-  >;
+  params: SearchContextParams;
+  setParams: Dispatch<SetStateAction<SearchContextParams>>;
   setQuery: (value: string) => void;
+  setPreset: (presetId: string | null) => void;
 };
 
 export const SearchContext = createContext<SearchContextValues<
