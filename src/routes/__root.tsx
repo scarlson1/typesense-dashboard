@@ -39,9 +39,15 @@ function RootComponent(props: { disableCustomTheme?: boolean }) {
     <>
       <AppTheme {...props} themeComponents={xThemeComponents}>
         <CssBaseline enableColorScheme />
+        {/* <CollectionProvider
+          client={client}
+          // collectionId={collectionId}
+          clusterId={clusterId}
+        > */}
         <DialogProvider>
           <Outlet />
         </DialogProvider>
+        {/* </CollectionProvider> */}
         <Toaster />
       </AppTheme>
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}

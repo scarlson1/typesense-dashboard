@@ -142,15 +142,13 @@ export function UpdateSearchParameters({
   // const formValuesOtherParams = useStore(form.store, (state) => state.values.other_params);
   // const formValuesQueryBy = useStore(form.store, (state) => state.values.query_by);
   // const formValuesSortBy = useStore(form.store, (state) => state.values.sort_by);
-
   const formValues = useStore(form.store, (state) => state.values);
-  // const prevFormValues = usePrevious(formValues)
 
   // update SearchContext preset when form preset is selected
   useEffect(() => {
     let newParams = formValuesToPresetSchema(formValues as SearchParamValues);
-    console.log('SETTING CTX PARAMS: ', newParams);
-    setParams((prev) => ({ ...prev, ...newParams }));
+    // console.log('SETTING CTX PARAMS: ', newParams);
+    setParams(newParams);
   }, [formValues]);
 
   return (

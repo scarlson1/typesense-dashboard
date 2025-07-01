@@ -11,6 +11,9 @@ import {
 import { useDebounce } from '../hooks';
 import { CollectionProvider } from './CollectionProvider';
 
+// TODO: move CollectionContext above InstantSearch
+// pass schema defaults to InstantSearchProps to initialize query_by, etc. params
+
 export type InstantSearchProps = {
   // SearchContextValues & {
   clusterId: string;
@@ -36,6 +39,13 @@ export function InstantSearch<T extends DocumentSchema>({
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, debounceMs);
 
+  console.log('Search: ', {
+    q: debouncedQuery,
+    ...params,
+  });
+
+  const { preset: testPreset, ...rest } = params;
+
   const { data, isLoading, isFetching, isError, error, isPlaceholderData } =
     useQuery({
       queryKey: collectionQueryKeys.search(
@@ -50,7 +60,8 @@ export function InstantSearch<T extends DocumentSchema>({
           .documents()
           .search({
             q: debouncedQuery,
-            ...params,
+            // ...params,
+            ...rest,
           }),
       enabled: !!debouncedQuery,
       staleTime,
@@ -95,9 +106,6 @@ export function InstantSearch<T extends DocumentSchema>({
 
   return (
     <SearchContext.Provider value={memoizedValue}>
-      TODO: index context to store current index info (schema, default query_by,
-      etc.)
-      {/* <IndexContext.Provider value={search.mainIndex}> */}
       <CollectionProvider
         client={client}
         collectionId={collectionId}
@@ -105,7 +113,6 @@ export function InstantSearch<T extends DocumentSchema>({
       >
         {children}
       </CollectionProvider>
-      {/* </IndexContext.Provider> */}
     </SearchContext.Provider>
   );
 }

@@ -9,11 +9,17 @@ import {
   type TextFieldProps,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { Suspense, useCallback, type ChangeEventHandler } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  type ChangeEventHandler,
+} from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import {
   ButtonLink,
   InstantSearch,
+  JsonEditor,
   UpdateSearchParameters,
 } from '../../../../components';
 import {
@@ -23,13 +29,7 @@ import {
   useTypesenseClient,
 } from '../../../../hooks';
 
-// 1) create context (https://github.com/algolia/instantsearch/blob/master/packages/react-instantsearch-core/src/components/InstantSearch.tsx)
-
-// 2) create hooks (useIndexContext vs useInstantSearchContext - need both ??)
-//      - ex: useSearchResults (https://github.com/algolia/instantsearch/blob/master/packages/react-instantsearch-core/src/lib/useSearchResults.ts)
-//      - https://github.com/algolia/instantsearch/blob/master/packages/react-instantsearch-core/src/lib/useInstantSearchApi.ts
-
-// 3) create UI components (roughly mapped to hooks ??)
+// TODO: create wrapper to wait for context to load (CollectionProvider & InstantSearch)
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/search'
@@ -40,23 +40,9 @@ export const Route = createFileRoute(
   },
 });
 
-// const useCollectionSchema = (collectionId: string) => {
-//   const [ client, clusterId] = useTypesenseClient()
-
-//   return useSuspenseQuery({
-//     queryKey: collectionQueryKeys.schema(clusterId, collectionId),
-//     queryFn: () => client.collections(collectionId).retrieve()
-//   })
-// }
-
-// TODO: default query_by ?? where should this be retrieved from before being explicitly set ??
-let DEFAULT_QUERY_BY = ['company_name'];
-
 function SearchCollection() {
   const { collectionId } = Route.useParams();
   const [client, clusterId] = useTypesenseClient();
-  // get collection schema defaults to populate params
-  // const { data } = useCollectionSchema(collectionId)
 
   return (
     <>
@@ -76,11 +62,15 @@ function SearchCollection() {
         collectionId={collectionId}
         client={client}
         clusterId={clusterId}
-        initialParams={{ query_by: DEFAULT_QUERY_BY }}
+        // TODO: need to set initial query by params from default index
+        // move index above search in component hierarchy ?? pass defaults as prop to InstantSearch ??
+        // initialParams={{ query_by: DEFAULT_QUERY_BY }}
       >
         <SearchBox sx={{ my: 1 }} />
+
+        <SearchStats />
+
         <TempHits />
-        <Box sx={{ minHeight: 200 }}>TODO: search / hits</Box>
 
         <Typography variant='h5' gutterBottom>
           Search Parameters
@@ -127,8 +117,8 @@ function TempDisplaySearchParams() {
 
 type SearchBoxProps = Omit<TextFieldProps, 'onChange'>;
 
-function SearchBox(props: SearchBoxProps) {
-  const { setQuery } = useSearch();
+function SearchBox({ disabled, helperText, ...props }: SearchBoxProps) {
+  const { setQuery, params } = useSearch();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
@@ -137,11 +127,16 @@ function SearchBox(props: SearchBoxProps) {
     []
   );
 
+  let queryByValid = Boolean(params?.query_by?.length);
+  let helperTextVal = !queryByValid ? `"query_by" param required` : helperText;
+
   return (
     <MuiTextField
       onChange={handleChange}
       fullWidth
-      // disabled={!params?.query_by?.length}
+      helperText={helperTextVal}
+      disabled={disabled || !Boolean(params?.query_by?.length)}
+      error={!queryByValid}
       {...props}
     />
   );
@@ -149,6 +144,10 @@ function SearchBox(props: SearchBoxProps) {
 
 function TempHits() {
   const hits = useHits();
+
+  useEffect(() => {
+    console.log('HITS: ', hits?.hits);
+  }, [hits?.hits]);
 
   if (!hits?.hits)
     return (
@@ -165,123 +164,27 @@ interface HitsProps {
 function Hits({ hits }: HitsProps) {
   return (
     <>
-      {hits.map((h) => (
-        <Typography component='div' variant='h2' color='textSecondary'>
+      <Box sx={{ py: 3 }}>
+        <JsonEditor value={JSON.stringify({ ...hits }, null, 2)} height={280} />
+      </Box>
+      {/* {hits.map((h) => (
+        <Typography component='div' variant='body2' color='textSecondary'>
           <pre>{JSON.stringify(h, null, 2)}</pre>
         </Typography>
-      ))}
+      ))} */}
     </>
   );
 }
 
-// function SearchParamsFormComponent({
-//   presets,
-//   queryByOptions,
-//   sortByOptions,
-//   facetByOptions,
-//   groupByOptions,
-// }: {
-//   presets: PresetSchema[];
-//   queryByOptions: string[];
-//   sortByOptions: string[];
-//   facetByOptions: string[];
-//   groupByOptions: string[];
-// }) {
-//   const mutation = useUpsertPreset();
+function SearchStats() {
+  const { data } = useSearch();
 
-//   const form = useAppForm({
-//     ...searchParamsFormOpts,
-//     onSubmit: async ({ value }) => {
-//       try {
-//         // @ts-ignore
-//         // if (value.query_by.length < 100)
-//         //   throw new Error('submit not implemented yet');
+  if (!data) return null;
 
-//         let { preset, other_params, ...rest } = value;
-//         console.log('VALUE: ', preset, rest);
-//         let otherParams = other_params.map((p) => ({
-//           // { name: MultiParameterKeys; value: string }
-//           [p.param]: p.value,
-//         }));
-//         console.log('other params: ', otherParams);
-//         let newValues = {
-//           ...rest,
-//           filter_by: rest.facet_by.join(','),
-//           ...(otherParams[0] || {}),
-//         };
-
-//         await mutation.mutateAsync({
-//           presetId: preset,
-//           params: { value: newValues },
-//         });
-
-//         // TODO: set preset in SearchContext ??
-
-//         // setTimeout(form.reset, 100);
-//       } catch (err) {
-//         console.log(err);
-//       }
-//     },
-//   });
-
-//   return (
-//     <Box
-//       component='form'
-//       onSubmit={(e) => {
-//         e.preventDefault();
-//         e.stopPropagation();
-//         form.handleSubmit();
-//       }}
-//       noValidate
-//     >
-//       <SearchParamsForm
-//         form={form}
-//         presets={presets}
-//         queryByOptions={queryByOptions}
-//         sortByOptions={sortByOptions}
-//         facetByOptions={facetByOptions}
-//         groupByOptions={groupByOptions}
-//         submitButtonText='Save as preset'
-//       />
-//     </Box>
-//   );
-// }
-
-// interface SearchProps extends Omit<TextFieldProps, 'onChange'> {
-//   collectionId: string;
-//   params?: Omit<SearchParams, 'q'> | Omit<SearchParamsWithPreset, 'q'>;
-// }
-
-// function Search({ collectionId, params, ...props }: SearchProps) {
-//   const [term, setTerm] = useState<string>('');
-//   const { data } = useSearchOld({
-//     collectionId,
-//     q: term,
-//     params,
-//     debounceMs: 200,
-//   });
-
-//   const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback(
-//     (event) => {
-//       setTerm(event.target.value);
-//     },
-//     []
-//   );
-
-//   useEffect(() => {
-//     console.log('DATA: ', data);
-//   }, [data]);
-
-//   return (
-//     <>
-//       <TextField
-//         onChange={handleChange}
-//         fullWidth
-//         disabled={!params?.query_by?.length}
-//         {...props}
-//       />
-//       <Divider sx={{ my: 2 }} />
-//       {/* <Box sx={{ py: 2 }}>{data?.hits ? <Hits hits={data?.hits} /> : null}</Box> */}
-//     </>
-//   );
-// }
+  return (
+    <Typography
+      variant='subtitle2'
+      color='text.secondary'
+    >{`${data?.found_docs} results found from ${data?.found} docs in ${data?.search_time_ms}ms`}</Typography>
+  );
+}

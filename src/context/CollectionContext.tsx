@@ -19,12 +19,13 @@ export type CollectionContextValues<TError = Error> = Pick<
   | 'error'
   | 'isPlaceholderData'
 > & {
-  collectionId: string;
+  collectionId?: string; // ?: string | null;
   defaultSortingField?: string | undefined;
   queryByOptions: string[];
   sortByOptions: string[];
   facetByOptions: string[];
   groupByOptions: string[];
+  // setCollectionId: Dispatch<SetStateAction<string | null>>;
 };
 
 export const CollectionContext =

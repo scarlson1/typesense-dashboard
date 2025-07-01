@@ -5,10 +5,13 @@ import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import { collectionQueryKeys } from '../constants';
 import { CollectionContext, type CollectionContextValues } from '../context';
 
+// TODO:  use zustand to store collection Id ??
+// can be passed to loader functions via router context  etc.
+
 export type CollectionContextProps = {
   clusterId: string;
   client: Client;
-  collectionId: string;
+  collectionId?: string; // TODO: collectionId as param or use zustand ??
   children?: ReactNode;
   // TODO: extends UseQueryOptions ??
   staleTime?: number;
@@ -21,11 +24,14 @@ export function CollectionProvider<T extends DocumentSchema>({
   collectionId,
   staleTime = 30000,
 }: CollectionContextProps) {
-  // use Suspense query instead ??
+  // const [collectionId, setCollectionId] = useState<string | null>(
+  //   collectionName
+  // );
+
   const { data, isLoading, isFetching, isError, error, isPlaceholderData } =
     useQuery({
-      queryKey: collectionQueryKeys.schema(clusterId, collectionId),
-      queryFn: () => client.collections<T>(collectionId).retrieve(),
+      queryKey: collectionQueryKeys.schema(clusterId, collectionId as string),
+      queryFn: () => client.collections<T>(collectionId as string).retrieve(),
       enabled: !!collectionId,
       staleTime,
     });
@@ -73,6 +79,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       sortByOptions,
       facetByOptions,
       groupByOptions,
+      // setCollectionId,
     }),
     [
       data,
@@ -86,6 +93,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       queryByOptions,
       facetByOptions,
       groupByOptions,
+      // setCollectionId,
     ]
   );
 

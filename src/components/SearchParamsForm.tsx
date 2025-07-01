@@ -138,6 +138,7 @@ export const SearchParamsForm = withForm({
                 disablePortal
                 label='Query By'
                 multiple
+                limitTags={4}
                 options={queryByOptions}
                 sx={{ maxWidth: 600 }}
                 slotProps={{
@@ -170,6 +171,7 @@ export const SearchParamsForm = withForm({
                 disablePortal
                 label='Sort By'
                 multiple
+                limitTags={4}
                 options={sortByOptions}
                 sx={{ maxWidth: 600 }}
                 slotProps={{
@@ -202,6 +204,7 @@ export const SearchParamsForm = withForm({
                 disablePortal
                 label='Facet & Filter By'
                 multiple
+                limitTags={4}
                 options={facetByOptions}
                 sx={{ maxWidth: 600 }}
                 slotProps={{
@@ -234,6 +237,7 @@ export const SearchParamsForm = withForm({
                 disablePortal
                 label='Group By'
                 multiple
+                limitTags={4}
                 options={groupByOptions}
                 sx={{ maxWidth: 600 }}
                 slotProps={{
