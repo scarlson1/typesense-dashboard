@@ -70,10 +70,11 @@ function AddSynonym({ collectionId }: AddSynonymProps) {
       toast.loading(`saving synonyms`, { id: 'synonyms' });
     },
     onSuccess: () => {
-      toast.success(`saving synonyms`, { id: 'synonyms' });
+      toast.success(`synonyms saved`, { id: 'synonyms' });
     },
-    onError: () => {
-      toast.error(`saving synonyms`, { id: 'synonyms' });
+    onError: (err) => {
+      let msg = err?.message ?? 'An error occurred saving synonyms';
+      toast.error(msg, { id: 'synonyms' });
     },
     onSettled: () => {
       queryClient.invalidateQueries({

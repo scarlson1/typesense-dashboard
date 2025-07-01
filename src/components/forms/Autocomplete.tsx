@@ -1,4 +1,7 @@
-import type { AutocompleteProps as MuiAutocompleteProps } from '@mui/material';
+import type {
+  AutocompleteProps as MuiAutocompleteProps,
+  TextFieldProps,
+} from '@mui/material';
 import { Autocomplete as MuiAutocomplete, TextField } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { useFieldContext } from '../../hooks';
@@ -19,19 +22,22 @@ type AutocompleteProps<
   >,
   'value' | 'onChange' | 'onBlur' | 'error' | 'renderInput'
 > & {
-  label: string;
+  label: string; // TODO: move to textFieldProps ??
   helperText?: string;
+  textFieldProps?: Omit<TextFieldProps, 'value' | ''>;
 };
 
 function Autocomplete<
   Value,
   Multiple extends boolean | undefined,
   DisableClearable extends boolean | undefined,
-  FreeSolo extends false | undefined,
+  FreeSolo extends boolean | undefined,
   ChipComponent extends React.ElementType = 'div',
 >({
   label,
   helperText,
+  textFieldProps,
+  // slotProps ={},
   ...props
 }: AutocompleteProps<
   Value,
@@ -43,7 +49,9 @@ function Autocomplete<
   const { state, store, handleBlur, handleChange } = useFieldContext();
   const errors = useStore(store, (state) => state.meta.errors);
 
-  console.log('STATE: ', state);
+  // useEffect(() => {
+  //   console.log('AUTOCOMPLETE STATE: ', state);
+  // }, [state]);
 
   return (
     <MuiAutocomplete
@@ -52,10 +60,11 @@ function Autocomplete<
       value={state.value}
       // @ts-ignore
       onChange={(_, newVal: Value | null) => {
-        console.log('NEW VAL: ', newVal);
+        // console.log('NEW VAL: ', newVal);
         handleChange(newVal ?? ('' as Value));
       }}
       blurOnSelect
+      {...props}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -67,18 +76,16 @@ function Autocomplete<
               ? errors.map((e) => e?.message).join(', ')
               : helperText
           }
+          {...(textFieldProps || {})}
+          slotProps={{
+            ...(textFieldProps?.slotProps || {}),
+            input: {
+              ...params.InputProps,
+              ...(textFieldProps?.slotProps?.input || {}),
+            },
+          }}
         />
       )}
-      {...props}
-      // onBlur={handleBlur}
-      // disabled={state.meta.isValidating}
-      // error={Boolean(state.meta.errors.length)}
-      // helperText={
-      //   errors.length
-      //     ? errors.map((e) => e?.message).join(', ')
-      //     : props.helperText
-      // }
-      // slotProps={{ inputLabel: { shrink: true }, ...(props.slotProps || {}) }}
     />
   );
 }

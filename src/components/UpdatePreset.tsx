@@ -55,7 +55,10 @@ export function UpdatePreset({
             value: presetValue,
           },
         });
-        form.reset(); // TODO: fix reset when updating (resets to original values before react query updates - optimistic update ??)
+
+        setTimeout(() => {
+          form.reset();
+        }, 100);
       } catch (err) {
         console.log(err);
       }
