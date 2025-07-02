@@ -7,14 +7,21 @@ export const collectionQueryKeys = {
   all: (clusterId: string) => [clusterId, 'collections'] as const,
   list: (clusterId: string, filters: any) =>
     [...collectionQueryKeys.all(clusterId), filters] as const, // [string, any],
-  detail: (clusterId: string, id: string) =>
-    [...collectionQueryKeys.all(clusterId), id] as const,
+  collection: (clusterId: string, collectionId: string) =>
+    [...collectionQueryKeys.all(clusterId), collectionId] as const,
   names: (clusterId: string, options?: any) =>
     [...collectionQueryKeys.all(clusterId), 'names', options] as const,
   schemas: (clusterId: string) =>
     [...collectionQueryKeys.all(clusterId), 'schemas'] as const,
   schema: (clusterId: string, id: string) =>
     [...collectionQueryKeys.schemas(clusterId), id] as const,
+  documents: (clusterId: string, collectionId: string) =>
+    [
+      ...collectionQueryKeys.collection(clusterId, collectionId),
+      'documents',
+    ] as const,
+  document: (clusterId: string, collectionId: string, docId: string) =>
+    [...collectionQueryKeys.documents(clusterId, collectionId), docId] as const,
   search: (
     clusterId: string,
     collectionId: string,
@@ -22,19 +29,18 @@ export const collectionQueryKeys = {
     q: string
   ) =>
     [
-      ...collectionQueryKeys.schema(clusterId, collectionId),
-      'search',
+      ...collectionQueryKeys.documents(clusterId, collectionId),
       params,
       q,
     ] as const,
   synonyms: (clusterId: string, collectionId: string) =>
     [
-      ...collectionQueryKeys.detail(clusterId, collectionId),
+      ...collectionQueryKeys.collection(clusterId, collectionId),
       'synonyms',
     ] as const,
   curation: (clusterId: string, collectionId: string) =>
     [
-      ...collectionQueryKeys.detail(clusterId, collectionId),
+      ...collectionQueryKeys.collection(clusterId, collectionId),
       'curation',
     ] as const,
   curationDetail: (
@@ -43,7 +49,7 @@ export const collectionQueryKeys = {
     overrideId: string
   ) =>
     [
-      ...collectionQueryKeys.detail(clusterId, collectionId),
+      ...collectionQueryKeys.collection(clusterId, collectionId),
       'curation',
       overrideId,
     ] as const,

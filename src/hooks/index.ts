@@ -8,6 +8,7 @@ export * from './useCountdown';
 export * from './useCounter';
 export * from './useDebounce';
 export * from './useDefaultIndexParams';
+export * from './useDeleteDocument';
 export * from './useDialog';
 export * from './useHits';
 export * from './useInterval';

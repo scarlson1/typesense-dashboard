@@ -49,10 +49,6 @@ function Autocomplete<
   const { state, store, handleBlur, handleChange } = useFieldContext();
   const errors = useStore(store, (state) => state.meta.errors);
 
-  // useEffect(() => {
-  //   console.log('AUTOCOMPLETE STATE: ', state);
-  // }, [state]);
-
   return (
     <MuiAutocomplete
       disablePortal

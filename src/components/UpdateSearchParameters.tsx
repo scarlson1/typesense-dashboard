@@ -34,7 +34,7 @@ export function UpdateSearchParameters({
   // mutationProps,
   ...props
 }: UpdateSearchParametersProps) {
-  const [_, setParams] = useSearchParams();
+  const [_, updateParams] = useSearchParams();
   const [preset, setPreset] = usePreset();
   const [client, clusterId] = useTypesenseClient();
   const prevPreset = usePrevious(preset);
@@ -111,8 +111,8 @@ export function UpdateSearchParameters({
 
   // update SearchContext preset when form preset is selected
   useEffect(() => {
-    setParams(formValuesToPresetSchema(formValues as SearchParamValues));
-  }, [formValues]);
+    updateParams(formValuesToPresetSchema(formValues as SearchParamValues));
+  }, [updateParams, formValues]);
 
   return (
     <Box
@@ -142,7 +142,10 @@ function filterEmptyProperties<T extends Record<string, any>>(obj: T) {
   for (const [key, value] of Object.entries(obj)) {
     let isEmptyArray = Array.isArray(value) && !value.length;
     let isEmptyString = typeof value === 'string' && !value.trim().length;
-    if (!(isEmptyArray || isEmptyString)) newObj[key as keyof T] = value;
+    if (!(isEmptyArray || isEmptyString)) {
+      newObj[key as keyof T] = value;
+    }
+    if (isEmptyArray || isEmptyString) newObj[key as keyof T] = undefined;
   }
   return newObj;
 }

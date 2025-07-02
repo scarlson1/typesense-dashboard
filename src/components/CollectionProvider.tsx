@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo, type ReactNode } from 'react';
 import type { Client } from 'typesense';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
@@ -22,7 +22,7 @@ const QUERYABLE_FIELD_TYPES: TypesenseFieldType[] = [
 export type CollectionContextProps = {
   clusterId: string;
   client: Client;
-  collectionId?: string; // TODO: collectionId as param or use zustand ??
+  collectionId: string; // TODO: collectionId as param or use zustand ??
   children?: ReactNode;
   // TODO: extends UseQueryOptions ??
   staleTime?: number;
@@ -39,11 +39,17 @@ export function CollectionProvider<T extends DocumentSchema>({
   //   collectionName
   // );
 
-  const { data, isLoading, isFetching, isError, error, isPlaceholderData } =
-    useQuery({
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = // isPlaceholderData
+    useSuspenseQuery({
       queryKey: collectionQueryKeys.schema(clusterId, collectionId as string),
       queryFn: () => client.collections<T>(collectionId as string).retrieve(),
-      enabled: !!collectionId,
+      // enabled: !!collectionId,
       staleTime,
     });
 
@@ -86,7 +92,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       isFetching,
       isError,
       error,
-      isPlaceholderData,
+      // isPlaceholderData,
       collectionId,
       defaultSortingField,
       queryByOptions,
@@ -101,7 +107,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       isFetching,
       isError,
       error,
-      isPlaceholderData,
+      // isPlaceholderData,
       collectionId,
       defaultSortingField,
       queryByOptions,

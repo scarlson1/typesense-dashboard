@@ -1,6 +1,10 @@
-import { useContext, useMemo } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
-import { SearchContext, type SearchContextValues } from '../context';
+import {
+  SearchContext,
+  type SearchContextParams,
+  type SearchContextValues,
+} from '../context';
 
 const noop = (_: any) => {};
 
@@ -18,7 +22,12 @@ export const useSearchParams = <
     setParams: noop,
   };
 
+  const updateParams = useCallback((values: SearchContextParams) => {
+    console.log('UPDATE PARAMS', values);
+    setParams(({ ...prev }) => ({ ...prev, ...values }));
+  }, []);
+
   return useMemo(() => {
-    return [params, setParams] as const;
-  }, [params, setParams]);
+    return [params, updateParams, setParams] as const;
+  }, [params, setParams, updateParams]);
 };

@@ -11,6 +11,11 @@ export type SearchContextParams =
   | Omit<SearchParams, 'q'>
   | Omit<SearchParamsWithPreset, 'q'>;
 
+export type PaginationParams = Pick<
+  SearchParams,
+  'page' | 'per_page' | 'limit' | 'offset'
+>;
+
 export type SearchContextValues<
   TData extends DocumentSchema,
   TError = Error,
@@ -30,6 +35,8 @@ export type SearchContextValues<
   setParams: Dispatch<SetStateAction<SearchContextParams>>;
   setQuery: (value: string) => void;
   setPreset: (presetId: string | null) => void;
+  setPagination: (params: PaginationParams) => void;
+  pageSizeOptions: number[];
 };
 
 export const SearchContext = createContext<SearchContextValues<
