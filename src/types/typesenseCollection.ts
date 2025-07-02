@@ -20,6 +20,7 @@ export const typesenseFieldType = z.enum([
   'string*',
   'image',
 ]);
+export type TypesenseFieldType = z.infer<typeof typesenseFieldType>;
 
 export const collectionFieldForm = z
   .object({

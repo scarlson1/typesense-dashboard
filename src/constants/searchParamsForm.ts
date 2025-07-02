@@ -16,7 +16,7 @@ export const filteredParamKeys = multiParameterKeys.options.filter(
 export const searchParamValues = z.object({
   preset: z.string(),
   query_by: z.array(z.string()),
-  sort_by: z.array(z.string()),
+  sort_by: z.array(z.string()).max(3),
   facet_by: z.array(z.string()),
   group_by: z.array(z.string()),
   other_params: z.array(

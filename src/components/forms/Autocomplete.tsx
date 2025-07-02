@@ -63,7 +63,7 @@ function Autocomplete<
         // console.log('NEW VAL: ', newVal);
         handleChange(newVal ?? ('' as Value));
       }}
-      blurOnSelect
+      blurOnSelect={!props?.multiple}
       {...props}
       renderInput={(params) => (
         <TextField

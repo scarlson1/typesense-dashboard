@@ -4,9 +4,20 @@ import type { Client } from 'typesense';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import { collectionQueryKeys } from '../constants';
 import { CollectionContext, type CollectionContextValues } from '../context';
+import { typesenseFieldType, type TypesenseFieldType } from '../types';
 
-// TODO:  use zustand to store collection Id ??
+// TODO:  use zustand to store collectionId ??
 // can be passed to loader functions via router context  etc.
+
+const QUERYABLE_FIELD_TYPES: TypesenseFieldType[] = [
+  typesenseFieldType.enum.string,
+  typesenseFieldType.enum['string[]'],
+  typesenseFieldType.enum['string*'],
+  // TODO: typesense should query fields within objects that have string type ??
+  // currently returning error ??
+  // typesenseFieldType.enum.object,
+  // typesenseFieldType.enum['object[]'],
+];
 
 export type CollectionContextProps = {
   clusterId: string;
@@ -47,19 +58,22 @@ export function CollectionProvider<T extends DocumentSchema>({
     groupByOptions = [],
   ] = useMemo(() => {
     const queryByOptions = data?.fields
-      .filter((field) => field.index)
+      .filter(
+        (field) => field.index && QUERYABLE_FIELD_TYPES.includes(field.type)
+      )
       .map((f) => f.name);
 
     const sortByOptions = data?.fields
       .filter((field) => field.sort)
-      .map((f) => f.name);
+      .map((f) => [`${f.name}:asc`, `${f.name}:desc`])
+      .flat();
 
     const facetByOptions = data?.fields
       .filter((field) => field.facet)
       .map((f) => f.name);
 
     const groupByOptions = data?.fields
-      .filter((field) => field.index)
+      .filter((field) => field.facet)
       .map((f) => f.name);
 
     return [queryByOptions, sortByOptions, facetByOptions, groupByOptions];

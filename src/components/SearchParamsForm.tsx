@@ -3,6 +3,7 @@ import {
   Box,
   Grid,
   IconButton,
+  Link,
   Autocomplete as MuiAutocomplete,
   TextField as MuiTextField,
   Stack,
@@ -83,7 +84,16 @@ export const SearchParamsForm = withForm({
             alignItems: 'center',
           }}
         >
-          <Typography sx={{ textAlign: 'right' }}>Preset</Typography>
+          <Typography sx={{ textAlign: 'right' }} component='div'>
+            <Link
+              href='https://typesense.org/docs/29.0/api/search.html#presets'
+              target='_blank'
+              rel='noopener noreferrer'
+              underline='hover'
+            >
+              Preset
+            </Link>
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 9 }}>
           <form.AppField
@@ -129,7 +139,16 @@ export const SearchParamsForm = withForm({
             alignItems: 'center',
           }}
         >
-          <Typography sx={{ textAlign: 'right' }}>Query By</Typography>
+          <Typography sx={{ textAlign: 'right' }} component='div'>
+            <Link
+              href='https://typesense.org/docs/29.0/api/search.html#query-parameters'
+              target='_blank'
+              rel='noopener noreferrer'
+              underline='hover'
+            >
+              Query By
+            </Link>
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 9 }}>
           <form.AppField name='query_by' mode='array'>
@@ -162,7 +181,16 @@ export const SearchParamsForm = withForm({
             alignItems: 'center',
           }}
         >
-          <Typography sx={{ textAlign: 'right' }}>Sort By</Typography>
+          <Typography sx={{ textAlign: 'right' }} component='div'>
+            <Link
+              href='https://typesense.org/docs/29.0/api/search.html#ranking-and-sorting-parameters'
+              target='_blank'
+              rel='noopener noreferrer'
+              underline='hover'
+            >
+              Sort By
+            </Link>
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 9 }}>
           <form.AppField name='sort_by' mode='array'>
@@ -195,7 +223,25 @@ export const SearchParamsForm = withForm({
             alignItems: 'center',
           }}
         >
-          <Typography sx={{ textAlign: 'right' }}>Facet & Filter By</Typography>
+          <Typography sx={{ textAlign: 'right' }} component='div'>
+            <Link
+              href='https://typesense.org/docs/29.0/api/search.html#faceting-parameters'
+              target='_blank'
+              rel='noopener noreferrer'
+              underline='hover'
+            >
+              Facet
+            </Link>{' '}
+            &{' '}
+            <Link
+              href='https://typesense.org/docs/29.0/api/search.html#filter-parameters'
+              target='_blank'
+              rel='noopener noreferrer'
+              underline='hover'
+            >
+              Filter By
+            </Link>
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 9 }}>
           <form.AppField name='facet_by' mode='array'>
@@ -228,7 +274,16 @@ export const SearchParamsForm = withForm({
             alignItems: 'center',
           }}
         >
-          <Typography sx={{ textAlign: 'right' }}>Group By</Typography>
+          <Typography sx={{ textAlign: 'right' }} component='div'>
+            <Link
+              href='https://typesense.org/docs/29.0/api/search.html#grouping-parameters'
+              target='_blank'
+              rel='noopener noreferrer'
+              underline='hover'
+            >
+              Group By
+            </Link>
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 9 }}>
           <form.AppField name='group_by' mode='array'>
@@ -260,7 +315,7 @@ export const SearchParamsForm = withForm({
             alignItems: 'flex-start',
           }}
         >
-          <Typography sx={{ textAlign: 'right', mt: 1 }}>
+          <Typography sx={{ textAlign: 'right', mt: 1 }} component='div'>
             Additional Parameters
           </Typography>
         </Grid>

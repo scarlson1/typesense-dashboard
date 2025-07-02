@@ -39,12 +39,10 @@ export function InstantSearch<T extends DocumentSchema>({
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, debounceMs);
 
-  console.log('Search: ', {
-    q: debouncedQuery,
-    ...params,
-  });
-
-  const { preset: testPreset, ...rest } = params;
+  // console.log('Search: ', {
+  //   q: debouncedQuery,
+  //   ...params,
+  // });
 
   const { data, isLoading, isFetching, isError, error, isPlaceholderData } =
     useQuery({
@@ -60,20 +58,17 @@ export function InstantSearch<T extends DocumentSchema>({
           .documents()
           .search({
             q: debouncedQuery,
-            // ...params,
-            ...rest,
+            ...params,
           }),
       enabled: !!debouncedQuery,
       staleTime,
     });
 
+  if (error) console.log(error);
+
   const setPreset = useCallback((presetId: string | null) => {
     setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
   }, []);
-
-  // TODO:
-  // search params
-  // create hooks for specific types of updates to context (presets, search params, etc.)
 
   const memoizedValue: SearchContextValues<T, Error> = useMemo(
     () => ({

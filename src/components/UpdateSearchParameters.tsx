@@ -23,9 +23,6 @@ import {
 } from '../hooks';
 import { SearchParamsForm } from './SearchParamsForm';
 
-// TODO: initialize params in context with defaults from schema ??
-// then use ctxParams to initialize form ??
-
 export interface UpdateSearchParametersProps {
   collectionId: string;
   defaultValues?: SearchParamValues;
@@ -57,32 +54,6 @@ export function UpdateSearchParameters({
     },
   });
 
-  // const { data } = useSuspenseQuery({
-  //   queryKey: collectionQueryKeys.schema(clusterId, collectionId),
-  //   queryFn: () => client.collections(collectionId).retrieve(),
-  // });
-
-  // const [queryByOptions, sortByOptions, facetByOptions, groupByOptions] =
-  //   useMemo(() => {
-  //     const queryByOptions = data.fields
-  //       .filter((field) => field.index)
-  //       .map((f) => f.name);
-
-  //     const sortByOptions = data.fields
-  //       .filter((field) => field.sort)
-  //       .map((f) => f.name);
-
-  //     const facetByOptions = data.fields
-  //       .filter((field) => field.facet)
-  //       .map((f) => f.name);
-
-  //     const groupByOptions = data.fields
-  //       .filter((field) => field.index)
-  //       .map((f) => f.name);
-
-  //     return [queryByOptions, sortByOptions, facetByOptions, groupByOptions];
-  //   }, [data?.fields]);
-
   const mutation = useUpsertPreset({
     onSuccess: (data) => {
       setPreset(data.name);
@@ -92,7 +63,6 @@ export function UpdateSearchParameters({
   const form = useAppForm({
     ...searchParamsFormOpts,
     defaultValues: {
-      // TODO: use preset from context to set default values (and update when preset changes)
       ...DEFAULT_SEARCH_PARAMS_VALUES,
       query_by: queryByOptions,
       sort_by: defaultSortingField ? [defaultSortingField] : [],
@@ -137,18 +107,11 @@ export function UpdateSearchParameters({
     }
   }, [preset, prevPreset]);
 
-  // const formValuesFacetBy = useStore(form.store, (state) => state.values.facet_by);
-  // const formValuesGroupBy = useStore(form.store, (state) => state.values.group_by);
-  // const formValuesOtherParams = useStore(form.store, (state) => state.values.other_params);
-  // const formValuesQueryBy = useStore(form.store, (state) => state.values.query_by);
-  // const formValuesSortBy = useStore(form.store, (state) => state.values.sort_by);
   const formValues = useStore(form.store, (state) => state.values);
 
   // update SearchContext preset when form preset is selected
   useEffect(() => {
-    let newParams = formValuesToPresetSchema(formValues as SearchParamValues);
-    // console.log('SETTING CTX PARAMS: ', newParams);
-    setParams(newParams);
+    setParams(formValuesToPresetSchema(formValues as SearchParamValues));
   }, [formValues]);
 
   return (
@@ -187,16 +150,19 @@ function filterEmptyProperties<T extends Record<string, any>>(obj: T) {
 function formValuesToPresetSchema(
   values: SearchParamValues
 ): SearchParams | SearchParamsWithPreset {
-  let { preset, other_params, ...rest } = values;
+  let { preset, other_params, facet_by, sort_by, query_by, group_by } = values;
 
   let otherParams = other_params.map((p) => ({
     [p.param]: p.value,
   }));
 
   let formattedValues = {
-    ...rest,
+    query_by, // TODO: validate query_by values
     preset: preset || undefined,
-    filter_by: rest.facet_by.join(','),
+    filter_by: facet_by.join(','),
+    facet_by: facet_by.join(','),
+    sort_by: sort_by.slice(0, 3).join(','),
+    group_by: group_by.join(','),
     ...(otherParams[0] || {}),
   };
 
