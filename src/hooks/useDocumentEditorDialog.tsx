@@ -3,6 +3,7 @@ import { editor } from 'monaco-editor';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { JsonEditor, type JsonEditorProps } from '../components';
 import { DEFAULT_MONACO_OPTIONS } from '../constants';
+import { useAsyncToast } from './useAsyncToast';
 import { useDialog } from './useDialog';
 import { useUpdateDocument } from './useUpdateDocument';
 
@@ -16,6 +17,8 @@ export const useDocumentEditorDialog = (
   const { initialOptions = DEFAULT_MONACO_OPTIONS } = props || {};
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
+  // const initialSchema = useRef<string>(null)
+  const toast = useAsyncToast();
   const dialog = useDialog();
 
   const [options, setOptions] =
@@ -23,9 +26,9 @@ export const useDocumentEditorDialog = (
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
 
   const mutation = useUpdateDocument({
-    onSuccess: () => {
-      setOptions((o) => ({ ...o, readOnly: true }));
-    },
+    // onSuccess: () => {
+    //   setOptions((o) => ({ ...o, readOnly: true }));
+    // },
     onError: () => {
       setOptions((o) => ({ ...o, readOnly: false }));
     },
@@ -39,10 +42,43 @@ export const useDocumentEditorDialog = (
     editorRef.current = editor;
   }, []);
 
-  const handleSave = useCallback(async () => {}, [mutation.mutate]);
+  const handleSave = useCallback(
+    async ({
+      collectionId,
+      docId,
+    }: {
+      collectionId: string;
+      docId: string;
+    }) => {
+      if (markers.length) {
+        toast.warn('Invalid JSON', { id: 'monaco-validation' });
+        return;
+      }
+
+      let value = editorRef.current?.getValue();
+      if (!value) return;
+
+      // const diff = getObjectDiff(JSON.parse(initialSchema.current as string), JSON.parse(value))
+
+      // TODO: validation
+      const updates = JSON.parse(value);
+      mutation.mutate({ collectionId, docId, updates });
+    },
+    [mutation.mutate]
+  );
 
   return useCallback(
-    ({ value, title }: { value: string; title: string }) => {
+    ({
+      collectionId,
+      docId,
+      value,
+      title,
+    }: {
+      collectionId: string;
+      docId: string;
+      value: string;
+      title: string;
+    }) => {
       // initialSchema.current = value;
 
       dialog.prompt({
@@ -50,7 +86,7 @@ export const useDocumentEditorDialog = (
         variant: 'danger',
         catchOnCancel: false,
         onSubmit: () => {
-          handleSave();
+          handleSave({ collectionId, docId });
         },
         onCancel: () => {
           dialog.handleClose();

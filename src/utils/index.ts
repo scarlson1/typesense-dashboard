@@ -1,4 +1,5 @@
 export * from './diffArrayOfObjects';
+export * from './getObjectDiff';
 export * from './queryClient';
 export * from './typesenseStore';
 

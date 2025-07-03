@@ -100,7 +100,7 @@ const Actions = () => {
   }, [onSubmit, handleAccept]);
 
   const handleCancel = useCallback(() => {
-    let fn = onCancel ?? handleClose();
+    let fn = onCancel ?? handleClose;
     fn && fn();
   }, []);
 

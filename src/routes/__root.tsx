@@ -2,8 +2,8 @@ import { CssBaseline } from '@mui/material';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { Toaster } from '../components';
-import { AppTheme, DialogProvider } from '../context';
+import { DialogProvider, Toaster } from '../components';
+import { AppTheme } from '../context';
 import { dataGridCustomizations } from '../theme/customizations';
 
 export interface RouterAppContext {

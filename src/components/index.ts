@@ -13,6 +13,7 @@ export * from './ColorModeIconDropdown';
 export * from './ContextDialog';
 export * from './CurationList';
 export * from './CustomToast';
+export * from './DialogContext';
 export * from './ErrorFallback';
 export * from './GridCellExpand';
 export * from './Header';

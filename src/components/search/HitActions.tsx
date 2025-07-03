@@ -41,6 +41,7 @@ interface DeleteDocumentIconButtonProps
 }
 
 function DeleteDocumentIconButton({ docId }: DeleteDocumentIconButtonProps) {
+  // TODO: pass collectionId as prop ??
   const { collectionId } = useSearch();
   const dialog = useDialog();
   const deleteMutation = useDeleteDocument();
@@ -85,6 +86,8 @@ function EditDocumentIconButton({
   docId,
   ...props
 }: EditDocumentIconButtonProps) {
+  // TODO: pass collectionId as prop ??
+  const { collectionId } = useSearch();
   const openEditDialog = useDocumentEditorDialog();
 
   return (
@@ -93,6 +96,8 @@ function EditDocumentIconButton({
         openEditDialog({
           value: JSON.stringify(docData, null, 2),
           title: `Edit doc ${docId}`,
+          collectionId,
+          docId,
         })
       }
       aria-label='edit'

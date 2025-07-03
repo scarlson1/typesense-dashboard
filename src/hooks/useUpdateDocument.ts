@@ -1,29 +1,29 @@
 import { useMutation } from '@tanstack/react-query';
-import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
+import type { DocumentWriteParameters } from 'typesense/lib/Typesense/Documents';
 import { collectionQueryKeys } from '../constants';
 import { useMutationToast, useTypesenseClient } from '../hooks';
 import { queryClient } from '../utils';
 
-interface UpdateCollectionArgs {
+export interface UpdateDocArgs {
   collectionId: string;
   docId: string;
-  updates: CollectionUpdateSchema;
+  updates: object;
+  options?: DocumentWriteParameters;
 }
 
 interface UseUpdateDocumentProps {
-  onSuccess?: (data: any, vars: UpdateCollectionArgs) => void;
+  onSuccess?: (data: any, vars: UpdateDocArgs) => void;
   onError?: (err: Error, vars: any) => void;
 }
 
-// TODO: pass onSuccess etc. options ??
 export const useUpdateDocument = (props: UseUpdateDocumentProps) => {
   const [client, clusterId] = useTypesenseClient();
 
   const { onMutate, onSuccess, onError } = useMutationToast<
     object,
     Error,
-    UpdateCollectionArgs,
-    UpdateCollectionArgs
+    UpdateDocArgs,
+    UpdateDocArgs
   >({
     toastId: 'update-doc',
     loadingMsg: 'test loading...',
@@ -32,8 +32,11 @@ export const useUpdateDocument = (props: UseUpdateDocumentProps) => {
   });
 
   return useMutation({
-    mutationFn: ({ collectionId, docId, updates }: UpdateCollectionArgs) =>
-      client.collections(collectionId).documents(docId).update(updates),
+    mutationFn: ({ collectionId, docId, updates, options }: UpdateDocArgs) =>
+      client
+        .collections(collectionId)
+        .documents(docId)
+        .update(updates, options),
     // ...toastHandlers,
     onMutate: (vars) => {
       onMutate && onMutate(vars);
