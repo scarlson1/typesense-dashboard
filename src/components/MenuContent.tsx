@@ -1,7 +1,6 @@
 import {
   AddRounded,
   AutoFixHighRounded,
-  BackupTableRounded,
   CompareArrowsRounded,
   DatasetRounded,
   DownloadRounded,
@@ -143,7 +142,7 @@ export function MenuContent() {
         icon: <SearchRounded fontSize='small' />,
         route: selectedCollection
           ? {
-              to: `/collections/$collectionId/search` as LinkProps['to'],
+              to: `/collections/$collectionId/documents/search` as LinkProps['to'],
               params: { collectionId: selectedCollection },
             }
           : { to: location.pathname as LinkProps['to'] },
@@ -166,17 +165,6 @@ export function MenuContent() {
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/synonyms' as LinkProps['to'],
-              params: { collectionId: selectedCollection },
-            }
-          : { to: location.pathname as LinkProps['to'] },
-        disabled: !Boolean(selectedCollection),
-      },
-      {
-        text: 'Documents',
-        icon: <BackupTableRounded fontSize='small' />,
-        route: selectedCollection
-          ? {
-              to: '/collections/$collectionId/documents' as LinkProps['to'],
               params: { collectionId: selectedCollection },
             }
           : { to: location.pathname as LinkProps['to'] },

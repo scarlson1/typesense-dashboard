@@ -1,13 +1,11 @@
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { JsonEditor } from '../../../../components';
 import {
   COLLECTION_SCHEMA,
-  collectionQueryKeys,
   DEFAULT_MONACO_OPTIONS,
 } from '../../../../constants';
-import { useTypesenseClient } from '../../../../hooks';
+import { useSchema } from '../../../../hooks';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/config'
@@ -20,12 +18,7 @@ export const Route = createFileRoute(
 
 function CollectionSettings() {
   const { collectionId } = Route.useParams();
-  const [client, clusterId] = useTypesenseClient();
-
-  const { data } = useSuspenseQuery({
-    queryKey: collectionQueryKeys.schema(clusterId, collectionId),
-    queryFn: () => client.collections(collectionId).retrieve(),
-  });
+  const { data } = useSchema(collectionId);
 
   return (
     <>

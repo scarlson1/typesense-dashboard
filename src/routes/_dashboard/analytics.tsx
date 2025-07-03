@@ -19,7 +19,7 @@ function RouteComponent() {
       <Typography sx={{ pb: 2 }}>
         This section allows you to configure rules to capture search analytics.{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/analytics-query-suggestions.html'
+          href='https://typesense.org/docs/29.0/api/analytics-query-suggestions.html'
           target='_blank'
           rel='noopener noreferrer'
         >

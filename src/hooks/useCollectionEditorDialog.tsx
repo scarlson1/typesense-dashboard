@@ -81,7 +81,7 @@ export function useCollectionEditorDialog(
     monacoRef.current = monaco;
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (markers.length) {
       toast.warn('Invalid JSON', { id: 'monaco-validation' });
       return;
@@ -133,7 +133,7 @@ export function useCollectionEditorDialog(
     console.log('UPDATES: ', updates);
 
     mutation.mutate({ colName: initialVal.name, updates });
-  };
+  }, [mutation.mutate]);
 
   const openDialog = useCallback(
     ({ value, title }: { value: string; title: string }) => {
@@ -169,7 +169,7 @@ export function useCollectionEditorDialog(
           console.log('PROPS: ', props);
           return (
             <JsonEditor
-              height='80vh'
+              height='calc(100% - 12px)'
               options={options}
               onMount={handleEditorDidMount}
               {...(props || {})}
@@ -184,6 +184,7 @@ export function useCollectionEditorDialog(
         slotProps: {
           content: {
             options,
+            sx: { height: '75vh' },
           },
           dialog: {
             fullScreen,

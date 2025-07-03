@@ -21,7 +21,7 @@ function RouteComponent() {
         reference just the preset name in your application. This way, you can
         change search parameters without having to make code changes.{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/search.html#presets'
+          href='https://typesense.org/docs/29.0/api/search.html#presets'
           target='_blank'
           rel='noopener noreferrer'
         >

@@ -24,7 +24,7 @@ function RouteComponent() {
         Curation allows you to pin certain records at particular positions or
         hide results, for a given search query.{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/curation.html'
+          href='https://typesense.org/docs/29.0/api/curation.html'
           target='_blank'
           rel='noopener noreferrer'
         >

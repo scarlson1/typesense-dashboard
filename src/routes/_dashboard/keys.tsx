@@ -22,7 +22,7 @@ function RouteComponent() {
         using parent API keys. You can also control access to records or even
         fields using{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/api-keys.html#generate-scoped-search-key'
+          href='https://typesense.org/docs/29.0/api/api-keys.html#generate-scoped-search-key'
           target='_blank'
           rel='noopener noreferrer'
         >

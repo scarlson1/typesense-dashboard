@@ -3,10 +3,15 @@ import {
   DeleteRounded,
   EditRounded,
 } from '@mui/icons-material';
-import { ButtonGroup, IconButton } from '@mui/material';
+import { ButtonGroup, IconButton, type IconButtonProps } from '@mui/material';
 import { useCallback } from 'react';
 import { DEFAULT_MONACO_OPTIONS } from '../../constants';
-import { useDeleteDocument, useDialog, useSearch } from '../../hooks';
+import {
+  useDeleteDocument,
+  useDialog,
+  useDocumentEditorDialog,
+  useSearch,
+} from '../../hooks';
 import { JsonEditor } from '../JsonEditor';
 
 interface HitActionsProps {
@@ -14,9 +19,8 @@ interface HitActionsProps {
   docId: string;
 }
 
+// TODO: render from slots / slotProps ??
 export function HitActions({ docData, docId }: HitActionsProps) {
-  // TODO: render from slots / slotProps
-
   return (
     <ButtonGroup
       size='small'
@@ -31,7 +35,8 @@ export function HitActions({ docData, docId }: HitActionsProps) {
   );
 }
 
-interface DeleteDocumentIconButtonProps {
+interface DeleteDocumentIconButtonProps
+  extends Omit<IconButtonProps, 'onClick'> {
   docId: string;
 }
 
@@ -63,30 +68,44 @@ function DeleteDocumentIconButton({ docId }: DeleteDocumentIconButtonProps) {
       aria-label='delete'
       size='small'
       loading={deleteMutation.isPending}
+      color='primary'
     >
       <DeleteRounded fontSize='inherit' />
     </IconButton>
   );
 }
 
-interface EditDocumentIconButtonProps {
+interface EditDocumentIconButtonProps extends Omit<IconButtonProps, 'onClick'> {
   docData: Record<string, any>;
   docId: string;
 }
 
-function EditDocumentIconButton(_: EditDocumentIconButtonProps) {
+function EditDocumentIconButton({
+  docData,
+  docId,
+  ...props
+}: EditDocumentIconButtonProps) {
+  const openEditDialog = useDocumentEditorDialog();
+
   return (
     <IconButton
-      onClick={() => alert('TODO: open editor dialog')}
+      onClick={() =>
+        openEditDialog({
+          value: JSON.stringify(docData, null, 2),
+          title: `Edit doc ${docId}`,
+        })
+      }
       aria-label='edit'
       size='small'
+      color='primary'
+      {...props}
     >
       <EditRounded fontSize='inherit' />
     </IconButton>
   );
 }
 
-interface ViewDocumentIconButtonProps {
+interface ViewDocumentIconButtonProps extends Omit<IconButtonProps, 'onClick'> {
   docData: Record<string, any>;
   docId: string;
 }
@@ -94,6 +113,7 @@ interface ViewDocumentIconButtonProps {
 function ViewDocumentIconButton({
   docData,
   docId,
+  ...props
 }: ViewDocumentIconButtonProps) {
   const dialog = useDialog();
 
@@ -122,7 +142,13 @@ function ViewDocumentIconButton({
   }, [dialog?.prompt, docId, docData]);
 
   return (
-    <IconButton onClick={() => handleViewJson()} aria-label='view' size='small'>
+    <IconButton
+      onClick={() => handleViewJson()}
+      aria-label='view'
+      size='small'
+      color='primary'
+      {...props}
+    >
       <DataObjectRounded fontSize='inherit' />
     </IconButton>
   );

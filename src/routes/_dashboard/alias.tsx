@@ -38,7 +38,7 @@ function RouteComponent() {
       <Typography>
         Aliases are like symlinks that can point to collections.{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/collection-alias.html'
+          href='https://typesense.org/docs/29.0/api/collection-alias.html'
           target='_blank'
           rel='noopener noreferrer'
         >

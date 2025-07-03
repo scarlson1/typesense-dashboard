@@ -61,6 +61,8 @@ const DEFAULT_INITIAL_VALUE: KeyCreateSchema = {
   collections: ['*'],
 };
 
+const createKeySchemaJson = toJSONSchema(createKeySchema);
+
 interface NewApiKeyEditorProps extends EditorProps {}
 
 export const NewApiKeyEditor = ({
@@ -85,6 +87,7 @@ export const NewApiKeyEditor = ({
     },
   });
 
+  // TODO: need to use editorRef.current.updateOptions ??
   const mergedOptions = useMemo(
     () => ({
       ...DEFAULT_MONACO_OPTIONS,
@@ -107,7 +110,7 @@ export const NewApiKeyEditor = ({
           {
             uri: '',
             fileMatch: ['*'], // associate with any file
-            schema: toJSONSchema(createKeySchema),
+            schema: createKeySchemaJson,
           },
         ],
       });

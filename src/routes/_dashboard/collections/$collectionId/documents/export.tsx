@@ -1,6 +1,7 @@
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Link, Paper, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
+import { format } from 'date-fns';
 import { useStore } from 'zustand';
 import { typesenseStore } from '../../../../../utils';
 
@@ -13,6 +14,7 @@ export const Route = createFileRoute(
   },
 });
 
+const formattedDate = format(new Date(), `MM-dd-yyyy--hh-mm-ss-a`);
 function RouteComponent() {
   const { collectionId } = Route.useParams();
   const creds = useStore(typesenseStore, (state) => state.credentials);
@@ -40,7 +42,7 @@ function RouteComponent() {
         Use a Typesense client library to export data from your collection using
         any programming language of your choice.{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/documents.html#export-documents'
+          href='https://typesense.org/docs/29.0/api/documents.html#export-documents'
           target='_blank'
           rel='noopener'
         >
@@ -74,7 +76,7 @@ function RouteComponent() {
           <br />
           <code
             style={{ paddingLeft: '24px' }}
-          >{`"${protocol}://${node}${port}/collections/${collection}/documents/export" > documents-export-${collection}-6-25-2025--10-40-28-AM.jsonl`}</code>
+          >{`"${protocol}://${node}${port}/collections/${collection}/documents/export" > documents-export-${collection}-${formattedDate}.jsonl`}</code>
         </Typography>
       </Paper>
     </>

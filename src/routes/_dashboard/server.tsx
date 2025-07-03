@@ -22,8 +22,13 @@ function RouteComponent() {
       <ServerStats />
       <ServerMetrics />
       <ServerOps />
+      <SchemaUpdatesInProgress />
     </Box>
   );
+}
+
+function SchemaUpdatesInProgress() {
+  return <Typography>TODO: In progress schema updates</Typography>;
 }
 
 function ServerConfig() {

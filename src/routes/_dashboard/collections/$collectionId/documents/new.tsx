@@ -1,16 +1,40 @@
-import { Editor } from '@monaco-editor/react';
-import { OpenInNewRounded } from '@mui/icons-material';
-import { Alert, Box, Link, Paper, Typography } from '@mui/material';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import type { OnMount } from '@monaco-editor/react';
+import {
+  ClearRounded,
+  ExpandLessRounded,
+  ExpandMoreRounded,
+  OpenInNewRounded,
+} from '@mui/icons-material';
+import {
+  Alert,
+  Box,
+  Button,
+  Collapse,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  Link,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Typography,
+  type SelectChangeEvent,
+} from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
+import { editor } from 'monaco-editor';
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+import type { DocumentImportParameters } from 'typesense/lib/Typesense/Documents';
 import { useStore } from 'zustand';
 import { JsonEditor } from '../../../../../components';
+import { DEFAULT_MONACO_OPTIONS } from '../../../../../constants';
 import {
-  collectionQueryKeys,
-  DEFAULT_MONACO_OPTIONS,
-} from '../../../../../constants';
-import { useTypesenseClient } from '../../../../../hooks';
+  useAsyncToast,
+  useImportDocuments,
+  useSchema,
+  type MultiDocImportRes,
+} from '../../../../../hooks';
+import type { TypesenseFieldType } from '../../../../../types';
 import { typesenseStore } from '../../../../../utils';
 
 export const Route = createFileRoute(
@@ -36,8 +60,9 @@ function RouteComponent() {
   return (
     <>
       <Box sx={{ py: 2 }}>
-        <Typography variant='h3'>Add Documents</Typography>
-        <Typography variant='overline'>{collectionId}</Typography>
+        <Typography variant='h3' gutterBottom>
+          Add Documents
+        </Typography>
         <Typography variant='h6' color='primary' gutterBottom>
           Option 1: Typesense client libraries
         </Typography>
@@ -45,7 +70,7 @@ function RouteComponent() {
           Use one of Typesense's client libraries to import data into your
           collection.{' '}
           <Link
-            href='https://typesense.org/docs/28.0/api/documents.html#index-a-single-document'
+            href='https://typesense.org/docs/29.0/api/documents.html#index-a-single-document'
             target='_blank'
             rel='noopener noreferrer'
           >
@@ -89,7 +114,7 @@ function RouteComponent() {
             style={{ paddingLeft: '24px' }}
           >{`"${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create"`}</code>
         </Code>
-        <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
+        {/* <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
           <Editor
             language='shell'
             height='150px'
@@ -102,7 +127,7 @@ function RouteComponent() {
             // style={{ backgroundColor: 'inherit'}}
             className='editor-container'
           />
-        </Paper>
+        </Paper> */}
       </Box>
 
       <Box sx={{ py: 2 }}>
@@ -179,6 +204,11 @@ function RouteComponent() {
           Edit the template documents below and click on Add at the bottom of
           the editor.
         </Typography>
+        <Alert severity='warning' sx={{ my: 1, maxWidth: 1000 }}>
+          The prefilled schema is determined on a best effort basis from
+          collection schema. Expect imperfections, especially for nested fields
+          and "auto" schemas.
+        </Alert>
         <Box>
           <NewDocumentEditor />
         </Box>
@@ -191,27 +221,262 @@ function NewDocumentEditor() {
   const collectionId = Route.useParams({
     select: ({ collectionId }) => collectionId,
   });
-  const [client, clusterId] = useTypesenseClient();
-  const { data } = useSuspenseQuery({
-    queryKey: collectionQueryKeys.schema(clusterId, collectionId),
-    queryFn: () => client.collections(collectionId).retrieve(),
-  });
+  const toast = useAsyncToast();
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
+  const [action, setAction] =
+    useState<DocumentImportParameters['action']>('create');
+  const [dirtyValues, setDirtyValues] =
+    useState<DocumentImportParameters['dirty_values']>();
+  const [markers, setMarkers] = useState<editor.IMarker[]>([]);
+
+  const { data } = useSchema(collectionId);
+
+  const value = useMemo(() => {
+    let schema = data?.fields.reduce((acc, cur) => {
+      let placeholder = getFieldPlaceholderValue(cur.type);
+      return placeholder ? { ...acc, [cur.name]: placeholder } : acc;
+    }, {});
+
+    return JSON.stringify([schema], null, 2);
+  }, [data?.fields]);
+
+  const [mutation, results, clearResults] = useImportDocuments();
+
+  const handleUpdateMethod = useCallback((e: SelectChangeEvent) => {
+    setAction(e.target.value as DocumentImportParameters['action']);
+  }, []);
+  const handleDirtyValues = useCallback((e: SelectChangeEvent) => {
+    setDirtyValues(e.target.value as DocumentImportParameters['dirty_values']);
+  }, []);
+
+  const handleMount: OnMount = useCallback((editor) => {
+    editorRef.current = editor;
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    const val = editorRef.current?.getValue();
+
+    if (markers.length)
+      return toast.warn('Invalid JSON', { id: 'monaco-validation' });
+    if (!val) return toast.warn(`value required`);
+
+    let formatted = toJsonLinesString(JSON.parse(val));
+
+    mutation.mutate({
+      collectionId,
+      documents: formatted,
+      options: { action, dirty_values: dirtyValues, return_id: true },
+    });
+  }, [collectionId, markers, action, dirtyValues]);
+
+  return (
+    <Box sx={{ py: 2, borderRadius: 1, overflow: 'hidden' }}>
+      <JsonEditor
+        height='50vh'
+        onMount={handleMount}
+        // schema={COLLECTION_SCHEMA}
+        options={DEFAULT_MONACO_OPTIONS}
+        value={value}
+        onValidate={(m) => {
+          setMarkers(m);
+        }}
+      />
+      <Stack
+        direction='row'
+        spacing={2}
+        sx={{
+          my: 2,
+          display: 'flex',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+        }}
+        useFlexGap
+        // sx={{ flexWrap: 'wrap' }}
+      >
+        <FormControl size='small' fullWidth sx={{ maxWidth: 190 }}>
+          <InputLabel id='action-select-label'>Action Mode</InputLabel>
+          <Select
+            label='Action Mode'
+            value={action}
+            onChange={handleUpdateMethod}
+            labelId='action-select-label'
+            id='action-select'
+            size='small'
+          >
+            <MenuItem value={'create'}>create</MenuItem>
+            <MenuItem value={'upsert'}>upsert</MenuItem>
+            <MenuItem value={'update'}>update</MenuItem>
+            <MenuItem value={'emplace'}>emplace</MenuItem>
+          </Select>
+          <FormHelperText component='div'>
+            <Link
+              href='https://typesense.org/docs/28.0/api/documents.html#index-multiple-documents'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              Action mode insert docs{' '}
+              <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+            </Link>
+          </FormHelperText>
+        </FormControl>
+        <FormControl size='small' fullWidth sx={{ maxWidth: 190 }}>
+          <InputLabel id='dirty-values-select-label'>
+            Dirty Values Behavior
+          </InputLabel>
+          <Select
+            label='Dirty Values Behavior'
+            value={dirtyValues || ''}
+            onChange={handleDirtyValues}
+            labelId='dirty-values-select-label'
+            id='dirty-values-select'
+            size='small'
+          >
+            <MenuItem value={''}></MenuItem>
+            <MenuItem value={'coerce_or_reject'}>coerce_or_reject</MenuItem>
+            <MenuItem value={'coerce_or_drop'}>coerce_or_drop</MenuItem>
+            <MenuItem value={'drop'}>drop</MenuItem>
+            <MenuItem value={'reject'}>reject</MenuItem>
+          </Select>
+          <FormHelperText component='div'>
+            <Link
+              href='https://typesense.org/docs/28.0/api/documents.html#dealing-with-dirty-data'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              Dirty values docs{' '}
+              <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+            </Link>
+          </FormHelperText>
+        </FormControl>
+        <Button
+          onClick={() => handleSubmit()}
+          disabled={Boolean(markers.length)}
+          variant='contained'
+        >
+          Add
+        </Button>
+      </Stack>
+      <MultiDocImportResult results={results} clearResults={clearResults} />
+    </Box>
+  );
+}
+
+function MultiDocImportResult({
+  results,
+  clearResults,
+}: {
+  results: MultiDocImportRes[];
+  clearResults: () => void;
+}) {
+  const [open, setOpen] = useState(true);
+
+  const handleOpen = useCallback(() => {
+    setOpen((o) => !o);
+  }, []);
+
+  const handleClearResults = useCallback(() => {
+    clearResults();
+  }, []);
 
   return (
     <>
-      <Alert severity='warning'>
-        TODO: monaco editor with prefilled schema
-      </Alert>
-      <Box sx={{ py: 2, borderRadius: 1, overflow: 'hidden' }}>
-        <JsonEditor
-          height='50vh'
-          // schema={COLLECTION_SCHEMA}
-          options={DEFAULT_MONACO_OPTIONS}
-          value={JSON.stringify(data)}
-        />
-      </Box>
+      {Boolean(results.length) ? (
+        <Stack
+          direction='row'
+          spacing={2}
+          sx={{ justifyContent: 'space-between', alignItems: 'center', py: 1 }}
+        >
+          <Button
+            size='small'
+            onClick={handleOpen}
+            endIcon={
+              open ? (
+                <ExpandLessRounded fontSize='small' />
+              ) : (
+                <ExpandMoreRounded fontSize='small' />
+              )
+            }
+          >
+            {open ? 'hide results' : 'show results'}
+          </Button>
+          <Button
+            size='small'
+            onClick={handleClearResults}
+            sx={{ mb: 1 }}
+            endIcon={<ClearRounded fontSize='small' />}
+          >
+            Clear results
+          </Button>
+        </Stack>
+      ) : null}
+      <Collapse in={open && Boolean(results?.length)}>
+        {results.map((r) => (
+          <Alert
+            key={r.id}
+            severity={r.success ? 'success' : 'error'}
+            sx={{
+              maxWidth: 760,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >{`[ID: ${r.id}] - ${(r.error as string) || `import success: ${r.success}`}`}</Alert>
+        ))}
+      </Collapse>
     </>
   );
+}
+
+function toJsonLinesString(jsonArray: any[]) {
+  return jsonArray.map((obj) => JSON.stringify(obj)).join('\n');
+}
+
+function getFieldPlaceholderValue(fieldType: TypesenseFieldType) {
+  switch (fieldType) {
+    case 'auto':
+      return null;
+    case 'bool':
+      return false;
+    case 'bool[]':
+      return [true, false];
+    case 'float':
+      return 3.14159;
+    case 'float[]':
+      return [3.12159];
+    case 'geopoint':
+      return [34.0549, 118.2426]; // ['LAT','LNG']
+    case 'geopoint[]':
+      return [
+        [34.0549, 118.2426],
+        [35.4792, 117.2389],
+      ];
+    case 'geopolygon':
+      return [34.0549, 35.4792, 118.2426, 117.2389];
+    case 'image':
+      return 'base64 encoded string of an image';
+    case 'int32':
+      return 0;
+    case 'int32[]':
+      return [0, 1];
+    case 'int64':
+      return 0;
+    case 'int64[]':
+      return [0, 1];
+    case 'object':
+      return {
+        key: 'value',
+      };
+    case 'object[]':
+      return [{ key: 'value' }];
+    case 'string':
+      return 'string value';
+    case 'string*':
+      return 'string or string[]';
+    case 'string[]':
+      return ['string value'];
+    default:
+      return null;
+  }
 }
 
 function Code({ children }: { children: ReactNode }) {

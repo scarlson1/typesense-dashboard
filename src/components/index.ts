@@ -14,6 +14,7 @@ export * from './ContextDialog';
 export * from './CurationList';
 export * from './CustomToast';
 export * from './ErrorFallback';
+export * from './GridCellExpand';
 export * from './Header';
 export * from './InstantSearch';
 export * from './JsonEditor';

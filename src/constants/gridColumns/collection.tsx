@@ -1,6 +1,7 @@
 import type { GridColDef } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
+import { GridCellExpand } from '../../components';
 
 export const collectionColumns: GridColDef<CollectionSchema>[] = [
   {
@@ -29,8 +30,24 @@ export const collectionColumns: GridColDef<CollectionSchema>[] = [
     flex: 2,
     sortable: false,
     filterable: false,
-    valueGetter: (_, row) => JSON.stringify(row.fields),
-    // renderCell: TODO: render on hover ??
+    renderCell: (params) => {
+      console.log('PARAMS: ');
+      return (
+        <GridCellExpand
+          value={params.value ? JSON.stringify(params.value) : ''}
+          popperValue={
+            params.value ? (
+              <pre style={{ marginTop: 0 }}>
+                {JSON.stringify(params.value, null, 2)}
+              </pre>
+            ) : (
+              ''
+            )
+          }
+          width={params.colDef.computedWidth}
+        />
+      );
+    },
   },
   {
     field: 'created_at',

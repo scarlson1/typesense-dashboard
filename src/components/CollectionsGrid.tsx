@@ -185,7 +185,7 @@ export function CollectionsGrid() {
         onCellDoubleClick={(params: GridCellParams<CollectionSchema>) => {
           navigate({
             from: '/collections',
-            to: `$collectionId`,
+            to: `$collectionId/documents/search`,
             params: { collectionId: params.row.name },
           });
         }}

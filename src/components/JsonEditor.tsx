@@ -17,9 +17,10 @@ export function JsonEditor({ schema, ...props }: JsonEditorProps) {
         monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
           validate: true,
           schemas: [
+            // @ts-ignore
             {
-              uri: '',
-              fileMatch: ['*'], // associate with any file
+              // uri: '',
+              fileMatch: ['*'], // ['*.json'], // associate with any file
               schema,
             },
           ],

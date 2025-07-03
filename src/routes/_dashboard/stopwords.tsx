@@ -32,7 +32,7 @@ function RouteComponent() {
         Stopwords are removed from the search query when they are present in the
         search query.{' '}
         <Link
-          href='https://typesense.org/docs/28.0/api/stopwords.html'
+          href='https://typesense.org/docs/29.0/api/stopwords.html'
           target='_blank'
           rel='noopener noreferrer'
         >

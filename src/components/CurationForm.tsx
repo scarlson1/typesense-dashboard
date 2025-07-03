@@ -66,8 +66,8 @@ export const CurationForm = withForm({
     ]);
 
     return (
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6, md: 5 }}>
+      <Grid container rowSpacing={2} columnSpacing={3}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <form.AppField name='overrideId'>
             {({ TextField }) => (
               <TextField
@@ -101,7 +101,7 @@ export const CurationForm = withForm({
               timeout='auto'
               unmountOnExit
             >
-              <Stack direction='row' spacing={2} sx={{ ml: 5 }}>
+              <Stack direction='row' spacing={2} sx={{ ml: 4 }}>
                 <form.AppField name='rule.query'>
                   {({ TextField }) => (
                     <TextField

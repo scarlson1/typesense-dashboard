@@ -34,7 +34,6 @@ export function Hit({ hit }: HitProps) {
     <Paper
       sx={{
         p: { xs: 3, sm: 4, md: 5 },
-        my: { xs: 2, sm: 3 },
         position: 'relative',
       }}
     >
@@ -100,7 +99,6 @@ export function Hit({ hit }: HitProps) {
         </Stack>
       </Stack>
 
-      {/* TODO: need helper function to get doc ID from schema (could be different than "id") ?? */}
       <HitActions docId={hit.document.id} docData={hit.document} />
     </Paper>
   );
