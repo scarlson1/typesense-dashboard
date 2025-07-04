@@ -3,7 +3,6 @@ import { type ReactNode, useCallback } from 'react';
 
 import { useDialog } from '../hooks';
 
-// TODO: slots & slotsProps --> allow replacing header & actions area
 // useGridRootProps: https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/hooks/utils/useGridRootProps.ts
 // computeSlots: https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/DataGrid/useDataGridProps.ts
 // https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/internals/utils/computeSlots.ts
@@ -11,7 +10,7 @@ import { useDialog } from '../hooks';
 // Example - MUI Grid Header (uses hook to check props to determine footer component rendering)
 // https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/components/GridHeader.tsx
 
-// TODO: use selector
+// TODO: use selector pattern ??
 // mui grid createSelector: https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/utils/createSelector.ts
 
 // TODO: optional success screen displayed after submission

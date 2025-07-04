@@ -14,13 +14,15 @@ import {
 } from '../../hooks';
 import { JsonEditor } from '../JsonEditor';
 
-interface HitActionsProps {
+export interface HitActionsProps {
   docData: Record<string, any>;
   docId: string;
 }
 
 // TODO: render from slots / slotProps ??
 export function HitActions({ docData, docId }: HitActionsProps) {
+  const { collectionId } = useSearch();
+
   return (
     <ButtonGroup
       size='small'
@@ -28,8 +30,12 @@ export function HitActions({ docData, docId }: HitActionsProps) {
       aria-label='Small button group'
       sx={{ position: 'absolute', right: '8px', top: '8px' }}
     >
-      <DeleteDocumentIconButton docId={docId} />
-      <EditDocumentIconButton docData={docData} docId={docId} />
+      <DeleteDocumentIconButton docId={docId} collectionId={collectionId} />
+      <EditDocumentIconButton
+        docData={docData}
+        docId={docId}
+        collectionId={collectionId}
+      />
       <ViewDocumentIconButton docData={docData} docId={docId} />
     </ButtonGroup>
   );
@@ -38,11 +44,13 @@ export function HitActions({ docData, docId }: HitActionsProps) {
 interface DeleteDocumentIconButtonProps
   extends Omit<IconButtonProps, 'onClick'> {
   docId: string;
+  collectionId: string;
 }
 
-function DeleteDocumentIconButton({ docId }: DeleteDocumentIconButtonProps) {
-  // TODO: pass collectionId as prop ??
-  const { collectionId } = useSearch();
+function DeleteDocumentIconButton({
+  docId,
+  collectionId,
+}: DeleteDocumentIconButtonProps) {
   const dialog = useDialog();
   const deleteMutation = useDeleteDocument();
 
@@ -79,15 +87,15 @@ function DeleteDocumentIconButton({ docId }: DeleteDocumentIconButtonProps) {
 interface EditDocumentIconButtonProps extends Omit<IconButtonProps, 'onClick'> {
   docData: Record<string, any>;
   docId: string;
+  collectionId: string;
 }
 
 function EditDocumentIconButton({
   docData,
   docId,
+  collectionId,
   ...props
 }: EditDocumentIconButtonProps) {
-  // TODO: pass collectionId as prop ??
-  const { collectionId } = useSearch();
   const openEditDialog = useDocumentEditorDialog();
 
   return (

@@ -21,6 +21,7 @@ export * from './usePrevious';
 export * from './useSchema';
 export * from './useSearch';
 export * from './useSearchParams';
+export * from './useSearchSlots';
 export * from './useTypesenseClient';
 export * from './useUpdateCollection';
 export * from './useUpsertPreset';

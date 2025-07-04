@@ -17,7 +17,6 @@ export const useDocumentEditorDialog = (
   const { initialOptions = DEFAULT_MONACO_OPTIONS } = props || {};
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
-  // const initialSchema = useRef<string>(null)
   const toast = useAsyncToast();
   const dialog = useDialog();
 
@@ -26,9 +25,13 @@ export const useDocumentEditorDialog = (
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
 
   const mutation = useUpdateDocument({
-    // onSuccess: () => {
-    //   setOptions((o) => ({ ...o, readOnly: true }));
-    // },
+    onSuccess: () => {
+      setOptions((o) => ({ ...o, readOnly: false }));
+    },
+    onMutate: (vars) => {
+      setOptions((o) => ({ ...o, readOnly: true }));
+      return vars;
+    },
     onError: () => {
       setOptions((o) => ({ ...o, readOnly: false }));
     },
@@ -58,9 +61,6 @@ export const useDocumentEditorDialog = (
       let value = editorRef.current?.getValue();
       if (!value) return;
 
-      // const diff = getObjectDiff(JSON.parse(initialSchema.current as string), JSON.parse(value))
-
-      // TODO: validation
       const updates = JSON.parse(value);
       mutation.mutate({ collectionId, docId, updates });
     },
@@ -79,8 +79,6 @@ export const useDocumentEditorDialog = (
       value: string;
       title: string;
     }) => {
-      // initialSchema.current = value;
-
       dialog.prompt({
         title,
         variant: 'danger',
@@ -102,7 +100,6 @@ export const useDocumentEditorDialog = (
               onValidate={(m) => {
                 setMarkers(m);
               }}
-              // schema={COLLECTION_SCHEMA}
             />
           );
         })(),

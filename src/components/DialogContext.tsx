@@ -7,7 +7,7 @@ import type {
 } from '@mui/material';
 import { merge } from 'lodash-es';
 import {
-  type JSXElementConstructor,
+  type ComponentType,
   type ReactNode,
   useCallback,
   useMemo,
@@ -27,15 +27,15 @@ interface AwaitingPromise {
 }
 
 export interface DialogSlotsComponents {
-  dialog: JSXElementConstructor<any>;
-  title: JSXElementConstructor<any>;
-  content: JSXElementConstructor<any>;
-  actions: JSXElementConstructor<any>;
-  acceptButton: JSXElementConstructor<any>;
-  cancelButton: JSXElementConstructor<any>;
+  dialog: ComponentType<DialogProps>; // JSXElementConstructor<DialogProps>;
+  title: ComponentType<DialogTitleProps>;
+  content: ComponentType<DialogContentProps>;
+  actions: ComponentType<DialogActionsProps>;
+  acceptButton: ComponentType<ButtonProps>;
+  cancelButton: ComponentType<ButtonProps>;
 }
 
-type SlotPropsWithOverrides<T> = Partial<T & Record<string, any>>;
+export type SlotPropsWithOverrides<T> = Partial<T & Record<string, any>>;
 
 export interface DialogSlotProps {
   dialog?: SlotPropsWithOverrides<Omit<DialogProps, 'open' | 'onClose'>>;

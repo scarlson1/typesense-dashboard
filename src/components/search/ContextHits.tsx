@@ -1,0 +1,72 @@
+import { Typography } from '@mui/material';
+import type { ReactNode } from 'react';
+import { useHits, useSearch, useSearchSlots } from '../../hooks';
+
+function CtxHits({ children }: { children?: ReactNode }) {
+  const x = useSearch();
+  const hits = useHits();
+  const [slots, slotProps] = useSearchSlots();
+
+  if (!hits?.hits) {
+    if (x?.isLoading || x?.isFetching) {
+      return slots.loadingHits ? (
+        <slots.loadingHits {...slotProps.loadingHits} />
+      ) : null;
+    }
+
+    return slots.noHitsFound ? (
+      <slots.noHitsFound {...slotProps.noHitsFound}>
+        <Typography>Enter a search above</Typography>
+      </slots.noHitsFound>
+    ) : null;
+  }
+
+  let message =
+    slotProps?.noHitsFound?.message ||
+    `No results for "${hits?.request_params?.q}"`;
+
+  if (!hits?.hits.length) {
+    return slots.noHitsFound ? (
+      <slots.noHitsFound {...slotProps.noHitsFound}>
+        <Typography component='div'>{message}</Typography>
+      </slots.noHitsFound>
+    ) : null;
+  }
+
+  return slots?.hits && slots?.hit ? (
+    <slots.hits {...slotProps.hits}>{children}</slots.hits>
+  ) : null;
+}
+
+export function CtxHit(props: { children?: ReactNode }) {
+  const hits = useHits();
+  const [slots, slotProps] = useSearchSlots();
+
+  return slots?.hit ? (
+    <>
+      {hits?.hits?.map((hit, i) => (
+        <slots.hit
+          {...slotProps}
+          // {...props}
+          hit={hit}
+          key={`hit-${hit.document.id}-${i}`}
+        >
+          {slots?.hitActions ? (
+            <slots.hitActions docData={hit.document} docId={hit.document.id} />
+          ) : null}
+          {props?.children}
+        </slots.hit>
+      ))}
+    </>
+  ) : null;
+}
+
+CtxHits.Hit = CtxHit;
+
+export function ContextHits() {
+  return (
+    <CtxHits>
+      <CtxHits.Hit />
+    </CtxHits>
+  );
+}

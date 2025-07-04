@@ -31,7 +31,6 @@ export const collectionColumns: GridColDef<CollectionSchema>[] = [
     sortable: false,
     filterable: false,
     renderCell: (params) => {
-      console.log('PARAMS: ');
       return (
         <GridCellExpand
           value={params.value ? JSON.stringify(params.value) : ''}

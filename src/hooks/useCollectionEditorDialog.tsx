@@ -3,7 +3,8 @@ import {
   type Monaco,
   type OnMount,
 } from '@monaco-editor/react';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { OpenInNewRounded } from '@mui/icons-material';
+import { Button, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { editor } from 'monaco-editor';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
@@ -103,31 +104,24 @@ export function useCollectionEditorDialog(
       fields || [],
       'name'
     );
-
     console.log({ added, removed, updated });
 
     let fieldUpdates = [];
-    for (let a of added) fieldUpdates.push(a);
     for (let r of removed) fieldUpdates.push({ name: r.name, drop: true });
     for (let u of updated) {
       fieldUpdates.push({ name: u.name, drop: true });
       fieldUpdates.push(u);
     }
+    for (let a of added) fieldUpdates.push(a);
 
     if (!fieldUpdates.length) {
-      toast.info(`no changes made`);
+      toast.info(`no field changes made`);
       setOptions((o) => ({ ...o, readOnly: false }));
       return;
     }
 
-    // TODO: changes to other properties ??
     let updates: CollectionUpdateSchema = {
-      // default_sorting_field,
-      // symbols_to_index,
-      // token_separators,
-      // enable_nested_fields,
       metadata,
-      // voice_query_model,
       fields: fieldUpdates,
     };
     console.log('UPDATES: ', updates);
@@ -135,13 +129,32 @@ export function useCollectionEditorDialog(
     mutation.mutate({ colName: initialVal.name, updates });
   }, [mutation.mutate]);
 
-  const openDialog = useCallback(
+  return useCallback(
     ({ value, title }: { value: string; title: string }) => {
-      //  Omit<DialogOptions, 'content' | 'onSubmit' | 'variant'> & {value: string}
       initialSchema.current = value;
 
       dialog.prompt({
-        title,
+        title: (() => {
+          return (
+            <Stack
+              direction='row'
+              spacing={2}
+              sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              {title}
+              <Button
+                component='a'
+                href='https://typesense.org/docs/29.0/api/collections.html#update-or-alter-a-collection'
+                target='_blank'
+                rel='noopener noreferrer'
+                size='small'
+                endIcon={<OpenInNewRounded />}
+              >
+                Docs
+              </Button>
+            </Stack>
+          );
+        })(),
         variant: 'danger',
         catchOnCancel: false,
         onSubmit: () => {
@@ -156,7 +169,6 @@ export function useCollectionEditorDialog(
           if (options?.readOnly) {
             dialog.handleClose();
           } else {
-            // set editor to original value
             let resetValue = initialSchema.current;
             if (resetValue) {
               editorRef.current?.setValue(resetValue);
@@ -166,7 +178,6 @@ export function useCollectionEditorDialog(
           }
         },
         content: ((props?: JsonEditorProps) => {
-          console.log('PROPS: ', props);
           return (
             <JsonEditor
               height='calc(100% - 12px)'
@@ -214,6 +225,4 @@ export function useCollectionEditorDialog(
       handleSave,
     ]
   );
-
-  return openDialog;
 }

@@ -22,6 +22,8 @@ export type InstantSearchProps = {
   // TODO: extends UseQueryOptions ??
   staleTime?: number;
   pageSizeOptions?: number[];
+  // slots?: Partial<SearchSlotComponents>;
+  // slotProps?: Partial<SearchSlotProps>;
 };
 
 export function InstantSearch<T extends DocumentSchema>({
@@ -33,6 +35,8 @@ export function InstantSearch<T extends DocumentSchema>({
   debounceMs = 200,
   staleTime = 30000,
   pageSizeOptions = [5, 10, 20, 50],
+  // slots,
+  // slotProps,
 }: InstantSearchProps) {
   // TODO: get default params (query_by) from CollectionProvider ??
   const [params, setParams] = useState(initialParams);
@@ -65,7 +69,6 @@ export function InstantSearch<T extends DocumentSchema>({
     setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
   }, []);
 
-  // TODO: pagination
   const setPagination = useCallback((values: PaginationParams) => {
     // { page, per_page, limit, offset, ...prev }
     setParams(({ ...prev }) => ({ ...prev, ...values }));
@@ -106,7 +109,9 @@ export function InstantSearch<T extends DocumentSchema>({
 
   return (
     <SearchContext.Provider value={memoizedValue}>
+      {/* <SearchSlotsProvider slots={slots} slotProps={slotProps}> */}
       {children}
+      {/* </SearchSlotsProvider> */}
     </SearchContext.Provider>
   );
 }

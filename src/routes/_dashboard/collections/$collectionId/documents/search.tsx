@@ -14,14 +14,15 @@ import {
   UpdateSearchParameters,
 } from '../../../../../components';
 import {
+  ContextHits,
+  CtxPageSize,
+  CtxPagination,
+  CtxSearchError,
+  CtxSearchStats,
   DashboardDisplayOptions,
-  Hits,
   SearchBox,
-  SearchError,
-  SearchPageSize,
-  SearchPagination,
-  SearchStats,
 } from '../../../../../components/search';
+import { SearchSlotsProvider } from '../../../../../components/search/SearchSlotsProvider';
 import { useTypesenseClient } from '../../../../../hooks';
 
 export const Route = createFileRoute(
@@ -63,87 +64,101 @@ function SearchCollection() {
           // TODO: need to set initial query by params from default index ??
           // move index above search in component hierarchy ?? pass defaults as prop to InstantSearch ??
         >
-          <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
-            <Box>
-              <SearchBox sx={{ my: 1 }} />
+          <SearchSlotsProvider
+            slots={{
+              // stats: Typography, // example (Typography is default component)
+              stats: undefined, // hide slot
+            }}
+            slotProps={{
+              stats: { color: 'text.secondary' },
+            }}
+          >
+            <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
+              <Box>
+                <SearchBox sx={{ my: 1 }} />
+                {/* <SearchStats /> */}
+                <CtxSearchStats />
+              </Box>
 
-              <SearchStats />
-            </Box>
+              {/* <SearchError />
+              <Hits /> */}
+              <CtxSearchError />
+              <ContextHits />
 
-            <SearchError />
-
-            <Hits />
-
-            <Stack
-              direction={{ xs: 'column-reverse', sm: 'row' }}
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <ButtonLink
-                to='/collections/$collectionId/documents/new'
-                params={{ collectionId }}
-                size='small'
-                startIcon={<AddRounded fontSize='small' />}
-                sx={{ lineHeight: '18px', my: 1 }}
-              >
-                Add Documents
-              </ButtonLink>
+              {/* TODO: slot for toolbar etc */}
               <Stack
-                direction='row'
-                spacing={2}
+                direction={{ xs: 'column-reverse', sm: 'row' }}
                 sx={{
-                  flex: '1 1 auto',
-                  justifyContent: 'flex-end',
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                 }}
               >
-                <SearchPageSize />
-                <SearchPagination />
-              </Stack>
-            </Stack>
-
-            <Box>
-              <Typography variant='h5' gutterBottom>
-                Search Parameters
-              </Typography>
-              <Typography component='div' gutterBottom>
-                These settings control ranking, relevance and search
-                fine-tuning. Use a preset to save your configuration, and recall
-                in your application.{' '}
-                <Link
-                  href='https://typesense.org/docs/29.0/api/search.html#search-parameters'
-                  target='_blank'
-                  rel='noopener noreferrer'
+                <ButtonLink
+                  to='/collections/$collectionId/documents/new'
+                  params={{ collectionId }}
+                  size='small'
+                  startIcon={<AddRounded fontSize='small' />}
+                  sx={{ lineHeight: '18px', my: 1 }}
                 >
-                  Docs
-                  <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.5 }} />
-                </Link>
-              </Typography>
-            </Box>
+                  Add Documents
+                </ButtonLink>
+                <Stack
+                  direction='row'
+                  spacing={2}
+                  sx={{
+                    flex: '1 1 auto',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                  }}
+                >
+                  {/* <SearchPageSize />
+                  <SearchPagination /> */}
+                  <CtxPageSize />
+                  <CtxPagination />
+                </Stack>
+              </Stack>
 
-            <Suspense>
-              <Paper id='search-params'>
-                <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
-                  <UpdateSearchParameters collectionId={collectionId} />
-                </Container>
-              </Paper>
-            </Suspense>
+              <Box>
+                <Typography variant='h5' gutterBottom>
+                  Search Parameters
+                </Typography>
+                <Typography component='div' gutterBottom>
+                  These settings control ranking, relevance and search
+                  fine-tuning. Use a preset to save your configuration, and
+                  recall in your application.{' '}
+                  <Link
+                    href='https://typesense.org/docs/29.0/api/search.html#search-parameters'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    Docs
+                    <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.5 }} />
+                  </Link>
+                </Typography>
+              </Box>
 
-            <Box>
-              <Typography variant='h6' gutterBottom>
-                Dashboard Display Options
-              </Typography>
-              <Typography variant='subtitle2'>
-                These options control the visual display of the results in the
-                search dashboard above
-              </Typography>
-            </Box>
+              <Suspense>
+                <Paper id='search-params'>
+                  <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
+                    <UpdateSearchParameters collectionId={collectionId} />
+                  </Container>
+                </Paper>
+              </Suspense>
 
-            <DashboardDisplayOptions />
-          </Stack>
+              <Box>
+                <Typography variant='h6' gutterBottom>
+                  Dashboard Display Options
+                </Typography>
+                <Typography variant='subtitle2'>
+                  These options control the visual display of the results in the
+                  search dashboard above
+                </Typography>
+              </Box>
+
+              <DashboardDisplayOptions />
+            </Stack>
+          </SearchSlotsProvider>
         </InstantSearch>
       </CollectionProvider>
     </>

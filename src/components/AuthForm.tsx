@@ -113,6 +113,7 @@ export const AuthForm = withForm({
                 label='Environment'
                 placeholder='development'
                 options={environment.options}
+                required
                 fullWidth
                 variant='outlined'
                 color={state.meta.errors.length ? 'error' : 'primary'}

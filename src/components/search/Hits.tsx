@@ -1,50 +1,52 @@
-import { Box, Typography } from '@mui/material';
-import type { ComponentType } from 'react';
-import { useHits } from '../../hooks';
-import { Hit, type HitProps } from './Hit';
+export {};
 
-interface HitsProps {
-  HitComponent?: ComponentType<HitProps>;
-}
+// import { Box, Typography } from '@mui/material';
+// import { type ComponentType } from 'react';
+// import { useHits } from '../../hooks';
+// import { Hit, type HitProps } from './Hit';
 
-export function Hits({ HitComponent = Hit }: HitsProps) {
-  const hits = useHits();
+// interface HitsProps {
+//   HitComponent?: ComponentType<HitProps>;
+// }
 
-  if (!hits?.hits) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 200,
-        }}
-      >
-        <Typography>Enter a search above</Typography>
-      </Box>
-    );
-  }
+// export function Hits({ HitComponent = Hit }: HitsProps) {
+//   const hits = useHits();
 
-  if (!hits?.hits.length) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 200,
-        }}
-      >
-        <Typography>{`No results for "${hits?.request_params?.q}"`}</Typography>
-      </Box>
-      // <Typography sx={{ textAlign: 'center', py: 2 }}>No results</Typography>
-    );
-  }
-  return (
-    <>
-      {hits.hits.map((hit, i) => (
-        <HitComponent hit={hit} key={`hit-${i}`} />
-      ))}
-    </>
-  );
-}
+//   if (!hits?.hits) {
+//     return (
+//       <Box
+//         sx={{
+//           display: 'flex',
+//           justifyContent: 'center',
+//           alignItems: 'center',
+//           height: 200,
+//         }}
+//       >
+//         <Typography>Enter a search above</Typography>
+//       </Box>
+//     );
+//   }
+
+//   if (!hits?.hits.length) {
+//     return (
+//       <Box
+//         sx={{
+//           display: 'flex',
+//           justifyContent: 'center',
+//           alignItems: 'center',
+//           height: 200,
+//         }}
+//       >
+//         <Typography>{`No results for "${hits?.request_params?.q}"`}</Typography>
+//       </Box>
+//       // <Typography sx={{ textAlign: 'center', py: 2 }}>No results</Typography>
+//     );
+//   }
+//   return (
+//     <>
+//       {hits.hits.map((hit, i) => (
+//         <HitComponent hit={hit} key={`hit-${i}`} />
+//       ))}
+//     </>
+//   );
+// }

@@ -20,7 +20,6 @@ export const useMutationToast = <TData, TError, TVars, TCtx>({
 > => {
   const toast = useAsyncToast();
   const id = useId();
-  console.log('ID: ', id);
 
   return useMemo(
     () => ({

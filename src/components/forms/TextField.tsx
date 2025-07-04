@@ -20,7 +20,7 @@ export function TextField(props: TextFieldProps) {
       onBlur={handleBlur}
       error={state.meta.isTouched && !state.meta.isValid} // Boolean(state.meta.errors.length)
       helperText={
-        errors.length
+        errors.length && state.meta.isTouched
           ? errors.map((e) => e?.message).join(', ')
           : props.helperText
       }

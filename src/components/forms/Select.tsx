@@ -41,7 +41,9 @@ export function Select({
       onChange={(e) => handleChange(e.target.value)}
       onBlur={handleBlur}
       helperText={
-        errors.length ? errors.map((e) => e?.message).join(', ') : helperText
+        errors.length && state.meta.isTouched
+          ? errors.map((e) => e?.message).join(', ')
+          : helperText
       }
       // delete render value ?? used default ??
       slotProps={{

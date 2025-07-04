@@ -6,5 +6,6 @@ export * from './monaco';
 export * from './presetsForm';
 export * from './queryKeys';
 export * from './searchParamsForm';
+export * from './searchSlots';
 export * from './stopwordsForm';
 export * from './toastTheme';

@@ -1,35 +1,17 @@
 import { Paper, Stack, Typography, type TypographyProps } from '@mui/material';
+import type { ReactNode } from 'react';
 import type {
   DocumentSchema,
   SearchResponseHit,
 } from 'typesense/lib/Typesense/Documents';
 import { HitActions } from './HitActions';
 
-function HitLabel({ children, ...props }: TypographyProps) {
-  return (
-    <Typography
-      variant='body2'
-      color='textSecondary'
-      sx={{
-        textAlign: 'right',
-        width: { xs: 120, sm: 150, md: 200 },
-        flex: '0 0 auto',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-      }}
-      {...props}
-    >
-      {children}
-    </Typography>
-  );
-}
-
 export interface HitProps {
   hit: SearchResponseHit<DocumentSchema>;
+  children?: ReactNode;
 }
 
-export function Hit({ hit }: HitProps) {
+export function Hit({ hit, children }: HitProps) {
   return (
     <Paper
       sx={{
@@ -100,6 +82,27 @@ export function Hit({ hit }: HitProps) {
       </Stack>
 
       <HitActions docId={hit.document.id} docData={hit.document} />
+      {children}
     </Paper>
+  );
+}
+
+function HitLabel({ children, ...props }: TypographyProps) {
+  return (
+    <Typography
+      variant='body2'
+      color='textSecondary'
+      sx={{
+        textAlign: 'right',
+        width: { xs: 120, sm: 150, md: 200 },
+        flex: '0 0 auto',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+      }}
+      {...props}
+    >
+      {children}
+    </Typography>
   );
 }

@@ -23,7 +23,6 @@ export const useSearchParams = <
   };
 
   const updateParams = useCallback((values: SearchContextParams) => {
-    console.log('UPDATE PARAMS', values);
     setParams(({ ...prev }) => ({ ...prev, ...values }));
   }, []);
 
