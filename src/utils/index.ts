@@ -15,3 +15,30 @@ export function getArrayVal(val: string | string[]) {
 export function uniqueArr(originalArray: string[]) {
   return [...new Set(originalArray)];
 }
+
+export function formatBytes(bytes: number) {
+  if (bytes === 0) {
+    return '0.00 B';
+  }
+
+  let e = Math.floor(Math.log(bytes) / Math.log(1024));
+  return (
+    (bytes / Math.pow(1024, e)).toFixed(2) + ' ' + ' KMGTP'.charAt(e) + 'B'
+  );
+}
+
+export function removeStartEndMatches(str: string, matchStr: string) {
+  let result = str;
+
+  // Remove from the beginning
+  if (result.startsWith(matchStr)) {
+    result = result.slice(matchStr.length);
+  }
+
+  // Remove from the end
+  if (result.endsWith(matchStr)) {
+    result = result.slice(0, result.length - matchStr.length);
+  }
+
+  return result;
+}
