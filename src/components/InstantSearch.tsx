@@ -9,7 +9,7 @@ import {
   type SearchContextParams,
   type SearchContextValues,
 } from '../context';
-import { useDebounce } from '../hooks';
+import { useCollectionSchema, useDebounce } from '../hooks';
 
 export type InstantSearchProps = {
   // SearchContextValues & {
@@ -39,7 +39,11 @@ export function InstantSearch<T extends DocumentSchema>({
   // slotProps,
 }: InstantSearchProps) {
   // TODO: get default params (query_by) from CollectionProvider ??
-  const [params, setParams] = useState(initialParams);
+  const { queryByOptions } = useCollectionSchema();
+  const [params, setParams] = useState<SearchContextParams>({
+    query_by: queryByOptions,
+    ...initialParams,
+  });
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, debounceMs);
 

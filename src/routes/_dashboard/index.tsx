@@ -1,11 +1,15 @@
 import { Container, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ButtonLink, ErrorFallback } from '../../components';
 import {
-  ServerHealth,
   ServerMetrics,
   ServerOps,
   TypesenseMetricsAndNodes,
 } from '../../components/serverStatus';
+
+// TODO: suspense / loading skeletons
 
 export const Route = createFileRoute('/_dashboard/')({
   component: HomeComponent,
@@ -22,9 +26,15 @@ function HomeComponent() {
         <Typography variant='h3' gutterBottom>
           Server Status
         </Typography>
-        <ServerHealth />
+        <ButtonLink to='/keys' variant='contained' size='small'>
+          Generate API Keys
+        </ButtonLink>
       </Stack>
-      <ServerMetrics />
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense>
+          <ServerMetrics />
+        </Suspense>
+      </ErrorBoundary>
       <TypesenseMetricsAndNodes />
       <ServerOps />
     </Container>

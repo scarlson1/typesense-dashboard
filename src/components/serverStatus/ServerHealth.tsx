@@ -8,6 +8,7 @@ export function ServerHealth() {
     queryKey: [clientId, 'server', 'health'],
     queryFn: () => client.health.retrieve(),
     staleTime: 1000 * 5,
+    refetchInterval: 10000,
   });
 
   // @ts-ignore

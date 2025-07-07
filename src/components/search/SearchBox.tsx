@@ -2,6 +2,9 @@ import { TextField, type TextFieldProps } from '@mui/material';
 import { useCallback, type ChangeEventHandler } from 'react';
 import { useSearch } from '../../hooks';
 
+// TODO: fix flashing query_by helper text while context is loading
+// currently relying on useEffect hook in UpdateSearchParameters
+
 type SearchBoxProps = Omit<TextFieldProps, 'onChange'>;
 
 export function SearchBox({ disabled, helperText, ...props }: SearchBoxProps) {

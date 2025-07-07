@@ -5,13 +5,15 @@ import { LinearProgressWithLabel } from '../../components';
 import { useTypesenseClient } from '../../hooks';
 import { formatBytes, removeStartEndMatches } from '../../utils';
 import { CircularProgressWithLabel } from '../CircularProgressWithLabel';
+import { ServerHealth } from './ServerHealth';
 
 export function ServerMetrics() {
   const [client, clientId] = useTypesenseClient();
   const { data } = useSuspenseQuery({
     queryKey: [clientId, 'server', 'metrics'],
     queryFn: () => client.metrics.retrieve(),
-    staleTime: 1000 * 5,
+    staleTime: 1000 * 4,
+    refetchInterval: 5000,
   });
 
   const cpuPcts = useMemo(() => {
@@ -29,9 +31,16 @@ export function ServerMetrics() {
 
   return (
     <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
-      <Typography variant='h6' gutterBottom>
-        Server Metrics
-      </Typography>
+      <Stack
+        direction='row'
+        spacing={2}
+        sx={{ justifyContent: 'space-between' }}
+      >
+        <Typography variant='h6' gutterBottom>
+          Server Metrics
+        </Typography>
+        <ServerHealth />
+      </Stack>
 
       <Stack
         direction='row'
@@ -51,7 +60,7 @@ export function ServerMetrics() {
                 '_active_percentage'
               )}
             </Typography>
-            <CircularProgressWithLabel val={Number(val)} />
+            <CircularProgressWithLabel value={Number(val)} size={48} />
           </Stack>
         ))}
       </Stack>

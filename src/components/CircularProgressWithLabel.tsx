@@ -1,17 +1,31 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  type CircularProgressProps,
+} from '@mui/material';
 
-export function CircularProgressWithLabel({ val }: { val: number }) {
+export interface CircularProgressWithLabelProps extends CircularProgressProps {}
+// {
+// val: number;
+// }
+
+export function CircularProgressWithLabel({
+  value,
+  ...props
+}: CircularProgressWithLabelProps) {
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
       <Box sx={{ position: 'relative', display: 'grid' }}>
         <CircularProgress
           variant='determinate'
-          value={Number(val)}
+          value={value}
           sx={{
             zIndex: 2,
             gridColumn: 1,
             gridRow: 1,
           }}
+          {...props}
         />
         <CircularProgress
           variant='determinate'
@@ -23,6 +37,7 @@ export function CircularProgressWithLabel({ val }: { val: number }) {
             gridRow: 1,
             zIndex: 1,
           }}
+          {...props}
         />
       </Box>
       <Box
@@ -41,7 +56,7 @@ export function CircularProgressWithLabel({ val }: { val: number }) {
           variant='caption'
           component='div'
           sx={{ color: 'text.secondary' }}
-        >{`${Number(val)}%`}</Typography>
+        >{`${value}%`}</Typography>
       </Box>
     </Box>
   );

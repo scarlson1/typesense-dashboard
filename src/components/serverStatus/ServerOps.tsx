@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../../components';
 import { useAsyncToast, useTypesenseClient } from '../../hooks';
@@ -20,8 +21,10 @@ export function ServerOps() {
       <Stack direction='column' spacing={2}>
         <Typography variant='h6'>Server Operations</Typography>
         <Box>
-          <Typography variant='subtitle1'>Cache</Typography>
-          <Typography variant='body2' gutterBottom>
+          <Typography variant='subtitle1' gutterBottom>
+            Cache
+          </Typography>
+          <Typography variant='body2' sx={{ pb: 2 }}>
             Responses of search requests that are sent with use_cache parameter
             are cached in a LRU cache{' '}
             <Link
@@ -32,11 +35,15 @@ export function ServerOps() {
               Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
             </Link>
           </Typography>
-          <ClearCache />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ClearCache />
+          </ErrorBoundary>
         </Box>
         <Box>
-          <Typography variant='subtitle1'>Compact DB</Typography>
-          <Typography variant='body2' gutterBottom>
+          <Typography variant='subtitle1' gutterBottom>
+            Compact DB
+          </Typography>
+          <Typography variant='body2' sx={{ pb: 2 }}>
             Typesense uses RocksDB to store your documents on the disk.
             Compacting could reduce the size of the database and decrease read
             latency.{' '}
@@ -48,14 +55,18 @@ export function ServerOps() {
               Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
             </Link>
           </Typography>
-          <CompactDatabase />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <CompactDatabase />
+          </ErrorBoundary>
         </Box>
         <Box>
-          <Typography variant='subtitle1'>
+          <Typography variant='subtitle1' gutterBottom>
             Schema Updates in Progress
           </Typography>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <SchemaUpdatesInProgress />
+            <Suspense>
+              <SchemaUpdatesInProgress />
+            </Suspense>
           </ErrorBoundary>
         </Box>
       </Stack>
@@ -137,7 +148,8 @@ function SchemaUpdatesInProgress() {
   const { data } = useSuspenseQuery<SchemaUpdate[]>({
     queryKey: [clientId, 'operations', 'schemaChanges'],
     queryFn: () => client.apiCall.get('/operations/schema_changes'), // client.operations.perform('schema_changes'),
-    staleTime: 1000 * 5,
+    staleTime: 1000 * 4,
+    refetchInterval: 5000,
   });
 
   return Boolean(data.length) ? (

@@ -1,7 +1,6 @@
-import { Container, Stack, Typography } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import {
-  ServerHealth,
   ServerMetrics,
   ServerOps,
   TypesenseMetricsAndNodes,
@@ -14,16 +13,9 @@ export const Route = createFileRoute('/_dashboard/server')({
 function RouteComponent() {
   return (
     <Container maxWidth='md' disableGutters>
-      <Stack
-        direction='row'
-        spacing={2}
-        sx={{ justifyContent: 'space-between' }}
-      >
-        <Typography variant='h3' gutterBottom>
-          Server Status
-        </Typography>
-        <ServerHealth />
-      </Stack>
+      <Typography variant='h3' gutterBottom>
+        Overview
+      </Typography>
       <ServerMetrics />
       <TypesenseMetricsAndNodes />
       <ServerOps />
