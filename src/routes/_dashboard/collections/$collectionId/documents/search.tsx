@@ -66,8 +66,8 @@ function SearchCollection() {
         >
           <SearchSlotsProvider
             slots={{
-              // stats: Typography, // example (Typography is default component)
-              stats: undefined, // hide slot
+              stats: Typography, // example (Typography is default component)
+              // stats: undefined, // hide slot
             }}
             slotProps={{
               stats: { color: 'text.secondary' },

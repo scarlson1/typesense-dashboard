@@ -205,9 +205,8 @@ function RouteComponent() {
           the editor.
         </Typography>
         <Alert severity='warning' sx={{ my: 1, maxWidth: 1000 }}>
-          The prefilled schema is determined on a best effort basis from
-          collection schema. Expect imperfections, especially for nested fields
-          and "auto" schemas.
+          The prefilled schema is derived from the collection schema. Expect
+          imperfections, especially for nested fields and "auto" schemas.
         </Alert>
         <Box>
           <NewDocumentEditor />

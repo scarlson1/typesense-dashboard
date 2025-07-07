@@ -7,12 +7,13 @@ import {
   ExpandLessRounded,
   ExpandMoreRounded,
   FrontHandRounded,
+  GitHub,
   HelpRounded,
   HomeRounded,
-  InfoRounded,
   InsightsRounded,
   KeyRounded,
   LeakAddRounded,
+  OpenInNewRounded,
   SearchRounded,
   SettingsInputSvideoRounded,
   SettingsRounded,
@@ -61,9 +62,31 @@ interface MainListItem {
 }
 
 const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRounded /> },
-  { text: 'About', icon: <InfoRounded /> },
-  { text: 'Feedback', icon: <HelpRounded /> },
+  {
+    text: 'Settings',
+    route: { to: '/server' }, // TODO: settings page ??
+    icon: <SettingsRounded fontSize='small' />,
+  },
+  {
+    text: 'Feedback',
+    route: {
+      to: 'https://github.com/scarlson1/typesense-dashboard/issues' as LinkProps['to'],
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    }, // TODO: feedback page (link to github for now ??)
+    icon: <HelpRounded fontSize='small' />,
+    textEndIcon: <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />,
+  },
+  {
+    text: 'Github',
+    route: {
+      to: 'https://github.com/scarlson1/typesense-dashboard' as LinkProps['to'],
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    icon: <GitHub fontSize='small' />,
+    textEndIcon: <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />,
+  },
 ];
 
 // https://tanstack.com/router/latest/docs/framework/react/guide/custom-link#mui-example
@@ -132,8 +155,6 @@ export function MenuContent() {
         Boolean(collections.length) ? collections[0].name : ''
       );
   }, [collections, clusterId]);
-
-  // TODO: navigate on selected collection change (if current path includes collectionId)
 
   const mainListItems = useMemo<MainListItem[]>(() => {
     let collectionChildren = [
@@ -315,7 +336,6 @@ export function MenuContent() {
                     unmountOnExit
                     key={`${item.text}-${child.text}-${i}-${j}`}
                   >
-                    {/* <List component='div' disablePadding> */}
                     <ListItem disablePadding sx={{ display: 'block' }}>
                       <RouterListItemButton
                         from={child.route.from}
@@ -339,7 +359,6 @@ export function MenuContent() {
                         <ListItemText primary={child.text} />
                       </RouterListItemButton>
                     </ListItem>
-                    {/* </List> */}
                   </Collapse>
                 ))
               : null}
@@ -349,24 +368,31 @@ export function MenuContent() {
       <List dense>
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton>
+            <RouterListItemButton
+              // to={item.route.to}
+              // selected={Boolean(matchRoute({ to: item.route.to }))}
+              {...item.route}
+            >
               <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
+              <ListItemText
+                primary={
+                  <>
+                    {`${item.text}`}
+                    {item.textEndIcon || null}
+                  </>
+                }
+                slotProps={{
+                  primary: {
+                    component: 'div',
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
+                }}
+              />
+            </RouterListItemButton>
           </ListItem>
         ))}
       </List>
     </Stack>
   );
 }
-
-// const mainListItems: MainListItem[] = [
-//   { text: 'Home', icon: <HomeRounded />, route: '/' },
-//   // { text: 'Server Status', icon: <AnalyticsRounded />, route: '/status' },
-//   { text: 'Collections', icon: <DatasetRounded />, route: '/collections' },
-//   { text: 'Aliases', icon: <CompareArrowsRounded />, route: '/alias' },
-//   { text: 'API Keys', icon: <KeyRounded />, route: '/keys' },
-//   // { text: 'Analytics Rules', icon: <KeyRounded />, route: '/analytics' },
-//   // { text: 'Search Presets', icon: <LocalShippingRounded />, route: '/presets' },
-//   // { text: 'Stopwords', icon: <AssessmentRounded />, route: '/stop-words' },
-// ];

@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { useHits, useSearch, useSearchSlots } from '../../hooks';
 
 function CtxHits({ children }: { children?: ReactNode }) {
@@ -33,21 +33,34 @@ function CtxHits({ children }: { children?: ReactNode }) {
     ) : null;
   }
 
-  return slots?.hits && slots?.hit ? (
+  return slots?.hits ? (
     <slots.hits {...slotProps.hits}>{children}</slots.hits>
   ) : null;
 }
+
+export function CtxHitWrapper(props: { children?: ReactNode }) {
+  const [slots, slotProps] = useSearchSlots();
+
+  return slots.hitWrapper ? (
+    <slots.hitWrapper {...slotProps.hitWrapper}>
+      {props?.children}
+    </slots.hitWrapper>
+  ) : (
+    <Fragment>{props?.children}</Fragment>
+  );
+}
+
+CtxHits.HitWrapper = CtxHitWrapper;
 
 export function CtxHit(props: { children?: ReactNode }) {
   const hits = useHits();
   const [slots, slotProps] = useSearchSlots();
 
   return slots?.hit ? (
-    <>
+    <CtxHitWrapper>
       {hits?.hits?.map((hit, i) => (
         <slots.hit
-          {...slotProps}
-          // {...props}
+          {...slotProps?.hit}
           hit={hit}
           key={`hit-${hit.document.id}-${i}`}
         >
@@ -57,7 +70,7 @@ export function CtxHit(props: { children?: ReactNode }) {
           {props?.children}
         </slots.hit>
       ))}
-    </>
+    </CtxHitWrapper>
   ) : null;
 }
 

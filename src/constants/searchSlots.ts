@@ -30,6 +30,9 @@ export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
     direction: 'column',
     spacing: { xs: 1, sm: 2 },
   },
+  hitWrapper: {
+    size: 12,
+  },
   pageSize: {
     size: 'small',
     label: 'Hits per page',

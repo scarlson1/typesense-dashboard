@@ -1,6 +1,7 @@
 import type {
   AlertProps,
   BoxProps,
+  GridProps,
   PaginationProps,
   SelectProps,
   StackProps,
@@ -14,6 +15,7 @@ export interface SearchSlotComponents {
   noHitsFound: ComponentType<BoxProps>;
   hits: ComponentType<Record<string, any>>;
   hit: ComponentType<HitProps>;
+  hitWrapper?: ComponentType<GridProps>;
   hitActions: ComponentType<HitActionsProps>;
   pageSize: ComponentType<SelectProps<number>>; //  ComponentType<TextFieldProps>;
   pagination: ComponentType<PaginationProps>;
@@ -26,6 +28,7 @@ export interface SearchSlotProps {
   noHitsFound?: SlotPropsWithOverrides<BoxProps>;
   hits?: SlotPropsWithOverrides<StackProps>; // Record<string, any>
   hit?: SlotPropsWithOverrides<HitProps>;
+  hitWrapper?: SlotPropsWithOverrides<GridProps>;
   hitActions?: SlotPropsWithOverrides<HitActionsProps>;
   pageSize?: SlotPropsWithOverrides<SelectProps<number>>;
   pagination?: SlotPropsWithOverrides<PaginationProps>;
@@ -37,6 +40,7 @@ export interface SearchSlotProps {
 export interface SearchSlotsContextValues {
   slots: SearchSlotComponents; // Partial<SearchSlotComponents>;
   slotProps: SearchSlotProps; // Partial<SearchSlotProps>;
+  updateSlotProps: (updates: SearchSlotProps) => void;
 }
 
 export const SearchSlotsContext =

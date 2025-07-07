@@ -12,8 +12,9 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useStore } from 'zustand';
+import { useAsyncToast } from '../hooks';
 import { queryClient, typesenseStore } from '../utils';
 import { MenuButton } from './MenuButton';
 // import { firebaseSignOut } from '../firebase/auth';
@@ -24,18 +25,19 @@ const MenuItem = styled(MuiMenuItem)({
 
 export default function OptionsMenu() {
   const navigate = useNavigate();
+  const toast = useAsyncToast();
   const logout = useStore(typesenseStore, (state) => state.logout);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
+  }, []);
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       // TODO: add loading state and show loading indicator in list item
       // await firebaseSignOut();
@@ -44,11 +46,19 @@ export default function OptionsMenu() {
       queryClient.clear();
       navigate({ to: '/auth' });
 
-      alert('TODO: signout');
+      // alert('TODO: signout');
     } catch (err) {
       console.log('LOGOUT ERROR: ', err);
     }
-  };
+  }, [logout, navigate]);
+
+  const handleToast = useCallback(
+    (id: string) => {
+      toast.info(`TODO: implement ${id}`, { id });
+      handleClose();
+    },
+    [toast, handleClose]
+  );
 
   return (
     <>
@@ -79,8 +89,8 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem onClick={() => handleToast('profile')}>Profile</MenuItem>
+        <MenuItem onClick={() => handleToast('account')}>My account</MenuItem>
         <Divider />
         <MenuItem
           onClick={() => {
@@ -90,7 +100,7 @@ export default function OptionsMenu() {
         >
           Add another account
         </MenuItem>
-        <MenuItem onClick={handleClose}>Settings</MenuItem>
+        <MenuItem onClick={() => handleToast('settings')}>Settings</MenuItem>
         <Divider />
         <MenuItem
           onClick={handleLogout}

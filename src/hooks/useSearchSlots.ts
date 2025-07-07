@@ -10,7 +10,8 @@ export const useSearchSlots = () => {
       'useSearchSlots must be within a SearchSlotsContext Provider'
     );
 
-  const { slots, slotProps } = (context || {}) as SearchSlotsContextValues;
+  const { slots, slotProps, updateSlotProps } = (context ||
+    {}) as SearchSlotsContextValues;
 
-  return [slots, slotProps] as const;
+  return [slots, slotProps, updateSlotProps] as const;
 };

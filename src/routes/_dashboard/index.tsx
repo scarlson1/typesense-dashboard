@@ -24,7 +24,7 @@ function HomeComponent() {
         sx={{ justifyContent: 'space-between' }}
       >
         <Typography variant='h3' gutterBottom>
-          Server Status
+          Overview
         </Typography>
         <ButtonLink to='/keys' variant='contained' size='small'>
           Generate API Keys

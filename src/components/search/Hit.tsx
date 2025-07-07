@@ -1,17 +1,31 @@
 import { Paper, Stack, Typography, type TypographyProps } from '@mui/material';
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import type {
   DocumentSchema,
   SearchResponseHit,
 } from 'typesense/lib/Typesense/Documents';
+import { useSearchSlots } from '../../hooks';
 import { HitActions } from './HitActions';
 
 export interface HitProps {
   hit: SearchResponseHit<DocumentSchema>;
   children?: ReactNode;
+  displayFields?: string[];
 }
 
-export function Hit({ hit, children }: HitProps) {
+export function Hit({ hit, children, displayFields }: HitProps) {
+  let displayFieldsArr = useMemo(() => {
+    if (!displayFields?.length) return Object.entries(hit?.document);
+
+    return Object.entries(hit?.document).filter(([field]) =>
+      displayFields.includes(field)
+    );
+  }, [displayFields, hit]);
+
+  const [_, slotProps] = useSearchSlots();
+
+  console.log(displayFields, slotProps.hit);
+
   return (
     <Paper
       sx={{
@@ -24,7 +38,7 @@ export function Hit({ hit, children }: HitProps) {
         spacing={1}
         sx={{ maxHeight: 300, overflowX: 'auto' }}
       >
-        {Object.entries(hit?.document).map(([key, value]) => (
+        {displayFieldsArr.map(([key, value]) => (
           <Stack direction='row' spacing={3} key={key} sx={{ display: 'flex' }}>
             <HitLabel>{key}</HitLabel>
             <Typography
