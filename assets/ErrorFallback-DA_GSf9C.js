@@ -1,1 +1,0 @@
-import{j as r}from"./index-CEjZvgK9.js";function s({error:e}){return r.jsxs("div",{role:"alert",children:[r.jsx("p",{children:"Something went wrong:"}),r.jsx("pre",{style:{color:"red"},children:e.message})]})}export{s as E};
