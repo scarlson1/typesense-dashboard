@@ -84,7 +84,6 @@ function SearchCollection() {
               stats: { color: 'text.secondary' },
               hits: { container: true, spacing: 2 },
               hitActions: {
-                // variant: 'contained',
                 sx: {
                   position: 'absolute',
                   right: '8px',

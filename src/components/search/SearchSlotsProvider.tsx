@@ -1,3 +1,11 @@
+import type {
+  AlertProps,
+  BoxProps,
+  GridProps,
+  PaginationProps,
+  SelectProps,
+  TypographyProps,
+} from '@mui/material';
 import { mergeWith } from 'lodash-es';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import {
@@ -9,10 +17,49 @@ import {
   type SearchSlotComponents,
   type SearchSlotProps,
 } from '../../context';
+import type { HitProps } from './Hit';
+import type { HitActionsProps } from './HitActions';
 
-interface SearchSlotsProvider {
-  slots?: Partial<SearchSlotComponents>;
-  slotProps?: Partial<SearchSlotProps>;
+interface SearchSlotsProviderProps<
+  THitsProps = Record<string, any>,
+  THitProps = HitProps,
+  THitWrapperProps = GridProps,
+  THitActionProps = HitActionsProps,
+  TNoHitsFoundProps = BoxProps,
+  TPageSizeProps extends SelectProps<number> = SelectProps<number>,
+  TPaginationProps extends PaginationProps = PaginationProps,
+  TStatsProps = TypographyProps,
+  TErrorProps = AlertProps,
+  TLoadingHitsProps = BoxProps,
+> {
+  slots: Partial<
+    SearchSlotComponents<
+      THitsProps,
+      THitProps,
+      THitWrapperProps,
+      THitActionProps,
+      TNoHitsFoundProps,
+      TPageSizeProps,
+      TPaginationProps,
+      TStatsProps,
+      TErrorProps,
+      TLoadingHitsProps
+    >
+  >;
+  slotProps?: Partial<
+    SearchSlotProps<
+      THitsProps,
+      THitProps,
+      THitWrapperProps,
+      THitActionProps,
+      TNoHitsFoundProps,
+      TPageSizeProps,
+      TPaginationProps,
+      TStatsProps,
+      TErrorProps,
+      TLoadingHitsProps
+    >
+  >;
   children: ReactNode;
 }
 
@@ -20,7 +67,7 @@ export const SearchSlotsProvider = ({
   slots: providedSlots,
   slotProps: providedSlotProps = {},
   children,
-}: SearchSlotsProvider) => {
+}: SearchSlotsProviderProps) => {
   const [slotPropsState, setSlotPropsState] = useState(providedSlotProps);
 
   const slots = useMemo(

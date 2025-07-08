@@ -33,7 +33,13 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import type { LinkComponent, LinkProps } from '@tanstack/react-router';
+import type {
+  AnyContext,
+  AnySchema,
+  LinkComponent,
+  LinkProps,
+  RouteMatch,
+} from '@tanstack/react-router';
 import {
   createLink,
   useLocation,
@@ -52,6 +58,8 @@ import {
 } from 'react';
 import { collectionQueryKeys } from '../constants';
 import { usePrevious, useTypesenseClient } from '../hooks';
+
+// TODO: clean up syncing collectionId between select/context/url
 
 interface MainListItem {
   text: string;
@@ -116,18 +124,38 @@ export function MenuContent() {
   const [open, setOpen] = useState<string | null>('Collections');
 
   const [typesense, clusterId] = useTypesenseClient();
-  // const currentCollection = useStore(typesenseStore, (state) => state.currentCollection);
-  // const setCurrentCollection = useStore(typesenseStore, (state) => state.setCurrentCollection);
 
   const { data: collections } = useSuspenseQuery({
     queryKey: collectionQueryKeys.all(clusterId),
     queryFn: () => typesense.collections().retrieve(),
   });
-  // better to pull up selected collection to context provider ??
-  const [selectedCollection, setSelectedCollection] = useState<string>(() =>
-    Boolean(collections.length) ? collections[0].name : ''
-  );
 
+  const getParamCollectionId = useCallback(() => {
+    // @ts-ignore
+    let match:
+      | RouteMatch<
+          string,
+          string,
+          { collectionId?: string },
+          AnySchema,
+          any,
+          AnyContext,
+          {}
+        >
+      | undefined = matches.find((m) => m.fullPath.includes('$collectionId'));
+    return match?.params?.collectionId;
+  }, [matches]);
+
+  // better to pull up selected collection to context provider ??
+  const [selectedCollection, setSelectedCollection] = useState<string>(() => {
+    let colId = getParamCollectionId();
+    if (colId && collections.map((c) => c.name).includes(colId)) {
+      return colId;
+    }
+    return Boolean(collections.length) ? collections[0].name : '';
+  });
+
+  // navigate to current page with updated collection ID on select change
   const prevCollection = usePrevious(selectedCollection);
   useEffect(() => {
     // only navigate if current path includes collectionId param
@@ -140,7 +168,6 @@ export function MenuContent() {
       match?.fullPath && // @ts-ignore
       match?.params?.collectionId !== selectedCollection
     ) {
-      console.log('NAVIGATING...');
       navigate({
         to: match.fullPath,
         params: { collectionId: selectedCollection },
@@ -148,13 +175,20 @@ export function MenuContent() {
     }
   }, [navigate, prevCollection, matches, selectedCollection]);
 
+  // update selected collection when clusterId changes
   const prevClusterId = usePrevious(clusterId);
   useEffect(() => {
-    if (clusterId !== prevClusterId)
-      setSelectedCollection(
-        Boolean(collections.length) ? collections[0].name : ''
-      );
-  }, [collections, clusterId]);
+    if (clusterId !== prevClusterId && prevClusterId) {
+      let colId = getParamCollectionId();
+      if (colId && collections.map((c) => c.name).includes(colId)) {
+        setSelectedCollection(colId);
+      } else {
+        setSelectedCollection(
+          Boolean(collections.length) ? collections[0].name : ''
+        );
+      }
+    }
+  }, [collections, clusterId, getParamCollectionId]);
 
   const mainListItems = useMemo<MainListItem[]>(() => {
     let collectionChildren = [

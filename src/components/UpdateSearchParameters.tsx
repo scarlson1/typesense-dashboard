@@ -92,19 +92,13 @@ export function UpdateSearchParameters({
   useEffect(() => {
     if (formPresetValue !== prevFormPresetValue) {
       let existingPreset = presets.find((p) => p.name === formPresetValue);
-      if (existingPreset?.name) {
-        console.log('UPDATING CONTEXT PRESET ON FORM PRESET SELECTION');
-        setPreset(existingPreset.name);
-      }
+      if (existingPreset?.name) setPreset(existingPreset.name);
     }
   }, [presets, formPresetValue, prevFormPresetValue]);
 
   // update form preset when preset changes in SearchContext
   useEffect(() => {
-    if (preset && preset !== prevPreset) {
-      console.log(`UPDATING FORM PRESET ${preset}`);
-      form.setFieldValue('preset', preset); // will trigger update in SearchParamsForm's useEffect
-    }
+    if (preset && preset !== prevPreset) form.setFieldValue('preset', preset); // will trigger update in SearchParamsForm's useEffect
   }, [preset, prevPreset]);
 
   const formValues = useStore(form.store, (state) => state.values);

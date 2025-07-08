@@ -11,38 +11,104 @@ import { createContext, type ComponentType } from 'react';
 import type { SlotPropsWithOverrides } from '../components';
 import type { HitActionsProps, HitProps } from '../components/search';
 
-export interface SearchSlotComponents {
-  noHitsFound: ComponentType<BoxProps>;
-  hits: ComponentType<Record<string, any>>;
-  hit: ComponentType<HitProps>;
-  hitWrapper?: ComponentType<GridProps>;
-  hitActions: ComponentType<HitActionsProps>;
-  pageSize: ComponentType<SelectProps<number>>; //  ComponentType<TextFieldProps>;
-  pagination: ComponentType<PaginationProps>;
-  stats: ComponentType<TypographyProps>;
-  error: ComponentType<AlertProps>;
-  loadingHits: ComponentType<BoxProps>;
+export interface SearchSlotComponents<
+  THitsProps = Record<string, any>,
+  THitProps = HitProps,
+  THitWrapperProps = GridProps,
+  THitActionProps = HitActionsProps,
+  TNoHitsFoundProps = BoxProps,
+  TPageSizeProps extends SelectProps<number> = SelectProps<number>,
+  TPaginationProps = PaginationProps,
+  TStatsProps = TypographyProps,
+  TErrorProps = AlertProps,
+  TLoadingHitsProps = BoxProps,
+> {
+  hits: ComponentType<THitsProps>;
+  hit: ComponentType<THitProps>;
+  hitWrapper?: ComponentType<THitWrapperProps>;
+  hitActions: ComponentType<THitActionProps>;
+  noHitsFound: ComponentType<TNoHitsFoundProps>;
+  pageSize: ComponentType<TPageSizeProps>; //  ComponentType<TextFieldProps>;
+  pagination: ComponentType<TPaginationProps>;
+  stats: ComponentType<TStatsProps>;
+  error: ComponentType<TErrorProps>;
+  loadingHits: ComponentType<TLoadingHitsProps>;
 }
 
-export interface SearchSlotProps {
-  noHitsFound?: SlotPropsWithOverrides<BoxProps>;
-  hits?: SlotPropsWithOverrides<StackProps>; // Record<string, any>
-  hit?: SlotPropsWithOverrides<HitProps>;
-  hitWrapper?: SlotPropsWithOverrides<GridProps>;
-  hitActions?: SlotPropsWithOverrides<HitActionsProps>;
-  pageSize?: SlotPropsWithOverrides<SelectProps<number>>;
-  pagination?: SlotPropsWithOverrides<PaginationProps>;
-  stats?: SlotPropsWithOverrides<TypographyProps>;
-  error?: SlotPropsWithOverrides<AlertProps>;
-  loadingHits?: SlotPropsWithOverrides<BoxProps>;
+export interface SearchSlotProps<
+  THitsProps = StackProps,
+  THitProps = HitProps,
+  THitWrapperProps = GridProps,
+  THitActionProps = HitActionsProps,
+  TNoHitsFoundProps = BoxProps,
+  TPageSizeProps extends SelectProps<number> = SelectProps<number>,
+  TPaginationProps = PaginationProps,
+  TStatsProps = TypographyProps,
+  TErrorProps = AlertProps,
+  TLoadingHitsProps = BoxProps,
+> {
+  hits?: SlotPropsWithOverrides<THitsProps>; // Record<string, any>
+  hit?: SlotPropsWithOverrides<THitProps>;
+  hitWrapper?: SlotPropsWithOverrides<THitWrapperProps>;
+  hitActions?: SlotPropsWithOverrides<THitActionProps>;
+  noHitsFound?: SlotPropsWithOverrides<TNoHitsFoundProps>;
+  pageSize?: SlotPropsWithOverrides<TPageSizeProps>;
+  pagination?: SlotPropsWithOverrides<TPaginationProps>;
+  stats?: SlotPropsWithOverrides<TStatsProps>;
+  error?: SlotPropsWithOverrides<TErrorProps>;
+  loadingHits?: SlotPropsWithOverrides<TLoadingHitsProps>;
 }
 
-export interface SearchSlotsContextValues {
-  slots: SearchSlotComponents; // Partial<SearchSlotComponents>;
-  slotProps: SearchSlotProps; // Partial<SearchSlotProps>;
+export interface SearchSlotsContextValues<
+  THitsProps = StackProps,
+  THitProps = HitProps,
+  THitWrapperProps = GridProps,
+  THitActionProps = HitActionsProps,
+  TNoHitsFoundProps = BoxProps,
+  TPageSizeProps extends SelectProps<number> = SelectProps<number>,
+  TPaginationProps = PaginationProps,
+  TStatsProps = TypographyProps,
+  TErrorProps = AlertProps,
+  TLoadingHitsProps = BoxProps,
+> {
+  slots: SearchSlotComponents<
+    THitsProps,
+    THitProps,
+    THitWrapperProps,
+    THitActionProps,
+    TNoHitsFoundProps,
+    TPageSizeProps,
+    TPaginationProps,
+    TStatsProps,
+    TErrorProps,
+    TLoadingHitsProps
+  >;
+  slotProps: SearchSlotProps<
+    THitsProps,
+    THitProps,
+    THitWrapperProps,
+    THitActionProps,
+    TNoHitsFoundProps,
+    TPageSizeProps,
+    TPaginationProps,
+    TStatsProps,
+    TErrorProps,
+    TLoadingHitsProps
+  >;
   updateSlotProps: (
-    updates: SearchSlotProps,
-    updater?: Function // (objValue: object, srcValue: object) => object | undefined
+    updates: SearchSlotProps<
+      THitsProps,
+      THitProps,
+      THitWrapperProps,
+      THitActionProps,
+      TNoHitsFoundProps,
+      TPageSizeProps,
+      TPaginationProps,
+      TStatsProps,
+      TErrorProps,
+      TLoadingHitsProps
+    >,
+    updater?: Function
   ) => void;
 }
 

@@ -1,8 +1,9 @@
 import {
-  Alert,
   Autocomplete,
   Button,
   createFilterOptions,
+  FormControl,
+  InputLabel,
   MenuItem,
   Paper,
   Select,
@@ -99,9 +100,6 @@ export function DashboardDisplayOptions() {
 
   return (
     <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
-      <Alert severity='warning' sx={{ mb: 2 }}>
-        TODO: dashboard display options
-      </Alert>
       <Stack direction='column' spacing={1.5}>
         <Stack
           direction='row'
@@ -130,6 +128,13 @@ export function DashboardDisplayOptions() {
               <TextField {...params} label='Display Fields' />
             )}
             sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
+            slotProps={{
+              paper: {
+                sx: {
+                  border: (theme) => `1px solid ${theme.palette.divider}`,
+                },
+              },
+            }}
           />
         </Stack>
 
@@ -194,6 +199,13 @@ export function DashboardDisplayOptions() {
               />
             )}
             sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
+            slotProps={{
+              paper: {
+                sx: {
+                  border: (theme) => `1px solid ${theme.palette.divider}`,
+                },
+              },
+            }}
           />
         </Stack>
 
@@ -207,24 +219,39 @@ export function DashboardDisplayOptions() {
           >
             Number of Columns in View
           </Typography>
-          <Select
-            value={
-              typeof slotProps?.hitWrapper?.size === 'number'
-                ? slotProps?.hitWrapper?.size / 12
-                : 0
-            }
-            onChange={handleSizeChange}
-            size='small'
-            label='Columns'
-            sx={{ minWidth: 100, maxWidth: 200 }}
-          >
-            <MenuItem value={0}>Default</MenuItem>
-            {selectOptions.map((o) => (
-              <MenuItem value={o} key={`${o}-columns`}>
-                {o}
-              </MenuItem>
-            ))}
-          </Select>
+          <FormControl size='small'>
+            <InputLabel id='display-columns-label'>Columns</InputLabel>
+            <Select
+              labelId='display-columns-label'
+              id='display-columns'
+              value={
+                typeof slotProps?.hitWrapper?.size === 'number'
+                  ? slotProps?.hitWrapper?.size / 12
+                  : 0
+              }
+              onChange={handleSizeChange}
+              size='small'
+              label='Columns'
+              sx={{ minWidth: 100, maxWidth: 200 }}
+              MenuProps={{
+                slotProps: {
+                  paper: {
+                    elevation: 0,
+                    sx: {
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                    },
+                  },
+                },
+              }}
+            >
+              <MenuItem value={0}>Default</MenuItem>
+              {selectOptions.map((o) => (
+                <MenuItem value={o} key={`${o}-columns`}>
+                  {o}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Button size='small' onClick={handleResetGrid}>
             reset
           </Button>

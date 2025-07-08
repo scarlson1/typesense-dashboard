@@ -78,12 +78,16 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
       {imgField ? (
         <CardMedia
           component='img'
-          sx={{ height: 100, objectFit: 'cover', backgroundSize: 'cover' }}
+          sx={{
+            height: { xs: 100, md: 120 },
+            // objectFit: 'cover',
+            // backgroundSize: 'cover',
+          }}
           image={imgField}
           title='hit image'
         />
       ) : null}
-      <CardContent>
+      <CardContent sx={{ pb: 2 }}>
         <Stack direction='row' spacing={3} sx={{ display: 'flex', pb: 1.5 }}>
           <HitLabel>ID</HitLabel>
           <HitValue> {hit?.document.id}</HitValue>
@@ -110,7 +114,10 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           ))}
         </Stack>
       </CardContent>
-      <CardActions disableSpacing sx={{ pt: 0 }}>
+      <CardActions
+        disableSpacing
+        sx={{ borderTop: (theme) => `1px solid ${theme.palette.divider}` }}
+      >
         <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}
