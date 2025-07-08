@@ -1,4 +1,5 @@
 import { Alert, Box, Pagination, Stack, Typography } from '@mui/material';
+import { Fragment } from 'react/jsx-runtime';
 import {
   DefaultCtxSearchPageSize,
   Hit,
@@ -9,10 +10,11 @@ import type { SearchSlotComponents, SearchSlotProps } from '../context';
 
 export const SEARCH_DEFAULT_SLOTS: SearchSlotComponents = {
   noHitsFound: Box, // CtxHitsNotFoundWrapper,
-  hits: Stack, // Hits,
+  hits: Stack,
   hit: Hit,
+  hitWrapper: Fragment,
   hitActions: HitActions,
-  pageSize: DefaultCtxSearchPageSize, // SearchPageSize,
+  pageSize: DefaultCtxSearchPageSize,
   pagination: Pagination,
   stats: Typography,
   error: Alert,
@@ -27,7 +29,7 @@ export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
     height: 200,
   },
   hits: {
-    direction: 'column',
+    // direction: 'column',
     spacing: { xs: 1, sm: 2 },
   },
   hitWrapper: {

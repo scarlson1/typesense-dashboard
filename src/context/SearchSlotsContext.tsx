@@ -40,7 +40,10 @@ export interface SearchSlotProps {
 export interface SearchSlotsContextValues {
   slots: SearchSlotComponents; // Partial<SearchSlotComponents>;
   slotProps: SearchSlotProps; // Partial<SearchSlotProps>;
-  updateSlotProps: (updates: SearchSlotProps) => void;
+  updateSlotProps: (
+    updates: SearchSlotProps,
+    updater?: Function // (objValue: object, srcValue: object) => object | undefined
+  ) => void;
 }
 
 export const SearchSlotsContext =

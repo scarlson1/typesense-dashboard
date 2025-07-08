@@ -3,7 +3,15 @@ import {
   ExpandMoreRounded,
   OpenInNewRounded,
 } from '@mui/icons-material';
-import { Box, Container, Link, Paper, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  Grid,
+  Link,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
@@ -68,9 +76,15 @@ function SearchCollection() {
             slots={{
               stats: Typography, // example (Typography is default component)
               // stats: undefined, // hide slot
+              hits: Grid,
+              hitWrapper: Grid,
             }}
             slotProps={{
               stats: { color: 'text.secondary' },
+              hits: { container: true, spacing: 2 },
+              hitWrapper: {
+                size: { xs: 12, sm: 2, lg: 3 },
+              },
             }}
           >
             <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>

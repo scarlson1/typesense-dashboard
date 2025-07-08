@@ -1,19 +1,18 @@
 import {
   Alert,
-  Box,
+  Autocomplete,
   Button,
-  Chip,
   MenuItem,
   Paper,
   Select,
   Stack,
+  TextField,
   Typography,
   type SelectChangeEvent,
 } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 import { SEARCH_DEFAULT_SLOT_PROPS } from '../../constants';
 import { useCollectionSchema, useSearchSlots } from '../../hooks';
-import { uniqueArr } from '../../utils';
 
 // TODO: change hits to be grid instead of stack ??
 
@@ -29,35 +28,23 @@ export function DashboardDisplayOptions() {
       .filter((name) => !name.includes('*'));
   }, [collectionSchema]);
 
-  const handleFieldsChange = useCallback(
-    (e: SelectChangeEvent<string[]>) => {
-      const {
-        target: { value },
-      } = e;
-      console.log(value);
-      let newVal = typeof value === 'string' ? value.split(',') : value;
-      // TODO: need to merge with existing fields ??
-      let displayFields = uniqueArr([
-        ...(slotProps?.hit?.displayFields || []),
-        ...newVal,
-      ]);
-      // console.log('TEST ', slotProps?.hit?.displayFields, newVal);
-      updateSlotProps({
-        hit: { displayFields },
-      });
-      alert('TODO: handle display fields');
-    },
-    [slotProps?.hit?.displayFields]
-  );
-
-  console.log('TEST ', slotProps?.hit?.displayFields);
+  const handleFieldsChange = useCallback((_: any, newVal: string[]) => {
+    updateSlotProps(
+      {
+        hit: { displayFields: newVal || [] },
+      },
+      (_: object, srcValue: object) => {
+        if (Array.isArray(srcValue)) return srcValue;
+      }
+    );
+  }, []);
 
   const handleSizeChange = useCallback(
     (e: SelectChangeEvent<number>) => {
       let size = e.target.value
         ? 12 / e.target.value
         : SEARCH_DEFAULT_SLOT_PROPS.hitWrapper?.size || 1;
-
+      console.log('size: ', size);
       updateSlotProps({ hitWrapper: { size } });
       alert('TODO: change Hits to <Grid /> instead of <Stack />');
     },
@@ -90,39 +77,20 @@ export function DashboardDisplayOptions() {
           >
             Display Fields
           </Typography>
-          <Select
+          <Autocomplete
+            multiple
+            id='display-fields'
+            size='small'
+            limitTags={4}
+            blurOnSelect
+            options={fieldOptions}
             value={slotProps.hit?.displayFields || []}
             onChange={handleFieldsChange}
-            multiple
-            size='small'
-            sx={{ minWidth: 100, maxWidth: 400 }}
-            // limitTags={4}
-            // maxRows={3}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
-              </Box>
+            renderInput={(params) => (
+              <TextField {...params} label='Display Fields' />
             )}
-          >
-            <MenuItem value={[]}>Default</MenuItem>
-            {fieldOptions.map((o) => (
-              <MenuItem
-                value={o}
-                key={`${o}-display-field`}
-                sx={{
-                  maxWidth: 400,
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                <Typography noWrap>{o}</Typography>
-                {/* {o} */}
-              </MenuItem>
-            ))}
-          </Select>
+            sx={{ minWidth: 280, maxWidth: 500 }}
+          />
         </Stack>
 
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>
@@ -156,6 +124,7 @@ export function DashboardDisplayOptions() {
             }
             onChange={handleSizeChange}
             size='small'
+            label='Columns'
             sx={{ minWidth: 100, maxWidth: 200 }}
           >
             <MenuItem value={0}>Default</MenuItem>

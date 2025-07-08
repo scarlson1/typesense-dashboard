@@ -4,7 +4,6 @@ import type {
   DocumentSchema,
   SearchResponseHit,
 } from 'typesense/lib/Typesense/Documents';
-import { useSearchSlots } from '../../hooks';
 import { HitActions } from './HitActions';
 
 export interface HitProps {
@@ -21,10 +20,6 @@ export function Hit({ hit, children, displayFields }: HitProps) {
       displayFields.includes(field)
     );
   }, [displayFields, hit]);
-
-  const [_, slotProps] = useSearchSlots();
-
-  console.log(displayFields, slotProps.hit);
 
   return (
     <Paper

@@ -40,6 +40,7 @@ function CtxHits({ children }: { children?: ReactNode }) {
 
 export function CtxHitWrapper(props: { children?: ReactNode }) {
   const [slots, slotProps] = useSearchSlots();
+  console.log('slotProps.hitWrapper: ', slotProps.hitWrapper);
 
   return slots.hitWrapper ? (
     <slots.hitWrapper {...slotProps.hitWrapper}>
@@ -57,20 +58,25 @@ export function CtxHit(props: { children?: ReactNode }) {
   const [slots, slotProps] = useSearchSlots();
 
   return slots?.hit ? (
-    <CtxHitWrapper>
+    <>
       {hits?.hits?.map((hit, i) => (
-        <slots.hit
-          {...slotProps?.hit}
-          hit={hit}
-          key={`hit-${hit.document.id}-${i}`}
-        >
-          {slots?.hitActions ? (
-            <slots.hitActions docData={hit.document} docId={hit.document.id} />
-          ) : null}
-          {props?.children}
-        </slots.hit>
+        <CtxHitWrapper key={`hit-${hit.document.id}-${i}-wrapper`}>
+          <slots.hit
+            {...slotProps?.hit}
+            hit={hit}
+            key={`hit-${hit.document.id}-${i}`}
+          >
+            {slots?.hitActions ? (
+              <slots.hitActions
+                docData={hit.document}
+                docId={hit.document.id}
+              />
+            ) : null}
+            {props?.children}
+          </slots.hit>
+        </CtxHitWrapper>
       ))}
-    </CtxHitWrapper>
+    </>
   ) : null;
 }
 

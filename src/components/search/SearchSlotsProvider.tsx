@@ -1,4 +1,4 @@
-import { merge } from 'lodash-es';
+import { merge, mergeWith } from 'lodash-es';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import {
   SEARCH_DEFAULT_SLOT_PROPS,
@@ -32,14 +32,24 @@ export const SearchSlotsProvider = ({
   );
 
   const slotProps = useMemo(
-    () => merge(SEARCH_DEFAULT_SLOT_PROPS, slotPropsState), //providedSlotProps
+    () =>
+      mergeWith(
+        SEARCH_DEFAULT_SLOT_PROPS,
+        slotPropsState,
+        (_: object, srcValue: object) => {
+          if (Array.isArray(srcValue)) return srcValue;
+        }
+      ),
     [slotPropsState] // providedSlotProps,
   );
 
-  const updateSlotProps = useCallback((updates: Partial<SearchSlotProps>) => {
-    console.log('updating slot props: ', updates);
-    setSlotPropsState((prev) => ({ ...merge(prev, updates) }));
-  }, []);
+  const updateSlotProps = useCallback(
+    (updates: Partial<SearchSlotProps>, mergeFn: Function = merge) => {
+      // setSlotPropsState((prev) => ({ ...merge(prev, updates) }));
+      setSlotPropsState((prev) => ({ ...mergeWith(prev, updates, mergeFn) }));
+    },
+    []
+  );
 
   return (
     <SearchSlotsContext.Provider value={{ slots, slotProps, updateSlotProps }}>
