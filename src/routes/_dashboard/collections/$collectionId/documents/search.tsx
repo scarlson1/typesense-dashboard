@@ -4,6 +4,7 @@ import {
   OpenInNewRounded,
 } from '@mui/icons-material';
 import {
+  alpha,
   Box,
   Container,
   Grid,
@@ -82,6 +83,16 @@ function SearchCollection() {
             slotProps={{
               stats: { color: 'text.secondary' },
               hits: { container: true, spacing: 2 },
+              hitActions: {
+                // variant: 'contained',
+                sx: {
+                  position: 'absolute',
+                  right: '8px',
+                  top: '8px',
+                  backgroundColor: (theme) =>
+                    alpha(theme.palette.background.paper, 0.78),
+                },
+              },
               // hitWrapper: {
               //   size: { xs: 12, sm: 6 },
               // },

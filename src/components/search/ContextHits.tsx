@@ -40,7 +40,6 @@ function CtxHits({ children }: { children?: ReactNode }) {
 
 export function CtxHitWrapper(props: { children?: ReactNode }) {
   const [slots, slotProps] = useSearchSlots();
-  console.log('slotProps.hitWrapper: ', slotProps.hitWrapper);
 
   return slots.hitWrapper ? (
     <slots.hitWrapper {...slotProps.hitWrapper}>
@@ -70,6 +69,7 @@ export function CtxHit(props: { children?: ReactNode }) {
               <slots.hitActions
                 docData={hit.document}
                 docId={hit.document.id}
+                {...slotProps?.hitActions}
               />
             ) : null}
             {props?.children}

@@ -3,7 +3,12 @@ import {
   DeleteRounded,
   EditRounded,
 } from '@mui/icons-material';
-import { ButtonGroup, IconButton, type IconButtonProps } from '@mui/material';
+import {
+  ButtonGroup,
+  IconButton,
+  type ButtonGroupProps,
+  type IconButtonProps,
+} from '@mui/material';
 import { useCallback } from 'react';
 import { DEFAULT_MONACO_OPTIONS } from '../../constants';
 import {
@@ -14,13 +19,13 @@ import {
 } from '../../hooks';
 import { JsonEditor } from '../JsonEditor';
 
-export interface HitActionsProps {
+export interface HitActionsProps extends ButtonGroupProps {
   docData: Record<string, any>;
   docId: string;
 }
 
 // TODO: render from slots / slotProps ??
-export function HitActions({ docData, docId }: HitActionsProps) {
+export function HitActions({ docData, docId, ...props }: HitActionsProps) {
   const { collectionId } = useSearch();
 
   return (
@@ -28,7 +33,13 @@ export function HitActions({ docData, docId }: HitActionsProps) {
       size='small'
       orientation='vertical'
       aria-label='Small button group'
-      sx={{ position: 'absolute', right: '8px', top: '8px' }}
+      {...props}
+      sx={{
+        position: 'absolute',
+        right: '8px',
+        top: '8px',
+        ...(props?.sx || {}),
+      }}
     >
       <DeleteDocumentIconButton docId={docId} collectionId={collectionId} />
       <EditDocumentIconButton

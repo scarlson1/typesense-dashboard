@@ -2,6 +2,7 @@ import {
   Alert,
   Autocomplete,
   Button,
+  createFilterOptions,
   MenuItem,
   Paper,
   Select,
@@ -17,6 +18,11 @@ import { useCollectionSchema, useSearchSlots } from '../../hooks';
 // TODO: change hits to be grid instead of stack ??
 
 const selectOptions = [1, 2, 3, 4];
+interface ImgOption {
+  title: string;
+  inputValue?: string;
+}
+const filter = createFilterOptions<ImgOption>();
 
 export function DashboardDisplayOptions() {
   const [_, slotProps, updateSlotProps] = useSearchSlots();
@@ -27,6 +33,15 @@ export function DashboardDisplayOptions() {
       .map(({ name }) => name)
       .filter((name) => !name.includes('*'));
   }, [collectionSchema]);
+
+  const imageFieldOptions = useMemo<ImgOption[]>(
+    () =>
+      collectionSchema.fields
+        .filter((f) => f.type === 'image')
+        .map((f) => ({ title: f.name })),
+    // .map((f) => f.name),
+    [collectionSchema]
+  );
 
   const handleFieldsChange = useCallback((_: any, newVal: string[]) => {
     updateSlotProps(
@@ -39,12 +54,33 @@ export function DashboardDisplayOptions() {
     );
   }, []);
 
+  const handleImageChange = useCallback(
+    (_: any, newValue: string | ImgOption | null) => {
+      if (typeof newValue === 'string') {
+        updateSlotProps({
+          hit: { imgField: newValue || '' },
+        });
+        // @ts-ignore
+      } else if (newValue && newValue.inputValue) {
+        // Create a new value from the user input
+        updateSlotProps({
+          // @ts-ignore
+          hit: { imgField: newValue.inputValue },
+        });
+      } else {
+        updateSlotProps({
+          hit: { imgField: newValue?.title || '' },
+        });
+      }
+    },
+    []
+  );
+
   const handleSizeChange = useCallback(
     (e: SelectChangeEvent<number>) => {
       let size = e.target.value
         ? 12 / e.target.value
-        : SEARCH_DEFAULT_SLOT_PROPS.hitWrapper?.size || 1;
-      console.log('size: ', size);
+        : SEARCH_DEFAULT_SLOT_PROPS.hitWrapper?.size || 12;
 
       updateSlotProps({
         hitWrapper: {
@@ -93,7 +129,7 @@ export function DashboardDisplayOptions() {
             renderInput={(params) => (
               <TextField {...params} label='Display Fields' />
             )}
-            sx={{ minWidth: 280, maxWidth: 500 }}
+            sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
           />
         </Stack>
 
@@ -107,7 +143,58 @@ export function DashboardDisplayOptions() {
           >
             Image Field
           </Typography>
-          <Typography>Input Select Field Placeholder</Typography>
+          <Autocomplete
+            id='image-field'
+            size='small'
+            freeSolo
+            blurOnSelect
+            selectOnFocus
+            clearOnBlur
+            options={imageFieldOptions}
+            value={slotProps?.hit?.imgField || ''}
+            onChange={handleImageChange}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+
+              const { inputValue } = params;
+              // Suggest the creation of a new value
+              const isExisting = options.some(
+                (option) => inputValue === option.title
+              );
+              if (inputValue !== '' && !isExisting) {
+                filtered.push({
+                  inputValue,
+                  title: `Add "${inputValue}"`,
+                });
+              }
+
+              return filtered;
+            }}
+            getOptionLabel={(option) => {
+              // Value selected with enter, right from the input
+              if (typeof option === 'string') {
+                return option;
+              }
+              // Add "xxx" option created dynamically
+
+              if (option.inputValue) {
+                // @ts-ignore
+                return option.inputValue;
+              }
+              // Regular option
+              return option.title;
+            }}
+            // value={slotProps.hit?.displayFields || []}
+            noOptionsText='No fields with image types were found, but you can still type any field name here'
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label='Display Fields'
+                helperText='The selected field is used to show an image in the results above.'
+              />
+            )}
+            sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
+          />
         </Stack>
 
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>
