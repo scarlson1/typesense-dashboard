@@ -1,4 +1,21 @@
 import {
+  ButtonLink,
+  CollectionProvider,
+  InstantSearch,
+  UpdateSearchParameters,
+} from '@/components';
+import {
+  ContextHits,
+  CtxPageSize,
+  CtxPagination,
+  CtxSearchError,
+  CtxSearchStats,
+  DashboardDisplayOptions,
+  SearchBox,
+} from '@/components/search';
+import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
+import { useTypesenseClient } from '@/hooks';
+import {
   AddRounded,
   ExpandMoreRounded,
   OpenInNewRounded,
@@ -16,23 +33,6 @@ import {
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
-import {
-  ButtonLink,
-  CollectionProvider,
-  InstantSearch,
-  UpdateSearchParameters,
-} from '../../../../../components';
-import {
-  ContextHits,
-  CtxPageSize,
-  CtxPagination,
-  CtxSearchError,
-  CtxSearchStats,
-  DashboardDisplayOptions,
-  SearchBox,
-} from '../../../../../components/search';
-import { SearchSlotsProvider } from '../../../../../components/search/SearchSlotsProvider';
-import { useTypesenseClient } from '../../../../../hooks';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search'

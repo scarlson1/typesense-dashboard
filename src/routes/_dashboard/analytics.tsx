@@ -1,7 +1,7 @@
+import { AnalyticsRulesList } from '@/components';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { AnalyticsRulesList } from '../../components';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,

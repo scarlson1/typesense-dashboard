@@ -1,3 +1,5 @@
+import { overrideFormOpts, overrideQueryMatch } from '@/constants';
+import { withForm } from '@/hooks';
 import {
   Box,
   Collapse,
@@ -8,8 +10,6 @@ import {
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { Suspense, useEffect, useState } from 'react';
-import { overrideFormOpts, overrideQueryMatch } from '../constants';
-import { withForm } from '../hooks';
 import { LoadingSpinner } from './LoadingSpinner';
 
 export const CurationForm = withForm({

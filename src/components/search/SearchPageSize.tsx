@@ -1,3 +1,4 @@
+import { useSearch, useSearchSlots } from '@/hooks';
 import {
   FormControl,
   InputLabel,
@@ -7,7 +8,6 @@ import {
   type SelectProps,
 } from '@mui/material';
 import { useCallback } from 'react';
-import { useSearch, useSearchSlots } from '../../hooks';
 
 export function DefaultCtxSearchPageSize(props: SelectProps<number>) {
   return (

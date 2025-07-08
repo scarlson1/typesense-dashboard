@@ -1,5 +1,5 @@
+import { CollectionContext, type CollectionContextValues } from '@/context';
 import { useContext } from 'react';
-import { CollectionContext, type CollectionContextValues } from '../context';
 
 export const useCollectionSchema = () => {
   const context = useContext<CollectionContextValues<Error> | null>(

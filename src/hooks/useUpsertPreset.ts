@@ -1,9 +1,9 @@
+import { presetQueryKeys } from '@/constants';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
 import type { PresetCreateSchema } from 'typesense/lib/Typesense/Presets';
-import { presetQueryKeys } from '../constants';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 
 interface UpsertPresetVariables {
   presetId: string;

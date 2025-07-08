@@ -1,8 +1,18 @@
+import { NewCollectionForm } from '@/components';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Tab, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { useCallback, useState, type SyntheticEvent } from 'react';
-import { NewCollectionEditor, NewCollectionForm } from '../../../components';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useState,
+  type SyntheticEvent,
+} from 'react';
+
+const NewCollectionEditor = lazy(
+  () => import('../../../components/NewCollectionEditor')
+);
 
 export const Route = createFileRoute('/_dashboard/collections/new')({
   component: NewCollection,
@@ -32,7 +42,9 @@ function NewCollection() {
           <NewCollectionForm />
         </TabPanel>
         <TabPanel value='editor'>
-          <NewCollectionEditor />
+          <Suspense>
+            <NewCollectionEditor />
+          </Suspense>
         </TabPanel>
       </TabContext>
     </Box>

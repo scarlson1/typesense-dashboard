@@ -1,5 +1,5 @@
+import { useSearch, useSearchSlots } from '@/hooks';
 import { CircularProgress, Fade } from '@mui/material';
-import { useSearch, useSearchSlots } from '../../hooks';
 
 export function CtxSearchStats() {
   const { data, isLoading, isFetching } = useSearch();

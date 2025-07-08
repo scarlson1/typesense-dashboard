@@ -1,6 +1,6 @@
+import { analyticsFormOpts, analyticsRuleType } from '@/constants';
+import { withForm } from '@/hooks';
 import { FormHelperText, Grid } from '@mui/material';
-import { analyticsFormOpts, analyticsRuleType } from '../constants';
-import { withForm } from '../hooks';
 
 export const AnalyticsRuleForm = withForm({
   ...analyticsFormOpts,

@@ -1,10 +1,10 @@
+import { collectionQueryKeys } from '@/constants';
+import { CollectionContext, type CollectionContextValues } from '@/context';
+import { typesenseFieldType, type TypesenseFieldType } from '@/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo, type ReactNode } from 'react';
 import type { Client } from 'typesense';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
-import { collectionQueryKeys } from '../constants';
-import { CollectionContext, type CollectionContextValues } from '../context';
-import { typesenseFieldType, type TypesenseFieldType } from '../types';
 
 // TODO:  use zustand to store collectionId ??
 // can be passed to loader functions via router context  etc.

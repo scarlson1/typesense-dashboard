@@ -1,10 +1,10 @@
+import { CircularProgressWithLabel } from '@/components/CircularProgressWithLabel';
+import { LinearProgressWithLabel } from '@/components/LinearProgressWithLabel';
+import { useTypesenseClient } from '@/hooks';
+import { formatBytes, removeStartEndMatches } from '@/utils';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { LinearProgressWithLabel } from '../../components';
-import { useTypesenseClient } from '../../hooks';
-import { formatBytes, removeStartEndMatches } from '../../utils';
-import { CircularProgressWithLabel } from '../CircularProgressWithLabel';
 import { ServerHealth } from './ServerHealth';
 
 export function ServerMetrics() {

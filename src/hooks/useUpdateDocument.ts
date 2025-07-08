@@ -1,8 +1,8 @@
+import { collectionQueryKeys } from '@/constants';
+import { useMutationToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import type { DocumentWriteParameters } from 'typesense/lib/Typesense/Documents';
-import { collectionQueryKeys } from '../constants';
-import { useMutationToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 
 export interface UpdateDocArgs {
   collectionId: string;

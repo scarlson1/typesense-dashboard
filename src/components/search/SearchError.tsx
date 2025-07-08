@@ -1,6 +1,6 @@
+import { useSearch, useSearchSlots } from '@/hooks';
 import { Collapse } from '@mui/material';
 import { useEffect } from 'react';
-import { useSearch, useSearchSlots } from '../../hooks';
 
 export function CtxSearchError() {
   const { isError, error } = useSearch();

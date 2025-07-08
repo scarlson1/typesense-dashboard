@@ -1,9 +1,9 @@
+import { collectionQueryKeys } from '@/constants';
+import { queryClient } from '@/utils';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
-import { collectionQueryKeys } from '../constants';
-import { queryClient } from '../utils';
 import { useAsyncToast } from './useAsyncToast';
 import { useTypesenseClient } from './useTypesenseClient';
 

@@ -1,6 +1,6 @@
+import { useTypesenseClient } from '@/hooks';
 import { Chip } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useTypesenseClient } from '../../hooks';
 
 export function ServerHealth() {
   const [client, clientId] = useTypesenseClient();

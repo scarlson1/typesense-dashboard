@@ -1,17 +1,32 @@
+import { type JsonEditorProps } from '@/components/JsonEditor';
+import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
+import { diffArraysOfObjects } from '@/utils';
 import {
   type EditorProps,
   type Monaco,
   type OnMount,
 } from '@monaco-editor/react';
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Button, Stack, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Button,
+  Skeleton,
+  Stack,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { editor } from 'monaco-editor';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
 import { useAsyncToast, useDialog, useUpdateCollection } from '.';
-import { JsonEditor, type JsonEditorProps } from '../components';
-import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '../constants';
-import { diffArraysOfObjects } from '../utils';
+
+const JsonEditor = lazy(() => import('../components/JsonEditor'));
 
 interface UseCollectionEditorDialogProps {
   initialOptions?: EditorProps['options'];
@@ -179,17 +194,23 @@ export function useCollectionEditorDialog(
         },
         content: ((props?: JsonEditorProps) => {
           return (
-            <JsonEditor
-              height='calc(100% - 12px)'
-              options={options}
-              onMount={handleEditorDidMount}
-              {...(props || {})}
-              value={value}
-              onValidate={(m) => {
-                setMarkers(m);
-              }}
-              schema={COLLECTION_SCHEMA}
-            />
+            <Suspense
+              fallback={
+                <Skeleton variant='rounded' height={'calc(100% - 12px)'} />
+              }
+            >
+              <JsonEditor
+                height='calc(100% - 12px)'
+                options={options}
+                onMount={handleEditorDidMount}
+                {...(props || {})}
+                value={value}
+                onValidate={(m) => {
+                  setMarkers(m);
+                }}
+                schema={COLLECTION_SCHEMA}
+              />
+            </Suspense>
           );
         })(),
         slotProps: {

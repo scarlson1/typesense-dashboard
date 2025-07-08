@@ -1,3 +1,5 @@
+import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
+import { useCollectionSchema, useSearchSlots } from '@/hooks';
 import {
   Autocomplete,
   Button,
@@ -13,8 +15,6 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import { useCallback, useMemo } from 'react';
-import { SEARCH_DEFAULT_SLOT_PROPS } from '../../constants';
-import { useCollectionSchema, useSearchSlots } from '../../hooks';
 
 // TODO: change hits to be grid instead of stack ??
 

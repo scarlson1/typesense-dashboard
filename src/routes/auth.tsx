@@ -1,3 +1,7 @@
+import { AuthForm, authFormOpts } from '@/components/AuthForm';
+import { useAppForm, useAsyncToast } from '@/hooks';
+import type { Environment } from '@/types';
+import { getTypesenseClient, typesenseStore } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import {
   Box,
@@ -11,10 +15,6 @@ import {
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 import { useStore } from 'zustand';
-import { AuthForm, authFormOpts } from '../components/AuthForm';
-import { useAppForm, useAsyncToast } from '../hooks';
-import type { Environment } from '../types';
-import { getTypesenseClient, typesenseStore } from '../utils';
 
 // https://github.com/bfritscher/typesense-dashboard/blob/1258005f0ba99790de943a5c3b17c1ae7e915987/src/stores/node.ts#L132
 

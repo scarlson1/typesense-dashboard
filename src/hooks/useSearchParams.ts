@@ -1,10 +1,10 @@
-import { useCallback, useContext, useMemo } from 'react';
-import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import {
   SearchContext,
   type SearchContextParams,
   type SearchContextValues,
-} from '../context';
+} from '@/context';
+import { useCallback, useContext, useMemo } from 'react';
+import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
 const noop = (_: any) => {};
 

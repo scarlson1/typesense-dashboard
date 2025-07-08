@@ -1,8 +1,8 @@
+import { darkToastOptions, lightToastOptions } from '@/constants';
 import { useTheme } from '@mui/material';
 import { useMemo } from 'react';
 import type { ToastOptions } from 'react-hot-toast';
 import { Toaster as HotToaster, ToastBar } from 'react-hot-toast';
-import { darkToastOptions, lightToastOptions } from '../constants';
 import { CustomToast } from './CustomToast';
 
 export interface CustomToastOptions extends ToastOptions {

@@ -1,3 +1,7 @@
+import { StopwordsForm } from '@/components';
+import { stopwordsFormOpts } from '@/constants';
+import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { DeleteRounded, OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Paper, Tooltip, Typography } from '@mui/material';
 import {
@@ -10,10 +14,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import type { StopwordSchema } from 'typesense/lib/Typesense/Stopword';
 import type { StopwordCreateSchema } from 'typesense/lib/Typesense/Stopwords';
-import { StopwordsForm } from '../../components';
-import { stopwordsFormOpts } from '../../constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '../../hooks';
-import { queryClient } from '../../utils';
 
 export const Route = createFileRoute('/_dashboard/stopwords')({
   component: RouteComponent,

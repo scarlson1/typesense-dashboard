@@ -1,3 +1,9 @@
+import { ContextDialog } from '@/components';
+import {
+  CONTEXT_DIALOG_DEFAULT_SLOT_PROPS,
+  CONTEXT_DIALOG_DEFAULT_SLOTS_COMPONENTS,
+} from '@/constants';
+import { DialogContext } from '@/context';
 import type {
   ButtonProps,
   DialogActionsProps,
@@ -14,12 +20,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { ContextDialog } from '../components';
-import {
-  CONTEXT_DIALOG_DEFAULT_SLOT_PROPS,
-  CONTEXT_DIALOG_DEFAULT_SLOTS_COMPONENTS,
-} from '../constants';
-import { DialogContext } from '../context';
 
 interface AwaitingPromise {
   resolve: (values?: any) => void;

@@ -1,3 +1,6 @@
+import { analyticsFormDefaultValues, analyticsQueryKeys } from '@/constants';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { ExpandMoreRounded } from '@mui/icons-material';
 import {
   Accordion,
@@ -9,9 +12,6 @@ import {
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState, type SyntheticEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { analyticsFormDefaultValues, analyticsQueryKeys } from '../constants';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 import { ErrorFallback } from './ErrorFallback';
 import { UpdateAnalyticsRule } from './UpdateAnalyticsRule';
 

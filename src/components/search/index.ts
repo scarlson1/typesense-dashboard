@@ -2,7 +2,6 @@ export * from './ContextHits';
 export * from './DashboardDisplayOptions';
 export * from './Hit';
 export * from './HitActions';
-export * from './Hits';
 export * from './LoadingHits';
 export * from './SearchBox';
 export * from './SearchError';

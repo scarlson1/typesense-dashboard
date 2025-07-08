@@ -1,3 +1,6 @@
+import { DEFAULT_MONACO_OPTIONS } from '@/constants';
+import { useAsyncToast, useNewCollection } from '@/hooks';
+import { createCollectionSchema, type CollectionSchema } from '@/types';
 import {
   Editor,
   type EditorProps,
@@ -8,9 +11,6 @@ import { Box, Button, Paper, Skeleton, useColorScheme } from '@mui/material';
 import { editor } from 'monaco-editor';
 import { useMemo, useRef, useState } from 'react';
 import { toJSONSchema } from 'zod/v4';
-import { DEFAULT_MONACO_OPTIONS } from '../constants';
-import { useAsyncToast, useNewCollection } from '../hooks';
-import { createCollectionSchema, type CollectionSchema } from '../types';
 
 const DEFAULT_INITIAL_VALUE: CollectionSchema = {
   name: 'companies',
@@ -31,7 +31,7 @@ const DEFAULT_INITIAL_VALUE: CollectionSchema = {
 
 interface NewCollectionEditorProps extends EditorProps {}
 
-export const NewCollectionEditor = ({
+const NewCollectionEditor = ({
   defaultValue = JSON.stringify(DEFAULT_INITIAL_VALUE),
   options,
   ...props
@@ -115,3 +115,5 @@ export const NewCollectionEditor = ({
     </Box>
   );
 };
+
+export default NewCollectionEditor;

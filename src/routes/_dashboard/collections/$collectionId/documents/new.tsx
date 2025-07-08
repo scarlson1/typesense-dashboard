@@ -1,3 +1,12 @@
+import { DEFAULT_MONACO_OPTIONS } from '@/constants';
+import {
+  useAsyncToast,
+  useImportDocuments,
+  useSchema,
+  type MultiDocImportRes,
+} from '@/hooks';
+import type { TypesenseFieldType } from '@/types';
+import { typesenseStore } from '@/utils';
 import type { OnMount } from '@monaco-editor/react';
 import {
   ClearRounded,
@@ -17,25 +26,26 @@ import {
   MenuItem,
   Paper,
   Select,
+  Skeleton,
   Stack,
   Typography,
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { editor } from 'monaco-editor';
-import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import type { DocumentImportParameters } from 'typesense/lib/Typesense/Documents';
 import { useStore } from 'zustand';
-import { JsonEditor } from '../../../../../components';
-import { DEFAULT_MONACO_OPTIONS } from '../../../../../constants';
-import {
-  useAsyncToast,
-  useImportDocuments,
-  useSchema,
-  type MultiDocImportRes,
-} from '../../../../../hooks';
-import type { TypesenseFieldType } from '../../../../../types';
-import { typesenseStore } from '../../../../../utils';
+
+const JsonEditor = lazy(() => import('../../../../../components/JsonEditor'));
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/new'
@@ -270,16 +280,18 @@ function NewDocumentEditor() {
 
   return (
     <Box sx={{ py: 2, borderRadius: 1, overflow: 'hidden' }}>
-      <JsonEditor
-        height='50vh'
-        onMount={handleMount}
-        // schema={COLLECTION_SCHEMA}
-        options={DEFAULT_MONACO_OPTIONS}
-        value={value}
-        onValidate={(m) => {
-          setMarkers(m);
-        }}
-      />
+      <Suspense fallback={<Skeleton variant='rounded' height={'50vh'} />}>
+        <JsonEditor
+          height='50vh'
+          onMount={handleMount}
+          // schema={COLLECTION_SCHEMA}
+          options={DEFAULT_MONACO_OPTIONS}
+          value={value}
+          onValidate={(m) => {
+            setMarkers(m);
+          }}
+        />
+      </Suspense>
       <Stack
         direction='row'
         spacing={2}

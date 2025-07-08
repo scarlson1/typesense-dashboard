@@ -1,5 +1,5 @@
+import { SearchSlotsContext, type SearchSlotsContextValues } from '@/context';
 import { useContext } from 'react';
-import { SearchSlotsContext, type SearchSlotsContextValues } from '../context';
 
 export const useSearchSlots = () => {
   const context = useContext<SearchSlotsContextValues | null>(

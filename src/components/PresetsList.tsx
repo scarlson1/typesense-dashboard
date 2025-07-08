@@ -1,3 +1,6 @@
+import { EMPTY_PRESET_PARAMS, presetQueryKeys, presetType } from '@/constants';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { ExpandMoreRounded } from '@mui/icons-material';
 import {
   Accordion,
@@ -14,9 +17,6 @@ import type {
   MultiSearchRequestSchema,
   MultiSearchRequestsSchema,
 } from 'typesense/lib/Typesense/MultiSearch';
-import { EMPTY_PRESET_PARAMS, presetQueryKeys, presetType } from '../constants';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 import { ErrorFallback } from './ErrorFallback';
 import { UpdatePreset } from './UpdatePreset';
 

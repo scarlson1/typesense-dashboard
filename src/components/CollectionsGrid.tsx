@@ -1,3 +1,12 @@
+import { collectionQueryKeys, DEFAULT_MONACO_OPTIONS } from '@/constants';
+import { collectionColumns } from '@/constants/gridColumns';
+import {
+  useAsyncToast,
+  useCollectionEditorDialog,
+  useDialog,
+  useTypesenseClient,
+} from '@/hooks';
+import { queryClient } from '@/utils';
 import { DataObjectRounded, DeleteRounded } from '@mui/icons-material';
 import { Box, Tooltip, Typography } from '@mui/material';
 import type {
@@ -12,15 +21,6 @@ import { useMemo } from 'react';
 import { Client } from 'typesense';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionsRetrieveOptions } from 'typesense/lib/Typesense/Collections';
-import { collectionQueryKeys, DEFAULT_MONACO_OPTIONS } from '../constants';
-import { collectionColumns } from '../constants/gridColumns';
-import {
-  useAsyncToast,
-  useCollectionEditorDialog,
-  useDialog,
-  useTypesenseClient,
-} from '../hooks';
-import { queryClient } from '../utils';
 import { ConfirmDeletionDialog } from './ConfirmDeletionDialog';
 
 const DEFAULT_VIEW_OPTIONS = { ...DEFAULT_MONACO_OPTIONS, readOnly: true };

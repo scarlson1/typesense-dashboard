@@ -12,7 +12,7 @@ import {
   shadows,
   shape,
   typography,
-} from '../theme/themePrimitives';
+} from '@/theme/themePrimitives';
 
 interface AppThemeProps {
   children: ReactNode;

@@ -12,7 +12,7 @@ import { MenuButton } from './MenuButton';
 import { MenuContent } from './MenuContent';
 // import { useNavigate } from '@tanstack/react-router';
 // import { firebaseSignOut } from '../firebase/auth';
-// import { useAsyncToast, useUser } from '../hooks';
+// import { useAsyncToast, useUser } from '@/hooks';
 
 interface SideMenuMobileProps {
   open: boolean | undefined;

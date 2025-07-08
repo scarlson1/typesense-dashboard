@@ -1,3 +1,4 @@
+import { useFieldContext } from '@/hooks';
 import {
   LocalizationProvider,
   DatePicker as MuiDatePicker,
@@ -5,14 +6,13 @@ import {
 } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useStore } from '@tanstack/react-form';
-import { useFieldContext } from '../../hooks';
 
 type DatePickerProps = Omit<
   MuiDatePickerProps,
   'onBlur' | 'error' | 'select' // | 'onChange'
 >;
 
-export function DatePicker({ label, ...props }: DatePickerProps) {
+export default function DatePicker({ label, ...props }: DatePickerProps) {
   const { state, store, handleBlur, handleChange } = useFieldContext<Date>();
   const errors = useStore(store, (state) => state.meta.errors);
 
@@ -42,5 +42,3 @@ export function DatePicker({ label, ...props }: DatePickerProps) {
     </LocalizationProvider>
   );
 }
-
-export default DatePicker;

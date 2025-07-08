@@ -1,3 +1,7 @@
+import { apiKeyQueryKeys, DEFAULT_MONACO_OPTIONS } from '@/constants';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { typesenseActions } from '@/types';
+import { queryClient } from '@/utils';
 import {
   Editor,
   type EditorProps,
@@ -10,10 +14,6 @@ import { editor } from 'monaco-editor';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { KeyCreateSchema } from 'typesense/lib/Typesense/Key';
 import { toJSONSchema, z } from 'zod/v4';
-import { apiKeyQueryKeys, DEFAULT_MONACO_OPTIONS } from '../constants';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
-import { typesenseActions } from '../types';
-import { queryClient } from '../utils';
 
 const createKeySchema = z.object({
   actions: z.array(typesenseActions),
@@ -65,7 +65,7 @@ const createKeySchemaJson = toJSONSchema(createKeySchema);
 
 interface NewApiKeyEditorProps extends EditorProps {}
 
-export const NewApiKeyEditor = ({
+const NewApiKeyEditor = ({
   defaultValue = JSON.stringify(DEFAULT_INITIAL_VALUE),
   options,
   ...props
@@ -159,3 +159,5 @@ export const NewApiKeyEditor = ({
     </Box>
   );
 };
+
+export default NewApiKeyEditor;

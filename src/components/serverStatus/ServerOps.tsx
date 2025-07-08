@@ -1,3 +1,6 @@
+import { ErrorFallback } from '@/components';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import {
   Box,
@@ -11,9 +14,6 @@ import {
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ErrorFallback } from '../../components';
-import { useAsyncToast, useTypesenseClient } from '../../hooks';
-import { queryClient } from '../../utils';
 
 export function ServerOps() {
   return (

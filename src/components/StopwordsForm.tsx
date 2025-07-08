@@ -1,6 +1,6 @@
+import { stopwordsFormOpts } from '@/constants';
+import { withForm } from '@/hooks';
 import { Grid } from '@mui/material';
-import { stopwordsFormOpts } from '../constants';
-import { withForm } from '../hooks';
 
 export const StopwordsForm = withForm({
   ...stopwordsFormOpts,

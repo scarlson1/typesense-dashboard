@@ -1,8 +1,8 @@
+import { collectionQueryKeys } from '@/constants';
+import { queryClient } from '@/utils';
 import { useMutation, type MutationOptions } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import type { DocumentImportParameters } from 'typesense/lib/Typesense/Documents';
-import { collectionQueryKeys } from '../constants';
-import { queryClient } from '../utils';
 import { useAsyncToast } from './useAsyncToast';
 import { useTypesenseClient } from './useTypesenseClient';
 

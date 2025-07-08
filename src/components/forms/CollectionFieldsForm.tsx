@@ -1,3 +1,6 @@
+import { collectionFormOpts, NEW_EMPTY_FIELD } from '@/constants';
+import { withForm } from '@/hooks';
+import { typesenseFieldType } from '@/types';
 import { AddRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Grid,
@@ -7,9 +10,6 @@ import {
   Stack,
 } from '@mui/material';
 import type { FieldType } from 'typesense/lib/Typesense/Collection';
-import { collectionFormOpts, NEW_EMPTY_FIELD } from '../../constants';
-import { withForm } from '../../hooks';
-import { typesenseFieldType } from '../../types';
 
 // TODO: accordion with rest of fields
 

@@ -1,6 +1,6 @@
+import { useHits, useSearch, useSearchSlots } from '@/hooks';
 import { Typography } from '@mui/material';
-import { Fragment, type ReactNode } from 'react';
-import { useHits, useSearch, useSearchSlots } from '../../hooks';
+import { Fragment, Suspense, type ReactNode } from 'react';
 
 function CtxHits({ children }: { children?: ReactNode }) {
   const x = useSearch();
@@ -66,11 +66,13 @@ export function CtxHit(props: { children?: ReactNode }) {
             key={`hit-${hit.document.id}-${i}`}
           >
             {slots?.hitActions ? (
-              <slots.hitActions
-                docData={hit.document}
-                docId={hit.document.id}
-                {...slotProps?.hitActions}
-              />
+              <Suspense>
+                <slots.hitActions
+                  docData={hit.document}
+                  docId={hit.document.id}
+                  {...slotProps?.hitActions}
+                />
+              </Suspense>
             ) : null}
             {props?.children}
           </slots.hit>

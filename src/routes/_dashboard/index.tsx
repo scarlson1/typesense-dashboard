@@ -1,13 +1,13 @@
-import { Container, Stack, Typography } from '@mui/material';
-import { createFileRoute } from '@tanstack/react-router';
-import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { ButtonLink, ErrorFallback } from '../../components';
+import { ButtonLink, ErrorFallback } from '@/components';
 import {
   ServerMetrics,
   ServerOps,
   TypesenseMetricsAndNodes,
-} from '../../components/serverStatus';
+} from '@/components/serverStatus';
+import { Container, Stack, Typography } from '@mui/material';
+import { createFileRoute } from '@tanstack/react-router';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 // TODO: suspense / loading skeletons
 

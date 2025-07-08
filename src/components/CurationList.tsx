@@ -1,3 +1,10 @@
+import {
+  collectionQueryKeys,
+  defaultOverrideValues,
+  overrideFormOpts,
+} from '@/constants';
+import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { ExpandMoreRounded } from '@mui/icons-material';
 import {
   Accordion,
@@ -11,13 +18,6 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState, type SyntheticEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import type { OverrideCreateSchema } from 'typesense/lib/Typesense/Overrides';
-import {
-  collectionQueryKeys,
-  defaultOverrideValues,
-  overrideFormOpts,
-} from '../constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 import { CurationForm } from './CurationForm';
 import { ErrorFallback } from './ErrorFallback';
 

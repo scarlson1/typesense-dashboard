@@ -1,3 +1,4 @@
+import type { DialogSlotProps, DialogSlotsComponents } from '@/components';
 import {
   Button,
   Dialog,
@@ -5,7 +6,6 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import type { DialogSlotProps, DialogSlotsComponents } from '../components';
 
 export const CONTEXT_DIALOG_DEFAULT_SLOTS_COMPONENTS: DialogSlotsComponents = {
   dialog: Dialog,

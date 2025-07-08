@@ -1,11 +1,11 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { JsonEditor } from '../../../../components';
-import {
-  COLLECTION_SCHEMA,
-  DEFAULT_MONACO_OPTIONS,
-} from '../../../../constants';
-import { useSchema } from '../../../../hooks';
+// import { JsonEditor } from '@/components';
+import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
+import { useSchema } from '@/hooks';
+import { lazy, Suspense } from 'react';
+
+const JsonEditor = lazy(() => import('../../../../components/JsonEditor'));
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/config'
@@ -42,13 +42,15 @@ function CollectionSettings() {
         </Button>
       </Stack>
       <Box sx={{ borderRadius: 1, overflow: 'hidden' }}>
-        <JsonEditor
-          height='70vh'
-          schema={COLLECTION_SCHEMA}
-          // options={{ ...DEFAULT_MONACO_OPTIONS, readOnly: true }}
-          options={DEFAULT_MONACO_OPTIONS}
-          value={JSON.stringify(data)}
-        />
+        <Suspense fallback={<Skeleton variant='rounded' height={'70vh'} />}>
+          <JsonEditor
+            height='70vh'
+            schema={COLLECTION_SCHEMA}
+            // options={{ ...DEFAULT_MONACO_OPTIONS, readOnly: true }}
+            options={DEFAULT_MONACO_OPTIONS}
+            value={JSON.stringify(data)}
+          />
+        </Suspense>
       </Box>
     </>
   );

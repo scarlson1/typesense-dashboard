@@ -1,6 +1,6 @@
+import { multiSearchRequestSchema, searchParams } from '@/types';
 import { formOptions } from '@tanstack/react-form';
 import { z } from 'zod/v4';
-import { multiSearchRequestSchema, searchParams } from '../types';
 
 export const parameterKeys = searchParams
   .extend({ collection: z.string() })

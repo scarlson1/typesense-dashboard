@@ -1,7 +1,6 @@
+import { useDialog } from '@/hooks';
 import { DialogContentText } from '@mui/material';
 import { type ReactNode, useCallback } from 'react';
-
-import { useDialog } from '../hooks';
 
 // useGridRootProps: https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/hooks/utils/useGridRootProps.ts
 // computeSlots: https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/DataGrid/useDataGridProps.ts

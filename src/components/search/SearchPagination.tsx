@@ -1,5 +1,5 @@
+import { useSearch, useSearchSlots } from '@/hooks';
 import { useCallback, useMemo, type ChangeEvent } from 'react';
-import { useSearch, useSearchSlots } from '../../hooks';
 
 export function CtxPagination() {
   const { setPagination, data, params } = useSearch();

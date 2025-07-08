@@ -1,7 +1,7 @@
+import { CurationList } from '@/components';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { CurationList } from '../../../../components';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/curation'

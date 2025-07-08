@@ -1,20 +1,13 @@
+import { SynonymsGrid } from '@/components';
+import { SynonymsForm, synonymsFormOpts } from '@/components/SynonymsForm';
+import { collectionQueryKeys } from '@/constants';
+import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Paper, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import type { SynonymCreateSchema } from 'typesense/lib/Typesense/Synonyms';
-import { SynonymsGrid } from '../../../../components';
-import {
-  SynonymsForm,
-  synonymsFormOpts,
-} from '../../../../components/SynonymsForm';
-import { collectionQueryKeys } from '../../../../constants';
-import {
-  useAppForm,
-  useAsyncToast,
-  useTypesenseClient,
-} from '../../../../hooks';
-import { queryClient } from '../../../../utils';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/synonyms'

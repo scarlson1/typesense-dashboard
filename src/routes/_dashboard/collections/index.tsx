@@ -1,11 +1,7 @@
+import { ButtonLink, CollectionsGrid, ErrorFallback } from '@/components';
 import { Box, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';
-import {
-  ButtonLink,
-  CollectionsGrid,
-  ErrorFallback,
-} from '../../../components';
 
 export const Route = createFileRoute('/_dashboard/collections/')({
   component: CollectionsComponent,

@@ -1,5 +1,5 @@
+import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
-export type { Dispatch, SetStateAction } from 'react';
 
 interface UseCounterOutput {
   count: number;

@@ -1,6 +1,6 @@
+import { SearchContext, type SearchContextValues } from '@/context';
 import { useContext, useMemo } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
-import { SearchContext, type SearchContextValues } from '../context';
 
 const noop = (_: any) => {};
 

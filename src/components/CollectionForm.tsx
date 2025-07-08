@@ -1,6 +1,6 @@
+import { collectionFormOpts } from '@/constants';
+import { withForm } from '@/hooks';
 import { Grid, Typography } from '@mui/material';
-import { collectionFormOpts } from '../constants';
-import { withForm } from '../hooks';
 import { CollectionFieldsForm } from './forms';
 
 // TODO: break out fields into separate sub-form (reuse for editing collection)

@@ -1,6 +1,6 @@
+import { useFieldContext } from '@/hooks';
 import type { CheckboxProps as MuiCheckboxProps } from '@mui/material';
 import { FormControlLabel, Checkbox as MuiCheckbox } from '@mui/material';
-import { useFieldContext } from '../../hooks';
 
 interface CheckboxProps
   extends Omit<MuiCheckboxProps, 'onChange' | 'onBlur' | 'error'> {

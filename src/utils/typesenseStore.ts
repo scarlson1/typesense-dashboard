@@ -1,7 +1,7 @@
+import type { Environment, OptionalProperty } from '@/types';
 import { Client } from 'typesense';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Environment, OptionalProperty } from '../types';
 
 export interface TypesenseCreds {
   name?: string;

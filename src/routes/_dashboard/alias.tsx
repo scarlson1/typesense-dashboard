@@ -1,3 +1,12 @@
+import {
+  AliasForm,
+  aliasFormOpts,
+  AliasGrid,
+  ErrorFallback,
+} from '@/components';
+import { aliasQueryKeys, collectionQueryKeys } from '@/constants';
+import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Paper, Typography } from '@mui/material';
 import {
@@ -12,15 +21,6 @@ import type {
   CollectionAliasCreateSchema,
   CollectionAliasSchema,
 } from 'typesense/lib/Typesense/Aliases';
-import {
-  AliasForm,
-  aliasFormOpts,
-  AliasGrid,
-  ErrorFallback,
-} from '../../components';
-import { aliasQueryKeys, collectionQueryKeys } from '../../constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '../../hooks';
-import { queryClient } from '../../utils';
 
 export const Route = createFileRoute('/_dashboard/alias')({
   component: RouteComponent,

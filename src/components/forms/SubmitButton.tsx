@@ -1,6 +1,6 @@
+import { useFormContext } from '@/hooks';
 import type { ButtonProps } from '@mui/material';
 import { Button } from '@mui/material';
-import { useFormContext } from '../../hooks';
 
 interface SubmitButtonProps extends ButtonProps {
   label: string;

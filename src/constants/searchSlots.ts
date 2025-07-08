@@ -1,12 +1,12 @@
-import { Alert, Box, Grid, Pagination, Typography } from '@mui/material';
-import { Fragment } from 'react/jsx-runtime';
 import {
   DefaultCtxSearchPageSize,
   Hit,
   HitActions,
   LoadingHits,
-} from '../components/search';
-import type { SearchSlotComponents, SearchSlotProps } from '../context';
+} from '@/components/search';
+import type { SearchSlotComponents, SearchSlotProps } from '@/context';
+import { Alert, Box, Grid, Pagination, Typography } from '@mui/material';
+import { Fragment } from 'react/jsx-runtime';
 
 export const SEARCH_DEFAULT_SLOTS: SearchSlotComponents = {
   noHitsFound: Box, // CtxHitsNotFoundWrapper,

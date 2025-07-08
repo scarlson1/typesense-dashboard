@@ -13,6 +13,7 @@ import { queryClient } from './utils';
 
 const router = createRouter({
   routeTree,
+  basepath: '/typesense-dashboard',
   scrollRestoration: true,
   defaultPreload: 'intent',
   // context: {

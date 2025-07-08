@@ -1,15 +1,17 @@
+import type { SlotPropsWithOverrides } from '@/components';
+import type { HitActionsProps, HitProps } from '@/components/search';
 import type {
   AlertProps,
   BoxProps,
   GridProps,
   PaginationProps,
   SelectProps,
-  StackProps,
   TypographyProps,
 } from '@mui/material';
 import { createContext, type ComponentType } from 'react';
-import type { SlotPropsWithOverrides } from '../components';
-import type { HitActionsProps, HitProps } from '../components/search';
+
+// TODO: fix generic Slots/SlotProps
+// https://stackoverflow.com/a/61020816
 
 export interface SearchSlotComponents<
   THitsProps = Record<string, any>,
@@ -36,7 +38,7 @@ export interface SearchSlotComponents<
 }
 
 export interface SearchSlotProps<
-  THitsProps = StackProps,
+  THitsProps = GridProps, // StackProps,
   THitProps = HitProps,
   THitWrapperProps = GridProps,
   THitActionProps = HitActionsProps,
@@ -60,7 +62,7 @@ export interface SearchSlotProps<
 }
 
 export interface SearchSlotsContextValues<
-  THitsProps = StackProps,
+  THitsProps = GridProps, // StackProps,
   THitProps = HitProps,
   THitWrapperProps = GridProps,
   THitActionProps = HitActionsProps,
@@ -118,3 +120,25 @@ export const SearchSlotsContext =
 if (import.meta.env.DEV) {
   SearchSlotsContext.displayName = 'SearchSlotsContext';
 }
+
+// TODO: need to create factory function for generic slot types ??
+
+// import { createContext, useContext, type ReactNode } from 'react';
+
+// function createGenericContext<T>() {
+//   const Context = createContext<T | undefined>(undefined);
+
+//   function useGenericContext() {
+//     const context = useContext(Context);
+//     if (context === undefined) {
+//       throw new Error('useGenericContext must be used within a GenericProvider');
+//     }
+//     return context;
+//   }
+
+//   const Provider = ({ children, value }: { children: ReactNode; value: T }) => (
+//     <Context.Provider value={value}>{children}</Context.Provider>
+//   );
+
+//   return [Provider, useGenericContext] as const;
+// }

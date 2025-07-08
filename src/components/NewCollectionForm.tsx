@@ -1,9 +1,9 @@
+import { collectionFormOpts } from '@/constants';
+import { useAppForm, useNewCollection } from '@/hooks';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
-import { collectionFormOpts } from '../constants';
-import { useAppForm, useNewCollection } from '../hooks';
 import { CollectionForm } from './CollectionForm';
 import { LoadingSpinner } from './LoadingSpinner';
 

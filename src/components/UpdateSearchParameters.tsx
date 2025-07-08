@@ -1,17 +1,9 @@
-import { Box } from '@mui/material';
-import { useStore } from '@tanstack/react-form';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import type {
-  SearchParams,
-  SearchParamsWithPreset,
-} from 'typesense/lib/Typesense/Documents';
 import {
   DEFAULT_SEARCH_PARAMS_VALUES,
   presetQueryKeys,
   searchParamsFormOpts,
   type SearchParamValues,
-} from '../constants';
+} from '@/constants';
 import {
   useAppForm,
   useDefaultIndexParams,
@@ -20,7 +12,15 @@ import {
   useSearchParams,
   useTypesenseClient,
   useUpsertPreset,
-} from '../hooks';
+} from '@/hooks';
+import { Box } from '@mui/material';
+import { useStore } from '@tanstack/react-form';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import type {
+  SearchParams,
+  SearchParamsWithPreset,
+} from 'typesense/lib/Typesense/Documents';
 import { SearchParamsForm } from './SearchParamsForm';
 
 export interface UpdateSearchParametersProps {

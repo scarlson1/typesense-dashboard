@@ -1,7 +1,7 @@
+import { GridCellExpand } from '@/components';
 import type { GridColDef } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
-import { GridCellExpand } from '../../components';
 
 export const collectionColumns: GridColDef<CollectionSchema>[] = [
   {

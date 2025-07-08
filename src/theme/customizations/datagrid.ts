@@ -2,6 +2,7 @@ import { paperClasses } from '@mui/material/Paper';
 import type { Theme } from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
 // import type { DataGridProComponents } from '@mui/x-data-grid-pro/themeAugmentation';
+import { gray } from '@/theme/themePrimitives';
 import { checkboxClasses } from '@mui/material/Checkbox';
 import { iconButtonClasses } from '@mui/material/IconButton';
 import { listClasses } from '@mui/material/List';
@@ -10,7 +11,6 @@ import { menuItemClasses } from '@mui/material/MenuItem';
 import { tablePaginationClasses } from '@mui/material/TablePagination';
 import { gridClasses } from '@mui/x-data-grid';
 import type { DataGridComponents } from '@mui/x-data-grid/themeAugmentation';
-import { gray } from '../themePrimitives';
 
 /* eslint-disable import/prefer-default-export */
 export const dataGridCustomizations: DataGridComponents<Theme> = {

@@ -1,3 +1,6 @@
+import { apiKeyQueryKeys, collectionQueryKeys } from '@/constants';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { DeleteRounded } from '@mui/icons-material';
 import { Box, Tooltip, Typography } from '@mui/material';
 import {
@@ -9,9 +12,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type { KeysRetrieveSchema } from 'typesense/lib/Typesense/Keys';
 import type { SynonymSchema } from 'typesense/lib/Typesense/Synonym';
-import { apiKeyQueryKeys, collectionQueryKeys } from '../constants';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 
 interface SynonymsGridProps {
   collectionId: string;

@@ -1,3 +1,10 @@
+import {
+  filteredParamKeys,
+  NEW_EMPTY_OTHER_PARAM,
+  searchParamsFormOpts,
+} from '@/constants';
+import { withForm } from '@/hooks';
+import { getArrayVal, splitIfString, uniqueArr } from '@/utils';
 import { AddRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Box,
@@ -13,13 +20,6 @@ import { Fragment, useCallback, useMemo } from 'react';
 import type { SearchParams } from 'typesense/lib/Typesense/Documents';
 import type { MultiSearchRequestsSchema } from 'typesense/lib/Typesense/MultiSearch';
 import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
-import {
-  filteredParamKeys,
-  NEW_EMPTY_OTHER_PARAM,
-  searchParamsFormOpts,
-} from '../constants';
-import { withForm } from '../hooks';
-import { getArrayVal, splitIfString, uniqueArr } from '../utils';
 
 export const SearchParamsForm = withForm({
   ...searchParamsFormOpts,

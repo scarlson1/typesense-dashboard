@@ -1,3 +1,4 @@
+import { useCountdown } from '@/hooks';
 import { CloseRounded } from '@mui/icons-material';
 import type { CircularProgressProps, LinearProgressProps } from '@mui/material';
 import {
@@ -12,12 +13,9 @@ import {
 import { useCallback, useEffect } from 'react';
 import type { Toast } from 'react-hot-toast';
 import { toast, useToasterStore } from 'react-hot-toast';
-import type { SwipeEventData } from 'react-swipeable';
 import { useSwipeable } from 'react-swipeable';
 
-import { useCountdown } from '../hooks';
-
-const ToastLinearProgress = styled(LinearProgress)(({ theme }) => ({
+const ToastLinearProgress = styled(LinearProgress)(() => ({
   position: 'absolute',
   bottom: 0,
   left: 0,
@@ -29,7 +27,7 @@ const ToastLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const ToastCircularProgress = styled(CircularProgress)(({ theme }) => ({
+const ToastCircularProgress = styled(CircularProgress)(() => ({
   scale: '-1 1',
   position: 'absolute',
   top: 0,
@@ -138,7 +136,7 @@ export function CustomToast({ icon, message, t }: any) {
 
   // TODO: swipe direction based on toast position ??
   const handlers = useSwipeable({
-    onSwiped: (eventData: SwipeEventData) => handleClose(),
+    onSwiped: () => handleClose(), // (eventData: SwipeEventData) => handleClose(),
     swipeDuration: 500,
     preventScrollOnSwipe: true,
     trackMouse: true,

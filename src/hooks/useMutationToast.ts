@@ -1,6 +1,6 @@
+import { useAsyncToast } from '@/hooks';
 import { type MutationOptions } from '@tanstack/react-query';
 import { useId, useMemo } from 'react';
-import { useAsyncToast } from '../hooks';
 
 interface UseMutationToast<TData, TError, TVars, TCtx> {
   toastId?: string; // needs to be dynamic ??

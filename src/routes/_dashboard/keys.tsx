@@ -1,7 +1,10 @@
+import { ApiKeyGrid } from '@/components';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { ApiKeyGrid, NewApiKeyEditor } from '../../components';
+import { lazy, Suspense } from 'react';
+
+const NewApiKeyEditor = lazy(() => import('../../components/NewApiKeyEditor'));
 
 export const Route = createFileRoute('/_dashboard/keys')({
   component: RouteComponent,
@@ -35,7 +38,9 @@ function RouteComponent() {
         Use the template below to create a new API key.
       </Typography>
       <Box sx={{ py: 2 }}>
-        <NewApiKeyEditor />
+        <Suspense>
+          <NewApiKeyEditor />
+        </Suspense>
       </Box>
       <Box sx={{ py: 1 }}>
         <ApiKeyGrid />

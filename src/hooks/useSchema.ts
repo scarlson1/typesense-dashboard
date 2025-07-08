@@ -1,5 +1,5 @@
+import { collectionQueryKeys } from '@/constants';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { collectionQueryKeys } from '../constants';
 import { useTypesenseClient } from './useTypesenseClient';
 
 // if looking for collection schema from CollectionContext --> useCollectionSchema hook

@@ -1,3 +1,5 @@
+import type { Environment } from '@/types';
+import { getCredsKey, queryClient, typesenseStore } from '@/utils';
 import {
   BugReportRounded,
   ChecklistRounded,
@@ -24,8 +26,6 @@ import {
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
-import type { Environment } from '../types';
-import { getCredsKey, queryClient, typesenseStore } from '../utils';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
   width: 24,

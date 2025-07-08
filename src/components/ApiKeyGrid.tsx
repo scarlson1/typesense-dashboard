@@ -1,3 +1,7 @@
+import { apiKeyQueryKeys } from '@/constants';
+import { apiKeyColumns } from '@/constants/gridColumns';
+import { useAsyncToast, useDialog, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { DeleteRounded } from '@mui/icons-material';
 import { Box, Tooltip, Typography } from '@mui/material';
 import {
@@ -9,10 +13,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type { KeySchema } from 'typesense/lib/Typesense/Key';
 import type { KeysRetrieveSchema } from 'typesense/lib/Typesense/Keys';
-import { apiKeyQueryKeys } from '../constants';
-import { apiKeyColumns } from '../constants/gridColumns';
-import { useAsyncToast, useDialog, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 
 export const ApiKeyGrid = () => {
   const [client, clusterId] = useTypesenseClient();

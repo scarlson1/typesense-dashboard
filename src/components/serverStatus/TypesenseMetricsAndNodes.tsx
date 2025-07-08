@@ -1,11 +1,11 @@
+import { ErrorFallback } from '@/components/ErrorFallback';
+import { useTypesenseClient } from '@/hooks';
+import { formatBytes, removeStartEndMatches } from '@/utils';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isObject, round } from 'lodash-es';
 import { Fragment, Suspense, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useTypesenseClient } from '../../hooks';
-import { formatBytes, removeStartEndMatches } from '../../utils';
-import { ErrorFallback } from '../ErrorFallback';
 
 export function TypesenseMetricsAndNodes() {
   return (

@@ -1,11 +1,21 @@
+import { type JsonEditorProps } from '@/components/JsonEditor';
+import { DEFAULT_MONACO_OPTIONS } from '@/constants';
 import type { EditorProps, OnMount } from '@monaco-editor/react';
+import { Skeleton } from '@mui/material';
 import { editor } from 'monaco-editor';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { JsonEditor, type JsonEditorProps } from '../components';
-import { DEFAULT_MONACO_OPTIONS } from '../constants';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useAsyncToast } from './useAsyncToast';
 import { useDialog } from './useDialog';
 import { useUpdateDocument } from './useUpdateDocument';
+
+const JsonEditor = lazy(() => import('../components/JsonEditor'));
 
 interface UseDocumentEditorDialogProps {
   initialOptions?: EditorProps['options'];
@@ -91,16 +101,22 @@ export const useDocumentEditorDialog = (
         },
         content: ((props?: JsonEditorProps) => {
           return (
-            <JsonEditor
-              height='calc(100% - 12px)'
-              options={options}
-              onMount={handleEditorDidMount}
-              {...(props || {})}
-              value={value}
-              onValidate={(m) => {
-                setMarkers(m);
-              }}
-            />
+            <Suspense
+              fallback={
+                <Skeleton variant='rounded' height={'calc(100% - 12px)'} />
+              }
+            >
+              <JsonEditor
+                height='calc(100% - 12px)'
+                options={options}
+                onMount={handleEditorDidMount}
+                {...(props || {})}
+                value={value}
+                onValidate={(m) => {
+                  setMarkers(m);
+                }}
+              />
+            </Suspense>
           );
         })(),
         slotProps: {

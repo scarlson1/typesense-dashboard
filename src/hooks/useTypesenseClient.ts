@@ -1,7 +1,7 @@
+import { getTypesenseClient, typesenseStore } from '@/utils';
 import { redirect } from '@tanstack/react-router';
 import type { Client } from 'typesense';
 import { useStore } from 'zustand';
-import { getTypesenseClient, typesenseStore } from '../utils';
 
 export const useTypesenseClient = () => {
   const credentials = useStore(typesenseStore, (state) => state.credentials);

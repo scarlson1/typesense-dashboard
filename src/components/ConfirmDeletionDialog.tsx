@@ -1,7 +1,7 @@
+import { useAppForm, useDialog, withForm } from '@/hooks';
 import { Box, Button, DialogActions } from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
 import { z } from 'zod/v4';
-import { useAppForm, useDialog, withForm } from '../hooks';
 
 const deleteFormOpts = formOptions({
   defaultValues: {

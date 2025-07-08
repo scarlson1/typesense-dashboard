@@ -1,5 +1,5 @@
+import { type DialogCtx } from '@/components';
 import { createContext } from 'react';
-import { type DialogCtx } from '../components';
 
 // TODO: slots:
 // https://github.com/mui/mui-x/blob/master/packages/grid/x-data-grid/src/DataGrid/useDataGridProps.ts

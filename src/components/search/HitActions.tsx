@@ -1,3 +1,10 @@
+import { DEFAULT_MONACO_OPTIONS } from '@/constants';
+import {
+  useDeleteDocument,
+  useDialog,
+  useDocumentEditorDialog,
+  useSearch,
+} from '@/hooks';
 import {
   DataObjectRounded,
   DeleteRounded,
@@ -6,18 +13,13 @@ import {
 import {
   ButtonGroup,
   IconButton,
+  Skeleton,
   type ButtonGroupProps,
   type IconButtonProps,
 } from '@mui/material';
-import { useCallback } from 'react';
-import { DEFAULT_MONACO_OPTIONS } from '../../constants';
-import {
-  useDeleteDocument,
-  useDialog,
-  useDocumentEditorDialog,
-  useSearch,
-} from '../../hooks';
-import { JsonEditor } from '../JsonEditor';
+import { lazy, Suspense, useCallback } from 'react';
+
+const JsonEditor = lazy(() => import('../JsonEditor'));
 
 export interface HitActionsProps extends ButtonGroupProps {
   docData: Record<string, any>;
@@ -149,12 +151,14 @@ function ViewDocumentIconButton({
       // description: ``,
       content: (() => {
         return (
-          <JsonEditor
-            height='75vh'
-            options={{ ...DEFAULT_MONACO_OPTIONS, readOnly: true }}
-            value={JSON.stringify(docData, null, 2)}
-            schema={{}}
-          />
+          <Suspense fallback={<Skeleton variant='rounded' height={'75vh'} />}>
+            <JsonEditor
+              height='75vh'
+              options={{ ...DEFAULT_MONACO_OPTIONS, readOnly: true }}
+              value={JSON.stringify(docData, null, 2)}
+              schema={{}}
+            />
+          </Suspense>
         );
       })(),
       slotProps: {

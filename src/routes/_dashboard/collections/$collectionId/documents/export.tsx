@@ -1,9 +1,9 @@
+import { typesenseStore } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Link, Paper, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useStore } from 'zustand';
-import { typesenseStore } from '../../../../../utils';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/export'

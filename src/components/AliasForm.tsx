@@ -1,7 +1,7 @@
+import { withForm } from '@/hooks';
 import { Grid } from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
 import { z } from 'zod/v4';
-import { withForm } from '../hooks';
 
 const newAliasSchema = z.object({
   aliasName: z.string(),

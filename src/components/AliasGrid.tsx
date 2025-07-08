@@ -1,3 +1,6 @@
+import { aliasQueryKeys } from '@/constants';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
 import { DeleteRounded } from '@mui/icons-material';
 import { Box, Tooltip } from '@mui/material';
 import {
@@ -9,9 +12,6 @@ import {
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type { CollectionAliasSchema } from 'typesense/lib/Typesense/Aliases';
-import { aliasQueryKeys } from '../constants';
-import { useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
 
 export function AliasGrid() {
   const toast = useAsyncToast();

@@ -1,5 +1,5 @@
+import { createCollectionSchemaForm } from '@/types';
 import { formOptions } from '@tanstack/react-form';
-import { createCollectionSchemaForm } from '../types';
 
 export const NEW_EMPTY_FIELD = {
   name: '',

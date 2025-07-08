@@ -1,10 +1,10 @@
+import { DialogProvider, Toaster } from '@/components';
+import { AppTheme } from '@/context';
+import { dataGridCustomizations } from '@/theme/customizations';
 import { CssBaseline } from '@mui/material';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { DialogProvider, Toaster } from '../components';
-import { AppTheme } from '../context';
-import { dataGridCustomizations } from '../theme/customizations';
 
 export interface RouterAppContext {
   // trpcQueryUtils: typeof trpcQueryUtils;

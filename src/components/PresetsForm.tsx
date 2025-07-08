@@ -1,3 +1,11 @@
+import {
+  EMPTY_PRESET_PARAMS,
+  multiParameterKeys,
+  parameterKeys,
+  presetsFormOpts,
+  presetType,
+} from '@/constants';
+import { withForm } from '@/hooks';
 import { AddRounded, CloseRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Autocomplete,
@@ -9,14 +17,6 @@ import {
   Typography,
 } from '@mui/material';
 import { Fragment } from 'react/jsx-runtime';
-import {
-  EMPTY_PRESET_PARAMS,
-  multiParameterKeys,
-  parameterKeys,
-  presetsFormOpts,
-  presetType,
-} from '../constants';
-import { withForm } from '../hooks';
 
 export const PresetsForm = withForm({
   ...presetsFormOpts,

@@ -6,7 +6,7 @@ export interface JsonEditorProps extends EditorProps {
   schema?: any;
 }
 
-export function JsonEditor({ schema, ...props }: JsonEditorProps) {
+export default function JsonEditor({ schema, ...props }: JsonEditorProps) {
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
 

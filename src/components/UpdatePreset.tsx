@@ -1,17 +1,17 @@
-import { Box } from '@mui/material';
-import type { PresetCreateSchema } from 'typesense/lib/Typesense/Presets';
 import {
   DEFAULT_PRESET_VALUES,
   presetsFormOpts,
   presetType,
   type MultiParameterKeys,
   type ParameterKeys,
-} from '../constants';
+} from '@/constants';
 import {
   useAppForm,
   useUpsertPreset,
   type UseUpsertPresetProps,
-} from '../hooks';
+} from '@/hooks';
+import { Box } from '@mui/material';
+import type { PresetCreateSchema } from 'typesense/lib/Typesense/Presets';
 import { PresetsForm } from './PresetsForm';
 
 interface UpdatePresetProps {

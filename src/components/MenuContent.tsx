@@ -1,3 +1,5 @@
+import { collectionQueryKeys } from '@/constants';
+import { usePrevious, useTypesenseClient } from '@/hooks';
 import {
   AddRounded,
   AutoFixHighRounded,
@@ -56,8 +58,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { collectionQueryKeys } from '../constants';
-import { usePrevious, useTypesenseClient } from '../hooks';
 
 // TODO: clean up syncing collectionId between select/context/url
 

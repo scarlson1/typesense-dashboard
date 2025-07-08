@@ -1,14 +1,14 @@
-import { Box } from '@mui/material';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import type { AnalyticsRuleCreateSchema } from 'typesense/lib/Typesense/AnalyticsRule';
 import {
   analyticsFormOpts,
   analyticsQueryKeys,
   collectionQueryKeys,
   type AnalyticsRuleCreateValues,
-} from '../constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '../hooks';
-import { queryClient } from '../utils';
+} from '@/constants';
+import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { queryClient } from '@/utils';
+import { Box } from '@mui/material';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import type { AnalyticsRuleCreateSchema } from 'typesense/lib/Typesense/AnalyticsRule';
 import { AnalyticsRuleForm } from './AnalyticsRuleForm';
 
 interface UpdateAnalyticsRuleProps {

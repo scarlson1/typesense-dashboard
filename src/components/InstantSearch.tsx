@@ -1,15 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import type { Client } from 'typesense';
-import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
-import { collectionQueryKeys } from '../constants';
+import { collectionQueryKeys } from '@/constants';
 import {
   SearchContext,
   type PaginationParams,
   type SearchContextParams,
   type SearchContextValues,
-} from '../context';
-import { useCollectionSchema, useDebounce } from '../hooks';
+} from '@/context';
+import { useCollectionSchema, useDebounce } from '@/hooks';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import type { Client } from 'typesense';
+import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
 export type InstantSearchProps = {
   // SearchContextValues & {
