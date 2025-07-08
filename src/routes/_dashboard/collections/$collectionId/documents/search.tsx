@@ -82,9 +82,9 @@ function SearchCollection() {
             slotProps={{
               stats: { color: 'text.secondary' },
               hits: { container: true, spacing: 2 },
-              hitWrapper: {
-                size: { xs: 12, sm: 2, lg: 3 },
-              },
+              // hitWrapper: {
+              //   size: { xs: 12, sm: 6 },
+              // },
             }}
           >
             <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>

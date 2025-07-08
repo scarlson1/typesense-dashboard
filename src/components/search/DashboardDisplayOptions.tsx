@@ -45,8 +45,12 @@ export function DashboardDisplayOptions() {
         ? 12 / e.target.value
         : SEARCH_DEFAULT_SLOT_PROPS.hitWrapper?.size || 1;
       console.log('size: ', size);
-      updateSlotProps({ hitWrapper: { size } });
-      alert('TODO: change Hits to <Grid /> instead of <Stack />');
+
+      updateSlotProps({
+        hitWrapper: {
+          size,
+        },
+      });
     },
     [updateSlotProps]
   );

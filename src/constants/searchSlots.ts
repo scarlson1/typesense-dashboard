@@ -33,7 +33,7 @@ export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
     spacing: { xs: 1, sm: 2 },
   },
   hitWrapper: {
-    size: 12,
+    size: { xs: 12, lg: 6 },
   },
   pageSize: {
     size: 'small',

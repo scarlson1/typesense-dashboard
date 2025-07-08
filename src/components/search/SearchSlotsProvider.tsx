@@ -1,4 +1,4 @@
-import { merge, mergeWith } from 'lodash-es';
+import { mergeWith } from 'lodash-es';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import {
   SEARCH_DEFAULT_SLOT_PROPS,
@@ -40,11 +40,11 @@ export const SearchSlotsProvider = ({
           if (Array.isArray(srcValue)) return srcValue;
         }
       ),
-    [slotPropsState] // providedSlotProps,
+    [slotPropsState]
   );
 
   const updateSlotProps = useCallback(
-    (updates: Partial<SearchSlotProps>, mergeFn: Function = merge) => {
+    (updates: Partial<SearchSlotProps>, mergeFn: Function = () => {}) => {
       // setSlotPropsState((prev) => ({ ...merge(prev, updates) }));
       setSlotPropsState((prev) => ({ ...mergeWith(prev, updates, mergeFn) }));
     },
