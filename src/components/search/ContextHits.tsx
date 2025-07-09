@@ -38,7 +38,7 @@ function CtxHits({ children }: { children?: ReactNode }) {
   ) : null;
 }
 
-export function CtxHitWrapper(props: { children?: ReactNode }) {
+function CtxHitWrapper(props: { children?: ReactNode }) {
   const [slots, slotProps] = useSearchSlots();
 
   return slots.hitWrapper ? (
@@ -52,7 +52,7 @@ export function CtxHitWrapper(props: { children?: ReactNode }) {
 
 CtxHits.HitWrapper = CtxHitWrapper;
 
-export function CtxHit(props: { children?: ReactNode }) {
+function CtxHit(props: { children?: ReactNode }) {
   const hits = useHits();
   const [slots, slotProps] = useSearchSlots();
 

@@ -46,6 +46,7 @@ export interface DialogSlotProps {
   cancelButton?: SlotPropsWithOverrides<Omit<ButtonProps, 'onClick'>>;
 }
 
+// TODO: remove onSubmit ?? use slotProps instead
 export type DialogVariant = 'danger' | 'info';
 export interface DialogOptions {
   onSubmit?: (values?: any, helpers?: any) => void; // update to tanstack form (from formik) ??

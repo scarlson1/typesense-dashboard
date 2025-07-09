@@ -60,6 +60,7 @@ import {
 } from 'react';
 
 // TODO: clean up syncing collectionId between select/context/url
+// TODO: fix collection select not updating on $collectionId change
 
 interface MainListItem {
   text: string;
