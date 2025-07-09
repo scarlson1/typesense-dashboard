@@ -4,16 +4,28 @@ A dashboard to manage [Typesense](https://typesense.org/)
 
 ## Usage
 
+### Web
+
 As a web application, only typesense server started with `--enable-cors` will work.
 
-Use https://scarlson1.github.io/typesense-dashboard/ or build and install on your own server
+Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally.
 
 ### Docker
 
-Currently, two official plugins are available:
+Download the repo and self-host with docker.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Example usage:
+
+```bash
+$ docker build -t typesense-dashboard .
+$ docker run -d -p 80:80 typesense-dashboard
+```
+
+To use the latest pre-built image:
+
+```bash
+docker run -d -p 80:80 ghcr.io/bfritscher/typesense-dashboard:latest
+```
 
 ## Expanding the ESLint configuration
 
