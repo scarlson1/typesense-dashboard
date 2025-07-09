@@ -6,7 +6,11 @@ export interface JsonEditorProps extends EditorProps {
   schema?: any;
 }
 
-export default function JsonEditor({ schema, ...props }: JsonEditorProps) {
+export default function JsonEditor({
+  schema = {},
+  onMount,
+  ...props
+}: JsonEditorProps) {
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
 
@@ -26,9 +30,9 @@ export default function JsonEditor({ schema, ...props }: JsonEditorProps) {
           ],
         });
       }, 100);
-      props.onMount && props.onMount(editor, monaco);
+      onMount && onMount(editor, monaco);
     },
-    [schema, props.onMount]
+    [schema, onMount]
   );
 
   return (

@@ -1,12 +1,11 @@
 import { collectionQueryKeys, DEFAULT_MONACO_OPTIONS } from '@/constants';
 import { collectionColumns } from '@/constants/gridColumns';
 import {
-  useAsyncToast,
   useCollectionEditorDialog,
-  useDialog,
+  useDeleteCollection,
   useTypesenseClient,
 } from '@/hooks';
-import { queryClient } from '@/utils';
+import { useConfirmDelete } from '@/hooks/useConfirmDelete';
 import { DataObjectRounded, DeleteRounded } from '@mui/icons-material';
 import { Box, Tooltip, Typography } from '@mui/material';
 import type {
@@ -15,13 +14,12 @@ import type {
   GridRowParams,
 } from '@mui/x-data-grid';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { Client } from 'typesense';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionsRetrieveOptions } from 'typesense/lib/Typesense/Collections';
-import { ConfirmDeletionDialog } from './ConfirmDeletionDialog';
 
 const DEFAULT_VIEW_OPTIONS = { ...DEFAULT_MONACO_OPTIONS, readOnly: true };
 
@@ -33,63 +31,14 @@ function fetchCollections(client: Client, query?: CollectionsRetrieveOptions) {
 export function CollectionsGrid() {
   const navigate = useNavigate();
   const [client, clusterId] = useTypesenseClient();
-  const toast = useAsyncToast();
-  const dialog = useDialog();
 
   const { data, isFetching, isLoading, isError, error } = useQuery({
     queryKey: collectionQueryKeys.list(clusterId, {}),
     queryFn: () => fetchCollections(client),
   });
 
-  const mutation = useMutation({
-    mutationFn: (colName: string) => client.collections(colName).delete(),
-    onMutate: async (variables) => {
-      await queryClient.cancelQueries({
-        queryKey: collectionQueryKeys.list(clusterId, {}),
-      });
-
-      const collections: CollectionSchema[] | undefined =
-        queryClient.getQueryData(collectionQueryKeys.list(clusterId, {}));
-      const prevCollection = collections?.find((c) => c.name === variables);
-
-      queryClient.setQueryData(
-        collectionQueryKeys.list(clusterId, {}),
-        (data: CollectionSchema[]) => data.filter((c) => c.name !== variables)
-      );
-
-      toast.loading(`dropping ${variables} collection`, {
-        id: 'delete-collection',
-      });
-
-      let ctx: { colName: string; prevCollection?: CollectionSchema } = {
-        colName: variables,
-      };
-      if (prevCollection) ctx.prevCollection = prevCollection;
-      return ctx;
-    },
-    onSuccess: (_, __, context) => {
-      toast.success(`collection ${context.colName} dropped`, {
-        id: 'delete-collection',
-      });
-    },
-    onError: (err, _, context) => {
-      let msg = err.message || 'failed to delete collection';
-      toast.error(msg, { id: 'delete-collection' });
-
-      if (context?.prevCollection) {
-        queryClient.setQueryData(
-          collectionQueryKeys.list(clusterId, {}),
-          (data: CollectionSchema[]) => [...data, context?.prevCollection]
-        );
-      }
-    },
-    onSettled: () => {
-      // queryClient.invalidateQueries({ queryKey: collectionQueryKeys.list({}) });
-      queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.all(clusterId),
-      });
-    },
-  });
+  const { openConfirmDelete } = useConfirmDelete();
+  const mutation = useDeleteCollection();
 
   const viewSchema = useCollectionEditorDialog({
     initialOptions: DEFAULT_VIEW_OPTIONS,
@@ -129,26 +78,10 @@ export function CollectionsGrid() {
               if (focusedEl) focusedEl.blur();
 
               try {
-                await dialog.prompt({
-                  variant: 'danger',
-                  catchOnCancel: true,
-                  title: `Confirm Collection Deletion [ID: ${params.id.toString()}]`,
-                  description: `THIS ACTION CANNOT BE UNDONE. Type the collection name to confirm deletion.`,
-                  content: (
-                    <ConfirmDeletionDialog correctValue={params.row.name} />
-                  ),
-                  slots: {
-                    actions: undefined,
-                  },
-                  slotProps: {
-                    dialog: {
-                      maxWidth: 'sm',
-                      fullWidth: true,
-                    },
-                  },
-                });
+                await openConfirmDelete(params.id.toString());
+
                 mutation.mutate(params.row.name);
-              } catch (error) {}
+              } catch (err) {}
             }}
             label='Delete Collection'
             disabled={mutation.isPending}
@@ -181,7 +114,6 @@ export function CollectionsGrid() {
         getRowId={(row) => row.name}
         loading={isLoading || isFetching}
         pageSizeOptions={[5, 10, 20]}
-        // checkboxSelection
         onCellDoubleClick={(params: GridCellParams<CollectionSchema>) => {
           navigate({
             from: '/collections',

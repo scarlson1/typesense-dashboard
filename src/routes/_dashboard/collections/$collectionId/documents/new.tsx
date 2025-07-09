@@ -243,7 +243,7 @@ function NewDocumentEditor() {
   const value = useMemo(() => {
     let schema = data?.fields.reduce((acc, cur) => {
       let placeholder = getFieldPlaceholderValue(cur.type);
-      return placeholder ? { ...acc, [cur.name]: placeholder } : acc;
+      return placeholder !== null ? { ...acc, [cur.name]: placeholder } : acc;
     }, {});
 
     return JSON.stringify([schema], null, 2);
@@ -254,6 +254,7 @@ function NewDocumentEditor() {
   const handleUpdateMethod = useCallback((e: SelectChangeEvent) => {
     setAction(e.target.value as DocumentImportParameters['action']);
   }, []);
+
   const handleDirtyValues = useCallback((e: SelectChangeEvent) => {
     setDirtyValues(e.target.value as DocumentImportParameters['dirty_values']);
   }, []);
@@ -284,12 +285,12 @@ function NewDocumentEditor() {
         <JsonEditor
           height='50vh'
           onMount={handleMount}
-          // schema={COLLECTION_SCHEMA}
           options={DEFAULT_MONACO_OPTIONS}
           value={value}
           onValidate={(m) => {
             setMarkers(m);
           }}
+          schema={{}}
         />
       </Suspense>
       <Stack
@@ -302,7 +303,6 @@ function NewDocumentEditor() {
           flexWrap: 'wrap',
         }}
         useFlexGap
-        // sx={{ flexWrap: 'wrap' }}
       >
         <FormControl size='small' fullWidth sx={{ maxWidth: 190 }}>
           <InputLabel id='action-select-label'>Action Mode</InputLabel>

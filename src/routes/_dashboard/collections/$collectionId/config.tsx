@@ -1,9 +1,34 @@
-import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
-import { createFileRoute } from '@tanstack/react-router';
-// import { JsonEditor } from '@/components';
+import { ErrorFallback } from '@/components';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
-import { useSchema } from '@/hooks';
-import { lazy, Suspense } from 'react';
+import {
+  useAsyncToast,
+  useDeleteCollection,
+  useSchema,
+  useUpdateCollection,
+} from '@/hooks';
+import { useConfirmDelete } from '@/hooks/useConfirmDelete';
+import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
+import type { EditorProps, OnMount } from '@monaco-editor/react';
+import {
+  Box,
+  Button,
+  Skeleton,
+  Stack,
+  Typography,
+  type ButtonProps,
+} from '@mui/material';
+import { createFileRoute } from '@tanstack/react-router';
+import { editor } from 'monaco-editor';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
 
 const JsonEditor = lazy(() => import('../../../../components/JsonEditor'));
 
@@ -18,7 +43,56 @@ export const Route = createFileRoute(
 
 function CollectionSettings() {
   const { collectionId } = Route.useParams();
+  const toast = useAsyncToast();
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
+  const [options, setOptions] = useState<EditorProps['options']>(
+    DEFAULT_MONACO_OPTIONS
+  );
+  const [markers, setMarkers] = useState<editor.IMarker[]>([]);
+
   const { data } = useSchema(collectionId);
+
+  const mutation = useUpdateCollection({
+    onSettled: () => {
+      setOptions((o) => ({ ...o, readOnly: false }));
+    },
+  });
+
+  const handleUpdateSchema = useCallback(() => {
+    if (markers.length) {
+      toast.warn('Invalid JSON', { id: 'monaco-validation' });
+      return;
+    }
+
+    let value = editorRef.current?.getValue();
+    if (!value) return;
+    let { fields, metadata = {} } = JSON.parse(value);
+
+    setOptions((o) => ({ ...o, readOnly: true }));
+
+    const fieldUpdates = getCollectionUpdates(data.fields, fields);
+
+    if (!fieldUpdates.length) {
+      toast.info(`no field changes made`);
+      setOptions((o) => ({ ...o, readOnly: false }));
+      return;
+    }
+
+    let updates: CollectionUpdateSchema = {
+      metadata,
+      fields: fieldUpdates,
+    };
+
+    mutation.mutate({ colName: collectionId, updates });
+  }, [mutation.mutate, data, markers]);
+
+  const handleEditorDidMount: OnMount = (editor) => {
+    editorRef.current = editor;
+  };
+
+  useEffect(() => {
+    editorRef.current?.getAction('editor.action.formatDocument')?.run();
+  }, [data]);
 
   return (
     <>
@@ -30,28 +104,68 @@ function CollectionSettings() {
       >
         <Button
           variant='contained'
-          onClick={() => alert('TODO: update schema')}
+          onClick={() => handleUpdateSchema()}
+          loading={mutation.isPending}
+          disabled={Boolean(markers.length)}
         >
           Update Schema
         </Button>
-        <Button
-          variant='contained'
-          onClick={() => alert('TODO: delete schema')}
-        >
-          Delete Collection
-        </Button>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <DeleteCollectionButton>Delete Collection</DeleteCollectionButton>
+        </ErrorBoundary>
       </Stack>
       <Box sx={{ borderRadius: 1, overflow: 'hidden' }}>
         <Suspense fallback={<Skeleton variant='rounded' height={'70vh'} />}>
           <JsonEditor
             height='70vh'
             schema={COLLECTION_SCHEMA}
-            // options={{ ...DEFAULT_MONACO_OPTIONS, readOnly: true }}
-            options={DEFAULT_MONACO_OPTIONS}
+            options={options}
             value={JSON.stringify(data)}
+            onMount={handleEditorDidMount}
+            onValidate={(m) => {
+              setMarkers(m);
+            }}
           />
         </Suspense>
       </Box>
     </>
+  );
+}
+
+type DeleteCollectionButtonProps = ButtonProps;
+
+function DeleteCollectionButton({
+  children = 'Delete Collection',
+  ...props
+}: DeleteCollectionButtonProps) {
+  const navigate = Route.useNavigate();
+  const { collectionId } = Route.useParams();
+  const { openConfirmDelete } = useConfirmDelete();
+
+  const deleteMutation = useDeleteCollection({
+    onSuccess: () => {
+      navigate({ to: '/collections' });
+    },
+  });
+
+  const handleDeleteCollection = useCallback(async () => {
+    try {
+      await openConfirmDelete(collectionId);
+
+      deleteMutation.mutate(collectionId);
+    } catch (err) {
+      console.log('delete aborted');
+    }
+  }, [deleteMutation.mutate, collectionId]);
+
+  return (
+    <Button
+      variant='contained'
+      {...props}
+      onClick={() => handleDeleteCollection()}
+      loading={deleteMutation.isPending}
+    >
+      {children}
+    </Button>
   );
 }

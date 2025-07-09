@@ -21,7 +21,6 @@ import {
   OpenInNewRounded,
 } from '@mui/icons-material';
 import {
-  alpha,
   Box,
   Container,
   Grid,
@@ -88,8 +87,8 @@ function SearchCollection() {
                   position: 'absolute',
                   right: '8px',
                   top: '8px',
-                  backgroundColor: (theme) =>
-                    alpha(theme.palette.background.paper, 0.78),
+                  // backgroundColor: (theme) => theme.vars.palette.background.paper,
+                  backdropFilter: 'blur(8px) opacity(0.84)',
                 },
               },
               // hitWrapper: {

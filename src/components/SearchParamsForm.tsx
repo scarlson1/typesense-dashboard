@@ -3,7 +3,7 @@ import {
   NEW_EMPTY_OTHER_PARAM,
   searchParamsFormOpts,
 } from '@/constants';
-import { withForm } from '@/hooks';
+import { usePrevious, withForm } from '@/hooks';
 import { getArrayVal, splitIfString, uniqueArr } from '@/utils';
 import { AddRounded, RemoveRounded } from '@mui/icons-material';
 import {
@@ -16,7 +16,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { Fragment, useCallback, useMemo } from 'react';
+import { isEqual } from 'lodash-es';
+import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import type { SearchParams } from 'typesense/lib/Typesense/Documents';
 import type { MultiSearchRequestsSchema } from 'typesense/lib/Typesense/MultiSearch';
 import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
@@ -41,6 +42,19 @@ export const SearchParamsForm = withForm({
     submitButtonText,
   }) => {
     const presetOptions = useMemo(() => presets.map((p) => p.name), [presets]);
+
+    // reset query by when options change or when collectionId changes ??
+    const prevQueryByOptions = usePrevious(queryByOptions);
+    useEffect(() => {
+      if (prevQueryByOptions && !isEqual(queryByOptions, prevQueryByOptions)) {
+        console.log(
+          'SETTING QUERY BY OPTIONS: ',
+          queryByOptions,
+          prevQueryByOptions
+        );
+        form.setFieldValue('query_by', queryByOptions);
+      }
+    }, [queryByOptions, prevQueryByOptions]);
 
     const handlePresetChange = useCallback(
       (newVal: string) => {

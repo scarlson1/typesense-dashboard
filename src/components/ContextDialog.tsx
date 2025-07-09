@@ -64,21 +64,6 @@ const Content = () => {
 
 CtxDialog.Content = Content;
 
-// const SuccessView = () => {
-//   const { slots, slotProps, successView, showSuccessView } = useDialog();
-//   if (!showSuccessView) return null;
-
-//   return <slots.content {...slotProps.content}>{successView}</slots.content>;
-// };
-
-// CtxDialog.SuccessView = SuccessView;
-
-// interface ActionsProps {
-//   // confirmButtonProps?: Omit<ButtonProps, 'onClick'>;
-//   confirmButtonText?: string; // TODO: use children instead ?? can pass via slotProps
-// }
-
-// const Actions = ({ confirmButtonText = 'submit' }: ActionsProps) => {
 const Actions = () => {
   const {
     onSubmit,
@@ -92,7 +77,6 @@ const Actions = () => {
   } = useDialog();
 
   const handleSubmit = useCallback(() => {
-    // if adding success screen --> need to check state and skip submit
     let fn = onSubmit ?? handleAccept;
     fn && fn();
   }, [onSubmit, handleAccept]);
@@ -108,7 +92,6 @@ const Actions = () => {
         <>
           {slots.cancelButton && (
             <slots.cancelButton
-              // onClick={handleClose}
               onClick={handleCancel}
               {...slotProps.cancelButton}
             >
@@ -146,7 +129,6 @@ function ContextDialog() {
     <CtxDialog>
       <CtxDialog.Title />
       <CtxDialog.Content />
-      {/* <CtxDialog.SuccessView /> */}
       <CtxDialog.Actions />
     </CtxDialog>
   );
