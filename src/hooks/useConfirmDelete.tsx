@@ -1,4 +1,5 @@
-import { LoadingSpinner, type DialogOptions } from '@/components';
+import { LoadingSpinner } from '@/components';
+import type { DialogOptions } from '@/components/DialogContext';
 import type { TextFieldProps } from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
 import { Suspense, useCallback, useMemo } from 'react';

@@ -4,7 +4,7 @@ import {
   searchParamsFormOpts,
 } from '@/constants';
 import { usePrevious, withForm } from '@/hooks';
-import { getArrayVal, splitIfString, uniqueArr } from '@/utils';
+import { getArrayVal, splitIfString } from '@/utils';
 import { AddRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Box,
@@ -67,10 +67,11 @@ export const SearchParamsForm = withForm({
           form.setFieldValue('sort_by', getArrayVal(splitIfString(sort_by)));
           form.setFieldValue(
             'facet_by',
-            uniqueArr([
-              ...getArrayVal(splitIfString(facet_by)),
-              ...getArrayVal(splitIfString(filter_by)),
-            ])
+            getArrayVal(splitIfString(facet_by))
+            // uniqueArr([
+            //   ...getArrayVal(splitIfString(facet_by)),
+            //   ...getArrayVal(splitIfString(filter_by)),
+            // ])
           );
           form.setFieldValue('group_by', getArrayVal(splitIfString(group_by)));
 

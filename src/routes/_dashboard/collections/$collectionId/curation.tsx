@@ -1,4 +1,4 @@
-import { CurationList } from '@/components';
+import { CurationList } from '@/components/CurationList';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';

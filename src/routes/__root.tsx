@@ -1,4 +1,5 @@
-import { DialogProvider, Toaster } from '@/components';
+import { DialogProvider } from '@/components/DialogContext';
+import { Toaster } from '@/components/Toaster';
 import { AppTheme } from '@/context';
 import { dataGridCustomizations } from '@/theme/customizations';
 import { CssBaseline } from '@mui/material';

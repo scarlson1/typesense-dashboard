@@ -1,4 +1,4 @@
-import { GridCellExpand } from '@/components';
+import { GridCellExpand } from '@/components/GridCellExpand';
 import type { GridColDef } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';

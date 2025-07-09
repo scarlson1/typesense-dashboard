@@ -27,6 +27,6 @@ export const useSearchParams = <
   }, []);
 
   return useMemo(() => {
-    return [params, updateParams, setParams] as const;
-  }, [params, setParams, updateParams]);
+    return [params as SearchContextParams, updateParams, setParams] as const;
+  }, [params, updateParams, setParams]);
 };

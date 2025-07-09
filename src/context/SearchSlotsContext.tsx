@@ -1,17 +1,21 @@
-import type { SlotPropsWithOverrides } from '@/components';
+import type { SlotPropsWithOverrides } from '@/components/DialogContext';
 import type { HitActionsProps, HitProps } from '@/components/search';
+import type { FacetOptionProps } from '@/components/search/FacetOptions';
 import type {
   AlertProps,
   BoxProps,
   GridProps,
   PaginationProps,
   SelectProps,
+  StackProps,
   TypographyProps,
 } from '@mui/material';
-import { createContext, type ComponentType } from 'react';
+import { createContext, type ComponentType, type ReactNode } from 'react';
 
 // TODO: fix generic Slots/SlotProps
 // https://stackoverflow.com/a/61020816
+
+type ChildProps = { children: ReactNode };
 
 export interface SearchSlotComponents<
   THitsProps = Record<string, any>,
@@ -24,6 +28,10 @@ export interface SearchSlotComponents<
   TStatsProps = TypographyProps,
   TErrorProps = AlertProps,
   TLoadingHitsProps = BoxProps,
+  TFacetContainerProps = StackProps,
+  TFacetOptionProps = FacetOptionProps,
+  TSortBySelect extends ChildProps = SelectProps<string[]> & ChildProps,
+  TRefinements extends ChildProps = ChildProps,
 > {
   hits: ComponentType<THitsProps>;
   hit: ComponentType<THitProps>;
@@ -35,6 +43,10 @@ export interface SearchSlotComponents<
   stats: ComponentType<TStatsProps>;
   error: ComponentType<TErrorProps>;
   loadingHits: ComponentType<TLoadingHitsProps>;
+  facetContainer: ComponentType<TFacetContainerProps>;
+  facetOption: ComponentType<TFacetOptionProps>;
+  sortBySelect: ComponentType<TSortBySelect>;
+  refinements: ComponentType<TRefinements>;
 }
 
 export interface SearchSlotProps<
@@ -48,6 +60,10 @@ export interface SearchSlotProps<
   TStatsProps = TypographyProps,
   TErrorProps = AlertProps,
   TLoadingHitsProps = BoxProps,
+  TFacetContainerProps = StackProps,
+  TFacetOptionProps = FacetOptionProps,
+  TSortBySelect extends ChildProps = SelectProps<string[]> & ChildProps,
+  TRefinements = ChildProps,
 > {
   hits?: SlotPropsWithOverrides<THitsProps>; // Record<string, any>
   hit?: SlotPropsWithOverrides<THitProps>;
@@ -59,6 +75,10 @@ export interface SearchSlotProps<
   stats?: SlotPropsWithOverrides<TStatsProps>;
   error?: SlotPropsWithOverrides<TErrorProps>;
   loadingHits?: SlotPropsWithOverrides<TLoadingHitsProps>;
+  facetContainer?: SlotPropsWithOverrides<TFacetContainerProps>;
+  facetOption?: SlotPropsWithOverrides<TFacetOptionProps>;
+  sortBySelect?: SlotPropsWithOverrides<TSortBySelect>;
+  refinements?: SlotPropsWithOverrides<TRefinements>;
 }
 
 export interface SearchSlotsContextValues<
@@ -72,6 +92,10 @@ export interface SearchSlotsContextValues<
   TStatsProps = TypographyProps,
   TErrorProps = AlertProps,
   TLoadingHitsProps = BoxProps,
+  TFacetContainerProps = StackProps,
+  TFacetOptionProps = FacetOptionProps,
+  TSortBySelect extends ChildProps = SelectProps<string[]> & ChildProps,
+  TRefinements extends ChildProps = ChildProps,
 > {
   slots: SearchSlotComponents<
     THitsProps,
@@ -83,7 +107,11 @@ export interface SearchSlotsContextValues<
     TPaginationProps,
     TStatsProps,
     TErrorProps,
-    TLoadingHitsProps
+    TLoadingHitsProps,
+    TFacetContainerProps,
+    TFacetOptionProps,
+    TSortBySelect,
+    TRefinements
   >;
   slotProps: SearchSlotProps<
     THitsProps,
@@ -95,7 +123,11 @@ export interface SearchSlotsContextValues<
     TPaginationProps,
     TStatsProps,
     TErrorProps,
-    TLoadingHitsProps
+    TLoadingHitsProps,
+    TFacetContainerProps,
+    TFacetOptionProps,
+    TSortBySelect,
+    TRefinements
   >;
   updateSlotProps: (
     updates: SearchSlotProps<
@@ -108,7 +140,11 @@ export interface SearchSlotsContextValues<
       TPaginationProps,
       TStatsProps,
       TErrorProps,
-      TLoadingHitsProps
+      TLoadingHitsProps,
+      TFacetContainerProps,
+      TFacetOptionProps,
+      TSortBySelect,
+      TRefinements
     >,
     updater?: Function
   ) => void;

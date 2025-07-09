@@ -1,4 +1,4 @@
-import { type DialogCtx } from '@/components';
+import type { DialogCtx } from '@/components/DialogContext';
 import { createContext } from 'react';
 
 // TODO: slots:

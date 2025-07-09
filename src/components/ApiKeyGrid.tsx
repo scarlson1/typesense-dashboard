@@ -14,7 +14,7 @@ import { useMemo } from 'react';
 import type { KeySchema } from 'typesense/lib/Typesense/Key';
 import type { KeysRetrieveSchema } from 'typesense/lib/Typesense/Keys';
 
-export const ApiKeyGrid = () => {
+const ApiKeyGrid = () => {
   const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
   const dialog = useDialog();
@@ -151,3 +151,5 @@ export const ApiKeyGrid = () => {
     </Box>
   );
 };
+
+export default ApiKeyGrid;

@@ -1,4 +1,5 @@
-import { ButtonLink, ErrorFallback } from '@/components';
+import { ErrorFallback } from '@/components';
+import { ButtonLink } from '@/components/ButtonLink';
 import {
   ServerMetrics,
   ServerOps,
