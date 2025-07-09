@@ -1,6 +1,6 @@
 import { type JsonEditorProps } from '@/components/JsonEditor';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
-import { diffArraysOfObjects } from '@/utils';
+import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import {
   type EditorProps,
   type Monaco,
@@ -105,29 +105,13 @@ export function useCollectionEditorDialog(
 
     let value = editorRef.current?.getValue();
     if (!value) return;
-    let parsed = JSON.parse(value);
-    setOptions((o) => ({ ...o, readOnly: true }));
-
     // typesense only supports updating metadata & fields ??
-    // TODO: need to validate metadata ??
-    const { fields, metadata = {} } = parsed;
+    let { fields, metadata = {} } = JSON.parse(value);
+    setOptions((o) => ({ ...o, readOnly: true }));
 
     const initialVal = JSON.parse(initialSchema.current || '{}');
 
-    const { added, removed, updated } = diffArraysOfObjects<any>(
-      initialVal?.fields || [],
-      fields || [],
-      'name'
-    );
-    console.log({ added, removed, updated });
-
-    let fieldUpdates = [];
-    for (let r of removed) fieldUpdates.push({ name: r.name, drop: true });
-    for (let u of updated) {
-      fieldUpdates.push({ name: u.name, drop: true });
-      fieldUpdates.push(u);
-    }
-    for (let a of added) fieldUpdates.push(a);
+    const fieldUpdates = getCollectionUpdates(initialVal?.fields, fields || []);
 
     if (!fieldUpdates.length) {
       toast.info(`no field changes made`);
@@ -142,7 +126,7 @@ export function useCollectionEditorDialog(
     console.log('UPDATES: ', updates);
 
     mutation.mutate({ colName: initialVal.name, updates });
-  }, [mutation.mutate]);
+  }, [mutation.mutate, markers]);
 
   return useCallback(
     ({ value, title }: { value: string; title: string }) => {

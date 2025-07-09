@@ -4,6 +4,12 @@ A dashboard to manage [Typesense](https://typesense.org/)
 
 ## Usage
 
+As a web application, only typesense server started with `--enable-cors` will work.
+
+Use https://scarlson1.github.io/typesense-dashboard/ or build and install on your own server
+
+### Docker
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
