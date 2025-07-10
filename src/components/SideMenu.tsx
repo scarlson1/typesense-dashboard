@@ -8,6 +8,8 @@ import {
   styled,
   Typography,
 } from '@mui/material';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from './ErrorFallback';
 import { MenuContent } from './MenuContent';
 import OptionsMenu from './OptionsMenu';
 import { SelectContent } from './SelectContent';
@@ -61,7 +63,9 @@ export function SideMenu() {
           flexDirection: 'column',
         }}
       >
-        <MenuContent />
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <MenuContent />
+        </ErrorBoundary>
         {/* <CardAlert /> */}
       </Box>
       <Stack

@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dev:docker": "docker run -dp 5173:5173 --name typesense-dashboard-container typesense-dashboard",
+    "dev:docker": "docker run -dp 5173:5173 typesense-dashboard",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "analyze:bundle": "npx vite-bundle-visualizer"

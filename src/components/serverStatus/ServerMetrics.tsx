@@ -34,7 +34,7 @@ export function ServerMetrics() {
       <Stack
         direction='row'
         spacing={2}
-        sx={{ justifyContent: 'space-between' }}
+        // sx={{ justifyContent: 'space-between' }}
       >
         <Typography variant='h6' gutterBottom>
           Server Metrics
