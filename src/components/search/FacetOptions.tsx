@@ -1,4 +1,10 @@
-import { useSearch, useSearchParams, useSearchSlots } from '@/hooks';
+import { collectionQueryKeys } from '@/constants';
+import {
+  useSearch,
+  useSearchParams,
+  useSearchSlots,
+  useTypesenseClient,
+} from '@/hooks';
 import { uniqueArr } from '@/utils';
 import {
   Checkbox,
@@ -9,17 +15,18 @@ import {
   Typography,
   type CheckboxProps,
 } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, type ChangeEvent, type ReactNode } from 'react';
+import type { SearchResponseFacetCountSchema } from 'typesense/lib/Typesense/Documents';
 import { z } from 'zod/v4';
 
 export interface FacetOptionProps extends CheckboxProps {
   label?: ReactNode;
   value: string;
+  // disabled?: boolean;
 }
 
-// TODO: use slots on change handler
 export const FacetOption = ({ label, ...props }: FacetOptionProps) => {
-  console.log('PROPS: ', props);
   return <FormControlLabel control={<Checkbox {...props} />} label={label} />;
 };
 
@@ -38,6 +45,7 @@ interface CtxFacetOptionProps {
   checked: boolean;
   label: ReactNode;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
 const filterOperators = z.enum([
@@ -48,14 +56,11 @@ const filterOperators = z.enum([
   '<', // less than
   '<=', // less or equal
   '!=', // not equal to
-  // TODO: arrays
   '[]', // Is one of
   '![]', // Is not any of
   '[..]', // range
 ]);
 type FilterOperators = z.infer<typeof filterOperators>;
-
-// TODO: run query without filter_by ??
 
 export const CtxFacetOption = (props: CtxFacetOptionProps) => {
   const [slots, slotProps] = useSearchSlots();
@@ -69,14 +74,77 @@ export const CtxFacetOption = (props: CtxFacetOptionProps) => {
   ) : null;
 };
 
+// filter_by removes facet options with count of 0
+const useFacetCounts = () => {
+  const [client, clusterId] = useTypesenseClient();
+  const { debouncedQuery, collectionId, params } = useSearch();
+
+  const { filter_by, ...restParams } = params || {};
+
+  return useQuery({
+    queryKey: [
+      ...collectionQueryKeys.search(
+        clusterId,
+        collectionId,
+        restParams,
+        debouncedQuery
+      ),
+      'facets',
+    ],
+    queryFn: async () => {
+      let res = await client
+        .collections(collectionId)
+        .documents()
+        .search({
+          q: debouncedQuery,
+          ...(restParams || {}),
+        });
+      console.log('res: ', res);
+
+      return res?.facet_counts || [];
+    },
+  });
+};
+
+// TODO: setting for showing facet results with 0 options
 export const CtxFacetOptions = () => {
   const { data } = useSearch();
   const [params, updateParams] = useSearchParams();
+
+  const { data: facetCounts } = useFacetCounts();
 
   const filterByParams = useMemo(
     () => params?.filter_by?.split(',') || [],
     [params]
   );
+
+  //
+  const mergedFacets = useMemo(() => {
+    return facetCounts?.map((facet: SearchResponseFacetCountSchema<object>) => {
+      let filteredFacet = data?.facet_counts?.find(
+        (f) => f.field_name === facet.field_name
+      );
+
+      let countsWithNums = facet.counts.map((c) => {
+        let filteredCount = filteredFacet?.counts.find(
+          (filteredCount) => filteredCount.value === c.value
+        );
+
+        return {
+          count: filteredCount?.count || 0,
+          highlighted: filteredCount?.highlighted || c.highlighted,
+          value: c.value, // TODO: get operator variable
+          checked: filterByParams.includes(`${facet?.field_name}:=${c.value}`),
+        };
+      });
+
+      return {
+        counts: countsWithNums,
+        field_name: facet.field_name,
+        stats: filteredFacet?.stats || facet.stats,
+      };
+    });
+  }, [data?.facet_counts, facetCounts, filterByParams]);
 
   // TODO: support filter operators
   // https://typesense.org/docs/guide/tips-for-filtering.html#available-operators
@@ -92,7 +160,6 @@ export const CtxFacetOptions = () => {
       let newParams = e.target.checked
         ? uniqueArr([...filterByParams, filterValue])
         : filterByParams.filter((f: string) => f !== filterValue);
-      console.log('new params: ', newParams);
 
       updateParams({ filter_by: newParams.join(',') });
     },
@@ -100,19 +167,18 @@ export const CtxFacetOptions = () => {
   );
 
   return (
-    <Collapse in={Boolean(data?.facet_counts?.length)}>
+    <Collapse in={Boolean(facetCounts?.length)}>
       <CtxFacetContainer>
-        {data?.facet_counts?.map((facetCount) => (
+        {mergedFacets?.map((facetCount) => (
           <CtxFacetContainer key={facetCount.field_name}>
             <Typography variant='overline'>{facetCount.field_name}</Typography>
+            {/* TODO: search to refine facet options  */}
             {facetCount.counts.map((c) => (
               <CtxFacetOption
                 key={c.value}
-                // TODO: get operator variable
-                checked={filterByParams.includes(
-                  `${facetCount.field_name}:=${c.value}`
-                )}
+                checked={c.checked}
                 value={c.value}
+                disabled={!c.count}
                 onChange={(e) => {
                   handleChange(e, facetCount.field_name);
                 }}

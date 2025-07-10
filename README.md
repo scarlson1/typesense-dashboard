@@ -10,7 +10,7 @@ As a web application, only typesense server started with `--enable-cors` will wo
 
 Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally.
 
-Use an admin key to authenticate.
+Use an admin key to authenticate. Cluster credentials are stored in session storage and will be removed when the window is closed.
 
 ### Docker
 

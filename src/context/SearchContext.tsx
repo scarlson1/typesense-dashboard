@@ -31,6 +31,7 @@ export type SearchContextValues<
   // clusterId: string;
   // client: Client;
   collectionId: string;
+  debouncedQuery: string;
   params: SearchContextParams;
   setParams: Dispatch<SetStateAction<SearchContextParams>>;
   setQuery: (value: string) => void;
