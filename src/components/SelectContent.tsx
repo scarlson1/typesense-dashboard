@@ -23,7 +23,7 @@ import {
   selectClasses,
   styled,
 } from '@mui/material';
-import { useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 
@@ -60,11 +60,11 @@ function getEnvAvatar(env?: Environment | null) {
 
 export function SelectContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   // TODO: allow multiple sets of credentials & add context provider
   const credentials = useStore(typesenseStore, (state) => state.credentials);
   const cluster = useStore(typesenseStore, (state) => state.currentCredsKey);
   const setCluster = useStore(typesenseStore, (state) => state.setCredsKey);
-  const logout = useStore(typesenseStore, (state) => state.logout);
   const [open, setOpen] = useState(false);
 
   // BUG: clearing query client not working - need to add cluster in query key ??
@@ -89,7 +89,18 @@ export function SelectContent() {
     setOpen(false);
   }, []);
 
-  const handleLogout = useCallback((key: string) => logout(key), [logout]);
+  const handleLogout = useCallback(
+    async (key: string) => {
+      navigate({
+        to: '/logout',
+        search: {
+          redirect: location.href,
+          clusterId: key,
+        },
+      });
+    },
+    [location, navigate]
+  );
 
   const { prodCreds, devCreds, stagingCreds, testingCreds, ciCreds } =
     useMemo(() => {

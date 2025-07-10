@@ -1,5 +1,4 @@
 import { useAsyncToast } from '@/hooks';
-import { queryClient, typesenseStore } from '@/utils';
 import { LogoutRounded, MoreVertRounded } from '@mui/icons-material';
 import {
   Divider,
@@ -13,9 +12,8 @@ import {
   paperClasses,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
-import { useStore } from 'zustand';
 import { MenuButton } from './MenuButton';
 // import { firebaseSignOut } from '../firebase/auth';
 
@@ -25,8 +23,8 @@ const MenuItem = styled(MuiMenuItem)({
 
 export default function OptionsMenu() {
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useAsyncToast();
-  const logout = useStore(typesenseStore, (state) => state.logout);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -37,20 +35,16 @@ export default function OptionsMenu() {
     setAnchorEl(null);
   }, []);
 
+  // TODO: logout without redirect is causing error
+  // typesense
   const handleLogout = useCallback(async () => {
-    try {
-      // TODO: add loading state and show loading indicator in list item
-      // await firebaseSignOut();
-      // handleClose();
-      logout();
-      queryClient.clear();
-      navigate({ to: '/auth' });
-
-      // alert('TODO: signout');
-    } catch (err) {
-      console.log('LOGOUT ERROR: ', err);
-    }
-  }, [logout, navigate]);
+    navigate({
+      to: '/logout',
+      search: {
+        redirect: location.href,
+      },
+    });
+  }, [location, navigate]);
 
   const handleToast = useCallback(
     (id: string) => {

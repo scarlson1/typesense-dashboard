@@ -77,6 +77,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
     <Card
       sx={{
         position: 'relative',
+        border: (theme) => `1px solid ${theme.vars.palette.divider}`,
       }}
     >
       {Boolean(image) ? (

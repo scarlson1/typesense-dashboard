@@ -23,7 +23,6 @@ import { z } from 'zod/v4';
 export interface FacetOptionProps extends CheckboxProps {
   label?: ReactNode;
   value: string;
-  // disabled?: boolean;
 }
 
 export const FacetOption = ({ label, ...props }: FacetOptionProps) => {

@@ -8,6 +8,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { useLocation, useNavigate } from '@tanstack/react-router';
+import { useCallback } from 'react';
 import { MenuButton } from './MenuButton';
 import { MenuContent } from './MenuContent';
 // import { useNavigate } from '@tanstack/react-router';
@@ -23,27 +25,23 @@ export default function SideMenuMobile({
   open,
   toggleDrawer,
 }: SideMenuMobileProps) {
-  // const navigate = useNavigate({ from: '/' });
+  const navigate = useNavigate();
+  const location = useLocation();
   // const { data: user } = useUser();
   // const user = useUser();
-  // const toast = useAsyncToast();
   const user = {
     displayName: 'John Doe',
     photoURL: '',
   };
 
-  const handleLogout = async () => {
-    try {
-      // TODO: add loading state and show loading indicator in list item
-      // await firebaseSignOut();
-      // toggleDrawer(false);
-      // navigate({ to: '/auth/signin' });
-      alert('TODO: signout');
-    } catch (err: any) {
-      console.log('LOGOUT ERROR: ', err);
-      // toast.error(err?.message || 'error logging out');
-    }
-  };
+  const handleLogout = useCallback(async () => {
+    navigate({
+      to: '/logout',
+      search: {
+        redirect: location.href,
+      },
+    });
+  }, [location, navigate]);
 
   return (
     <Drawer

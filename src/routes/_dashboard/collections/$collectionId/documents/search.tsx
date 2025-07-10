@@ -29,7 +29,7 @@ import {
   Typography,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { Suspense } from 'react';
+import { Suspense, useEffect, type ReactNode } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
 export const Route = createFileRoute(
@@ -51,146 +51,172 @@ function SearchCollection() {
         {collectionId}
       </Typography>
 
-      <CollectionProvider
-        client={client}
-        collectionId={collectionId}
-        clusterId={clusterId}
-      >
-        <InstantSearch<DocumentSchema>
-          collectionId={collectionId}
+      <TempLogoutBandaid client={client} clusterId={clusterId}>
+        <CollectionProvider
           client={client}
+          collectionId={collectionId}
           clusterId={clusterId}
         >
-          <SearchSlotsProvider
-            slots={{
-              // stats: undefined, // hide slot
-              hits: Grid,
-              hitWrapper: Grid,
-            }}
-            slotProps={{
-              stats: { color: 'text.secondary' },
-              hits: { container: true, spacing: 2 },
-              hitActions: {
-                sx: {
-                  position: 'absolute',
-                  right: '8px',
-                  top: '8px',
-                  // backgroundColor: theme => alpha(theme.palette.background.paper, 0.6),
-                  bgcolor: 'background.paper',
-                  opacity: 0.8,
-                  backdropFilter: 'blur(8px) opacity(0.87)',
-                },
-              },
-              // hitWrapper: {
-              //   size: { xs: 12, sm: 6 },
-              // },
-            }}
+          <InstantSearch<DocumentSchema>
+            collectionId={collectionId}
+            client={client}
+            clusterId={clusterId}
           >
-            <Stack
-              direction='row'
-              spacing={2}
-              sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+            <SearchSlotsProvider
+              slots={{
+                // stats: undefined, // hide slot
+                hits: Grid,
+                hitWrapper: Grid,
+              }}
+              slotProps={{
+                stats: { color: 'text.secondary' },
+                hits: { container: true, spacing: 2 },
+                hitActions: {
+                  sx: {
+                    position: 'absolute',
+                    right: '8px',
+                    top: '8px',
+                    // backgroundColor: theme => alpha(theme.palette.background.paper, 0.6),
+                    bgcolor: 'background.paper',
+                    opacity: 0.8,
+                    backdropFilter: 'blur(8px) opacity(0.87)',
+                  },
+                },
+                // hitWrapper: {
+                //   size: { xs: 12, sm: 6 },
+                // },
+              }}
             >
-              <ButtonLink
-                from={Route.path}
-                hash='search-params'
-                endIcon={<ExpandMoreRounded />}
-                size='small'
+              <Stack
+                direction='row'
+                spacing={2}
+                sx={{ justifyContent: 'space-between', alignItems: 'center' }}
               >
-                Search Parameters
-              </ButtonLink>
-              {/* TODO: move filter & sort to popover with icon buttons ?? */}
-              {/* <Box>
+                <ButtonLink
+                  from={Route.path}
+                  hash='search-params'
+                  endIcon={<ExpandMoreRounded />}
+                  size='small'
+                >
+                  Search Parameters
+                </ButtonLink>
+                {/* TODO: move filter & sort to popover with icon buttons ?? */}
+                {/* <Box>
                 <Box sx={{ maxWidth: 200 }}>
                   <SortBy fullWidth />
                 </Box>
               </Box> */}
-              <CtxRefinements />
-            </Stack>
+                <CtxRefinements />
+              </Stack>
 
-            <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
-              <Box>
-                <SearchBox sx={{ my: 1 }} />
-                {/* <SearchStats /> */}
-                <CtxSearchStats />
-              </Box>
-              <CtxSearchError />
-              <ContextHits />
+              <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
+                <Box>
+                  <SearchBox sx={{ my: 1 }} />
+                  {/* <SearchStats /> */}
+                  <CtxSearchStats />
+                </Box>
+                <CtxSearchError />
+                <ContextHits />
 
-              {/* TODO: slot for toolbar etc */}
-              <Stack
-                direction={{ xs: 'column-reverse', sm: 'row' }}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <ButtonLink
-                  to='/collections/$collectionId/documents/new'
-                  params={{ collectionId }}
-                  size='small'
-                  startIcon={<AddRounded fontSize='small' />}
-                  sx={{ lineHeight: '18px', my: 1 }}
-                >
-                  Add Documents
-                </ButtonLink>
+                {/* TODO: slot for toolbar etc */}
                 <Stack
-                  direction='row'
-                  spacing={2}
+                  direction={{ xs: 'column-reverse', sm: 'row' }}
                   sx={{
-                    flex: '1 1 auto',
-                    justifyContent: 'flex-end',
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
-                  <CtxPageSize />
-                  <CtxPagination />
-                </Stack>
-              </Stack>
-
-              <Box>
-                <Typography variant='h5' gutterBottom>
-                  Search Parameters
-                </Typography>
-                <Typography component='div' gutterBottom>
-                  These settings control ranking, relevance and search
-                  fine-tuning. Use a preset to save your configuration, and
-                  recall in your application.{' '}
-                  <Link
-                    href='https://typesense.org/docs/29.0/api/search.html#search-parameters'
-                    target='_blank'
-                    rel='noopener noreferrer'
+                  <ButtonLink
+                    to='/collections/$collectionId/documents/new'
+                    params={{ collectionId }}
+                    size='small'
+                    startIcon={<AddRounded fontSize='small' />}
+                    sx={{ lineHeight: '18px', my: 1 }}
                   >
-                    Docs
-                    <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.5 }} />
-                  </Link>
-                </Typography>
-              </Box>
+                    Add Documents
+                  </ButtonLink>
+                  <Stack
+                    direction='row'
+                    spacing={2}
+                    sx={{
+                      flex: '1 1 auto',
+                      justifyContent: 'flex-end',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <CtxPageSize />
+                    <CtxPagination />
+                  </Stack>
+                </Stack>
 
-              <Suspense>
-                <Paper id='search-params'>
-                  <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
-                    <UpdateSearchParameters collectionId={collectionId} />
-                  </Container>
-                </Paper>
-              </Suspense>
+                <Box>
+                  <Typography variant='h5' gutterBottom>
+                    Search Parameters
+                  </Typography>
+                  <Typography component='div' gutterBottom>
+                    These settings control ranking, relevance and search
+                    fine-tuning. Use a preset to save your configuration, and
+                    recall in your application.{' '}
+                    <Link
+                      href='https://typesense.org/docs/29.0/api/search.html#search-parameters'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      Docs
+                      <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.5 }} />
+                    </Link>
+                  </Typography>
+                </Box>
 
-              <Box>
-                <Typography variant='h6' gutterBottom>
-                  Dashboard Display Options
-                </Typography>
-                <Typography variant='subtitle2'>
-                  These options control the visual display of the results in the
-                  search dashboard above
-                </Typography>
-              </Box>
+                <Suspense>
+                  <Paper id='search-params'>
+                    <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
+                      <UpdateSearchParameters collectionId={collectionId} />
+                    </Container>
+                  </Paper>
+                </Suspense>
 
-              <DashboardDisplayOptions />
-            </Stack>
-          </SearchSlotsProvider>
-        </InstantSearch>
-      </CollectionProvider>
+                <Box>
+                  <Typography variant='h6' gutterBottom>
+                    Dashboard Display Options
+                  </Typography>
+                  <Typography variant='subtitle2'>
+                    These options control the visual display of the results in
+                    the search dashboard above
+                  </Typography>
+                </Box>
+
+                <DashboardDisplayOptions />
+              </Stack>
+            </SearchSlotsProvider>
+          </InstantSearch>
+        </CollectionProvider>
+      </TempLogoutBandaid>
     </>
   );
+}
+
+function TempLogoutBandaid({
+  client,
+  clusterId,
+  children,
+}: {
+  client: any;
+  clusterId: any;
+  children: ReactNode;
+}) {
+  useEffect(() => {
+    if (!(client && clusterId)) {
+      // todo: redirect ??
+    }
+  }, [client, clusterId]);
+
+  if (!(client && clusterId)) {
+    console.log('SHOULD RETURN NULL');
+    return null;
+  }
+  console.log('SHOULD RETURN CHILDREN');
+
+  return children;
 }

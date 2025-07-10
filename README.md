@@ -2,13 +2,15 @@
 
 A dashboard to manage self hosted or local [Typesense](https://typesense.org/) instances.
 
+Reference the [Typesense installation docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
+
 ## Usage
 
 ### Web
 
 As a web application, only typesense server started with `--enable-cors` will work.
 
-Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally.
+Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (Typesense config must be XX or you'll get "ERR_NETWORK Network Error")
 
 Use an admin key to authenticate. Cluster credentials are stored in session storage and will be removed when the window is closed.
 
@@ -19,6 +21,7 @@ Download the repo and self-host with docker.
 Example usage:
 
 ```bash
+$ git clone git@github.com:scarlson1/typesense-dashboard.git
 $ docker build -t typesense-dashboard .
 $ docker run -d -p 80:80 typesense-dashboard
 ```
@@ -26,34 +29,10 @@ $ docker run -d -p 80:80 typesense-dashboard
 To use the latest pre-built image:
 
 ```bash
-docker run -d -p 80:80 ghcr.io/bfritscher/typesense-dashboard:latest
+docker run -d -p 80:80 ghcr.io/scarlson1/typesense-dashboard:latest
 ```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
-```
-
-## Limitations
+## Limitations/Issues
 
 TODO
 
@@ -65,3 +44,20 @@ TODO
 - [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
 - Search result view customization
 - Improve search implementation
+- Delete documents by query
+
+## Screenshots
+
+# Development
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### run locally
+
+```bash
+npm run dev
+```
