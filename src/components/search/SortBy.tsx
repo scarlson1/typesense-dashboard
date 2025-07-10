@@ -132,7 +132,6 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
 
   if (!data?.facet_counts?.length && !sortByOptions.length) return null;
 
-  // TODO: disable icon if no select or filter options ??
   return (
     <>
       <IconButton
