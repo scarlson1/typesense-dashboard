@@ -64,22 +64,14 @@ const NavbarBreadcrumbs = () => {
   //           let pathIsValid = allPaths.includes(
   //             '/' + arr.slice(0, i + 1).join('/')
   //           );
-  //           console.log(
-  //             'PATH IS VALID: ',
-  //             pathIsValid,
-  //             '/' + arr.slice(0, i + 1).join('/')
-  //           );
 
   //           let path = arr.slice(0, i + 1).map((k) => {
   //             if (k.startsWith('$')) {
-  //               // @ts-ignore
-  //               console.log(`PARAM ${k}: ${rest.params[k.slice(1)]}`);
   //               // @ts-ignore
   //               return rest.params[k.slice(1)] || '';
   //             } else return k;
   //           });
 
-  //           console.log('PATH: ', path);
   //           // @ts-ignore
   //           let key = cur.startsWith('$') ? rest.params[cur.slice(1)] : cur;
   //           if (key && path.every((val) => val))

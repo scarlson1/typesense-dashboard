@@ -102,9 +102,7 @@ export const useConfirmDelete = (options?: UseConfirmDeleteOptions) => {
           },
           acceptButton: {
             // necessary ??
-            onClick: () => {
-              console.log('button clicked --> submit form');
-            },
+            onClick: () => {},
             ...(options?.slotProps?.acceptButton || {}),
           },
           cancelButton: {

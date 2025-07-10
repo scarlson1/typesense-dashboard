@@ -103,9 +103,7 @@ const ApiKeyGrid = () => {
                   },
                 });
                 mutation.mutate(params.row.id);
-              } catch (err) {
-                console.log(`confirmation exited`);
-              }
+              } catch (err) {}
             }}
             label='Delete Collection'
             disabled={mutation.isPending}

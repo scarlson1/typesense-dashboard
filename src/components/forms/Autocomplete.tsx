@@ -56,7 +56,6 @@ function Autocomplete<
       value={state.value}
       // @ts-ignore
       onChange={(_, newVal: Value | null) => {
-        // console.log('NEW VAL: ', newVal);
         handleChange(newVal ?? ('' as Value));
       }}
       blurOnSelect={!props?.multiple}

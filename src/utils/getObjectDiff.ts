@@ -67,7 +67,7 @@ export function getObjectDiff<T extends Record<string, any>>(
 // const objB = { name: 'Alice', age: 31, country: 'USA' };
 
 // const differences = getObjectDiff(objA, objB);
-// console.log(differences);
+
 // // Expected output: { age: 31, city: undefined, country: "USA" }
 
 // function getObjectDiff(obj1, obj2) {

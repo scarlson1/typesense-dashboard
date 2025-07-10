@@ -98,7 +98,6 @@ const useFacetCounts = () => {
           q: debouncedQuery,
           ...(restParams || {}),
         });
-      console.log('res: ', res);
 
       return res?.facet_counts || [];
     },

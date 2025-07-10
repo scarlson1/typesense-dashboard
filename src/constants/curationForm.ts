@@ -79,7 +79,6 @@ export const overrideValues = z
     ({ custom_metadata_bool, metadata }) => {
       if (custom_metadata_bool) {
         try {
-          console.log('PARSING: ', custom_metadata_bool, metadata);
           JSON.parse(metadata);
         } catch (_) {
           return false;

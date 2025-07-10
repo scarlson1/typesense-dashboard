@@ -47,11 +47,6 @@ export const SearchParamsForm = withForm({
     const prevQueryByOptions = usePrevious(queryByOptions);
     useEffect(() => {
       if (prevQueryByOptions && !isEqual(queryByOptions, prevQueryByOptions)) {
-        console.log(
-          'SETTING QUERY BY OPTIONS: ',
-          queryByOptions,
-          prevQueryByOptions
-        );
         form.setFieldValue('query_by', queryByOptions);
       }
     }, [queryByOptions, prevQueryByOptions]);

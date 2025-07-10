@@ -67,8 +67,6 @@ export function InstantSearch<T extends DocumentSchema>({
       staleTime,
     });
 
-  if (error) console.log(error);
-
   const setPreset = useCallback((presetId: string | null) => {
     setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
   }, []);
