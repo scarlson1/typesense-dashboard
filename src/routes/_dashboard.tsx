@@ -1,4 +1,6 @@
-import { AppNavbar, Header, SideMenu } from '@/components';
+import { AppNavbar } from '@/components/AppNavbar';
+import { Header } from '@/components/Header';
+import { SideMenu } from '@/components/SideMenu';
 import { typesenseStore } from '@/utils';
 import { alpha, Box, Stack } from '@mui/material';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';

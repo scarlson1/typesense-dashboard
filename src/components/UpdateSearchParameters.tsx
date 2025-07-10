@@ -156,7 +156,6 @@ function formValuesToPresetSchema(
   let formattedValues = {
     query_by, // TODO: validate query_by values
     preset: preset || undefined,
-    filter_by: facet_by.join(','),
     facet_by: facet_by.join(','),
     sort_by: sort_by.slice(0, 3).join(','),
     group_by: group_by.join(','),

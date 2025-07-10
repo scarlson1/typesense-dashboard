@@ -1,4 +1,4 @@
-import { AnalyticsRulesList } from '@/components';
+import { AnalyticsRulesList } from '@/components/AnalyticsRulesList';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';

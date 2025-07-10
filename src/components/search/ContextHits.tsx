@@ -3,12 +3,12 @@ import { Typography } from '@mui/material';
 import { Fragment, Suspense, type ReactNode } from 'react';
 
 function CtxHits({ children }: { children?: ReactNode }) {
-  const x = useSearch();
+  const { isLoading, isFetching } = useSearch();
   const hits = useHits();
   const [slots, slotProps] = useSearchSlots();
 
   if (!hits?.hits) {
-    if (x?.isLoading || x?.isFetching) {
+    if (isLoading || isFetching) {
       return slots.loadingHits ? (
         <slots.loadingHits {...slotProps.loadingHits} />
       ) : null;

@@ -194,7 +194,7 @@ export function DashboardDisplayOptions() {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label='Display Fields'
+                label='Image Field'
                 helperText='The selected field is used to show an image in the results above.'
               />
             )}

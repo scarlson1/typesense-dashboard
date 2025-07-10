@@ -5,12 +5,12 @@ import {
   Collapse,
   FormHelperText,
   Grid,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { Suspense, useEffect, useState } from 'react';
-import { LoadingSpinner } from './LoadingSpinner';
 
 export const CurationForm = withForm({
   ...overrideFormOpts,
@@ -377,7 +377,9 @@ export const CurationForm = withForm({
                 unmountOnExit
               >
                 <Box sx={{ pl: 3 }}>
-                  <Suspense fallback={<LoadingSpinner />}>
+                  <Suspense
+                    fallback={<Skeleton variant='rounded' height={54} />}
+                  >
                     <form.AppField name='effective_from_ts'>
                       {({ DatePicker }) => (
                         <DatePicker
@@ -415,7 +417,9 @@ export const CurationForm = withForm({
                 unmountOnExit
               >
                 <Box sx={{ pl: 3 }}>
-                  <Suspense fallback={<LoadingSpinner />}>
+                  <Suspense
+                    fallback={<Skeleton variant='rounded' height={54} />}
+                  >
                     <form.AppField name='effective_to_ts'>
                       {({ DatePicker }) => (
                         <DatePicker
