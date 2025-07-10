@@ -85,7 +85,6 @@ export const CtxFacetOptions = () => {
       field: string,
       operator: FilterOperators = '='
     ) => {
-      console.log('checked: ', e.target.value, e.target.checked);
       let filterValue = `${field}:${operator}${e.target.value}`;
 
       let newParams = e.target.checked
@@ -104,39 +103,30 @@ export const CtxFacetOptions = () => {
         {data?.facet_counts?.map((facetCount) => (
           <CtxFacetContainer key={facetCount.field_name}>
             <Typography variant='overline'>{facetCount.field_name}</Typography>
-            {facetCount.counts.map((c) => {
-              console.log(
-                'CHECKED: ',
-                filterByParams.includes(c.value),
-                c.value,
-                filterByParams
-              );
+            {facetCount.counts.map((c) => (
+              <CtxFacetOption
+                key={c.value}
+                // TODO: get operator variable
+                checked={filterByParams.includes(
+                  `${facetCount.field_name}:=${c.value}`
+                )}
+                value={c.value}
+                onChange={(e) => {
+                  handleChange(e, facetCount.field_name);
+                }}
+                label={
+                  <Stack
+                    direction='row'
+                    spacing={0.75}
+                    sx={{ alignItems: 'center' }}
+                  >
+                    <Typography variant='body2'>{c.value}</Typography>
 
-              return (
-                <CtxFacetOption
-                  key={c.value}
-                  // TODO: get operator variable
-                  checked={filterByParams.includes(
-                    `${facetCount.field_name}:=${c.value}`
-                  )}
-                  value={c.value}
-                  onChange={(e) => {
-                    handleChange(e, facetCount.field_name);
-                  }}
-                  label={
-                    <Stack
-                      direction='row'
-                      spacing={0.75}
-                      sx={{ alignItems: 'center' }}
-                    >
-                      <Typography variant='body2'>{c.value}</Typography>
-
-                      <Chip size='small' label={c.count} sx={{ height: 18 }} />
-                    </Stack>
-                  }
-                />
-              );
-            })}
+                    <Chip size='small' label={c.count} sx={{ height: 18 }} />
+                  </Stack>
+                }
+              />
+            ))}
           </CtxFacetContainer>
         ))}
       </CtxFacetContainer>

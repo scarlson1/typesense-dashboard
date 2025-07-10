@@ -76,7 +76,13 @@ export const CtxSortBy = () => {
       } = event;
       let newVal = typeof value === 'string' ? value.split(',') : value;
 
-      updateParams({ sort_by: newVal.filter((x) => x).join(',') || undefined });
+      updateParams({
+        sort_by:
+          newVal
+            .filter((x) => x)
+            .slice(0, 3) // max of three sort_by fields
+            .join(',') || undefined,
+      });
     },
     [updateParams]
   );
