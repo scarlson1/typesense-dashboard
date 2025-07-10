@@ -1,4 +1,7 @@
-import type { DialogSlotProps, DialogSlotsComponents } from '@/components';
+import type {
+  DialogSlotProps,
+  DialogSlotsComponents,
+} from '@/components/DialogContext';
 import {
   Button,
   Dialog,
