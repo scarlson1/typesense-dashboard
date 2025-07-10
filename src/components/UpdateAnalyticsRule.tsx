@@ -67,7 +67,7 @@ export function UpdateAnalyticsRule({
       };
 
       try {
-        let res = await mutation.mutateAsync({
+        await mutation.mutateAsync({
           name,
           schema,
         });
