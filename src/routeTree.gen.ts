@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
@@ -28,6 +29,11 @@ import { Route as DashboardCollectionsCollectionIdDocumentsNewRouteImport } from
 import { Route as DashboardCollectionsCollectionIdDocumentsExportRouteImport } from './routes/_dashboard/collections/$collectionId/documents/export'
 import { Route as DashboardCollectionsCollectionIdDocumentsDocumentIdRouteImport } from './routes/_dashboard/collections/$collectionId/documents/$documentId'
 
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -128,6 +134,7 @@ const DashboardCollectionsCollectionIdDocumentsDocumentIdRoute =
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
+  '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
   '/analytics': typeof DashboardAnalyticsRoute
   '/keys': typeof DashboardKeysRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
   '/analytics': typeof DashboardAnalyticsRoute
   '/keys': typeof DashboardKeysRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_dashboard': typeof DashboardRouteWithChildren
   '/auth': typeof AuthRoute
+  '/logout': typeof LogoutRoute
   '/_dashboard/alias': typeof DashboardAliasRoute
   '/_dashboard/analytics': typeof DashboardAnalyticsRoute
   '/_dashboard/keys': typeof DashboardKeysRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/auth'
+    | '/logout'
     | '/alias'
     | '/analytics'
     | '/keys'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/logout'
     | '/alias'
     | '/analytics'
     | '/keys'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_dashboard'
     | '/auth'
+    | '/logout'
     | '/_dashboard/alias'
     | '/_dashboard/analytics'
     | '/_dashboard/keys'
@@ -249,10 +261,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LogoutRoute: typeof LogoutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -434,6 +454,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   AuthRoute: AuthRoute,
+  LogoutRoute: LogoutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
