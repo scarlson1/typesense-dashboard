@@ -123,7 +123,6 @@ export function useCollectionEditorDialog(
       metadata,
       fields: fieldUpdates,
     };
-    console.log('UPDATES: ', updates);
 
     mutation.mutate({ colName: initialVal.name, updates });
   }, [mutation.mutate, markers]);
@@ -158,7 +157,6 @@ export function useCollectionEditorDialog(
         catchOnCancel: false,
         onSubmit: () => {
           if (options?.readOnly) {
-            console.log('setting read only: FALSE');
             setOptions((o) => ({ ...o, readOnly: false }));
           } else {
             handleSave();

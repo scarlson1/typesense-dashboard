@@ -153,9 +153,7 @@ function DeleteCollectionButton({
       await openConfirmDelete(collectionId);
 
       deleteMutation.mutate(collectionId);
-    } catch (err) {
-      console.log('delete aborted');
-    }
+    } catch (err) {}
   }, [deleteMutation.mutate, collectionId]);
 
   return (

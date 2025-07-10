@@ -18,18 +18,3 @@ export function CtxSearchError() {
     </Collapse>
   ) : null;
 }
-
-// export function SearchError() {
-//   const { isError, error } = useSearch();
-
-//   useEffect(() => {
-//     if (error) console.log(error);
-//   }, [error]);
-
-//   let errMsg = error?.message || 'An error occurred. See console for details';
-//   return (
-//     <Collapse in={isError}>
-//       <Alert severity='warning'>{errMsg}</Alert>
-//     </Collapse>
-//   );
-// }
