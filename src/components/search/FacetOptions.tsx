@@ -55,6 +55,8 @@ const filterOperators = z.enum([
 ]);
 type FilterOperators = z.infer<typeof filterOperators>;
 
+// TODO: run query without filter_by ??
+
 export const CtxFacetOption = (props: CtxFacetOptionProps) => {
   const [slots, slotProps] = useSearchSlots();
 
