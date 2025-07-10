@@ -1,5 +1,5 @@
-import { SynonymsGrid } from '@/components';
 import { SynonymsForm, synonymsFormOpts } from '@/components/SynonymsForm';
+import { SynonymsGrid } from '@/components/SynonymsGrid';
 import { collectionQueryKeys } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';

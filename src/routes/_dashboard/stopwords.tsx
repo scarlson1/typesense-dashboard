@@ -1,4 +1,4 @@
-import { StopwordsForm } from '@/components';
+import { StopwordsForm } from '@/components/StopwordsForm';
 import { stopwordsFormOpts } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';

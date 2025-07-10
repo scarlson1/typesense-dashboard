@@ -1,4 +1,3 @@
-import { ContextDialog } from '@/components';
 import {
   CONTEXT_DIALOG_DEFAULT_SLOT_PROPS,
   CONTEXT_DIALOG_DEFAULT_SLOTS_COMPONENTS,
@@ -20,6 +19,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { ContextDialog } from './ContextDialog';
 
 interface AwaitingPromise {
   resolve: (values?: any) => void;

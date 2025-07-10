@@ -4,8 +4,10 @@ import {
   HitActions,
   LoadingHits,
 } from '@/components/search';
+import { FacetOption } from '@/components/search/FacetOptions';
+import { Refinements, SortBy } from '@/components/search/SortBy';
 import type { SearchSlotComponents, SearchSlotProps } from '@/context';
-import { Alert, Box, Grid, Pagination, Typography } from '@mui/material';
+import { Alert, Box, Grid, Pagination, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react/jsx-runtime';
 
 export const SEARCH_DEFAULT_SLOTS: SearchSlotComponents = {
@@ -19,6 +21,10 @@ export const SEARCH_DEFAULT_SLOTS: SearchSlotComponents = {
   stats: Typography,
   error: Alert,
   loadingHits: LoadingHits,
+  facetContainer: Stack,
+  facetOption: FacetOption,
+  sortBySelect: SortBy,
+  refinements: Refinements,
 };
 
 export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
@@ -51,5 +57,16 @@ export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
   error: {
     severity: 'warning',
   },
-  // loadingHits: {}
+  facetContainer: {
+    direction: 'column',
+    spacing: 0.75,
+  },
+  facetOption: {
+    size: 'small',
+    sx: { p: 0.5 },
+  },
+  sortBySelect: {
+    multiple: true,
+    size: 'small',
+  },
 };

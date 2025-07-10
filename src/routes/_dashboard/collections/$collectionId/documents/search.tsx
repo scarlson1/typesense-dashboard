@@ -1,9 +1,6 @@
-import {
-  ButtonLink,
-  CollectionProvider,
-  InstantSearch,
-  UpdateSearchParameters,
-} from '@/components';
+import { ButtonLink } from '@/components/ButtonLink';
+import { CollectionProvider } from '@/components/CollectionProvider';
+import { InstantSearch } from '@/components/InstantSearch';
 import {
   ContextHits,
   CtxPageSize,
@@ -14,6 +11,8 @@ import {
   SearchBox,
 } from '@/components/search';
 import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
+import { CtxRefinements } from '@/components/search/SortBy';
+import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
 import { useTypesenseClient } from '@/hooks';
 import {
   AddRounded,
@@ -51,14 +50,6 @@ function SearchCollection() {
       <Typography variant='h3' gutterBottom>
         {collectionId}
       </Typography>
-      <ButtonLink
-        from={Route.path}
-        hash='search-params'
-        endIcon={<ExpandMoreRounded />}
-        size='small'
-      >
-        Search Parameters
-      </ButtonLink>
 
       <CollectionProvider
         client={client}
@@ -69,12 +60,9 @@ function SearchCollection() {
           collectionId={collectionId}
           client={client}
           clusterId={clusterId}
-          // TODO: need to set initial query by params from default index ??
-          // move index above search in component hierarchy ?? pass defaults as prop to InstantSearch ??
         >
           <SearchSlotsProvider
             slots={{
-              stats: Typography, // example (Typography is default component)
               // stats: undefined, // hide slot
               hits: Grid,
               hitWrapper: Grid,
@@ -87,8 +75,10 @@ function SearchCollection() {
                   position: 'absolute',
                   right: '8px',
                   top: '8px',
-                  // backgroundColor: (theme) => theme.vars.palette.background.paper,
-                  backdropFilter: 'blur(8px) opacity(0.84)',
+                  // backgroundColor: theme => alpha(theme.palette.background.paper, 0.6),
+                  bgcolor: 'background.paper',
+                  opacity: 0.8,
+                  backdropFilter: 'blur(8px) opacity(0.87)',
                 },
               },
               // hitWrapper: {
@@ -96,15 +86,34 @@ function SearchCollection() {
               // },
             }}
           >
+            <Stack
+              direction='row'
+              spacing={2}
+              sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <ButtonLink
+                from={Route.path}
+                hash='search-params'
+                endIcon={<ExpandMoreRounded />}
+                size='small'
+              >
+                Search Parameters
+              </ButtonLink>
+              {/* TODO: move filter & sort to popover with icon buttons ?? */}
+              {/* <Box>
+                <Box sx={{ maxWidth: 200 }}>
+                  <SortBy fullWidth />
+                </Box>
+              </Box> */}
+              <CtxRefinements />
+            </Stack>
+
             <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
               <Box>
                 <SearchBox sx={{ my: 1 }} />
                 {/* <SearchStats /> */}
                 <CtxSearchStats />
               </Box>
-
-              {/* <SearchError />
-              <Hits /> */}
               <CtxSearchError />
               <ContextHits />
 
@@ -135,8 +144,6 @@ function SearchCollection() {
                     alignItems: 'center',
                   }}
                 >
-                  {/* <SearchPageSize />
-                  <SearchPagination /> */}
                   <CtxPageSize />
                   <CtxPagination />
                 </Stack>

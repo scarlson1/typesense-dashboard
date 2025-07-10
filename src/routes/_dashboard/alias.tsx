@@ -1,9 +1,6 @@
-import {
-  AliasForm,
-  aliasFormOpts,
-  AliasGrid,
-  ErrorFallback,
-} from '@/components';
+import { ErrorFallback } from '@/components';
+import { AliasForm, aliasFormOpts } from '@/components/AliasForm';
+import { AliasGrid } from '@/components/AliasGrid';
 import { aliasQueryKeys, collectionQueryKeys } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';

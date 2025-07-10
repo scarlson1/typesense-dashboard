@@ -69,13 +69,17 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
     );
   }, [displayFields, hit]);
 
+  const image = imgField ? hit?.document[imgField] : null;
+
+  // console.log('HIT: ', hit);
+
   return (
     <Card
       sx={{
         position: 'relative',
       }}
     >
-      {imgField ? (
+      {Boolean(image) ? (
         <CardMedia
           component='img'
           sx={{
@@ -83,7 +87,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
             // objectFit: 'cover',
             // backgroundSize: 'cover',
           }}
-          image={imgField}
+          image={image}
           title='hit image'
         />
       ) : null}
@@ -137,23 +141,21 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           >
             text_match_info
           </HitLabel>
-          {Object.entries(hit?.text_match_info as Record<string, any>).map(
-            ([key, value], i) => (
-              <Stack
-                direction='row'
-                spacing={3}
-                key={key}
-                sx={{ display: 'flex', mt: i === 0 ? 2 : 0 }}
-              >
-                <HitLabel>{key}</HitLabel>
-                <HitValue>
-                  {typeof value === 'string' || typeof value === 'number'
-                    ? value
-                    : JSON.stringify(value)}
-                </HitValue>
-              </Stack>
-            )
-          )}
+          {Object.entries(hit?.text_match_info || {}).map(([key, value], i) => (
+            <Stack
+              direction='row'
+              spacing={3}
+              key={key}
+              sx={{ display: 'flex', mt: i === 0 ? 2 : 0 }}
+            >
+              <HitLabel>{key}</HitLabel>
+              <HitValue>
+                {typeof value === 'string' || typeof value === 'number'
+                  ? value
+                  : JSON.stringify(value)}
+              </HitValue>
+            </Stack>
+          ))}
         </CardContent>
       </Collapse>
 

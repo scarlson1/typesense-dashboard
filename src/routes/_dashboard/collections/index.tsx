@@ -1,4 +1,6 @@
-import { ButtonLink, CollectionsGrid, ErrorFallback } from '@/components';
+import { ErrorFallback } from '@/components';
+import { ButtonLink } from '@/components/ButtonLink';
+import { CollectionsGrid } from '@/components/CollectionsGrid';
 import { Box, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';

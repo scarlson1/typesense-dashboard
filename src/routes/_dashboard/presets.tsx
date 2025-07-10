@@ -1,4 +1,4 @@
-import { PresetsList } from '@/components';
+import { PresetsList } from '@/components/PresetsList';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';

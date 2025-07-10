@@ -1,7 +1,6 @@
-import { useContext } from 'react';
-
-import type { DialogCtx } from '@/components';
+import type { DialogCtx } from '@/components/DialogContext';
 import { DialogContext } from '@/context';
+import { useContext } from 'react';
 
 export const useDialog = () => {
   const context = useContext(DialogContext);

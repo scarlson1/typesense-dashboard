@@ -1,6 +1,6 @@
 # Typesense Dashboard
 
-A dashboard to manage [Typesense](https://typesense.org/)
+A dashboard to manage self hosted or local [Typesense](https://typesense.org/) instances.
 
 ## Usage
 
@@ -9,6 +9,8 @@ A dashboard to manage [Typesense](https://typesense.org/)
 As a web application, only typesense server started with `--enable-cors` will work.
 
 Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally.
+
+Use an admin key to authenticate.
 
 ### Docker
 
@@ -50,3 +52,16 @@ export default tseslint.config({
   },
 });
 ```
+
+## Limitations
+
+TODO
+
+## TODO
+
+- Tests
+- [Filter operators](https://typesense.org/docs/guide/tips-for-filtering.html#available-operators)
+- [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
+- [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
+- Search result view customization
+- Improve search implementation
