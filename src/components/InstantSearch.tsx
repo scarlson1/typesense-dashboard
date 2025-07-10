@@ -93,6 +93,7 @@ export function InstantSearch<T extends DocumentSchema>({
       setPreset,
       setPagination,
       pageSizeOptions,
+      debouncedQuery,
     }),
     [
       data,
@@ -108,6 +109,7 @@ export function InstantSearch<T extends DocumentSchema>({
       setPreset,
       setPagination,
       pageSizeOptions,
+      debouncedQuery,
     ]
   );
 
