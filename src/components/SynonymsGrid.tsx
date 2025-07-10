@@ -146,23 +146,6 @@ export const SynonymsGrid = ({ collectionId }: SynonymsGridProps) => {
             }
             onClick={async () => {
               mutation.mutate(params.row.id);
-              // try {
-              //   await dialog.prompt({
-              //     variant: 'danger',
-              //     catchOnCancel: true,
-              //     title: `Confirm API Key Deletion [ID: ${params.id.toString()}]`,
-              //     description: `THIS ACTION CANNOT BE UNDONE. Please confirm whether you'd like to delete API Key with prefix ${params.row.value_prefix}`,
-              //     // content: <div dangerouslySetInnerHTML={{ __html: disclosureHTML }} />,
-              //     slotProps: {
-              //       dialog: {
-              //         maxWidth: 'sm',
-              //       },
-              //     },
-              //   });
-              //   mutation.mutate(params.row.id);
-              // } catch (err) {
-              //   console.log(`confirmation exited`);
-              // }
             }}
             label='Delete Synonyms'
             disabled={mutation.isPending}

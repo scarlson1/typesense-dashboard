@@ -87,14 +87,6 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       if (awaitingPromiseRef.current)
         awaitingPromiseRef.current.resolve(values);
 
-      // TODO: accept optional onSuccessComponent to display after dialog is complete ??
-      // if (awaitingPromiseRef.current) {
-      //   awaitingPromiseRef.current.resolve(values);
-      //   // show success view instead of closing dialog if provided
-      //   console.log(`show success view: `, dialogOptions?.successView);
-      //   if (dialogOptions?.successView) return;
-      // }
-
       setDialogOptions(null);
     },
     [awaitingPromiseRef]

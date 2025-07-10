@@ -39,7 +39,6 @@ export const useDeleteDocument = (props?: UseDeleteDocumentProps) => {
       props?.onError && props.onError(err, vars, ctx);
     },
     onSettled: (data, err, vars, ctx) => {
-      console.log(data);
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.collection(clusterId, vars.collectionId),
       });

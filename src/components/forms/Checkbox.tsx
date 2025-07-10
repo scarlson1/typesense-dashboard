@@ -8,11 +8,7 @@ interface CheckboxProps
 }
 
 export function Checkbox({ label, ...props }: CheckboxProps) {
-  // Use the context returned from `createFormHookContexts`
   const { state, handleBlur, handleChange } = useFieldContext<boolean>();
-  // const errors = useStore(store, (state) => state.metaCheckbox
-  // console.log('state: ', state);
-  // console.log('store: ', store);
 
   return (
     <FormControlLabel

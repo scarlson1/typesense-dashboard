@@ -36,8 +36,7 @@ export function UpdateAnalyticsRule({
         id: `rule-updated-${vars.name}`,
       });
     },
-    onSuccess: (data, vars, ctx) => {
-      console.log(data, vars, ctx);
+    onSuccess: (_, vars) => {
       toast.success(`analytics rule saved`, {
         id: `rule-updated-${vars.name}`,
       });
@@ -72,7 +71,7 @@ export function UpdateAnalyticsRule({
           name,
           schema,
         });
-        console.log('RESETTING FORM...', res);
+
         form.reset();
       } catch (err) {}
     },

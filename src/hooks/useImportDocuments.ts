@@ -49,7 +49,6 @@ export const useImportDocuments = (options?: UseImportDocuments) => {
     },
     onSuccess: (data, vars, ctx) => {
       // TODO: import will always return 200 --> need to handle success/error for each doc
-      console.log('lines: ', data);
       setResults(data);
 
       const successCount = data.reduce(

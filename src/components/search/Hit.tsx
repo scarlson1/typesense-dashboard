@@ -71,8 +71,6 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
 
   const image = imgField ? hit?.document[imgField] : null;
 
-  // console.log('HIT: ', hit);
-
   return (
     <Card
       sx={{
