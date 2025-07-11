@@ -23,6 +23,7 @@ export const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions
       // previewMode: 'prefix',
       // maxVisibleSuggestions: 12,
     },
+    padding: { top: 10, bottom: 10 },
   };
 
 export const COLLECTION_SCHEMA = z.toJSONSchema(collectionSchema);

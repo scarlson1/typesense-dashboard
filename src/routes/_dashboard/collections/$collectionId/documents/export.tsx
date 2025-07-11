@@ -1,6 +1,6 @@
 import { typesenseStore } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Link, Paper, Typography } from '@mui/material';
+import { Box, Link, Paper, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useStore } from 'zustand';
@@ -27,7 +27,7 @@ function RouteComponent() {
   let collection = collectionId || '[COLLECTION_NAME]';
 
   return (
-    <>
+    <Box sx={{ maxWidth: 920 }}>
       <Typography variant='h3' gutterBottom>
         Export Documents
       </Typography>
@@ -79,6 +79,6 @@ function RouteComponent() {
           >{`"${protocol}://${node}${port}/collections/${collection}/documents/export" > documents-export-${collection}-${formattedDate}.jsonl`}</code>
         </Typography>
       </Paper>
-    </>
+    </Box>
   );
 }

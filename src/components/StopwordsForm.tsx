@@ -6,8 +6,8 @@ export const StopwordsForm = withForm({
   ...stopwordsFormOpts,
   render: ({ form }) => {
     return (
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6, md: 5 }}>
+      <Grid container columnSpacing={2} rowSpacing={1}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <form.AppField name='stopwordId'>
             {({ TextField }) => (
               <TextField
@@ -21,7 +21,7 @@ export const StopwordsForm = withForm({
             )}
           </form.AppField>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 5 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <form.AppField name='stopwords'>
             {({ TextField }) => (
               <TextField
@@ -36,7 +36,7 @@ export const StopwordsForm = withForm({
             )}
           </form.AppField>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <form.AppField name='locale'>
             {({ TextField }) => (
               <TextField
@@ -50,8 +50,7 @@ export const StopwordsForm = withForm({
             )}
           </form.AppField>
         </Grid>
-
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{ xs: 12, md: 'auto' }}>
           <form.AppForm>
             <form.SubmitButton label='Add' />
           </form.AppForm>

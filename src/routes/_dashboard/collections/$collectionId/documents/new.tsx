@@ -68,7 +68,7 @@ function RouteComponent() {
   let collection = collectionId || '[COLLECTION_NAME]';
 
   return (
-    <>
+    <Box sx={{ maxWidth: 920 }}>
       <Box sx={{ py: 2 }}>
         <Typography variant='h3' gutterBottom>
           Add Documents
@@ -222,7 +222,7 @@ function RouteComponent() {
           <NewDocumentEditor />
         </Box>
       </Box>
-    </>
+    </Box>
   );
 }
 
