@@ -10,7 +10,7 @@ Reference the [Typesense installation docs](https://typesense.org/docs/guide/ins
 
 As a web application, only typesense server started with `--enable-cors` will work.
 
-Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). Reference for create a certificate: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
+Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). Reference: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
 
 Use an admin key to authenticate. Cluster credentials are stored in session storage and will be removed when the window is closed.
 
