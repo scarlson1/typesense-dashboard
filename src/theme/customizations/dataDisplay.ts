@@ -5,7 +5,6 @@ export const dataDisplayCustomizations: Components<Theme> = {
     styleOverrides: {
       root: {
         borderRadius: '8px',
-        // border: '1px solid grey',
       },
     },
   },
