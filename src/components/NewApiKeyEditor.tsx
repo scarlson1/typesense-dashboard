@@ -88,7 +88,7 @@ const NewApiKeyEditor = ({
   });
 
   // TODO: need to use editorRef.current.updateOptions ??
-  const mergedOptions = useMemo(
+  const mergedOptions: editor.IStandaloneEditorConstructionOptions = useMemo(
     () => ({
       ...DEFAULT_MONACO_OPTIONS,
       ...options,
@@ -132,7 +132,7 @@ const NewApiKeyEditor = ({
 
   return (
     <Box>
-      <Paper>
+      <Paper sx={{ borderRadius: 1, overflow: 'hidden' }}>
         <Editor
           height='260px'
           defaultLanguage='json'

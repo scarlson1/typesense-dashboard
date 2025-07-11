@@ -95,7 +95,7 @@ function CollectionSettings() {
   }, [data]);
 
   return (
-    <>
+    <Box sx={{ maxWidth: 920 }}>
       <Typography variant='h3'>{collectionId}</Typography>
       <Stack
         direction='row'
@@ -128,7 +128,7 @@ function CollectionSettings() {
           />
         </Suspense>
       </Box>
-    </>
+    </Box>
   );
 }
 

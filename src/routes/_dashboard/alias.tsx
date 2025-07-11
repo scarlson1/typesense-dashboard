@@ -28,7 +28,7 @@ export const Route = createFileRoute('/_dashboard/alias')({
 
 function RouteComponent() {
   return (
-    <Box>
+    <Box sx={{ maxWidth: 920 }}>
       <Typography variant='h3' gutterBottom>
         Aliases
       </Typography>

@@ -1,7 +1,12 @@
 import { DialogProvider } from '@/components/DialogContext';
 import { Toaster } from '@/components/Toaster';
 import { AppTheme } from '@/context';
-import { dataGridCustomizations } from '@/theme/customizations';
+import {
+  dataDisplayCustomizations,
+  dataGridCustomizations,
+  inputCustomizations,
+  surfacesCustomizations,
+} from '@/theme/customizations';
 import { CssBaseline } from '@mui/material';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
@@ -27,6 +32,9 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 const xThemeComponents = {
+  ...surfacesCustomizations,
+  ...inputCustomizations,
+  ...dataDisplayCustomizations,
   // ...chartsCustomizations,
   ...dataGridCustomizations,
   // ...datePickersCustomizations,
@@ -40,15 +48,9 @@ function RootComponent(props: { disableCustomTheme?: boolean }) {
     <>
       <AppTheme {...props} themeComponents={xThemeComponents}>
         <CssBaseline enableColorScheme />
-        {/* <CollectionProvider
-          client={client}
-          // collectionId={collectionId}
-          clusterId={clusterId}
-        > */}
         <DialogProvider>
           <Outlet />
         </DialogProvider>
-        {/* </CollectionProvider> */}
         <Toaster />
       </AppTheme>
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
