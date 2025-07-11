@@ -4,6 +4,7 @@ import { SideMenu } from '@/components/SideMenu';
 import { typesenseStore } from '@/utils';
 import { alpha, Box, Stack } from '@mui/material';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+console.log('test');
 
 function isAuthenticated() {
   const creds = typesenseStore.getState().credentials;
