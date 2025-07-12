@@ -44,7 +44,7 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ github.repository }}
-            spencercarlson/${{ env.IMAGE_NAME }}
+            spencercarlson/${{ github.event.repository.name }}
 
       - name: Build and push Docker image
         id: push
