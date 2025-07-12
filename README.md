@@ -30,8 +30,13 @@ $ docker run -d -p 80:80 typesense-dashboard
 
 ```bash
 docker pull spencercarlson/typesense-dashboard
+# or
 docker run -d -p 443:443 spencercarlson/typesense-dashboard
-docker run -d -p 80:80 ghcr.io/scarlson1/typesense-dashboard:latest
+```
+
+To use the latest pre-built docker image:
+```bash
+docker run -d -p 443:443 ghcr.io/scarlson1/typesense-dashboard:latest
 ```
 
 ```bash

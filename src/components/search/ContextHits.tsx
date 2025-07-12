@@ -52,6 +52,17 @@ function CtxHitWrapper(props: { children?: ReactNode }) {
 
 CtxHits.HitWrapper = CtxHitWrapper;
 
+// need to pass props --> render in CtxHit (or could pass render fn prop ??)
+
+// function CtxHitActions({docData, docId, ...props}: HitActionsProps) {
+//   const [slots, slotProps] = useSearchSlots();
+
+//   return slots?.hitActions ? (
+//     <slots.hitActions docData={docData} docId={docId} {...props} {...slotProps?.hitActions || {}} />
+//   ) : null;
+// }
+// CtxHits.HitActions = CtxHitActions
+
 function CtxHit(props: { children?: ReactNode }) {
   const hits = useHits();
   const [slots, slotProps] = useSearchSlots();

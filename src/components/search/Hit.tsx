@@ -17,7 +17,6 @@ import type {
   DocumentSchema,
   SearchResponseHit,
 } from 'typesense/lib/Typesense/Documents';
-import { HitActions } from './HitActions';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -76,6 +75,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
       sx={{
         position: 'relative',
         border: (theme) => `1px solid ${theme.vars.palette.divider}`,
+        pb: 1.25,
       }}
     >
       {Boolean(image) ? (
@@ -90,7 +90,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           title='hit image'
         />
       ) : null}
-      <CardContent sx={{ pb: 2 }}>
+      <CardContent sx={{ pb: 1.5 }}>
         <Stack direction='row' spacing={3} sx={{ display: 'flex', pb: 1.5 }}>
           <HitLabel>ID</HitLabel>
           <HitValue> {hit?.document.id}</HitValue>
@@ -119,7 +119,10 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
       </CardContent>
       <CardActions
         disableSpacing
-        sx={{ borderTop: (theme) => `1px solid ${theme.palette.divider}` }}
+        sx={{
+          borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+          pt: 0.75,
+        }}
       >
         <ExpandMore
           expand={expanded}
@@ -127,6 +130,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           aria-expanded={expanded}
           aria-label='show stats'
           size='small'
+          edge='end'
         >
           <ExpandMoreRounded fontSize='inherit' />
         </ExpandMore>
@@ -158,7 +162,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
         </CardContent>
       </Collapse>
 
-      <HitActions docId={hit.document.id} docData={hit.document} />
+      {/* <HitActions docId={hit.document.id} docData={hit.document} /> */}
       {children}
     </Card>
   );
@@ -201,101 +205,3 @@ function HitValue({ children, ...props }: TypographyProps) {
     </Typography>
   );
 }
-
-// export function Hit({ hit, children, displayFields, imgField }: HitProps) {
-//   let displayFieldsArr = useMemo(() => {
-//     if (!displayFields?.length) return Object.entries(hit?.document);
-
-//     return Object.entries(hit?.document).filter(([field]) =>
-//       displayFields.includes(field)
-//     );
-//   }, [displayFields, hit]);
-
-//   return (
-//     <Paper
-//       sx={{
-//         p: { xs: 3, sm: 4, md: 5 },
-//         position: 'relative',
-//       }}
-//     >
-//       {imgField ? (
-//         // <img
-//         //   src={imgField}
-//         //   style={{ borderRadius: '10px', objectFit: 'cover' }}
-//         //   height={100}
-//         //   width={100}
-//         // />
-//         <CardMedia
-//           component='img'
-//           sx={{ height: 100, objectFit: 'cover', backgroundSize: 'cover' }}
-//           image={imgField}
-//           title='green iguana'
-//         />
-//       ) : null}
-//       <Stack
-//         direction='column'
-//         spacing={1}
-//         sx={{ maxHeight: 300, overflowX: 'auto' }}
-//       >
-//         {displayFieldsArr.map(([key, value]) => (
-//           <Stack direction='row' spacing={3} key={key} sx={{ display: 'flex' }}>
-//             <HitLabel>{key}</HitLabel>
-//             <Typography
-//               variant='body2'
-//               sx={{
-//                 textOverflow: 'ellipsis',
-//                 overflow: 'hidden',
-//                 whiteSpace: 'nowrap',
-//               }}
-//             >
-//               {typeof value === 'string' || typeof value === 'number'
-//                 ? value
-//                 : JSON.stringify(value)}
-//             </Typography>
-//           </Stack>
-//         ))}
-//         <HitLabel variant='overline'>text_match_info</HitLabel>
-//         {Object.entries(hit?.text_match_info as Record<string, any>).map(
-//           ([key, value], i) => (
-//             <Stack
-//               direction='row'
-//               spacing={3}
-//               key={key}
-//               sx={{ display: 'flex', mt: i === 0 ? 2 : 0 }}
-//             >
-//               <HitLabel>{key}</HitLabel>
-//               <Typography
-//                 variant='body2'
-//                 sx={{
-//                   textOverflow: 'ellipsis',
-//                   overflow: 'hidden',
-//                   whiteSpace: 'nowrap',
-//                 }}
-//               >
-//                 {typeof value === 'string' || typeof value === 'number'
-//                   ? value
-//                   : JSON.stringify(value)}
-//               </Typography>
-//             </Stack>
-//           )
-//         )}
-//         <Stack direction='row' spacing={3} sx={{ display: 'flex', mt: 2 }}>
-//           <HitLabel>ID</HitLabel>
-//           <Typography
-//             variant='body2'
-//             sx={{
-//               textOverflow: 'ellipsis',
-//               overflow: 'hidden',
-//               whiteSpace: 'nowrap',
-//             }}
-//           >
-//             {hit?.document.id}
-//           </Typography>
-//         </Stack>
-//       </Stack>
-
-//       <HitActions docId={hit.document.id} docData={hit.document} />
-//       {children}
-//     </Paper>
-//   );
-// }
