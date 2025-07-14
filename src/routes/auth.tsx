@@ -95,10 +95,10 @@ function AuthComponent() {
     ...authFormOpts,
     onSubmit: async ({ value: { node, port, protocol, apiKey, env } }) => {
       let creds = {
-        node,
-        port: Number(port),
+        node: node.trim(),
+        port: Number(port.trim()),
         protocol,
-        apiKey,
+        apiKey: apiKey.trim(),
         env: env as Environment,
       };
       const client = getTypesenseClient(creds);

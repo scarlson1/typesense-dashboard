@@ -1,19 +1,17 @@
 import { apiKeyQueryKeys, DEFAULT_MONACO_OPTIONS } from '@/constants';
-import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { useAsyncToast, useDialog, useTypesenseClient } from '@/hooks';
 import { typesenseActions } from '@/types';
 import { queryClient } from '@/utils';
-import {
-  Editor,
-  type EditorProps,
-  type Monaco,
-  type OnMount,
-} from '@monaco-editor/react';
-import { Box, Button, Paper, useColorScheme } from '@mui/material';
+import { type EditorProps, type OnMount } from '@monaco-editor/react';
+import { Box, Button, Paper } from '@mui/material';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { editor } from 'monaco-editor';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { lazy, useCallback, useMemo, useRef, useState } from 'react';
 import type { KeyCreateSchema } from 'typesense/lib/Typesense/Key';
 import { toJSONSchema, z } from 'zod/v4';
+import { Copy } from './Copy';
+
+const JsonEditor = lazy(() => import('./JsonEditor'));
 
 const createKeySchema = z.object({
   actions: z.array(typesenseActions),
@@ -33,6 +31,7 @@ type UseNewApiKeyProps = Omit<
 const useCreateApiKey = (props?: UseNewApiKeyProps) => {
   const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
+  const dialog = useDialog();
 
   const { onSuccess, onError, ...rest } = props || {};
 
@@ -43,6 +42,29 @@ const useCreateApiKey = (props?: UseNewApiKeyProps) => {
       toast.success('API key created', { id: 'new-api-key' });
       queryClient.invalidateQueries({
         queryKey: apiKeyQueryKeys.all(clusterId),
+      });
+
+      dialog.prompt({
+        variant: 'info',
+        catchOnCancel: false,
+        title: 'Copy new key',
+        description:
+          "Please copy the key below. IT CANNOT BE RETRIEVED LATER. If you lose the key, you'll need to create a new one.",
+        content: (
+          <Copy
+            value={data.value}
+            textProps={{ color: 'textPrimary' }}
+            buttonProps={{ color: 'primary' }}
+          >
+            {data.value}
+          </Copy>
+        ),
+        slotProps: {
+          dialog: {
+            maxWidth: 'xs',
+            fullWidth: true,
+          },
+        },
       });
 
       onSuccess && onSuccess(data, vars, {});
@@ -71,9 +93,9 @@ const NewApiKeyEditor = ({
   ...props
 }: NewApiKeyEditorProps) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
-  const monacoRef = useRef<Monaco>(null);
-  const { mode, systemMode } = useColorScheme();
-  const themeMode = mode === 'system' ? systemMode : mode;
+  // const monacoRef = useRef<Monaco>(null);
+  // const { mode, systemMode } = useColorScheme();
+  // const themeMode = mode === 'system' ? systemMode : mode;
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
   const toast = useAsyncToast();
 
@@ -97,24 +119,22 @@ const NewApiKeyEditor = ({
     [options, mutation.isPending]
   ); // merge nested objects ??
 
-  // reset editor onSuccess
-
-  const handleEditorDidMount: OnMount = (editor, monaco) => {
+  const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
-    monacoRef.current = monaco;
-    setTimeout(() => {
-      editor.getAction('editor.action.formatDocument')?.run();
-      monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-        validate: true,
-        schemas: [
-          {
-            uri: '',
-            fileMatch: ['*'], // associate with any file
-            schema: createKeySchemaJson,
-          },
-        ],
-      });
-    }, 200);
+    // monacoRef.current = monaco;
+    // setTimeout(() => {
+    //   editor.getAction('editor.action.formatDocument')?.run();
+    //   monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+    //     validate: true,
+    //     schemas: [
+    //       {
+    //         uri: '',
+    //         fileMatch: ['*'], // associate with any file
+    //         schema: createKeySchemaJson,
+    //       },
+    //     ],
+    //   });
+    // }, 200);
   };
 
   const handleSave = useCallback(() => {
@@ -133,16 +153,16 @@ const NewApiKeyEditor = ({
   return (
     <Box>
       <Paper sx={{ borderRadius: 1, overflow: 'hidden' }}>
-        <Editor
+        <JsonEditor
           height='260px'
-          defaultLanguage='json'
-          theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
+          // theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
           onMount={handleEditorDidMount}
           defaultValue={defaultValue}
           onValidate={(m) => {
             setMarkers(m);
           }}
           options={mergedOptions}
+          schema={createKeySchemaJson}
           // loading={<Skeleton variant='rounded' height={'100%'} />}
           {...props}
         />

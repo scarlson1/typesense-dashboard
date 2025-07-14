@@ -81,6 +81,6 @@ export const apiKeyColumns: GridColDef<KeySchema>[] = [
     valueGetter: (_, row) =>
       row.expires_at ? new Date(row.expires_at * 1000) : null,
     renderCell: (params) =>
-      params.value ? format(params.value, 'MM/dd/yy') : '',
+      params.value ? format(params.value, 'MM/dd/yyyy') : '',
   },
 ];
