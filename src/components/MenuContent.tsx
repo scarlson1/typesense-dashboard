@@ -1,5 +1,6 @@
 import { collectionQueryKeys } from '@/constants';
 import { usePrevious, useTypesenseClient } from '@/hooks';
+import { useMutationObservable } from '@/hooks/useMutationObservable';
 import {
   AddRounded,
   AutoFixHighRounded,
@@ -34,6 +35,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
+import { animated, useSpring } from '@react-spring/web';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import type {
   AnyContext,
@@ -56,6 +58,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -115,6 +118,173 @@ export const RouterListItemButton: LinkComponent<
   typeof RouterListItemButtonComponent
 > = (props) => {
   return <CreatedLinkComponent preload={'intent'} {...props} />;
+};
+
+const TestListItemButton = ({
+  children,
+  setSelected,
+  setSelectedId,
+  selectedId,
+  selected,
+}: {
+  children: ReactNode;
+  setSelected: (el: HTMLDivElement | null, id?: string | null) => void;
+  setSelectedId: (id: string | null) => void;
+  selectedId: string;
+  selected: boolean;
+}) => {
+  let testRef = useRef<HTMLDivElement>(null);
+
+  const handleClassChange = useCallback(
+    (mutations: MutationRecord[], observer: MutationObserver) => {
+      console.log(mutations, observer);
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const currentState = (mutation.target as Element).classList.contains(
+            'Mui-selected'
+          );
+          console.log(`'Mui-selected': ${currentState}`);
+          if (currentState && testRef.current)
+            setSelected(testRef.current, selectedId);
+          else {
+            setSelected(null);
+          }
+        }
+      });
+    },
+    [selectedId]
+  );
+
+  useMutationObservable(testRef, handleClassChange);
+
+  const handleClick = () => {
+    console.log('clicked');
+    setSelectedId(selected ? null : selectedId);
+  };
+
+  return (
+    <ListItemButton
+      ref={testRef}
+      component='div'
+      selected={selected}
+      onClick={() => handleClick()}
+      sx={{ zIndex: 11 }}
+    >
+      {children}
+    </ListItemButton>
+  );
+};
+
+const TestAnimation = () => {
+  // const selectedRef = useRef<HTMLDivElement>(null);
+  const animatedRef = useRef<HTMLDivElement>(null);
+  const [selectedEl, setSelectedEl] = useState<HTMLDivElement | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [props, api] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    height: 26,
+    width: 222,
+    opacity: Boolean(selectedEl) ? 1 : 0,
+  }));
+  // usePrevious for "to" and "from" ??
+  const prevEl = usePrevious(selectedEl);
+
+  useEffect(() => {
+    if (!selectedEl) {
+      api.start({
+        to: { opacity: 0 },
+      });
+      return;
+    }
+    const { x, y } = selectedEl.getBoundingClientRect() || {};
+
+    console.log(
+      'X Y: ',
+      x,
+      y,
+      selectedEl.clientHeight,
+      selectedEl.clientWidth,
+      selectedEl.offsetLeft,
+      selectedEl.offsetTop
+    );
+
+    const prev = prevEl?.getBoundingClientRect();
+    console.log('PREV: ', prevEl);
+    console.log('PREV RECT; ', prev);
+
+    const targetRect = selectedEl.getBoundingClientRect();
+    const referenceRect =
+      animatedRef.current?.getBoundingClientRect() || ({} as DOMRect);
+
+    const relativeX = targetRect.left - referenceRect?.left || 0;
+    const relativeY = targetRect.top - referenceRect?.top || 0;
+
+    console.log('relativeX; relativeY: ', relativeX, relativeY);
+
+    if (x && y)
+      api.start({
+        to: {
+          x: selectedEl.offsetLeft, // relativeX, //: 0,
+          y: selectedEl.offsetTop, // relativeY, //: 0,
+          height: selectedEl.clientHeight,
+          width: selectedEl.clientWidth,
+          opacity: 1,
+        },
+      });
+  }, [prevEl, selectedEl]);
+
+  const handleNewSelected = (el: HTMLDivElement | null, id?: string | null) => {
+    setSelectedEl(el || null);
+    setSelectedId(id ?? null);
+    // const { x, y } = el.getBoundingClientRect() || {};
+    // console.log('X Y: ', x, y, el.clientHeight, el.clientWidth);
+    // if (x && y)
+    //   api.start({ x, y, height: el.clientHeight, width: el.clientWidth }); // Animate to target's x and y
+  };
+
+  // props.x.
+
+  return (
+    <>
+      <List dense sx={{ position: 'relative' }}>
+        <TestListItemButton
+          setSelected={handleNewSelected}
+          setSelectedId={(id: string | null) => setSelectedId(id)}
+          selectedId={'1'}
+          selected={selectedId === '1'}
+        >
+          Test 1
+        </TestListItemButton>
+        <TestListItemButton
+          setSelected={handleNewSelected}
+          setSelectedId={(id: string | null) => setSelectedId(id)}
+          selectedId={'2'}
+          selected={selectedId === '2'}
+          // selected={selectedEl === this}
+        >
+          Test 2
+        </TestListItemButton>
+        <animated.div
+          ref={animatedRef}
+          style={{
+            // width: '222px',
+            // height: '29px',
+            top: 0,
+            left: 0,
+            background: 'red',
+            position: 'absolute',
+            zIndex: 10,
+            ...props,
+            // transform: props.y.to((y) => `translateY(${y}px)`),
+            // transform: props.x.to(
+            //   (x) => `translate3d(${x}px, ${props.y.get()}px, 0)`
+            // ),
+          }}
+        />
+      </List>
+    </>
+  );
 };
 
 export function MenuContent() {
@@ -318,6 +488,8 @@ export function MenuContent() {
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
       <List dense>
+        {/* <TestListItemButton>Test</TestListItemButton> */}
+        <TestAnimation />
         {mainListItems.map((item, i) => (
           <Fragment key={i}>
             <ListItem disablePadding sx={{ display: 'block' }}>

@@ -25,8 +25,8 @@ export const useUpdateDocument = (props: UseUpdateDocumentProps) => {
     UpdateDocArgs
   >({
     toastId: 'update-doc',
-    loadingMsg: 'test loading...',
-    successMsg: 'success',
+    loadingMsg: 'updating document...',
+    successMsg: 'doc updated',
     errorMsg: (err) => err.message ?? 'failed to update document',
   });
 
