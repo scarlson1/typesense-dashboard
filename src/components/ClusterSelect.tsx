@@ -133,7 +133,7 @@ export function ClusterSelect() {
         let cred = val ? credentials[val] : null;
 
         return (
-          <MenuItem disableGutters>
+          <MenuItem disableGutters sx={{ maxWidth: '100%' }}>
             <ListItemAvatar sx={{ px: 1, mr: 0 }}>
               <Avatar alt={cred ? cred.env || cred.node : 'No Cluster'}>
                 {getEnvAvatar(cred?.env)}

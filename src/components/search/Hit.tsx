@@ -75,14 +75,15 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
       sx={{
         position: 'relative',
         border: (theme) => `1px solid ${theme.vars.palette.divider}`,
-        pb: 1.25,
+        // pb: 1.25,
       }}
     >
       {Boolean(image) ? (
         <CardMedia
-          component='img'
+          // component='img'
           sx={{
             height: { xs: 100, md: 120 },
+            mb: 1,
             // objectFit: 'cover',
             // backgroundSize: 'cover',
           }}
@@ -136,11 +137,19 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
         </ExpandMore>
       </CardActions>
       <Collapse in={expanded} timeout='auto' unmountOnExit>
-        <CardContent>
+        <CardContent
+          sx={{
+            pb: 2,
+            pt: 0.5,
+            [`& .MuiCardContent-root:last-child`]: {
+              pb: `10px !important`,
+            },
+          }}
+        >
           <HitLabel
             variant='overline'
             component='div'
-            sx={{ textAlign: 'center' }}
+            sx={{ textAlign: 'center', lineHeight: '1.5rem' }}
           >
             text_match_info
           </HitLabel>
@@ -149,7 +158,8 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
               direction='row'
               spacing={3}
               key={key}
-              sx={{ display: 'flex', mt: i === 0 ? 2 : 0 }}
+              // sx={{ display: 'flex', mt: i === 0 ? 2 : 0 }}
+              sx={{ display: 'flex' }}
             >
               <HitLabel>{key}</HitLabel>
               <HitValue>
