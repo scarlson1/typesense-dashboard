@@ -14,6 +14,7 @@ services:
         - path: package.json
           action: rebuild
 
+  # optionally start up typesense cluster for development
   typesense:
     image: typesense/typesense:29.0
     restart: on-failure
@@ -32,6 +33,7 @@ services:
     # command: '--data-dir=/data --api-key=xyz --enable-cors'
     command: '--data-dir=/data --api-key=xyz --enable-cors --api-port=443 --ssl-certificate=/etc/ssl/certs/typesense.dev.crt --ssl-certificate-key=/etc/ssl/certs/typesense.dev.key'
 
+  # optionally run ngrok image for https (if connecting to github pages etc.)
   # ngrok:
   #   image: ngrok/ngrok:latest
   #   command:

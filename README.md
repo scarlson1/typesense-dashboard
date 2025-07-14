@@ -10,9 +10,19 @@ Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesens
 
 As a web application, only typesense server started with `--enable-cors` will work.
 
-Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). Reference: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
-
 Use an admin key to authenticate. Cluster credentials are stored in session storage and will be removed when the window is closed.
+
+Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https). Self-signed certificate reference: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
+
+You can use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
+
+```bash
+ngrok http https://localhost:443
+# OR use ngrok's docker image:
+docker run -it -e NGROK_AUTHTOKEN=[YOUR_NGROK_TOKEN] ngrok/ngrok:latest http host.docker.internal:443
+```
+
+Then use the address displayed in your console under "Forwarding" as the node when connecting your cluster (ex: f4ab4aad2e7b.ngrok-free.app). [Ngrok docs](https://ngrok.com/docs/using-ngrok-with/docker/)
 
 ### Docker
 
@@ -58,10 +68,9 @@ TODO
 - [Filter operators](https://typesense.org/docs/guide/tips-for-filtering.html#available-operators)
 - [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
 - [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
-- Search result view customization
+- Search results view customization
 - Improve search implementation
 - Delete documents by query
-- Account options on auth page
 
 ## Screenshots
 
