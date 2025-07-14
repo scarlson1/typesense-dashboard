@@ -9,10 +9,10 @@ import {
   Typography,
 } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ClusterSelect } from './ClusterSelect';
 import { ErrorFallback } from './ErrorFallback';
 import { MenuContent } from './MenuContent';
 import OptionsMenu from './OptionsMenu';
-import { SelectContent } from './SelectContent';
 
 const drawerWidth = 240;
 
@@ -52,7 +52,7 @@ export function SideMenu() {
           p: 1.5,
         }}
       >
-        <SelectContent />
+        <ClusterSelect />
       </Box>
       <Divider />
       <Box
