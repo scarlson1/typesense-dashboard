@@ -2,7 +2,7 @@
 
 A dashboard to manage self hosted or local [Typesense](https://typesense.org/) instances.
 
-Reference the [Typesense installation docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
+Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
 ## Usage
 
