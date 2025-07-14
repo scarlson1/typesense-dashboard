@@ -65,11 +65,7 @@ export const CtxFacetOption = (props: CtxFacetOptionProps) => {
   const [slots, slotProps] = useSearchSlots();
 
   return slots.facetOption ? (
-    <slots.facetOption
-      {...slotProps?.facetOption}
-      {...props}
-      // onChange={handleChange}
-    />
+    <slots.facetOption {...slotProps?.facetOption} {...props} />
   ) : null;
 };
 
@@ -116,7 +112,6 @@ export const CtxFacetOptions = () => {
     [params]
   );
 
-  //
   const mergedFacets = useMemo(() => {
     return facetCounts?.map((facet: SearchResponseFacetCountSchema<object>) => {
       let filteredFacet = data?.facet_counts?.find(

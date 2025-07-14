@@ -3,9 +3,10 @@ import {
   Hit,
   HitActions,
   LoadingHits,
+  Refinements,
 } from '@/components/search';
 import { FacetOption } from '@/components/search/FacetOptions';
-import { Refinements, SortBy } from '@/components/search/SortBy';
+import { SortBy } from '@/components/search/SortBy';
 import type { SearchSlotComponents, SearchSlotProps } from '@/context';
 import { Alert, Box, Grid, Pagination, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react/jsx-runtime';
