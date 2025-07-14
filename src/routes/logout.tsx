@@ -24,7 +24,6 @@ function RouteComponent() {
       queryClient.cancelQueries();
       logout(search?.clusterId);
       queryClient.clear();
-      console.log('query cache cleared');
     } catch (err) {
       console.log('LOGOUT ERROR: ', err);
     }

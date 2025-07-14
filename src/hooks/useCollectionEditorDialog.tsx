@@ -119,7 +119,6 @@ export function useCollectionEditorDialog(
       initialSchema.current = value;
 
       let readOnly = editorRef.current?.getRawOptions()?.readOnly ?? true;
-      console.log('readOnly: ', readOnly);
 
       dialog.prompt({
         title: (() => {
