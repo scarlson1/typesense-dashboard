@@ -1,18 +1,28 @@
 import { AuthForm, authFormOpts } from '@/components/AuthForm';
 import { useAppForm, useAsyncToast } from '@/hooks';
 import type { Environment } from '@/types';
-import { getTypesenseClient, typesenseStore } from '@/utils';
-import { OpenInNewRounded } from '@mui/icons-material';
+import { getCredsKey, getTypesenseClient, typesenseStore } from '@/utils';
+import {
+  DevicesRounded,
+  LogoutRounded,
+  OpenInNewRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Divider,
+  IconButton,
   Link,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Card as MuiCard,
   Stack,
   styled,
   Typography,
 } from '@mui/material';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useLocation } from '@tanstack/react-router';
+import { useCallback } from 'react';
 import { z } from 'zod/v4';
 import { useStore } from 'zustand';
 
@@ -108,44 +118,129 @@ function AuthComponent() {
   });
 
   return (
-    <AuthContainer>
-      <Card>
-        <Box
-          component='form'
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          noValidate
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            gap: 2,
-          }}
-        >
-          <AuthForm form={form} title={'Login'} />
-        </Box>
-        <Divider />
-        <Stack direction='row' spacing={1}>
-          <Typography component='div' sx={{ textAlign: 'center' }}>
-            Don&apos;t have an account?
-          </Typography>
-          <Link
-            href='https://typesense.org/'
-            target='_blank'
-            rel='noopener noreferrer'
+    <>
+      <AuthContainer
+        direction='column'
+        spacing={3}
+        sx={{ justifyContent: 'center' }}
+      >
+        <Card>
+          <Box
+            component='form'
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+            noValidate
             sx={{
               display: 'flex',
-              alignContent: 'center',
-              justifyContent: 'center',
+              flexDirection: 'column',
+              width: '100%',
+              gap: 2,
             }}
           >
-            Typesense <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
-          </Link>
-        </Stack>
-      </Card>
-    </AuthContainer>
+            <AuthForm form={form} title={'Login'} />
+          </Box>
+          <Divider />
+          <Stack direction='row' spacing={1}>
+            <Typography component='div' sx={{ textAlign: 'center' }}>
+              Don&apos;t have an account?
+            </Typography>
+            <Link
+              href='https://typesense.org/'
+              target='_blank'
+              rel='noopener noreferrer'
+              sx={{
+                display: 'flex',
+                alignContent: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              Typesense{' '}
+              <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+            </Link>
+          </Stack>
+        </Card>
+        <AuthenticatedAccounts />
+      </AuthContainer>
+    </>
+  );
+}
+
+function AuthenticatedAccounts() {
+  const navigate = Route.useNavigate();
+  const location = useLocation();
+  const search = Route.useSearch();
+  const credentials = useStore(typesenseStore, (state) => state.credentials);
+  const setCredsKey = useStore(typesenseStore, (state) => state.setCredsKey);
+
+  let credEntries = Object.entries(credentials);
+
+  const handleSelect = useCallback(
+    (key: string) => {
+      setCredsKey(key);
+      navigate({ to: search?.redirect || '/', replace: true });
+    },
+    [navigate, setCredsKey]
+  );
+
+  const handleLogout = useCallback(
+    async (key: string) => {
+      navigate({
+        to: '/logout',
+        search: {
+          redirect: location.href,
+          clusterId: key,
+        },
+      });
+    },
+    [location, navigate]
+  );
+
+  if (!credEntries.length) return null;
+
+  return (
+    <Card sx={{ mt: 2, maxHeight: 360, overflowY: 'auto' }}>
+      <List dense>
+        {credEntries.map(([key, creds]) => (
+          <ListItemButton
+            LinkComponent='div'
+            onClick={() => handleSelect(key)}
+            key={key}
+            sx={{
+              border: (theme) => `1px solid ${theme.vars.palette.divider}`,
+              borderRadius: 1,
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 36 }}>
+              <DevicesRounded sx={{ fontSize: '1rem' }} />
+            </ListItemIcon>
+            <ListItemText
+              primary={creds.name ?? creds.env ?? key}
+              secondary={creds?.env ? key : ''}
+            />
+
+            <IconButton
+              aria-label='logout'
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleLogout(
+                  getCredsKey({
+                    protocol: creds.protocol,
+                    node: creds.node,
+                    port: creds.port,
+                  })
+                );
+              }}
+              size='small'
+            >
+              <LogoutRounded fontSize='inherit' />
+            </IconButton>
+          </ListItemButton>
+        ))}
+      </List>
+    </Card>
   );
 }

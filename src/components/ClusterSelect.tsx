@@ -58,7 +58,7 @@ function getEnvAvatar(env?: Environment | null) {
   }
 }
 
-export function SelectContent() {
+export function ClusterSelect() {
   const navigate = useNavigate();
   const location = useLocation();
   // TODO: allow multiple sets of credentials & add context provider
@@ -74,7 +74,7 @@ export function SelectContent() {
         navigate({ to: '/auth' });
       } else {
         setCluster(event.target.value);
-        queryClient.clear();
+        // queryClient.clear();
         queryClient.refetchQueries();
       }
     },

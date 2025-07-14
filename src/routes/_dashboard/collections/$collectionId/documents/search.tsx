@@ -5,13 +5,13 @@ import {
   ContextHits,
   CtxPageSize,
   CtxPagination,
+  CtxRefinements,
   CtxSearchError,
   CtxSearchStats,
   DashboardDisplayOptions,
   SearchBox,
 } from '@/components/search';
 import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
-import { CtxRefinements } from '@/components/search/SortBy';
 import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
 import { useTypesenseClient } from '@/hooks';
 import {
