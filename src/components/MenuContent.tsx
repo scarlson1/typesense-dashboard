@@ -35,13 +35,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import type {
-  AnyContext,
-  AnySchema,
-  LinkComponent,
-  LinkProps,
-  RouteMatch,
-} from '@tanstack/react-router';
+import type { LinkComponent, LinkProps } from '@tanstack/react-router';
 import {
   createLink,
   useLocation,
@@ -132,19 +126,12 @@ export function MenuContent() {
   });
 
   const getParamCollectionId = useCallback(() => {
-    // @ts-ignore
-    let match:
-      | RouteMatch<
-          string,
-          string,
-          { collectionId?: string },
-          AnySchema,
-          any,
-          AnyContext,
-          {}
-        >
-      | undefined = matches.find((m) => m.fullPath.includes('$collectionId'));
-    return match?.params?.collectionId;
+    let match = matches.find((m) => m.fullPath.includes('$collectionId'));
+
+    if (match && 'collectionId' in match.params)
+      return (match.params as { collectionId?: string }).collectionId;
+
+    return undefined;
   }, [matches]);
 
   // better to pull up selected collection to context provider ??
@@ -385,7 +372,7 @@ export function MenuContent() {
                         selected={Boolean(
                           matchRoute(child.route) && selectedCollection
                         )}
-                        disabled={item.disabled}
+                        disabled={child.disabled}
                         sx={{ pl: 4 }}
                       >
                         <ListItemIcon sx={{ minWidth: 36 }}>

@@ -21,7 +21,7 @@ export const CollectionFieldsForm = withForm({
         {({ state, pushValue, removeValue }) => (
           <>
             {state.value.map((_, i) => (
-              <Grid container spacing={2} key={`${i}`}>
+              <Grid container columnSpacing={2} rowSpacing={0.5} key={`${i}`}>
                 <Grid size={{ xs: 7, md: 8 }}>
                   <form.Field name={`fields[${i}].name`}>
                     {({ state, handleChange, handleBlur }) => (
