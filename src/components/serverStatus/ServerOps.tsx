@@ -152,7 +152,7 @@ function SchemaUpdatesInProgress() {
     refetchInterval: 5000,
   });
 
-  return Boolean(data.length) ? (
+  return Boolean(data?.length) ? (
     <>
       {data.map((update) => (
         <Grid container columnSpacing={2} rowSpacing={1}>

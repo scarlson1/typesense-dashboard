@@ -4,3 +4,40 @@ services:
     build: .
     ports:
       - '5173:5173'
+    develop:
+      watch:
+        - path: ./src
+          target: /app/src
+          action: sync
+          ignore:
+            - node_modules/
+        - path: package.json
+          action: rebuild
+
+  typesense:
+    image: typesense/typesense:29.0
+    restart: on-failure
+    ports:
+      - '8108:8108' # For HTTP (not recommended for production)
+      - '443:443' # For HTTPS
+    volumes:
+      - ../typesense-dashboard-data:/data
+      # - ./certs:/certs
+      - /Users/spencercarlson/typesenseCreds:/etc/ssl/certs
+    environment:
+      - TYPESENSE_API_KEY=xyz
+      - TYPESENSE_DATA_DIR=/data
+      - SSL_CERTIFICATE=/etc/ssl/certs/typesense.dev.crt # server-cert.pem # cert.pem
+      - SSL_CERTIFICATE_KEY=/etc/ssl/certs/typesense.dev.key # server-key.pem # key.pem
+    # command: '--data-dir=/data --api-key=xyz --enable-cors'
+    command: '--data-dir=/data --api-key=xyz --enable-cors --api-port=443 --ssl-certificate=/etc/ssl/certs/typesense.dev.crt --ssl-certificate-key=/etc/ssl/certs/typesense.dev.key'
+
+  # ngrok:
+  #   image: ngrok/ngrok:latest
+  #   command:
+  #     - 'http'
+  #     - 'http://host.docker.internal:443'
+  #   environment:
+  #     NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+  #   ports:
+  #     - 4040:4040
