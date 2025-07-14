@@ -153,7 +153,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           >
             text_match_info
           </HitLabel>
-          {Object.entries(hit?.text_match_info || {}).map(([key, value], i) => (
+          {Object.entries(hit?.text_match_info || {}).map(([key, value]) => (
             <Stack
               direction='row'
               spacing={3}
