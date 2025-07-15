@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
@@ -11,6 +12,11 @@ export default defineConfig({
       autoCodeSplitting: true,
     }),
     react(),
+    sentryVitePlugin({
+      org: process.env.SENTRY_ORG || 'spencer-carlson',
+      project: process.env.SENTRY_PROJECT || 'typesense-dashboard',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
   ],
   server: {
     host: '0.0.0.0',
@@ -21,5 +27,9 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
     },
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true, // required for sentry
   },
 });

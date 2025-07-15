@@ -9,6 +9,7 @@ import {
   Button,
   Typography,
 } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState, type SyntheticEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -73,7 +74,12 @@ export function AnalyticsRulesList() {
             <Typography variant='h6'>{r.name}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: Error) => {
+                captureException(err);
+              }}
+            >
               <Suspense>
                 <UpdateAnalyticsRule
                   defaultValues={{
@@ -120,7 +126,12 @@ export function AnalyticsRulesList() {
           <Typography variant='h6'>Add New Analytics Rule</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <Suspense>
               <UpdateAnalyticsRule
                 defaultValues={analyticsFormDefaultValues}

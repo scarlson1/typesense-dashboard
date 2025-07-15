@@ -6,6 +6,7 @@ import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Link, Paper, Typography } from '@mui/material';
+import { captureException } from '@sentry/react';
 import {
   useMutation,
   useSuspenseQuery,
@@ -49,7 +50,12 @@ function RouteComponent() {
         <AddAlias />
       </Paper>
       <Box>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: Error) => {
+            captureException(err);
+          }}
+        >
           <Suspense>
             <AliasGrid />
           </Suspense>

@@ -11,6 +11,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -35,7 +36,12 @@ export function ServerOps() {
               Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
             </Link>
           </Typography>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <ClearCache />
           </ErrorBoundary>
         </Box>
@@ -55,7 +61,12 @@ export function ServerOps() {
               Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
             </Link>
           </Typography>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <CompactDatabase />
           </ErrorBoundary>
         </Box>
@@ -63,7 +74,12 @@ export function ServerOps() {
           <Typography variant='subtitle1' gutterBottom>
             Schema Updates in Progress
           </Typography>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <Suspense>
               <SchemaUpdatesInProgress />
             </Suspense>

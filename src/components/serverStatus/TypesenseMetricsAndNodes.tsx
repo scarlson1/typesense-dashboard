@@ -2,6 +2,7 @@ import { ErrorFallback } from '@/components/ErrorFallback';
 import { useTypesenseClient } from '@/hooks';
 import { formatBytes, removeStartEndMatches } from '@/utils';
 import { Box, Paper, Stack, Typography } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isObject, round } from 'lodash-es';
 import { Fragment, Suspense, useMemo } from 'react';
@@ -20,21 +21,36 @@ export function TypesenseMetricsAndNodes() {
         sx={{ flexWrap: 'wrap' }}
       >
         <Box sx={{ flex: '1 1 auto' }}>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <Suspense>
               <TypesenseMetrics />
             </Suspense>
           </ErrorBoundary>
         </Box>
         <Box sx={{ flex: '1 1 auto' }}>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <Suspense>
               <ServerConfig />
             </Suspense>
           </ErrorBoundary>
         </Box>
         <Box sx={{ flex: '1 1 auto' }}>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <Suspense>
               <ServerStats />
             </Suspense>
