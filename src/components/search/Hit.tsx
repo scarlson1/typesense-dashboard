@@ -70,8 +70,6 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
 
   const image = imgField ? hit?.document[imgField] : null;
 
-  console.log('HIT: ', hit);
-
   return (
     <Card
       sx={{
@@ -104,8 +102,8 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           sx={{ maxHeight: 300, overflowX: 'auto' }}
         >
           {displayFieldsArr.map(([key, value]) => {
-            // let highlight = hit.highlights?.find((h) => h.field === key);
             let snippet = hit.highlight[key]?.snippet;
+
             return (
               <Stack
                 direction='row'
@@ -122,6 +120,7 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
                       ['& mark']: {
                         fontWeight: 'bold',
                         backgroundColor: 'info.light',
+                        color: 'text.primary',
                       },
                     }}
                   >
