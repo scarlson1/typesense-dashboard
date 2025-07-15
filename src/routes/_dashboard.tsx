@@ -29,7 +29,7 @@ export const Route = createFileRoute('/_dashboard')({
 
 function RouteComponent() {
   useEffect(() => {
-    console.log(process.env);
+    console.log(import.meta.env);
   }, []);
   return (
     <Box sx={{ display: 'flex' }}>
