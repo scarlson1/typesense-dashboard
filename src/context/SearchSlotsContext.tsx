@@ -4,6 +4,7 @@ import type { FacetOptionProps } from '@/components/search/FacetOptions';
 import type {
   AlertProps,
   BoxProps,
+  CardMediaProps,
   GridProps,
   PaginationProps,
   SelectProps,
@@ -69,6 +70,7 @@ export interface SearchSlotProps<
   hit?: SlotPropsWithOverrides<THitProps>;
   hitWrapper?: SlotPropsWithOverrides<THitWrapperProps>;
   hitActions?: SlotPropsWithOverrides<THitActionProps>;
+  hitImg?: SlotPropsWithOverrides<CardMediaProps>;
   noHitsFound?: SlotPropsWithOverrides<TNoHitsFoundProps>;
   pageSize?: SlotPropsWithOverrides<TPageSizeProps>;
   pagination?: SlotPropsWithOverrides<TPaginationProps>;
