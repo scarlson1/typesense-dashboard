@@ -4,8 +4,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
-// https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     tanstackRouter({
       target: 'react',
@@ -30,6 +29,36 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true, // required for sentry
+    sourcemap: mode === 'sentry',
   },
-});
+}));
+
+// // https://vite.dev/config/
+// export default defineConfig({
+//   plugins: [
+//     tanstackRouter({
+//       target: 'react',
+//       autoCodeSplitting: true,
+//     }),
+//     react(),
+//     sentryVitePlugin({
+//       org: process.env.SENTRY_ORG || 'spencer-carlson',
+//       project: process.env.SENTRY_PROJECT || 'typesense-dashboard',
+//       authToken: process.env.SENTRY_AUTH_TOKEN,
+//     }),
+//   ],
+//   server: {
+//     host: '0.0.0.0',
+//     port: 5173,
+//   },
+//   base: '/typesense-dashboard/',
+//   resolve: {
+//     alias: {
+//       '@': resolve(__dirname, 'src'),
+//     },
+//   },
+//   build: {
+//     outDir: 'dist',
+//     sourcemap: false,
+//   },
+// });
