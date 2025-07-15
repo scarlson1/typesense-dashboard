@@ -6,7 +6,9 @@
   "homepage": "https://scarlson1.github.io/typesense-dashboard",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && GENERATE_SOURCEMAP=false vite build",
+    "build:sentry": "tsc -b && build --mode sentry",
+    "build:sentry.old": "tsc -b && GENERATE_SOURCEMAP=true vite --config vite.config.sentry.js build --mode sentry",
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:docker": "docker run -dp 5173:5173 typesense-dashboard",

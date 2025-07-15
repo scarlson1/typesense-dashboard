@@ -4,7 +4,6 @@ import { SideMenu } from '@/components/SideMenu';
 import { typesenseStore } from '@/utils';
 import { alpha, Box, Stack } from '@mui/material';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { useEffect } from 'react';
 
 function isAuthenticated() {
   const creds = typesenseStore.getState().credentials;
@@ -28,9 +27,6 @@ export const Route = createFileRoute('/_dashboard')({
 });
 
 function RouteComponent() {
-  useEffect(() => {
-    console.log(import.meta.env);
-  }, []);
   return (
     <Box sx={{ display: 'flex' }}>
       <SideMenu />
