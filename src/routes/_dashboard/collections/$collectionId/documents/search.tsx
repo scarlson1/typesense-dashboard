@@ -92,7 +92,9 @@ function SearchCollection() {
               sx={{ justifyContent: 'space-between', alignItems: 'center' }}
             >
               <ButtonLink
-                from={Route.path}
+                // from={Route.fullPath}
+                to={Route.fullPath}
+                params={{ collectionId }}
                 hash='search-params'
                 endIcon={<ExpandMoreRounded />}
                 size='small'
@@ -150,7 +152,7 @@ function SearchCollection() {
               </Stack>
 
               <Box>
-                <Typography variant='h5' gutterBottom>
+                <Typography variant='h5' gutterBottom id='search-params'>
                   Search Parameters
                 </Typography>
                 <Typography component='div' gutterBottom>
@@ -169,7 +171,7 @@ function SearchCollection() {
               </Box>
 
               <Suspense>
-                <Paper id='search-params'>
+                <Paper>
                   <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
                     <UpdateSearchParameters collectionId={collectionId} />
                   </Container>

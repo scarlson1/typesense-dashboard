@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
     host: '0.0.0.0',
     port: 5173,
   },
-  base: '/typesense-dashboard/',
+  base: '/typesense-dashboard',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
