@@ -32,6 +32,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
+// TODO: reset display options when collection changes
+
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search'
 )({
@@ -63,7 +65,6 @@ function SearchCollection() {
         >
           <SearchSlotsProvider
             slots={{
-              // stats: undefined, // hide slot
               hits: Grid,
               hitWrapper: Grid,
             }}
@@ -81,9 +82,6 @@ function SearchCollection() {
                   backdropFilter: 'blur(8px) opacity(0.87)',
                 },
               },
-              // hitWrapper: {
-              //   size: { xs: 12, sm: 6 },
-              // },
             }}
           >
             <Stack
@@ -101,12 +99,6 @@ function SearchCollection() {
               >
                 Search Parameters
               </ButtonLink>
-              {/* TODO: move filter & sort to popover with icon buttons ?? */}
-              {/* <Box>
-                <Box sx={{ maxWidth: 200 }}>
-                  <SortBy fullWidth />
-                </Box>
-              </Box> */}
               <CtxRefinements />
             </Stack>
 
@@ -119,7 +111,6 @@ function SearchCollection() {
               <CtxSearchError />
               <ContextHits />
 
-              {/* TODO: slot for toolbar etc */}
               <Stack
                 direction={{ xs: 'column-reverse', sm: 'row' }}
                 sx={{
