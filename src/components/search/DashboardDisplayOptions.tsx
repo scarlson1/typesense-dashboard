@@ -1,5 +1,5 @@
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
-import { useCollectionSchema, useSearchSlots } from '@/hooks';
+import { useCollectionSchema, usePrevious, useSearchSlots } from '@/hooks';
 import {
   Autocomplete,
   Button,
@@ -15,7 +15,7 @@ import {
   type CSSProperties,
   type SelectChangeEvent,
 } from '@mui/material';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 // TODO: change hits to be grid instead of stack ??
 const imgFitOptions: CSSProperties['backgroundSize'][] = [
@@ -49,9 +49,21 @@ export function DashboardDisplayOptions() {
       collectionSchema.fields
         .filter((f) => f.type === 'image')
         .map((f) => ({ title: f.name })),
-    // .map((f) => f.name),
     [collectionSchema]
   );
+
+  const prevSchemaName = usePrevious(collectionSchema?.name);
+  useEffect(() => {
+    if (prevSchemaName && prevSchemaName !== collectionSchema.name)
+      updateSlotProps(
+        {
+          hit: { displayFields: [] },
+        },
+        (_: object, srcValue: object) => {
+          if (Array.isArray(srcValue)) return srcValue;
+        }
+      );
+  }, [collectionSchema?.name]);
 
   const handleFieldsChange = useCallback((_: any, newVal: string[]) => {
     updateSlotProps(
