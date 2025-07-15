@@ -36,5 +36,5 @@ jobs:
         with:
           environment: production
           sourcemaps: ./dist
-          release: ${{ github.event.release }}
+          release: ${{ github.event.release.tag_name }}
           dist: ${{ github.sha }}
