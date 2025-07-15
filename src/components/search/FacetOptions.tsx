@@ -16,15 +16,21 @@ import {
   type CheckboxProps,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo, type ChangeEvent, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  type ChangeEvent,
+  type ReactNode,
+} from 'react';
 import type { SearchResponseFacetCountSchema } from 'typesense/lib/Typesense/Documents';
-import { z } from 'zod/v4';
 
 export interface FacetOptionProps extends CheckboxProps {
   label?: ReactNode;
   value: string;
 }
 
+// rename FacetOptionInput ??
 export const FacetOption = ({ label, ...props }: FacetOptionProps) => {
   return <FormControlLabel control={<Checkbox {...props} />} label={label} />;
 };
@@ -47,19 +53,19 @@ interface CtxFacetOptionProps {
   disabled?: boolean;
 }
 
-const filterOperators = z.enum([
-  '', // partially equal to
-  '=', // equal to
-  '>', // greater than
-  '>=', // greater or equal
-  '<', // less than
-  '<=', // less or equal
-  '!=', // not equal to
-  '[]', // Is one of
-  '![]', // Is not any of
-  '[..]', // range
-]);
-type FilterOperators = z.infer<typeof filterOperators>;
+// const filterOperators = z.enum([
+//   '', // partially equal to
+//   '=', // equal to
+//   '>', // greater than
+//   '>=', // greater or equal
+//   '<', // less than
+//   '<=', // less or equal
+//   '!=', // not equal to
+//   '[]', // Is one of
+//   '![]', // Is not any of
+//   '[..]', // range
+// ]);
+// type FilterOperators = z.infer<typeof filterOperators>;
 
 export const CtxFacetOption = (props: CtxFacetOptionProps) => {
   const [slots, slotProps] = useSearchSlots();
@@ -69,7 +75,7 @@ export const CtxFacetOption = (props: CtxFacetOptionProps) => {
   ) : null;
 };
 
-// filter_by removes facet options with count of 0
+// filter_by removes facet options with count of 0 (desired behavior ??)
 const useFacetCounts = () => {
   const [client, clusterId] = useTypesenseClient();
   const { debouncedQuery, collectionId, params } = useSearch();
@@ -107,10 +113,15 @@ export const CtxFacetOptions = () => {
 
   const { data: facetCounts } = useFacetCounts();
 
+  // cant split on ',' when using array
   const filterByParams = useMemo(
-    () => params?.filter_by?.split(',') || [],
+    () => params?.filter_by?.split(/,(?![^\\[]*\])/) || [], // .split(',') || [],
     [params]
   );
+
+  useEffect(() => {
+    console.log('FILTER BY: ', filterByParams);
+  }, [filterByParams]);
 
   const mergedFacets = useMemo(() => {
     return facetCounts?.map((facet: SearchResponseFacetCountSchema<object>) => {
@@ -122,12 +133,26 @@ export const CtxFacetOptions = () => {
         let filteredCount = filteredFacet?.counts.find(
           (filteredCount) => filteredCount.value === c.value
         );
+        // console.log('FILTER BY PARAMS: ', filterByParams);
+        let filterBy = filterByParams.find((f: string) =>
+          f.startsWith(facet?.field_name)
+        );
+        // console.log('MATCHED FILTER_BY: ', filterBy);
+        let filterValues = filterBy
+          ? filterBy
+              .split(':')[1]
+              .replace(/[\[\]]/g, '')
+              .split(',')
+          : null;
+
+        // console.log('filterValues: ', filterValues);
 
         return {
           count: filteredCount?.count || 0,
           highlighted: filteredCount?.highlighted || c.highlighted,
           value: c.value, // TODO: get operator variable
-          checked: filterByParams.includes(`${facet?.field_name}:=${c.value}`),
+          checked: filterValues ? filterValues.includes(c.value) : false,
+          // checked: filterByParams.includes(`${facet?.field_name}:=${c.value}`),
         };
       });
 
@@ -145,19 +170,75 @@ export const CtxFacetOptions = () => {
   const handleChange = useCallback(
     (
       e: ChangeEvent<HTMLInputElement>,
-      field: string,
-      operator: FilterOperators = '='
+      field: string
+      // operator: FilterOperators = '='
     ) => {
-      let filterValue = `${field}:${operator}${e.target.value}`;
+      // let filterValue = `${field}:${operator}${e.target.value}`;
+      // TODO: use array instead ??
+      let existingFilter = filterByParams.find((f) =>
+        f.startsWith(`${field}:`)
+      );
+      console.log('existing filter: ', existingFilter);
 
-      let newParams = e.target.checked
-        ? uniqueArr([...filterByParams, filterValue])
-        : filterByParams.filter((f: string) => f !== filterValue);
+      let newFilterValue = `${field}:[${e.target.value}]`;
+      if (existingFilter) {
+        try {
+          let prevOptions = existingFilter
+            .split(':')[1]
+            .replace(/[\[\]]/g, '')
+            .split(',');
+          console.log('prevOptions: ', prevOptions);
+
+          let newOptions = e.target.checked
+            ? uniqueArr([...prevOptions, e.target.value])
+            : prevOptions.filter((f: string) => f !== e.target.value);
+
+          newFilterValue = newOptions.length
+            ? `${field}:[${newOptions.join(',')}]`
+            : '';
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      console.log('new filter value: ', newFilterValue);
+
+      let filtersSansTarget = filterByParams.filter(
+        (f: string) => !f.startsWith(`${field}`)
+      );
+
+      let newParams = [...filtersSansTarget, newFilterValue].filter((x) => x);
+      // let newParams = e.target.checked
+      //   ? uniqueArr([...filterByParams, filterValue])
+      //   : filterByParams.filter((f: string) => f !== filterValue);
+
+      console.log('new params: ', newParams.join(','));
 
       updateParams({ filter_by: newParams.join(',') });
     },
     [filterByParams, updateParams]
   );
+  // const handleChange = useCallback(
+  //   (
+  //     e: ChangeEvent<HTMLInputElement>,
+  //     field: string,
+  //     operator: FilterOperators = '='
+  //   ) => {
+  //     let filterValue = `${field}:${operator}${e.target.value}`;
+  //     // TODO: use array instead ??
+  //     let existingFilter = filterByParams.find((f) =>
+  //       f.startsWith(`${field}:`)
+  //     );
+  //     console.log('existing filter: ', existingFilter);
+
+  //     let newParams = e.target.checked
+  //       ? uniqueArr([...filterByParams, filterValue])
+  //       : filterByParams.filter((f: string) => f !== filterValue);
+
+  //     updateParams({ filter_by: newParams.filter((x) => x).join(',') });
+  //   },
+  //   [filterByParams, updateParams]
+  // );
 
   return (
     <Collapse in={Boolean(facetCounts?.length)}>
@@ -171,7 +252,7 @@ export const CtxFacetOptions = () => {
                 key={c.value}
                 checked={c.checked}
                 value={c.value}
-                disabled={!c.count}
+                // disabled={!c.count}
                 onChange={(e) => {
                   handleChange(e, facetCount.field_name);
                 }}

@@ -71,6 +71,7 @@ TODO
 - Search results view customization
 - Improve search implementation
 - Delete documents by query
+- Export documents
 
 ## Screenshots
 
