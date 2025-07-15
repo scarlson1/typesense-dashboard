@@ -16,13 +16,7 @@ import {
   type CheckboxProps,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  type ChangeEvent,
-  type ReactNode,
-} from 'react';
+import { useCallback, useMemo, type ChangeEvent, type ReactNode } from 'react';
 import type { SearchResponseFacetCountSchema } from 'typesense/lib/Typesense/Documents';
 
 export interface FacetOptionProps extends CheckboxProps {
@@ -119,10 +113,6 @@ export const CtxFacetOptions = () => {
     [params]
   );
 
-  useEffect(() => {
-    console.log('FILTER BY: ', filterByParams);
-  }, [filterByParams]);
-
   const mergedFacets = useMemo(() => {
     return facetCounts?.map((facet: SearchResponseFacetCountSchema<object>) => {
       let filteredFacet = data?.facet_counts?.find(
@@ -173,51 +163,37 @@ export const CtxFacetOptions = () => {
       field: string
       // operator: FilterOperators = '='
     ) => {
-      // let filterValue = `${field}:${operator}${e.target.value}`;
-      // TODO: use array instead ??
       let existingFilter = filterByParams.find((f) =>
         f.startsWith(`${field}:`)
       );
-      console.log('existing filter: ', existingFilter);
 
       let newFilterValue = `${field}:[${e.target.value}]`;
       if (existingFilter) {
-        try {
-          let prevOptions = existingFilter
-            .split(':')[1]
-            .replace(/[\[\]]/g, '')
-            .split(',');
-          console.log('prevOptions: ', prevOptions);
+        let prevOptions = existingFilter
+          .split(':')[1]
+          .replace(/[\[\]]/g, '')
+          .split(',');
 
-          let newOptions = e.target.checked
-            ? uniqueArr([...prevOptions, e.target.value])
-            : prevOptions.filter((f: string) => f !== e.target.value);
+        let newOptions = e.target.checked
+          ? uniqueArr([...prevOptions, e.target.value])
+          : prevOptions.filter((f: string) => f !== e.target.value);
 
-          newFilterValue = newOptions.length
-            ? `${field}:[${newOptions.join(',')}]`
-            : '';
-        } catch (err) {
-          console.log(err);
-        }
+        newFilterValue = newOptions.length
+          ? `${field}:[${newOptions.join(',')}]`
+          : '';
       }
-
-      console.log('new filter value: ', newFilterValue);
 
       let filtersSansTarget = filterByParams.filter(
         (f: string) => !f.startsWith(`${field}`)
       );
 
       let newParams = [...filtersSansTarget, newFilterValue].filter((x) => x);
-      // let newParams = e.target.checked
-      //   ? uniqueArr([...filterByParams, filterValue])
-      //   : filterByParams.filter((f: string) => f !== filterValue);
-
-      console.log('new params: ', newParams.join(','));
 
       updateParams({ filter_by: newParams.join(',') });
     },
     [filterByParams, updateParams]
   );
+
   // const handleChange = useCallback(
   //   (
   //     e: ChangeEvent<HTMLInputElement>,
