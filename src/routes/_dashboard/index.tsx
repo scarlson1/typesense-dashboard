@@ -6,6 +6,7 @@ import {
   TypesenseMetricsAndNodes,
 } from '@/components/serverStatus';
 import { Container, Stack, Typography } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -31,7 +32,12 @@ function HomeComponent() {
           Generate API Keys
         </ButtonLink>
       </Stack>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onError={(err: Error) => {
+          captureException(err);
+        }}
+      >
         <Suspense>
           <ServerMetrics />
         </Suspense>

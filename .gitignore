@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .tanstack
+
+.env.sentry-build-plugin

@@ -19,6 +19,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, type ChangeEvent, type ReactNode } from 'react';
 import type { SearchResponseFacetCountSchema } from 'typesense/lib/Typesense/Documents';
 
+// TODO: show more props (UI: https://github.com/algolia/instantsearch/blob/master/packages/react-instantsearch/src/ui/RefinementList.tsx)
+// props: https://github.com/algolia/instantsearch/blob/master/packages/react-instantsearch/src/widgets/RefinementList.tsx
+// useRefinementList: https://github.com/algolia/instantsearch/blob/master/packages/instantsearch.js/src/connectors/refinement-list/connectRefinementList.ts
+
+// algolia search facets implementation: https://github.com/algolia/instantsearch/blob/d0486032831c0b2ee22169aa1f5052b88b9543b0/packages/instantsearch.js/src/connectors/refinement-list/connectRefinementList.ts#L296
+
 export interface FacetOptionProps extends CheckboxProps {
   label?: ReactNode;
   value: string;

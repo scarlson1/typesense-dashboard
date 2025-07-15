@@ -8,6 +8,7 @@ import {
   styled,
   Typography,
 } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClusterSelect } from './ClusterSelect';
 import { ErrorFallback } from './ErrorFallback';
@@ -63,7 +64,12 @@ export function SideMenu() {
           flexDirection: 'column',
         }}
       >
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: Error) => {
+            captureException(err);
+          }}
+        >
           <MenuContent />
         </ErrorBoundary>
         {/* <CardAlert /> */}

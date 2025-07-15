@@ -14,6 +14,7 @@ import {
   Button,
   Typography,
 } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState, type SyntheticEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -60,7 +61,12 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
             <Typography variant='h6'>{override.id}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: Error) => {
+                captureException(err);
+              }}
+            >
               <Suspense>
                 <CurationFormComponent
                   collectionId={collectionId}
@@ -130,7 +136,12 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
           <Typography variant='h6'>Add New Override</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: Error) => {
+              captureException(err);
+            }}
+          >
             <Suspense>
               <CurationFormComponent
                 collectionId={collectionId}
