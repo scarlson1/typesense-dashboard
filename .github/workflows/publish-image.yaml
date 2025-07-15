@@ -46,6 +46,8 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}
             spencercarlson/${{ github.event.repository.name }}
 
+      # need build and push in separate steps to upload source maps to sentry ??
+      # https://docs.sentry.io/product/releases/setup/release-automation/github-actions/#source-maps
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4

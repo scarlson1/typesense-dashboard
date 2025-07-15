@@ -1,0 +1,40 @@
+name: Create sentry release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create-sentry-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'spencer-carlson' # ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: typesense-dashboard # ${{ secrets.SENTRY_PROJECT }}
+          # SENTRY_URL: https://sentry.io/
+        with:
+          environment: production
+          sourcemaps: ./dist
+          release: ${{ github.event.release }}
+          dist: ${{ github.sha }}

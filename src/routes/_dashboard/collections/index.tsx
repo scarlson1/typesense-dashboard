@@ -2,6 +2,7 @@ import { ErrorFallback } from '@/components';
 import { ButtonLink } from '@/components/ButtonLink';
 import { CollectionsGrid } from '@/components/CollectionsGrid';
 import { Box, Stack, Typography } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -34,8 +35,8 @@ function CollectionsComponent() {
       <Box sx={{ py: { xs: 1, sm: 2 } }}>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(error: Error, info) => {
-            console.log(error, info);
+          onError={(err: Error) => {
+            captureException(err);
           }}
         >
           <CollectionsGrid />

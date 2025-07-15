@@ -17,6 +17,7 @@ import {
   Typography,
   type ButtonProps,
 } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { editor } from 'monaco-editor';
 import {
@@ -110,7 +111,12 @@ function CollectionSettings() {
         >
           Update Schema
         </Button>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: Error) => {
+            captureException(err);
+          }}
+        >
           <DeleteCollectionButton>Delete Collection</DeleteCollectionButton>
         </ErrorBoundary>
       </Stack>
