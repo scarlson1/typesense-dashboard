@@ -65,6 +65,7 @@ export function InstantSearch<T extends DocumentSchema>({
           }),
       // enabled: !!debouncedQuery,
       staleTime,
+      placeholderData: (previousData) => previousData,
     });
 
   const setPreset = useCallback((presetId: string | null) => {

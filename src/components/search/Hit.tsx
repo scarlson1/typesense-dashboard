@@ -101,21 +101,45 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
           spacing={0.75}
           sx={{ maxHeight: 300, overflowX: 'auto' }}
         >
-          {displayFieldsArr.map(([key, value]) => (
-            <Stack
-              direction='row'
-              spacing={3}
-              key={key}
-              sx={{ display: 'flex' }}
-            >
-              <HitLabel>{key}</HitLabel>
-              <HitValue>
-                {typeof value === 'string' || typeof value === 'number'
-                  ? value
-                  : JSON.stringify(value)}
-              </HitValue>
-            </Stack>
-          ))}
+          {displayFieldsArr.map(([key, value]) => {
+            let snippet = hit.highlight[key]?.snippet;
+
+            return (
+              <Stack
+                direction='row'
+                spacing={3}
+                key={key}
+                sx={{ display: 'flex' }}
+              >
+                <HitLabel>{key}</HitLabel>
+
+                {snippet && typeof snippet === 'string' ? (
+                  <HitValue
+                    component='div'
+                    sx={{
+                      ['& mark']: {
+                        fontWeight: 'bold',
+                        backgroundColor: 'info.light',
+                        color: 'text.primary',
+                      },
+                    }}
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: snippet,
+                      }}
+                    />
+                  </HitValue>
+                ) : (
+                  <HitValue>
+                    {typeof value === 'string' || typeof value === 'number'
+                      ? value
+                      : JSON.stringify(value)}
+                  </HitValue>
+                )}
+              </Stack>
+            );
+          })}
         </Stack>
       </CardContent>
       <CardActions
@@ -172,7 +196,6 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
         </CardContent>
       </Collapse>
 
-      {/* <HitActions docId={hit.document.id} docData={hit.document} /> */}
       {children}
     </Card>
   );
