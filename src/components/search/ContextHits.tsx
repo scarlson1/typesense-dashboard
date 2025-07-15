@@ -75,6 +75,7 @@ function CtxHit(props: { children?: ReactNode }) {
             {...slotProps?.hit}
             hit={hit}
             key={`hit-${hit.document.id}-${i}`}
+            imgProps={slotProps?.hitImg || {}}
           >
             {slots?.hitActions ? (
               <Suspense>

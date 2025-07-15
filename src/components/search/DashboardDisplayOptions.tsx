@@ -12,12 +12,21 @@ import {
   Stack,
   TextField,
   Typography,
+  type CSSProperties,
   type SelectChangeEvent,
 } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 
 // TODO: change hits to be grid instead of stack ??
-
+const imgFitOptions: CSSProperties['backgroundSize'][] = [
+  'auto',
+  'contain',
+  'cover',
+  'inherit',
+  'initial',
+  'revert',
+  'unset',
+];
 const selectOptions = [1, 2, 3, 4];
 interface ImgOption {
   title: string;
@@ -86,6 +95,19 @@ export function DashboardDisplayOptions() {
       updateSlotProps({
         hitWrapper: {
           size,
+        },
+      });
+    },
+    [updateSlotProps]
+  );
+
+  const handleImgSizeChange = useCallback(
+    (e: SelectChangeEvent) => {
+      updateSlotProps({
+        hitImg: {
+          sx: {
+            backgroundSize: e.target.value || 'auto',
+          },
         },
       });
     },
@@ -207,6 +229,37 @@ export function DashboardDisplayOptions() {
               },
             }}
           />
+          {/* TODO: img fit */}
+          <FormControl size='small' sx={{ alignSelf: 'flex-start' }}>
+            <InputLabel id='img-size-label'>Image Size</InputLabel>
+            <Select<string>
+              labelId='img-size-label'
+              id='img-size'
+              // @ts-ignore
+              value={slotProps?.hitImg?.sx?.backgroundSize || ''}
+              onChange={handleImgSizeChange}
+              size='small'
+              label='Image size'
+              sx={{ minWidth: 120, maxWidth: 200, alignSelf: 'flex-start' }}
+              MenuProps={{
+                slotProps: {
+                  paper: {
+                    elevation: 0,
+                    sx: {
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                    },
+                  },
+                },
+              }}
+            >
+              <MenuItem value={''}>{'default'}</MenuItem>
+              {imgFitOptions.map((o) => (
+                <MenuItem value={o} key={`${o}-bg-fit`}>
+                  {o}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Stack>
 
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>

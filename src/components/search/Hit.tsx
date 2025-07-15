@@ -9,6 +9,7 @@ import {
   Stack,
   styled,
   Typography,
+  type CardMediaProps,
   type IconButtonProps,
   type TypographyProps,
 } from '@mui/material';
@@ -51,9 +52,16 @@ export interface HitProps {
   children?: ReactNode;
   displayFields?: string[];
   imgField?: string | null;
+  imgProps?: CardMediaProps;
 }
 
-export function Hit({ hit, children, displayFields, imgField }: HitProps) {
+export function Hit({
+  hit,
+  children,
+  displayFields,
+  imgField,
+  imgProps,
+}: HitProps) {
   const [expanded, setExpanded] = useState(false);
 
   const handleExpandClick = useCallback(() => {
@@ -81,14 +89,16 @@ export function Hit({ hit, children, displayFields, imgField }: HitProps) {
       {Boolean(image) ? (
         <CardMedia
           // component='img'
+          image={image}
+          title='hit image'
+          {...imgProps}
           sx={{
             height: { xs: 100, md: 120 },
             mb: 1,
+            ...(imgProps?.sx || {}),
             // objectFit: 'cover',
             // backgroundSize: 'cover',
           }}
-          image={image}
-          title='hit image'
         />
       ) : null}
       <CardContent sx={{ pb: 1.5 }}>

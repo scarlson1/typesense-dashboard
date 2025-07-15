@@ -33,7 +33,7 @@ Example usage:
 ```bash
 $ git clone git@github.com:scarlson1/typesense-dashboard.git
 $ docker build -t typesense-dashboard .
-$ docker run -d -p 80:80 typesense-dashboard
+$ docker run -d -p 8108:8108 typesense-dashboard
 ```
 
 <!-- To use the latest pre-built image:
