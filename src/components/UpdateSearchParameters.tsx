@@ -78,7 +78,6 @@ export function UpdateSearchParameters({
           presetId: preset,
           params: { value: newValues },
         });
-        // setTimeout(form.reset, 100);
       } catch (err) {
         console.log(err);
       }
