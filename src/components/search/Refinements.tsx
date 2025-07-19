@@ -81,6 +81,8 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
               bgcolor: 'background.paper',
               border: (theme) => `1px solid ${theme.vars.palette.divider}`,
               zIndex: 1200,
+              maxHeight: '70vh',
+              overflowY: 'auto',
             }}
           >
             <Stack direction='column' spacing={2}>
