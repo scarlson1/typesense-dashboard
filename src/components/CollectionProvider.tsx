@@ -54,7 +54,9 @@ export function CollectionProvider<T extends DocumentSchema>({
     });
 
   const defaultSortingField = useMemo(() => {
-    return data?.default_sorting_field;
+    return data?.default_sorting_field
+      ? `${data?.default_sorting_field}:desc`
+      : undefined;
   }, [data?.default_sorting_field]);
 
   const [
