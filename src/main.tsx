@@ -15,6 +15,7 @@ import { queryClient } from './utils';
 Sentry.init({
   dsn: 'https://b293b3e281f37fe75bbdea7a52489a24@o4509429931442176.ingest.us.sentry.io/4509673463808000',
   sendDefaultPii: true,
+  environment: import.meta.env.DEV ? 'development' : 'production',
   // release: "<release_name>",
   // integrations: [
   //   Sentry.browserTracingIntegration(),

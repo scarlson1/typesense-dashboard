@@ -12,13 +12,13 @@ import { useCallback } from 'react';
 export function DefaultCtxSearchPageSize(props: SelectProps<number>) {
   return (
     <FormControl sx={{ width: { xs: 100, sm: 120, md: 140 } }}>
-      <InputLabel id='per-page-select-label'>
+      <InputLabel id='per-page-select-label' sx={{ zIndex: 0 }}>
         {props?.label ?? 'Hits Per Page'}
       </InputLabel>
       <Select
         labelId='per-page-select-label'
         id='per-page-select'
-        label='Hits Per Page'
+        label={props?.label ?? 'Hits Per Page'}
         // value={params?.per_page || pageSizeOptions[0] || 10}
         // onChange={handleChange}
         size='small'

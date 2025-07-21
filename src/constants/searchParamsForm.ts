@@ -4,9 +4,9 @@ import { multiParameterKeys, type MultiParameterKeys } from './presetsForm';
 
 const omitKeys: MultiParameterKeys[] = [
   // 'collection',
-  'query_by',
+  // 'query_by',
   'sort_by',
-  'facet_by',
+  // 'facet_by',
   'group_by',
 ];
 export const filteredParamKeys = multiParameterKeys.options.filter(
@@ -20,10 +20,15 @@ export const searchParamValues = z.object({
   facet_by: z.array(z.string()),
   group_by: z.array(z.string()),
   other_params: z.array(
-    z.object({
-      param: multiParameterKeys,
-      value: z.string(),
-    })
+    z
+      .object({
+        param: multiParameterKeys,
+        value: z.string(),
+      })
+      .refine(({ param, value }) => {
+        if (param && !value) return false;
+        return true;
+      })
   ),
 });
 export type SearchParamValues = z.infer<typeof searchParamValues>;
