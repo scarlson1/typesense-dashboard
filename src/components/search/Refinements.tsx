@@ -13,6 +13,8 @@ import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { CtxFacetOptions } from './FacetOptions';
 import { CtxSortBy } from './SortBy';
 
+// use temporary drawer instead of popper ??
+
 export const Refinements = ({ children }: { children: ReactNode }) => {
   const { sortByOptions } = useDefaultIndexParams();
   const { data, params } = useSearch();
