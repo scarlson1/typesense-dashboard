@@ -33,6 +33,8 @@ import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection'
 
 const JsonEditor = lazy(() => import('../../../../components/JsonEditor'));
 
+// TODO: confirm collection updates
+
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/config'
 )({
@@ -78,6 +80,7 @@ function CollectionSettings() {
       setOptions((o) => ({ ...o, readOnly: false }));
       return;
     }
+    // TODO: confirm updates in dialog ??
 
     let updates: CollectionUpdateSchema = {
       metadata,

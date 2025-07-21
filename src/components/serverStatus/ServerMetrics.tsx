@@ -29,6 +29,12 @@ export function ServerMetrics() {
       100
   );
 
+  const megabytesPctDisk = Math.round(
+    (Number(data.system_disk_used_bytes) /
+      Number(data.system_disk_total_bytes)) *
+      100
+  );
+
   return (
     <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
       <Stack
@@ -45,7 +51,9 @@ export function ServerMetrics() {
       <Stack
         direction='row'
         spacing={{ xs: 1, sm: 1.5, md: 2 }}
-        sx={{ py: { xs: 1, sm: 2, md: 2.5 }, justifyContent: 'space-between' }}
+        // sx={{ py: { xs: 1, sm: 2, md: 2.5 }, justifyContent: 'space-between' }}
+        useFlexGap
+        sx={{ py: { xs: 1, sm: 2, md: 2.5 }, flexWrap: 'wrap' }}
       >
         {cpuPcts.map(([id, val]: [string, string]) => (
           <Stack
@@ -82,7 +90,7 @@ export function ServerMetrics() {
         <LinearProgressWithLabel
           label={`${formatBytes(Number(data.system_disk_used_bytes))}`}
           labelTotal={`${formatBytes(Number(data.system_disk_total_bytes))}`}
-          value={megabytesPct}
+          value={megabytesPctDisk}
         />
       </Box>
       <Box>

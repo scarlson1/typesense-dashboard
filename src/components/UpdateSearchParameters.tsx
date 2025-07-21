@@ -23,6 +23,8 @@ import type {
 } from 'typesense/lib/Typesense/Documents';
 import { SearchParamsForm } from './SearchParamsForm';
 
+// TODO: reset filter_by when facet_by option is removed
+
 export interface UpdateSearchParametersProps {
   collectionId: string;
   defaultValues?: SearchParamValues;
@@ -31,7 +33,6 @@ export interface UpdateSearchParametersProps {
 
 export function UpdateSearchParameters({
   collectionId,
-  // mutationProps,
   ...props
 }: UpdateSearchParametersProps) {
   const [_, updateParams] = useSearchParams();
@@ -71,14 +72,12 @@ export function UpdateSearchParameters({
     onSubmit: async ({ value }) => {
       try {
         let { preset } = value;
-
         let newValues = formValuesToPresetSchema(value as SearchParamValues);
 
         await mutation.mutateAsync({
           presetId: preset,
           params: { value: newValues },
         });
-        // setTimeout(form.reset, 100);
       } catch (err) {
         console.log(err);
       }
@@ -100,6 +99,20 @@ export function UpdateSearchParameters({
   useEffect(() => {
     if (preset && preset !== prevPreset) form.setFieldValue('preset', preset); // will trigger update in SearchParamsForm's useEffect
   }, [preset, prevPreset]);
+
+  const formFacetByValue = useStore(
+    form.store,
+    (state) => state.values.facet_by
+  );
+  const prevFormFacetByValue = usePrevious(formFacetByValue);
+
+  // reset filter_by if facet_by field is added or removed
+  useEffect(() => {
+    if (
+      JSON.stringify(formFacetByValue) !== JSON.stringify(prevFormFacetByValue)
+    )
+      updateParams({ filter_by: undefined });
+  }, [formFacetByValue, prevFormFacetByValue, updateParams]);
 
   const formValues = useStore(form.store, (state) => state.values);
 
@@ -149,9 +162,11 @@ function formValuesToPresetSchema(
 ): SearchParams | SearchParamsWithPreset {
   let { preset, other_params, facet_by, sort_by, query_by, group_by } = values;
 
-  let otherParams = other_params.map((p) => ({
-    [p.param]: p.value,
-  }));
+  let otherParams = other_params
+    .filter(({ param }) => param)
+    .map((p) => ({
+      [p.param]: p.value,
+    }));
 
   let formattedValues = {
     query_by, // TODO: validate query_by values

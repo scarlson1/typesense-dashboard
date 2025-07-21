@@ -13,6 +13,8 @@ import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { CtxFacetOptions } from './FacetOptions';
 import { CtxSortBy } from './SortBy';
 
+// use temporary drawer instead of popper ??
+
 export const Refinements = ({ children }: { children: ReactNode }) => {
   const { sortByOptions } = useDefaultIndexParams();
   const { data, params } = useSearch();
@@ -81,6 +83,8 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
               bgcolor: 'background.paper',
               border: (theme) => `1px solid ${theme.vars.palette.divider}`,
               zIndex: 1200,
+              maxHeight: '70vh',
+              overflowY: 'auto',
             }}
           >
             <Stack direction='column' spacing={2}>

@@ -66,8 +66,10 @@ TODO
 
 - Tests
 - [Filter operators](https://typesense.org/docs/guide/tips-for-filtering.html#available-operators)
+- Facet/filter components ([range](https://typesense.org/docs/29.0/api/search.html#facet-ranges), numeric, etc.) currently only rendering checkmark
 - [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
 - [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
+- [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
 - Search results view customization
 - Improve search implementation
 - Delete documents by query
@@ -96,6 +98,12 @@ TODO
 ![synonyms](docs/images/synonyms.png)
 
 ![analytics rules](docs/images/analytics_rules.png)
+
+# Alternatives
+
+- [Typesense Cloud](https://cloud.typesense.org/)(paid)
+- bfritscher/typesense-dashboard([github])(https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
+- amartya-dev/typesense-dashboard([github])(https://github.com/amartya-dev/typesense-dashboard) (typescript)
 
 # Development
 
