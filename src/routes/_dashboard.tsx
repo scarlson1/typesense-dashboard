@@ -34,6 +34,8 @@ function RouteComponent() {
       <Box
         component='main'
         sx={(theme) => ({
+          // TODO: use css var for AppNavbar height
+          // height: { xs: 'calc(100vh - 60px)', md: '100vh' },
           flexGrow: 1,
           backgroundColor: theme.vars
             ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
@@ -51,7 +53,13 @@ function RouteComponent() {
           }}
         >
           <Header />
-          <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1600px' } }}>
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: { sm: '100%', md: '1600px' },
+              pb: 5,
+            }}
+          >
             <Outlet />
           </Box>
         </Stack>

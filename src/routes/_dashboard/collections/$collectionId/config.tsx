@@ -91,7 +91,6 @@ function CollectionSettings() {
     }
 
     let updates: CollectionUpdateSchema = {
-      // metadata,
       fields: fieldUpdates,
     };
     if (metadata) updates.metadata = metadata;
