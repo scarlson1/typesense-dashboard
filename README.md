@@ -14,7 +14,7 @@ Use an admin key to authenticate. Cluster credentials are stored in session stor
 
 Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https). Self-signed certificate reference: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
 
-You can use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
+You can use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add SSL if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
 
 ```bash
 ngrok http https://localhost:443
@@ -36,7 +36,7 @@ $ docker build -t typesense-dashboard .
 $ docker run -d -p 8108:8108 typesense-dashboard
 ```
 
-If you want to enable geosearch, pass a boxbox key as an environment variable (i.e. docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token")
+To enable geosearch, pass a mapbox key as an environment variable (i.e. docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token")
 
 <!-- To use the latest pre-built image:
 
