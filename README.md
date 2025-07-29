@@ -106,9 +106,9 @@ TODO
 
 # Alternatives
 
-- [Typesense Cloud](https://cloud.typesense.org/)(paid)
-- bfritscher/typesense-dashboard([github])(https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
-- amartya-dev/typesense-dashboard([github])(https://github.com/amartya-dev/typesense-dashboard) (typescript)
+- [Typesense Cloud](https://cloud.typesense.org/) (paid)
+- bfritscher/typesense-dashboard [github](https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
+- amartya-dev/typesense-dashboard [github](https://github.com/amartya-dev/typesense-dashboard) (typescript)
 
 # Development
 
