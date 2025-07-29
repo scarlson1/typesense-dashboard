@@ -112,6 +112,19 @@ function RouteComponent() {
               ) : null
             }
           >
+            <Alert severity='warning' sx={{ mb: 2, maxWidth: 400, mx: 'auto' }}>
+              <AlertTitle>Swipeable Drawer Bug</AlertTitle>
+              TODO: touch scroll issue when rendered above map:{' '}
+              <Link
+                href='https://github.com/mui/material-ui/issues/37814'
+                target='_blank'
+                rel='noopener noreferrer'
+                // sx={{ ml: 0.25 }}
+              >
+                https://github.com/mui/material-ui/issues/37814{' '}
+                <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+              </Link>
+            </Alert>
             <ContextHits hitWrapperProps={{ size: 12 }} />
           </SwipeableEdgeDrawer>
         </Suspense>
