@@ -21,6 +21,7 @@ export type CollectionContextValues<TError = Error> = Pick<
   sortByOptions: string[];
   facetByOptions: string[];
   groupByOptions: string[];
+  geoFieldOptions: string[];
   // setCollectionId: Dispatch<SetStateAction<string | null>>;
 };
 

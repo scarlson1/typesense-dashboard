@@ -1,9 +1,19 @@
 import { CollectionProvider } from '@/components/CollectionProvider';
 import { InstantSearch } from '@/components/InstantSearch';
+import { CtxRefinements } from '@/components/search';
 import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
-import { useTypesenseClient } from '@/hooks';
-import { Box, Grid, Typography } from '@mui/material';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { useDefaultIndexParams, useTypesenseClient } from '@/hooks';
+import { GridViewRounded, MapRounded } from '@mui/icons-material';
+import {
+  Box,
+  Grid,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
+import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
+import { useCallback, useState, type MouseEvent } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
 export const Route = createFileRoute(
@@ -37,7 +47,7 @@ function SearchLayout() {
               hitWrapper: Grid,
             }}
             slotProps={{
-              stats: { color: 'text.secondary' },
+              stats: { color: 'text.secondary', sx: { fontSize: '0.7rem' } },
               hits: { container: true, spacing: 2 },
               hitActions: {
                 sx: {
@@ -52,15 +62,86 @@ function SearchLayout() {
               },
             }}
           >
-            <Box sx={{ height: 'calc(100vh - 40px)' }}>
-              <Typography variant='h3' gutterBottom>
-                {collectionId}
-              </Typography>
+            {/* <Box sx={{ height: 'calc(100vh - 56px)' }}> */}
+            <Box>
+              <Stack
+                direction='row'
+                spacing={2}
+                sx={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  pb: { xs: 0.5, md: 1 },
+                }}
+              >
+                <Typography
+                  variant='h3'
+                  // gutterBottom
+                  sx={{
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {collectionId}
+                </Typography>
+
+                <Stack direction='row' spacing={{ xs: 1, sm: 2 }}>
+                  <ViewToggleButtons />
+
+                  <CtxRefinements />
+                </Stack>
+              </Stack>
+
               <Outlet />
             </Box>
           </SearchSlotsProvider>
         </InstantSearch>
       </CollectionProvider>
     </>
+  );
+}
+
+function ViewToggleButtons() {
+  const navigate = Route.useNavigate();
+  const location = useLocation();
+  const [view, setView] = useState(() =>
+    location.pathname.includes('map') ? 'map' : 'grid'
+  );
+
+  const { geoFieldOptions } = useDefaultIndexParams();
+  const enableMap = Boolean(geoFieldOptions.length);
+
+  // useEffect not necessary ?? explicitly navigate below ??
+  // better to use useEffect (only rely on url state) ??
+  // useEffect(() => {
+  //   // console.log(location);
+  //   let newView = location.pathname.includes('map') ? 'map' : 'grid';
+  //   setView(newView);
+  // }, [location?.pathname]);
+
+  const handleViewChange = useCallback(
+    (_: MouseEvent<HTMLElement>, nextView: string) => {
+      setView(nextView);
+      let nextPath = nextView === 'map' ? 'map' : '.';
+      navigate({ to: nextPath });
+    },
+    [navigate]
+  );
+
+  return (
+    <ToggleButtonGroup
+      value={view}
+      size='small'
+      aria-label='search view'
+      exclusive
+      onChange={handleViewChange}
+    >
+      <ToggleButton value='grid' aria-label='grid view'>
+        <GridViewRounded fontSize='inherit' />
+      </ToggleButton>
+      <ToggleButton value='map' aria-label='map view' disabled={!enableMap}>
+        <MapRounded fontSize='inherit' />
+      </ToggleButton>
+    </ToggleButtonGroup>
   );
 }

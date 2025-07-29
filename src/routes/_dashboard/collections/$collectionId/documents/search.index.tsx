@@ -3,7 +3,6 @@ import {
   ContextHits,
   CtxPageSize,
   CtxPagination,
-  CtxRefinements,
   CtxSearchError,
   CtxSearchStats,
   DashboardDisplayOptions,
@@ -30,7 +29,7 @@ function RouteComponent() {
 
   return (
     <>
-      <Stack
+      {/* <Stack
         direction='row'
         spacing={2}
         sx={{ justifyContent: 'space-between', alignItems: 'center' }}
@@ -46,11 +45,30 @@ function RouteComponent() {
           Search Parameters
         </ButtonLink>
         <CtxRefinements />
-      </Stack>
+      </Stack> */}
       <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
         <Box>
           <SearchBox sx={{ my: 1 }} />
-          <CtxSearchStats />
+          <Stack
+            direction='row'
+            spacing={1}
+            sx={{ justifyContent: 'space-between', alignItems: 'flex' }}
+          >
+            <Box>
+              <CtxSearchStats />
+            </Box>
+
+            <ButtonLink
+              // to={Route.fullPath}
+              to={'.'}
+              params={{ collectionId }}
+              hash='search-params'
+              endIcon={<ExpandMoreRounded />}
+              size='small'
+            >
+              Search Parameters
+            </ButtonLink>
+          </Stack>
         </Box>
         <CtxSearchError />
         <ContextHits />
@@ -61,6 +79,7 @@ function RouteComponent() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            // pb: 3,
           }}
         >
           <ButtonLink
@@ -123,7 +142,11 @@ function RouteComponent() {
           </Typography>
         </Box>
 
-        <DashboardDisplayOptions />
+        <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
+          <Container maxWidth='sm' disableGutters>
+            <DashboardDisplayOptions />
+          </Container>
+        </Paper>
       </Stack>
     </>
   );
