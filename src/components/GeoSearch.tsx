@@ -227,8 +227,9 @@ export function HoverInfo({
         p: slots?.hit ? 0 : 2,
         borderRadius: 1,
         border: slots?.hit ? `1px solid ${theme.vars.palette.divider}` : 'none',
+        maxWidth: 360,
+        maxHeight: 400,
       }}
-      // onClick={console.log}
     >
       {onClose ? (
         <IconButton
