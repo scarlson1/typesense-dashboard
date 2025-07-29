@@ -32,6 +32,8 @@ import {
 import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 
+console.log('test');
+
 const SwipeableEdgeDrawer = lazy(
   () => import('@/components/SwipeableEdgeDrawer')
 );
