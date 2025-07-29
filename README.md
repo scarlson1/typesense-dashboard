@@ -84,6 +84,8 @@ TODO
 
 ![search](docs/images/search.png)
 
+![geo search](docs/images/geosearch.png)
+
 ![search parameters](docs/images/search_params.png)
 
 ![server status](docs/images/server_status.png)

@@ -248,7 +248,7 @@ export function DashboardDisplayOptions() {
             maxWidth: 500,
             // flex: '0 0 40%',
             flex: '1 1 0',
-            ml: { xs: `0 !important`, sm: 2 },
+            ml: { xs: `0 !important`, sm: `16px !important` },
           }}
           slotProps={{
             paper: {
