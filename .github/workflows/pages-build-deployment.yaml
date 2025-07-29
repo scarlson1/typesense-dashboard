@@ -42,6 +42,7 @@ jobs:
         run: npm run build
         env:
           VITE_APP_VERSION: ${{ steps.vars.outputs.tag }}
+          VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN}}
           # VITE_APP_VERSION: ${{ github.event.release.tag_name }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
