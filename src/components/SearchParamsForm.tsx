@@ -89,9 +89,9 @@ export const SearchParamsForm = withForm({
         <Grid
           size={{ xs: 12, sm: 3 }}
           sx={{
-            display: 'flex',
             justifyContent: 'flex-end',
             alignItems: 'center',
+            display: { xs: 'none', sm: 'flex' },
           }}
         >
           <Typography sx={{ textAlign: 'right' }} component='div'>
@@ -144,7 +144,7 @@ export const SearchParamsForm = withForm({
         <Grid
           size={{ xs: 12, sm: 3 }}
           sx={{
-            display: 'flex',
+            display: { xs: 'none', sm: 'flex' },
             justifyContent: 'flex-end',
             alignItems: 'center',
           }}
@@ -186,7 +186,7 @@ export const SearchParamsForm = withForm({
         <Grid
           size={{ xs: 12, sm: 3 }}
           sx={{
-            display: 'flex',
+            display: { xs: 'none', sm: 'flex' },
             justifyContent: 'flex-end',
             alignItems: 'center',
           }}
@@ -228,7 +228,7 @@ export const SearchParamsForm = withForm({
         <Grid
           size={{ xs: 12, sm: 3 }}
           sx={{
-            display: 'flex',
+            display: { xs: 'none', sm: 'flex' },
             justifyContent: 'flex-end',
             alignItems: 'center',
           }}
@@ -279,7 +279,7 @@ export const SearchParamsForm = withForm({
         <Grid
           size={{ xs: 12, sm: 3 }}
           sx={{
-            display: 'flex',
+            display: { xs: 'none', sm: 'flex' },
             justifyContent: 'flex-end',
             alignItems: 'center',
           }}
@@ -320,7 +320,7 @@ export const SearchParamsForm = withForm({
         <Grid
           size={{ xs: 12, sm: 3 }}
           sx={{
-            display: 'flex',
+            display: { xs: 'none', sm: 'flex' },
             justifyContent: 'flex-end',
             alignItems: 'flex-start',
           }}
