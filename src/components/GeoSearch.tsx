@@ -25,7 +25,7 @@ import type { SearchResponseHit } from 'typesense/lib/Typesense/Documents';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 const MAP_LIGHT_STYLE = 'mapbox://styles/mapbox/light-v11';
-const MAP_DARK_STYLE = 'mapbox://styles/mapbox/dark-v11';
+const MAP_DARK_STYLE = 'mapbox://styles/s-carlson/cmdp028fi00b201qp3n382bo0'; // 'mapbox://styles/mapbox/dark-v11';
 // https://deck.gl/docs/api-reference/core/deck#initialviewstate
 const INITIAL_VIEW_STATE: MapViewState = {
   latitude: 37.5,
