@@ -1,9 +1,12 @@
+import { ErrorFallback } from '@/components';
 import { AppNavbar } from '@/components/AppNavbar';
 import { Header } from '@/components/Header';
 import { SideMenu } from '@/components/SideMenu';
 import { typesenseStore } from '@/utils';
 import { alpha, Box, Stack } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { ErrorBoundary } from 'react-error-boundary';
 
 function isAuthenticated() {
   const creds = typesenseStore.getState().credentials;
@@ -60,7 +63,14 @@ function RouteComponent() {
               pb: 5,
             }}
           >
-            <Outlet />
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: Error) => {
+                captureException(err);
+              }}
+            >
+              <Outlet />
+            </ErrorBoundary>
           </Box>
         </Stack>
       </Box>

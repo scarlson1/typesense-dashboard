@@ -4,6 +4,7 @@ import { typesenseFieldType, type TypesenseFieldType } from '@/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo, type ReactNode } from 'react';
 import type { Client } from 'typesense';
+import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
 // TODO:  use zustand to store collectionId ??
@@ -64,6 +65,7 @@ export function CollectionProvider<T extends DocumentSchema>({
     sortByOptions = [],
     facetByOptions = [],
     groupByOptions = [],
+    geoFieldOptions = [],
   ] = useMemo(() => {
     const queryByOptions = data?.fields
       .filter(
@@ -84,7 +86,22 @@ export function CollectionProvider<T extends DocumentSchema>({
       .filter((field) => field.facet)
       .map((f) => f.name);
 
-    return [queryByOptions, sortByOptions, facetByOptions, groupByOptions];
+    const geoFieldOptions = data?.fields
+      .filter((field) =>
+        [
+          typesenseFieldType.enum.geopoint,
+          typesenseFieldType.enum['geopoint[]'],
+        ].includes(field.type as 'geopoint' | 'geopoint[]')
+      )
+      .map((f: CollectionFieldSchema) => f.name);
+
+    return [
+      queryByOptions,
+      sortByOptions,
+      facetByOptions,
+      groupByOptions,
+      geoFieldOptions,
+    ];
   }, [data?.fields]);
 
   const memoizedValue: CollectionContextValues<Error> = useMemo(
@@ -101,6 +118,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       sortByOptions,
       facetByOptions,
       groupByOptions,
+      geoFieldOptions,
       // setCollectionId,
     }),
     [
@@ -115,6 +133,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       queryByOptions,
       facetByOptions,
       groupByOptions,
+      geoFieldOptions,
       // setCollectionId,
     ]
   );
