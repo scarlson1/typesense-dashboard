@@ -36,6 +36,8 @@ $ docker build -t typesense-dashboard .
 $ docker run -d -p 8108:8108 typesense-dashboard
 ```
 
+If you want to enable geosearch, pass a boxbox key as an environment variable (i.e. docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token")
+
 <!-- To use the latest pre-built image:
 
 ```bash
