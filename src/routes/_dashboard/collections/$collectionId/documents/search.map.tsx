@@ -27,6 +27,7 @@ import {
   Stack,
   Typography,
   useMediaQuery,
+  type PopperProps,
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
@@ -105,11 +106,31 @@ function RouteComponent() {
         <Suspense>
           <SwipeableEdgeDrawer
             tabContent={
-              hitCount !== undefined ? (
-                <Typography sx={{ p: 2, color: 'text.secondary' }}>
-                  {`${hitCount} results`}
-                </Typography>
-              ) : null
+              <Stack
+                direction='row'
+                spacing={1}
+                sx={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mx: 2,
+                  height: '100%',
+                }}
+              >
+                {hitCount !== undefined ? (
+                  <Typography sx={{ color: 'text.secondary' }}>
+                    {`${hitCount} results`}
+                  </Typography>
+                ) : (
+                  <div />
+                )}
+                <DisplayOptionsButton
+                  setGeoFieldName={setGeoFieldName}
+                  geoFieldName={geoFieldName || ''}
+                  geoFieldOptions={geoFieldOptions}
+                  placement='auto'
+                  sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                />
+              </Stack>
             }
           >
             <ContextHits hitWrapperProps={{ size: 12 }} />
@@ -194,7 +215,8 @@ function RouteComponent() {
   );
 }
 
-interface DashboardDisplayOptionsProps {
+interface DashboardDisplayOptionsProps
+  extends Omit<PopperProps, 'open' | 'anchorEl'> {
   setGeoFieldName: (field: string) => void;
   geoFieldName: string;
   geoFieldOptions: string[];
@@ -204,6 +226,7 @@ function DisplayOptionsButton({
   setGeoFieldName,
   geoFieldName,
   geoFieldOptions,
+  ...props
 }: DashboardDisplayOptionsProps) {
   const anchorRef = useRef<HTMLButtonElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
@@ -231,6 +254,10 @@ function DisplayOptionsButton({
         aria-expanded={open ? 'true' : undefined}
         aria-haspopup='true'
         onClick={handleToggle}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 2,
+          pointerEvents: 'auto',
+        }}
       >
         <SettingsRounded fontSize='inherit' />
       </IconButton>
@@ -239,6 +266,7 @@ function DisplayOptionsButton({
         anchorEl={anchorRef.current}
         placement='bottom-end'
         role={undefined}
+        {...props}
       >
         <ClickAwayListener onClickAway={handleClose} mouseEvent='onMouseUp'>
           <Paper
@@ -250,13 +278,20 @@ function DisplayOptionsButton({
               px: 1.5,
               bgcolor: 'background.paper',
               border: (theme) => `1px solid ${theme.vars.palette.divider}`,
-              zIndex: 1200,
+              zIndex: 2200,
               maxHeight: '70vh',
               overflowY: 'auto',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', pb: 2 }}>
-              <Typography sx={{ textAlign: 'right', flex: '0 0 25%', mr: 2 }}>
+              <Typography
+                sx={{
+                  textAlign: 'right',
+                  flex: '0 0 25%',
+                  mr: 2,
+                  display: { xs: 'none', sm: 'block' },
+                }}
+              >
                 Geo field
               </Typography>
               <FormControl
@@ -280,7 +315,14 @@ function DisplayOptionsButton({
               </FormControl>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', pb: 2 }}>
-              <Typography sx={{ textAlign: 'right', flex: '0 0 25%', mr: 2 }}>
+              <Typography
+                sx={{
+                  textAlign: 'right',
+                  flex: '0 0 25%',
+                  mr: 2,
+                  display: { xs: 'none', sm: 'block' },
+                }}
+              >
                 Hits limit
               </Typography>
               <CtxPageSize />

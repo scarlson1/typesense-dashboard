@@ -1,4 +1,4 @@
-import { useDebounce, useHits, useSearchParams } from '@/hooks';
+import { useDebounce, useHits, useSearchParams, useSearchSlots } from '@/hooks';
 import {
   WebMercatorViewport,
   type MapViewState,
@@ -15,7 +15,13 @@ import {
   useTheme,
 } from '@mui/material';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 import { Map } from 'react-map-gl/mapbox';
 import type { SearchResponseHit } from 'typesense/lib/Typesense/Documents';
 
@@ -204,60 +210,66 @@ export function HoverInfo({
   children,
 }: HoverInfoProps) {
   const theme = useTheme();
+  const [slots, slotProps] = useSearchSlots();
+
   if (!(pickingInfo && pickingInfo.object)) return null;
 
+  let closeButtonSx = slots?.hit ? { left: 6 } : { right: 6 };
+
   return (
-    // <Popup
-    //   longitude={pickingInfo.coordinate ? pickingInfo.coordinate[0] : 0}
-    //   latitude={pickingInfo.coordinate ? pickingInfo.coordinate![1] : 0}
-    //   closeButton={false}
-    //   anchor='left'
-    //   // offsetLeft={10}
-    // >
     <Box
       sx={{
         position: 'absolute',
         zIndex: 100,
-        // pointerEvents: 'none',
         left: pickingInfo.x,
         top: pickingInfo.y,
         backgroundColor: 'background.paper',
-        p: 2,
+        p: slots?.hit ? 0 : 2,
         borderRadius: 1,
-        border: `1px solid ${theme.vars.palette.divider}`,
-        // display: 'flex',
-        // alignItems: 'center',
-        // flexWrap: 'wrap',
-        // maxHeight: 360,
-        // maxWidth: 300,
-        // overflowY: 'auto',
-        // pointerEvents: 'all'
+        border: slots?.hit ? `1px solid ${theme.vars.palette.divider}` : 'none',
       }}
-      onClick={console.log}
+      // onClick={console.log}
     >
       {onClose ? (
         <IconButton
           size='small'
           onClick={onClose}
-          sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2000 }}
+          sx={{ position: 'absolute', top: 6, zIndex: 2000, ...closeButtonSx }}
         >
           <CloseRounded fontSize='inherit' />
         </IconButton>
       ) : null}
-      <Box sx={{ overflowX: 'auto', maxHeight: 360, maxWidth: 300 }}>
-        <Typography
-          variant='body2'
-          component='div'
-          sx={{ fontSize: `0.775rem` }}
+      {slots?.hit ? (
+        <slots.hit
+          {...slotProps?.hit}
+          hit={pickingInfo.object}
+          imgProps={slotProps?.hitImg || {}}
         >
-          {renderTooltipContent ? (
-            renderTooltipContent(pickingInfo)
-          ) : (
-            <pre>{JSON.stringify(pickingInfo.object.document, null, 2)}</pre>
-          )}
-          {/* // : pickingInfo.object.properties?.NAME || ''} */}
-        </Typography>
-      </Box>
+          {slots?.hitActions ? (
+            <Suspense>
+              <slots.hitActions
+                docData={pickingInfo.object.document}
+                docId={pickingInfo.object.document.id}
+                {...slotProps?.hitActions}
+              />
+            </Suspense>
+          ) : null}
+        </slots.hit>
+      ) : (
+        <Box sx={{ overflowX: 'auto', maxHeight: 360, maxWidth: 300 }}>
+          <Typography
+            variant='body2'
+            component='div'
+            sx={{ fontSize: `0.775rem` }}
+          >
+            {renderTooltipContent ? (
+              renderTooltipContent(pickingInfo)
+            ) : (
+              <pre>{JSON.stringify(pickingInfo.object.document, null, 2)}</pre>
+            )}
+          </Typography>
+        </Box>
+      )}
 
       {children}
     </Box>

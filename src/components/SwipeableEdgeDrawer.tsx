@@ -1,5 +1,4 @@
 import { styled, SwipeableDrawer } from '@mui/material';
-import { grey } from '@mui/material/colors';
 import { useState, type ReactNode } from 'react';
 
 const drawerBleeding = 56;
@@ -7,20 +6,20 @@ const drawerBleeding = 56;
 const StyledBox = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
   ...theme.applyStyles('dark', {
-    backgroundColor: grey[800],
+    backgroundColor: theme.vars.palette.grey[700], // grey[800],
   }),
 }));
 
 const Puller = styled('div')(({ theme }) => ({
   width: 30,
   height: 6,
-  backgroundColor: grey[300],
+  backgroundColor: theme.vars.palette.grey[300], // grey[300],
   borderRadius: 3,
   position: 'absolute',
   top: 8,
   left: 'calc(50% - 15px)',
   ...theme.applyStyles('dark', {
-    backgroundColor: grey[900],
+    backgroundColor: theme.vars.palette.grey[500], // grey[700],
   }),
 }));
 
@@ -73,6 +72,8 @@ export default function SwipeableEdgeDrawer({
             visibility: 'visible',
             right: 0,
             left: 0,
+            height: drawerBleeding,
+            // pointerEvents: 'auto',
           }}
         >
           <Puller />
