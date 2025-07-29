@@ -8,6 +8,7 @@ export const useDefaultIndexParams = () => {
     sortByOptions,
     facetByOptions,
     groupByOptions,
+    geoFieldOptions,
   } = useCollectionSchema();
 
   return useMemo(
@@ -17,6 +18,7 @@ export const useDefaultIndexParams = () => {
       sortByOptions,
       facetByOptions,
       groupByOptions,
+      geoFieldOptions,
     }),
     [
       defaultSortingField,
@@ -24,6 +26,7 @@ export const useDefaultIndexParams = () => {
       sortByOptions,
       facetByOptions,
       groupByOptions,
+      geoFieldOptions,
     ]
   );
 };

@@ -1,9 +1,12 @@
+import { ErrorFallback } from '@/components';
 import { AppNavbar } from '@/components/AppNavbar';
 import { Header } from '@/components/Header';
 import { SideMenu } from '@/components/SideMenu';
 import { typesenseStore } from '@/utils';
 import { alpha, Box, Stack } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { ErrorBoundary } from 'react-error-boundary';
 
 function isAuthenticated() {
   const creds = typesenseStore.getState().credentials;
@@ -34,6 +37,8 @@ function RouteComponent() {
       <Box
         component='main'
         sx={(theme) => ({
+          // TODO: use css var for AppNavbar height
+          // height: { xs: 'calc(100vh - 60px)', md: '100vh' },
           flexGrow: 1,
           backgroundColor: theme.vars
             ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
@@ -51,8 +56,21 @@ function RouteComponent() {
           }}
         >
           <Header />
-          <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1600px' } }}>
-            <Outlet />
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: { sm: '100%', md: '1600px' },
+              pb: 5,
+            }}
+          >
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: Error) => {
+                captureException(err);
+              }}
+            >
+              <Outlet />
+            </ErrorBoundary>
           </Box>
         </Stack>
       </Box>

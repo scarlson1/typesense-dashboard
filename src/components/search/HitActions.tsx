@@ -78,6 +78,9 @@ function DeleteDocumentIconButton({
           dialog: {
             maxWidth: 'sm',
           },
+          acceptButton: {
+            children: 'confirm',
+          },
         },
       });
       deleteMutation.mutate({ collectionId, docId });
@@ -164,6 +167,9 @@ function ViewDocumentIconButton({
       slotProps: {
         dialog: {
           maxWidth: 'sm',
+        },
+        acceptButton: {
+          children: 'close',
         },
       },
     });

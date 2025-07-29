@@ -1,5 +1,5 @@
 import { useHits, useSearch, useSearchSlots } from '@/hooks';
-import { Typography } from '@mui/material';
+import { Typography, type GridProps } from '@mui/material';
 import { Fragment, Suspense, type ReactNode } from 'react';
 
 function CtxHits({ children }: { children?: ReactNode }) {
@@ -38,15 +38,19 @@ function CtxHits({ children }: { children?: ReactNode }) {
   ) : null;
 }
 
-function CtxHitWrapper(props: { children?: ReactNode }) {
+type CtxHitWrapperProps = Partial<GridProps>;
+
+function CtxHitWrapper({ children, ...overrides }: CtxHitWrapperProps) {
+  // { children?: ReactNode }
   const [slots, slotProps] = useSearchSlots();
 
   return slots.hitWrapper ? (
-    <slots.hitWrapper {...slotProps.hitWrapper}>
-      {props?.children}
+    <slots.hitWrapper {...slotProps.hitWrapper} {...overrides}>
+      {/* {props?.children} */}
+      {children}
     </slots.hitWrapper>
   ) : (
-    <Fragment>{props?.children}</Fragment>
+    <Fragment>{children}</Fragment>
   );
 }
 
@@ -63,14 +67,22 @@ CtxHits.HitWrapper = CtxHitWrapper;
 // }
 // CtxHits.HitActions = CtxHitActions
 
-function CtxHit(props: { children?: ReactNode }) {
+type CtxHitProps = {
+  children?: ReactNode;
+  hitWrapperProps?: Partial<GridProps>;
+};
+
+function CtxHit({ children, hitWrapperProps }: CtxHitProps) {
   const hits = useHits();
   const [slots, slotProps] = useSearchSlots();
 
   return slots?.hit ? (
     <>
       {hits?.hits?.map((hit, i) => (
-        <CtxHitWrapper key={`hit-${hit.document.id}-${i}-wrapper`}>
+        <CtxHitWrapper
+          key={`hit-${hit.document.id}-${i}-wrapper`}
+          {...hitWrapperProps}
+        >
           <slots.hit
             {...slotProps?.hit}
             hit={hit}
@@ -86,7 +98,7 @@ function CtxHit(props: { children?: ReactNode }) {
                 />
               </Suspense>
             ) : null}
-            {props?.children}
+            {children}
           </slots.hit>
         </CtxHitWrapper>
       ))}
@@ -96,10 +108,14 @@ function CtxHit(props: { children?: ReactNode }) {
 
 CtxHits.Hit = CtxHit;
 
-export function ContextHits() {
+interface ContextHitsProps {
+  hitWrapperProps?: CtxHitWrapperProps;
+}
+
+export function ContextHits({ hitWrapperProps }: ContextHitsProps) {
   return (
     <CtxHits>
-      <CtxHits.Hit />
+      <CtxHits.Hit hitWrapperProps={hitWrapperProps} />
     </CtxHits>
   );
 }

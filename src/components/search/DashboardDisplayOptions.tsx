@@ -7,7 +7,6 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Stack,
   TextField,
@@ -133,195 +132,216 @@ export function DashboardDisplayOptions() {
   }, []);
 
   return (
-    <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
-      <Stack direction='column' spacing={1.5}>
-        <Stack
-          direction='row'
-          spacing={2}
-          sx={{ display: 'flex', alignItems: 'center' }}
+    // <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
+    <Stack direction='column' spacing={1.5}>
+      <Stack
+        direction='row'
+        spacing={2}
+        sx={{ display: 'flex', alignItems: 'center' }}
+      >
+        <Typography
+          sx={{
+            textAlign: 'right',
+            // flex: '0 0 auto',
+            // width: { xs: 120, sm: 150, md: 200 },
+            flex: '0 0 25%',
+          }}
         >
-          <Typography
-            sx={{
-              textAlign: 'right',
-              flex: '0 0 auto',
-              width: { xs: 120, sm: 150, md: 200 },
-            }}
-          >
-            Display Fields
-          </Typography>
-          <Autocomplete
-            multiple
-            id='display-fields'
-            size='small'
-            limitTags={4}
-            blurOnSelect
-            options={fieldOptions}
-            value={slotProps.hit?.displayFields || []}
-            onChange={handleFieldsChange}
-            renderInput={(params) => (
-              <TextField {...params} label='Display Fields' />
-            )}
-            sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
-            slotProps={{
-              paper: {
-                sx: {
-                  border: (theme) => `1px solid ${theme.palette.divider}`,
-                },
+          Display fields
+        </Typography>
+        <Autocomplete
+          multiple
+          id='display-fields'
+          size='small'
+          limitTags={4}
+          blurOnSelect
+          fullWidth
+          options={fieldOptions}
+          value={slotProps.hit?.displayFields || []}
+          onChange={handleFieldsChange}
+          renderInput={(params) => (
+            <TextField {...params} label='Display Fields' />
+          )}
+          // sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
+          sx={{ minWidth: { xs: 100, sm: 120, md: 140 }, maxWidth: 500 }}
+          slotProps={{
+            paper: {
+              sx: {
+                border: (theme) => `1px solid ${theme.palette.divider}`,
               },
-            }}
-          />
-        </Stack>
-
-        <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>
-          <Typography
-            sx={{
-              textAlign: 'right',
-              flex: '0 0 auto',
-              width: { xs: 120, sm: 150, md: 200 },
-            }}
-          >
-            Image Field
-          </Typography>
-          <Autocomplete
-            id='image-field'
-            size='small'
-            freeSolo
-            blurOnSelect
-            selectOnFocus
-            clearOnBlur
-            options={imageFieldOptions}
-            value={slotProps?.hit?.imgField || ''}
-            onChange={handleImageChange}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-
-              const { inputValue } = params;
-              // Suggest the creation of a new value
-              const isExisting = options.some(
-                (option) => inputValue === option.title
-              );
-              if (inputValue !== '' && !isExisting) {
-                filtered.push({
-                  inputValue,
-                  title: `Add "${inputValue}"`,
-                });
-              }
-
-              return filtered;
-            }}
-            getOptionLabel={(option) => {
-              // Value selected with enter, right from the input
-              if (typeof option === 'string') {
-                return option;
-              }
-              // Add "xxx" option created dynamically
-
-              if (option.inputValue) {
-                // @ts-ignore
-                return option.inputValue;
-              }
-              // Regular option
-              return option.title;
-            }}
-            // value={slotProps.hit?.displayFields || []}
-            noOptionsText='No fields with image types were found, but you can still type any field name here'
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label='Image Field'
-                helperText='The selected field is used to show an image in the results above.'
-              />
-            )}
-            sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
-            slotProps={{
-              paper: {
-                sx: {
-                  border: (theme) => `1px solid ${theme.palette.divider}`,
-                },
-              },
-            }}
-          />
-          {/* TODO: img fit */}
-          <FormControl size='small' sx={{ alignSelf: 'flex-start' }}>
-            <InputLabel id='img-size-label'>Image Size</InputLabel>
-            <Select<string>
-              labelId='img-size-label'
-              id='img-size'
-              // @ts-ignore
-              value={slotProps?.hitImg?.sx?.backgroundSize || ''}
-              onChange={handleImgSizeChange}
-              size='small'
-              label='Image size'
-              sx={{ minWidth: 120, maxWidth: 200, alignSelf: 'flex-start' }}
-              MenuProps={{
-                slotProps: {
-                  paper: {
-                    elevation: 0,
-                    sx: {
-                      border: (theme) => `1px solid ${theme.palette.divider}`,
-                    },
-                  },
-                },
-              }}
-            >
-              <MenuItem value={''}>{'default'}</MenuItem>
-              {imgFitOptions.map((o) => (
-                <MenuItem value={o} key={`${o}-bg-fit`}>
-                  {o}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Stack>
-
-        <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>
-          <Typography
-            sx={{
-              textAlign: 'right',
-              flex: '0 0 auto',
-              width: { xs: 120, sm: 150, md: 200 },
-            }}
-          >
-            Number of Columns in View
-          </Typography>
-          <FormControl size='small'>
-            <InputLabel id='display-columns-label'>Columns</InputLabel>
-            <Select
-              labelId='display-columns-label'
-              id='display-columns'
-              value={
-                typeof slotProps?.hitWrapper?.size === 'number'
-                  ? slotProps?.hitWrapper?.size / 12
-                  : 0
-              }
-              onChange={handleSizeChange}
-              size='small'
-              label='Columns'
-              sx={{ minWidth: 100, maxWidth: 200 }}
-              MenuProps={{
-                slotProps: {
-                  paper: {
-                    elevation: 0,
-                    sx: {
-                      border: (theme) => `1px solid ${theme.palette.divider}`,
-                    },
-                  },
-                },
-              }}
-            >
-              <MenuItem value={0}>Default</MenuItem>
-              {selectOptions.map((o) => (
-                <MenuItem value={o} key={`${o}-columns`}>
-                  {o}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button size='small' onClick={handleResetGrid}>
-            reset
-          </Button>
-        </Stack>
+            },
+          }}
+        />
       </Stack>
-    </Paper>
+
+      <Stack
+        direction='row'
+        spacing={2}
+        // useFlexGap
+        sx={{ alignItems: 'center' }}
+      >
+        <Typography
+          sx={{
+            textAlign: 'right',
+            // flex: '0 0 auto',
+            // width: { xs: 120, sm: 150, md: 200 },
+            flex: '0 0 25%',
+          }}
+        >
+          Image field
+        </Typography>
+        <Autocomplete
+          id='image-field'
+          size='small'
+          freeSolo
+          blurOnSelect
+          selectOnFocus
+          clearOnBlur
+          options={imageFieldOptions}
+          value={slotProps?.hit?.imgField || ''}
+          onChange={handleImageChange}
+          filterOptions={(options, params) => {
+            const filtered = filter(options, params);
+
+            const { inputValue } = params;
+            // Suggest the creation of a new value
+            const isExisting = options.some(
+              (option) => inputValue === option.title
+            );
+            if (inputValue !== '' && !isExisting) {
+              filtered.push({
+                inputValue,
+                title: `Add "${inputValue}"`,
+              });
+            }
+
+            return filtered;
+          }}
+          getOptionLabel={(option) => {
+            // Value selected with enter, right from the input
+            if (typeof option === 'string') {
+              return option;
+            }
+            // Add "xxx" option created dynamically
+
+            if (option.inputValue) {
+              // @ts-ignore
+              return option.inputValue;
+            }
+            // Regular option
+            return option.title;
+          }}
+          // value={slotProps.hit?.displayFields || []}
+          noOptionsText='No fields with image types were found, but you can still type any field name here'
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label='Image Field'
+              helperText='The selected field is used to show an image in the results above.'
+            />
+          )}
+          // sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
+          sx={{
+            minWidth: { xs: 80, sm: 100 },
+            maxWidth: 500,
+            // flex: '0 0 40%',
+            flex: '1 1 0',
+          }}
+          slotProps={{
+            paper: {
+              sx: {
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+              },
+            },
+          }}
+        />
+        {/* TODO: img fit */}
+        <FormControl
+          size='small'
+          sx={{ alignSelf: 'flex-start', flex: '0 0 25%' }}
+          fullWidth
+        >
+          <InputLabel id='img-size-label'>Image size</InputLabel>
+          <Select<string>
+            labelId='img-size-label'
+            id='img-size'
+            fullWidth
+            // @ts-ignore
+            value={slotProps?.hitImg?.sx?.backgroundSize || ''}
+            onChange={handleImgSizeChange}
+            size='small'
+            label='Image size'
+            sx={{ minWidth: 80, maxWidth: 200, alignSelf: 'flex-start' }}
+            MenuProps={{
+              slotProps: {
+                paper: {
+                  elevation: 0,
+                  sx: {
+                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                  },
+                },
+              },
+            }}
+          >
+            <MenuItem value={''}>{'default'}</MenuItem>
+            {imgFitOptions.map((o) => (
+              <MenuItem value={o} key={`${o}-bg-fit`}>
+                {o}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+
+      <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>
+        <Typography
+          sx={{
+            textAlign: 'right',
+            // flex: '0 0 auto',
+            // width: { xs: 120, sm: 150, md: 200 },
+            flex: '0 0 25%',
+          }}
+        >
+          Number of columns in view
+        </Typography>
+        <FormControl size='small'>
+          <InputLabel id='display-columns-label'>Columns</InputLabel>
+          <Select
+            labelId='display-columns-label'
+            id='display-columns'
+            value={
+              typeof slotProps?.hitWrapper?.size === 'number'
+                ? slotProps?.hitWrapper?.size / 12
+                : 0
+            }
+            onChange={handleSizeChange}
+            size='small'
+            label='Columns'
+            sx={{ minWidth: 100, maxWidth: 200 }}
+            MenuProps={{
+              slotProps: {
+                paper: {
+                  elevation: 0,
+                  sx: {
+                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                  },
+                },
+              },
+            }}
+          >
+            <MenuItem value={0}>Default</MenuItem>
+            {selectOptions.map((o) => (
+              <MenuItem value={o} key={`${o}-columns`}>
+                {o}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button size='small' onClick={handleResetGrid}>
+          reset
+        </Button>
+      </Stack>
+    </Stack>
+    // {/* </Paper> */}
   );
 }

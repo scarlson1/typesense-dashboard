@@ -157,6 +157,7 @@ export function MenuContent() {
       match?.params?.collectionId !== selectedCollection
     ) {
       navigate({
+        // @ts-ignore
         to: match.fullPath,
         params: { collectionId: selectedCollection },
       });
