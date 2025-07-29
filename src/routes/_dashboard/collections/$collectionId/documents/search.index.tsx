@@ -78,7 +78,7 @@ function RouteComponent() {
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: { xs: 'flex-end', sm: 'center' },
             // pb: 3,
           }}
         >
@@ -96,8 +96,10 @@ function RouteComponent() {
             spacing={2}
             sx={{
               flex: '1 1 auto',
-              justifyContent: 'flex-end',
+              justifyContent: { xs: 'space-between', sm: 'flex-end' },
               alignItems: 'center',
+              my: 1,
+              width: { xs: '100%', sm: 'auto' },
             }}
           >
             <CtxPageSize />
@@ -105,7 +107,7 @@ function RouteComponent() {
           </Stack>
         </Stack>
 
-        <Box>
+        <Box sx={{ pt: 2 }}>
           <Typography variant='h5' gutterBottom id='search-params'>
             Search Parameters
           </Typography>
@@ -132,7 +134,7 @@ function RouteComponent() {
           </Paper>
         </Suspense>
 
-        <Box>
+        <Box sx={{ pt: 2 }}>
           <Typography variant='h6' gutterBottom>
             Dashboard Display Options
           </Typography>

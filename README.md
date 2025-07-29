@@ -72,6 +72,7 @@ TODO
 - [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
 - [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
+- Improved geosearch UI
 - Search results view customization
 - Improve search implementation
 - Delete documents by query

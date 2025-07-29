@@ -32,13 +32,11 @@ import {
 import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 
-console.log('test');
-
 const SwipeableEdgeDrawer = lazy(
   () => import('@/components/SwipeableEdgeDrawer')
 );
 
-// TODO: filter / display settings for mobile
+// TODO: filter / display settings for mobile (number of results, pagination, etc.)
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search/map'
@@ -116,7 +114,7 @@ function RouteComponent() {
           >
             {/* <Alert severity='warning' sx={{ mb: 2, maxWidth: 400, mx: 'auto' }}>
               <AlertTitle>Swipeable Drawer Bug</AlertTitle>
-              TODO: touch scroll issue when rendered above map:{' '}
+              Touch scroll issue when rendered above map:{' '}
               <Link
                 href='https://github.com/mui/material-ui/issues/37814'
                 target='_blank'
@@ -128,6 +126,9 @@ function RouteComponent() {
               </Link>
             </Alert> */}
             <ContextHits hitWrapperProps={{ size: 12 }} />
+            <Box sx={{ py: 1, mx: 'auto' }}>
+              <CtxPagination />
+            </Box>
           </SwipeableEdgeDrawer>
         </Suspense>
       ) : null}

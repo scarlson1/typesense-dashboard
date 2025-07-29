@@ -136,7 +136,7 @@ export function DashboardDisplayOptions() {
     <Stack direction='column' spacing={1.5}>
       <Stack
         direction='row'
-        spacing={2}
+        spacing={{ xs: 0, sm: 2 }}
         sx={{ display: 'flex', alignItems: 'center' }}
       >
         <Typography
@@ -145,6 +145,7 @@ export function DashboardDisplayOptions() {
             // flex: '0 0 auto',
             // width: { xs: 120, sm: 150, md: 200 },
             flex: '0 0 25%',
+            display: { xs: 'none', sm: 'block' },
           }}
         >
           Display fields
@@ -176,7 +177,7 @@ export function DashboardDisplayOptions() {
 
       <Stack
         direction='row'
-        spacing={2}
+        spacing={{ xs: 1, sm: 2 }}
         // useFlexGap
         sx={{ alignItems: 'center' }}
       >
@@ -186,6 +187,7 @@ export function DashboardDisplayOptions() {
             // flex: '0 0 auto',
             // width: { xs: 120, sm: 150, md: 200 },
             flex: '0 0 25%',
+            display: { xs: 'none', sm: 'block' },
           }}
         >
           Image field
@@ -246,6 +248,7 @@ export function DashboardDisplayOptions() {
             maxWidth: 500,
             // flex: '0 0 40%',
             flex: '1 1 0',
+            ml: { xs: `0 !important`, sm: 2 },
           }}
           slotProps={{
             paper: {
@@ -258,7 +261,10 @@ export function DashboardDisplayOptions() {
         {/* TODO: img fit */}
         <FormControl
           size='small'
-          sx={{ alignSelf: 'flex-start', flex: '0 0 25%' }}
+          sx={{
+            alignSelf: 'flex-start',
+            flex: '0 0 25%',
+          }}
           fullWidth
         >
           <InputLabel id='img-size-label'>Image size</InputLabel>
@@ -293,13 +299,18 @@ export function DashboardDisplayOptions() {
         </FormControl>
       </Stack>
 
-      <Stack direction='row' spacing={2} sx={{ alignItems: 'center' }}>
+      <Stack
+        direction='row'
+        spacing={{ xs: 0, sm: 2 }}
+        sx={{ alignItems: 'center' }}
+      >
         <Typography
           sx={{
             textAlign: 'right',
             // flex: '0 0 auto',
             // width: { xs: 120, sm: 150, md: 200 },
             flex: '0 0 25%',
+            display: { xs: 'none', sm: 'block' },
           }}
         >
           Number of columns in view
