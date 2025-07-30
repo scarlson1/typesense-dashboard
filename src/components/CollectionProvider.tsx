@@ -36,10 +36,6 @@ export function CollectionProvider<T extends DocumentSchema>({
   collectionId,
   staleTime = 30000,
 }: CollectionContextProps) {
-  // const [collectionId, setCollectionId] = useState<string | null>(
-  //   collectionName
-  // );
-
   const {
     data,
     isLoading,

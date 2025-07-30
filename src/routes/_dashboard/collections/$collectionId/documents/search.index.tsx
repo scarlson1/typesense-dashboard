@@ -29,23 +29,6 @@ function RouteComponent() {
 
   return (
     <>
-      {/* <Stack
-        direction='row'
-        spacing={2}
-        sx={{ justifyContent: 'space-between', alignItems: 'center' }}
-      >
-        <ButtonLink
-          // to={Route.fullPath}
-          to={'.'}
-          params={{ collectionId }}
-          hash='search-params'
-          endIcon={<ExpandMoreRounded />}
-          size='small'
-        >
-          Search Parameters
-        </ButtonLink>
-        <CtxRefinements />
-      </Stack> */}
       <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
         <Box>
           <SearchBox sx={{ my: 1 }} />
@@ -59,7 +42,6 @@ function RouteComponent() {
             </Box>
 
             <ButtonLink
-              // to={Route.fullPath}
               to={'.'}
               params={{ collectionId }}
               hash='search-params'
@@ -79,7 +61,6 @@ function RouteComponent() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: { xs: 'flex-end', sm: 'center' },
-            // pb: 3,
           }}
         >
           <ButtonLink

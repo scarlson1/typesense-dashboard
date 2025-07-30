@@ -31,6 +31,7 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
     setOpen(false);
   };
 
+  // only show count of filters ?? (not sort ??)
   const activeRefinements = useMemo(() => {
     const { sort_by, filter_by } = params || {};
 
@@ -40,7 +41,8 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
         ? sort_by.split(',').length
         : 0;
 
-    let filterByCount: number = filter_by ? filter_by.split(',').length : 0;
+    // TODO: handle filter combinations other than &&
+    let filterByCount: number = filter_by ? filter_by.split('&&').length : 0;
 
     return sortByCount + filterByCount;
   }, [params?.sort_by, params?.filter_by]);
@@ -72,7 +74,6 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
         anchorEl={anchorRef.current}
         placement='bottom-end'
         role={undefined}
-        // disablePortal
       >
         <ClickAwayListener onClickAway={handleClose} mouseEvent='onMouseUp'>
           <Paper
