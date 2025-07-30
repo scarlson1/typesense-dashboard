@@ -340,8 +340,7 @@ export const CtxFacetOptions = () => {
 function ValueLabelComponent(
   props: SliderValueLabelProps & { valueLabelDisplay: string }
 ) {
-  const { children, value, valueLabelDisplay, ...rest } = props;
-  console.log(rest);
+  const { children, value, valueLabelDisplay } = props;
   const [open, setOpen] = useState(() => valueLabelDisplay === 'on');
 
   const handleClose = () => {

@@ -8,8 +8,6 @@ Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesens
 
 ### Web
 
-Use an admin key to authenticate. Cluster credentials are stored in session storage and will be removed when the window is closed.
-
 Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (If using github pages option, Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https). Self-signed certificate reference: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
 
 You can use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add SSL if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
@@ -23,6 +21,8 @@ docker run -it -e NGROK_AUTHTOKEN=[YOUR_NGROK_TOKEN] ngrok/ngrok:latest http hos
 Then use the address displayed in your console under "Forwarding" as the node when connecting your cluster (ex: f4ab4aad2e7b.ngrok-free.app). [Ngrok docs](https://ngrok.com/docs/using-ngrok-with/docker/)
 
 If using the Github pages option, pass the `--enable-cors` flag in typesense command.
+
+Use an admin key to authenticate. Cluster credentials are stored in session storage and will be removed when the window is closed.
 
 ### Docker
 

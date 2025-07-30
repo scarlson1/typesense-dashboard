@@ -32,8 +32,12 @@ export const useCreateApiKey = (props?: UseNewApiKeyProps) => {
         variant: 'info',
         catchOnCancel: false,
         title: 'Copy new key',
-        description:
-          "Please copy the key below. IT CANNOT BE RETRIEVED LATER. If you lose the key, you'll need to create a new one.",
+        description: (
+          <>
+            Please copy the key below. <b>IT CANNOT BE RETRIEVED LATER</b>. If
+            you lose the key, you'll need to create a new one.
+          </>
+        ),
         content: (
           <Copy
             value={data.value}
