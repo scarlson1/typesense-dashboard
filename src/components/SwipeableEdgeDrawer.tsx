@@ -73,7 +73,6 @@ export default function SwipeableEdgeDrawer({
             right: 0,
             left: 0,
             height: drawerBleeding,
-            // pointerEvents: 'auto',
           }}
         >
           <Puller />

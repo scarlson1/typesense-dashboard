@@ -114,9 +114,7 @@ export function InstantSearch<T extends DocumentSchema>({
 
   return (
     <SearchContext.Provider value={memoizedValue}>
-      {/* <SearchSlotsProvider slots={slots} slotProps={slotProps}> */}
       {children}
-      {/* </SearchSlotsProvider> */}
     </SearchContext.Provider>
   );
 }
