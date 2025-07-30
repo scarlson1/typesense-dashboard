@@ -1,13 +1,9 @@
-import { SearchContext, type SearchContextValues } from '@/context';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
+import { useSearch } from './useSearch';
 
 export const useHits = <T extends DocumentSchema>() => {
-  const context = useContext<SearchContextValues<T, Error> | null>(
-    SearchContext
-  );
-  if (context === undefined)
-    throw new Error('useHits must be within a InstantSearch Provider');
+  const context = useSearch<T>();
 
   return useMemo(() => context?.data, [context?.data]);
 };
