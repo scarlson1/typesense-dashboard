@@ -279,6 +279,10 @@ function SchemaWarningAlert() {
   );
 }
 
+// BUG: opening schema in dialog editor disrupts new doc schema validation
+// pass ID to editor ?? ref issue ??
+// https://stackoverflow.com/questions/77135467/different-monaco-editor-components-sharing-same-schema
+
 function NewDocumentEditor() {
   const collectionId = Route.useParams({
     select: ({ collectionId }) => collectionId,
@@ -344,7 +348,8 @@ function NewDocumentEditor() {
             onValidate={(m) => {
               setMarkers(m);
             }}
-            schema={{}}
+            // schema={{}}
+            schema={undefined}
           />
         </Paper>
       </Suspense>

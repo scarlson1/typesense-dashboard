@@ -1,5 +1,6 @@
 import { type JsonEditorProps } from '@/components/JsonEditor';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
+import { gray } from '@/theme/themePrimitives';
 import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import { type EditorProps, type OnMount } from '@monaco-editor/react';
 import { OpenInNewRounded } from '@mui/icons-material';
@@ -10,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import Color from 'color';
 import { editor } from 'monaco-editor';
 import {
   lazy,
@@ -185,6 +187,11 @@ export function useCollectionEditorDialog(
                   setMarkers(m);
                 }}
                 schema={COLLECTION_SCHEMA}
+                slotProps={{
+                  background: {
+                    dark: Color(gray[800]).hex(),
+                  },
+                }}
               />
             </Suspense>
           );
