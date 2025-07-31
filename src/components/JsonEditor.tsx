@@ -21,14 +21,13 @@ export default function JsonEditor({
   schema = {},
   slotProps,
   onMount: onMountProp,
-
   ...props
 }: JsonEditorProps) {
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
   const editorId = useId();
 
-  const { onMount } = useInitMonaco({
+  const { onMount, editorPath } = useInitMonaco({
     schema,
     slotProps,
     onMount: onMountProp,
@@ -42,6 +41,7 @@ export default function JsonEditor({
       // theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
       theme={themeMode === 'dark' ? DARK_THEME : LIGHT_THEME}
       onMount={onMount}
+      path={editorPath}
       {...props}
     />
   );
@@ -67,10 +67,10 @@ function useInitMonaco({
       validate: true,
       schemas: [
         {
-          uri: `schema://${editorId}`,
+          uri: `schema://${editorId}`, // '', // 'http://json-schema.org/draft-04/schema#',
           fileMatch: [editorPath], // Match only this editor's path
           schema,
-          // // uri: '',
+          // uri: '',
           // fileMatch: ['*'], // ['*.json'], // associate with any file
           // schema,
         },

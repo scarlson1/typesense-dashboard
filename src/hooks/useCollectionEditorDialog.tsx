@@ -6,6 +6,7 @@ import { type EditorProps, type OnMount } from '@monaco-editor/react';
 import { OpenInNewRounded } from '@mui/icons-material';
 import {
   Button,
+  Paper,
   Skeleton,
   Stack,
   useMediaQuery,
@@ -177,22 +178,31 @@ export function useCollectionEditorDialog(
                 <Skeleton variant='rounded' height={'calc(100% - 12px)'} />
               }
             >
-              <JsonEditor
-                height='calc(100% - 12px)'
-                options={initialOptions}
-                onMount={handleEditorDidMount}
-                {...(props || {})}
-                value={value}
-                onValidate={(m) => {
-                  setMarkers(m);
+              <Paper
+                sx={{
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  height: 'calc(100% - 12px)',
                 }}
-                schema={COLLECTION_SCHEMA}
-                slotProps={{
-                  background: {
-                    dark: Color(gray[800]).hex(),
-                  },
-                }}
-              />
+              >
+                <JsonEditor
+                  // height='calc(100% - 12px)'
+                  height='100%'
+                  options={initialOptions}
+                  onMount={handleEditorDidMount}
+                  {...(props || {})}
+                  value={value}
+                  onValidate={(m) => {
+                    setMarkers(m);
+                  }}
+                  schema={COLLECTION_SCHEMA}
+                  slotProps={{
+                    background: {
+                      dark: Color(gray[800]).hex(),
+                    },
+                  }}
+                />
+              </Paper>
             </Suspense>
           );
         })(),
