@@ -282,16 +282,18 @@ function NewDocumentEditor() {
   return (
     <Box sx={{ py: 2, borderRadius: 1, overflow: 'hidden' }}>
       <Suspense fallback={<Skeleton variant='rounded' height={'50vh'} />}>
-        <JsonEditor
-          height='50vh'
-          onMount={handleMount}
-          options={DEFAULT_MONACO_OPTIONS}
-          value={value}
-          onValidate={(m) => {
-            setMarkers(m);
-          }}
-          schema={{}}
-        />
+        <Paper sx={{ borderRadius: 1, overflow: 'hidden' }}>
+          <JsonEditor
+            height='50vh'
+            onMount={handleMount}
+            options={DEFAULT_MONACO_OPTIONS}
+            value={value}
+            onValidate={(m) => {
+              setMarkers(m);
+            }}
+            schema={{}}
+          />
+        </Paper>
       </Suspense>
       <Stack
         direction='row'
