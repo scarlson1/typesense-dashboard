@@ -13,6 +13,7 @@ import {
   Typography,
   useColorScheme,
   useTheme,
+  type CSSProperties,
 } from '@mui/material';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {
@@ -40,6 +41,13 @@ const INITIAL_VIEW_STATE: MapViewState = {
   pitch: 30,
 };
 
+export const getPlaceMarker = (color: CSSProperties['color'] = '#000000') =>
+  `<svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="${color}"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
+
+function svgToDataURL(svg: any) {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 interface GeoSearchProps {
   geoFieldName: string;
   // layers?: LayersList | undefined;
@@ -52,6 +60,7 @@ const GeoSearch = ({
   // hoverInfo,
   renderTooltipContent,
 }: GeoSearchProps) => {
+  const theme = useTheme();
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
   const hits = useHits();
@@ -69,16 +78,27 @@ const GeoSearch = ({
       // data: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/bart-stations.json',
       data: hits?.hits || [],
       // getColor: (d) => [Math.sqrt(d.exits), 140, 0],
-      getIcon: () => 'marker',
+      // getIcon: () => 'marker',
+      getIcon: () => ({
+        url: svgToDataURL(`${getPlaceMarker(theme.palette.primary.main)}`),
+        width: 36,
+        height: 36,
+        anchorX: 18,
+        anchorY: 36,
+      }),
       getPosition: (d) => {
         let coords = d.document[geoFieldName] || [0, 0];
         return [coords[1], coords[0]];
       },
-      getSize: 30,
-      iconAtlas:
-        'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-      iconMapping:
-        'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.json',
+      getSize: 36,
+      updateTriggers: {
+        getIcon: [theme.palette.mode],
+      },
+      // scale: 1,
+      // iconAtlas:
+      //   'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+      // iconMapping:
+      //   'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.json',
       pickable: true,
       // onHover: (pickingInfo) => {
       //   setHoverInfo(pickingInfo || null);
