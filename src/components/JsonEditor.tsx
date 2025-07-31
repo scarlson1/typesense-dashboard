@@ -55,13 +55,10 @@ export default function JsonEditor({
         },
       });
 
-      console.log('ON MOUNT: ', theme.palette.mode, themeMode);
       monaco.editor.setTheme(themeMode === 'dark' ? DARK_THEME : LIGHT_THEME);
     },
     [schema, onMount, theme, themeMode]
   );
-
-  console.log('THEME MODE: ', themeMode);
 
   return (
     <Editor
