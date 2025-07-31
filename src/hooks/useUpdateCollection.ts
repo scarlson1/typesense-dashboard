@@ -29,7 +29,7 @@ export function useUpdateCollection(props?: UseUpdateCollection) {
       return { name: vars.colName };
     },
     onSuccess: (data, vars, ctx) => {
-      toast.success(`listing updated`, { id: 'update-schema' });
+      toast.success(`collection updated`, { id: 'update-schema' });
 
       onSuccess && onSuccess(data, vars, ctx);
     },

@@ -1,6 +1,7 @@
 import { DEFAULT_MONACO_OPTIONS } from '@/constants';
 import {
   useAsyncToast,
+  useCollectionEditorDialog,
   useImportDocuments,
   useSchema,
   type MultiDocImportRes,
@@ -10,6 +11,7 @@ import { typesenseStore } from '@/utils';
 import type { OnMount } from '@monaco-editor/react';
 import {
   ClearRounded,
+  CloseRounded,
   ExpandLessRounded,
   ExpandMoreRounded,
   OpenInNewRounded,
@@ -21,6 +23,7 @@ import {
   Collapse,
   FormControl,
   FormHelperText,
+  IconButton,
   InputLabel,
   Link,
   MenuItem,
@@ -214,10 +217,7 @@ function RouteComponent() {
           Edit the template documents below and click on Add at the bottom of
           the editor.
         </Typography>
-        <Alert severity='warning' sx={{ my: 1, maxWidth: 1000 }}>
-          The prefilled schema is derived from the collection schema. Expect
-          imperfections, especially for nested fields and "auto" schemas.
-        </Alert>
+        <SchemaWarningAlert />
         <Box>
           <NewDocumentEditor />
         </Box>
@@ -225,6 +225,63 @@ function RouteComponent() {
     </Box>
   );
 }
+
+const DEFAULT_VIEW_OPTIONS = { ...DEFAULT_MONACO_OPTIONS, readOnly: true };
+
+function SchemaWarningAlert() {
+  const collectionId = Route.useParams({
+    select: ({ collectionId }) => collectionId,
+  });
+  const [open, setOpen] = useState(true);
+
+  const { data } = useSchema(collectionId);
+
+  const viewSchema = useCollectionEditorDialog({
+    initialOptions: DEFAULT_VIEW_OPTIONS,
+  });
+
+  const handleClick = useCallback(() => {
+    viewSchema({
+      title: `${collectionId} Schema`,
+      value: JSON.stringify(data, null, 2),
+    });
+  }, [viewSchema, data]);
+
+  const handleDismiss = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  return (
+    <Collapse in={open}>
+      <Alert
+        severity='warning'
+        sx={{ my: 1, maxWidth: 1000 }}
+        action={
+          <Stack direction='row' spacing={1}>
+            <Box>
+              <Button color='inherit' size='small' onClick={handleClick}>
+                View&nbsp;Schema
+              </Button>
+            </Box>
+
+            <Box>
+              <IconButton size='small' onClick={() => handleDismiss()}>
+                <CloseRounded fontSize='inherit' />
+              </IconButton>
+            </Box>
+          </Stack>
+        }
+      >
+        The prefilled schema is derived from the collection schema. Expect
+        imperfections, especially for nested fields and "auto" schemas.
+      </Alert>
+    </Collapse>
+  );
+}
+
+// BUG: opening schema in dialog editor disrupts new doc schema validation
+// pass ID to editor ?? ref issue ??
+// https://stackoverflow.com/questions/77135467/different-monaco-editor-components-sharing-same-schema
 
 function NewDocumentEditor() {
   const collectionId = Route.useParams({
@@ -282,16 +339,19 @@ function NewDocumentEditor() {
   return (
     <Box sx={{ py: 2, borderRadius: 1, overflow: 'hidden' }}>
       <Suspense fallback={<Skeleton variant='rounded' height={'50vh'} />}>
-        <JsonEditor
-          height='50vh'
-          onMount={handleMount}
-          options={DEFAULT_MONACO_OPTIONS}
-          value={value}
-          onValidate={(m) => {
-            setMarkers(m);
-          }}
-          schema={{}}
-        />
+        <Paper sx={{ borderRadius: 1, overflow: 'hidden' }}>
+          <JsonEditor
+            height='50vh'
+            onMount={handleMount}
+            options={DEFAULT_MONACO_OPTIONS}
+            value={value}
+            onValidate={(m) => {
+              setMarkers(m);
+            }}
+            // schema={{}}
+            schema={undefined}
+          />
+        </Paper>
       </Suspense>
       <Stack
         direction='row'

@@ -3,9 +3,9 @@ import {
   Hit,
   HitActions,
   LoadingHits,
-  Refinements,
 } from '@/components/search';
 import { FacetOption } from '@/components/search/FacetOptions';
+import { Refinements } from '@/components/search/Refinements';
 import { SortBy } from '@/components/search/SortBy';
 import type { SearchSlotComponents, SearchSlotProps } from '@/context';
 import { Alert, Box, Grid, Pagination, Stack, Typography } from '@mui/material';
