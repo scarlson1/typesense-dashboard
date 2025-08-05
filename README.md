@@ -13,9 +13,9 @@ Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and
 You can use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add SSL if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
 
 ```bash
-ngrok http https://localhost:443
-# OR use ngrok's docker image:
-docker run -it -e NGROK_AUTHTOKEN=[YOUR_NGROK_TOKEN] ngrok/ngrok:latest http host.docker.internal:443
+$ ngrok http https://localhost:443
+  # OR use ngrok's docker image:
+$ docker run -it -e NGROK_AUTHTOKEN=[YOUR_NGROK_TOKEN] ngrok/ngrok:latest http host.docker.internal:443
 ```
 
 Then use the address displayed in your console under "Forwarding" as the node when connecting your cluster (ex: f4ab4aad2e7b.ngrok-free.app). [Ngrok docs](https://ngrok.com/docs/using-ngrok-with/docker/)
@@ -79,13 +79,9 @@ TODO
 
 - Tests
 - [Filter operators](https://typesense.org/docs/guide/tips-for-filtering.html#available-operators)
-- Facet/filter components ([range](https://typesense.org/docs/29.0/api/search.html#facet-ranges), numeric, etc.) currently only rendering checkmark
 - [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
 - [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
-- Improved geosearch UI
-- Search results view customization
-- Improve search implementation
 - Delete documents by query
 - Export documents
 
