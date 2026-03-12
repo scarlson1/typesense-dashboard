@@ -27,6 +27,7 @@ export const CONTEXT_DIALOG_DEFAULT_SLOT_PROPS: DialogSlotProps = {
   title: {},
   content: {
     dividers: true,
+    height: 'auto',
   },
   actions: {},
   acceptButton: {

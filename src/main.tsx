@@ -84,7 +84,7 @@ if (!rootElement.innerHTML) {
 }
 
 function LastResortErrorBoundary({ error }: FallbackProps) {
-  let msg =
+  const msg =
     error && error.message ? (
       <div>
         <pre>{error.message}</pre>

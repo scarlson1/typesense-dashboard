@@ -19,7 +19,7 @@ function RouteComponent() {
       <Typography variant='h3' gutterBottom>
         API Keys
       </Typography>
-      <Typography component='div'>
+      <Typography component='div' sx={{ maxWidth: 800 }}>
         API Keys can be used to control access to the data you index in
         Typesense. You can restrict access to particular collections or actions
         using parent API keys. You can also control access to records or even
@@ -37,7 +37,7 @@ function RouteComponent() {
       <Typography sx={{ py: 1 }}>
         Use the template below to create a new API key.
       </Typography>
-      <Box sx={{ py: 2 }}>
+      <Box sx={{ py: 2, maxWidth: 800 }}>
         <Suspense fallback={<Skeleton variant='rounded' height={260} />}>
           <NewApiKeyEditor />
         </Suspense>

@@ -6,11 +6,18 @@ Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesens
 
 ## Usage
 
+#### Prerequisites
+
+- running instance of typesense ([docs](https://typesense.org/docs/guide/install-typesense.html#option-1-typesense-cloud))
+
 ### Web
 
-Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (If using github pages option, Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error"). [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https). Self-signed certificate reference: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
+Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (If using github pages option, Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error").
 
-You can use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add SSL if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
+- [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https)
+- Self-signed certificate references: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/) / [mkcert](https://github.com/FiloSottile/mkcert)
+
+If your typesense instance is running locally, use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add SSL if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
 
 ```bash
 $ ngrok http https://localhost:443
@@ -71,9 +78,9 @@ option 1) ngrok http https://localhost:443
 option 2) https://ngrok.com/docs/using-ngrok-with/docker/
 -->
 
-## Limitations/Issues
+<!-- ## Limitations/Issues
 
-TODO
+TODO -->
 
 ## TODO
 
@@ -84,6 +91,7 @@ TODO
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
 - Delete documents by query
 - Export documents
+- Set up demo typesense instance with data
 
 ## Screenshots
 
@@ -119,14 +127,38 @@ TODO
 
 # Development
 
+### Run locally
+
 #### Install dependencies
 
 ```bash
 npm install
 ```
 
-#### run locally
+#### Start the dashboard
 
 ```bash
 npm run dev
 ```
+
+### Docker Compose
+
+Update the volume paths in `compose.yml` or update `TYPESENSE_CERTS_DIR` and `TYPESENSE_DATA_PATH` environment variable in `.env.development`
+
+```yml
+volumes:
+  - [path_to_typesense_data]:/data
+  - [path_to_your_certs_directory]:/etc/ssl/certs
+```
+
+```bash
+docker compose up -d
+```
+
+### Set up demo data
+
+Find a dataset. Checkout [Typesense's example datasets](https://github.com/typesense/typesense?tab=readme-ov-file)
+
+TODO
+
+TODO: update compose.yml to use docker volume instead of mounting volume ??

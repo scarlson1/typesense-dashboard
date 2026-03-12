@@ -138,4 +138,34 @@ export const surfacesCustomizations: Components<Theme> = {
       // },
     },
   },
+  MuiDialogTitle: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        backgroundColor: theme.palette.common.white,
+        ...theme.applyStyles('dark', {
+          background: theme.palette.grey[900], // 18191b
+        }),
+      }),
+    },
+  },
+  MuiDialogContent: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        backgroundColor: theme.palette.background.paper, // '#f1f3f4', // theme.palette.common.white,
+        ...theme.applyStyles('dark', {
+          background: theme.vars.palette.background.paper, // theme.palette.grey[900], // 292b2e
+        }), // 18191b
+      }),
+    },
+  },
+  MuiDialogActions: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        backgroundColor: theme.palette.common.white,
+        ...theme.applyStyles('dark', {
+          background: theme.palette.grey[900], // 18191b
+        }),
+      }),
+    },
+  },
 };

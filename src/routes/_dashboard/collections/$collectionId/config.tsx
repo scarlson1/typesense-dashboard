@@ -1,12 +1,5 @@
 import { ErrorFallback } from '@/components';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
-import { useConfirmDelete } from '@/hooks/useConfirmDelete';
-import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
-// import { useAsyncToast } from '@hooks/useAsyncToast';
-// import { useDeleteCollection } from '@hooks/useDeleteCollection';
-// import { useDialog } from '@hooks/useDialog';
-// import { useSchema } from '@hooks/useSchema';
-// import { useUpdateCollection } from '@hooks/useUpdateCollection';
 import {
   useAsyncToast,
   useDeleteCollection,
@@ -14,6 +7,8 @@ import {
   useSchema,
   useUpdateCollection,
 } from '@/hooks';
+import { useConfirmDelete } from '@/hooks/useConfirmDelete';
+import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import type { EditorProps, OnMount } from '@monaco-editor/react';
 import {
   Box,
@@ -42,7 +37,7 @@ import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection'
 const JsonEditor = lazy(() => import('../../../../components/JsonEditor'));
 
 export const Route = createFileRoute(
-  '/_dashboard/collections/$collectionId/config'
+  '/_dashboard/collections/$collectionId/config',
 )({
   component: CollectionSettings,
   staticData: {
@@ -55,7 +50,7 @@ function CollectionSettings() {
   const toast = useAsyncToast();
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
   const [options, setOptions] = useState<EditorProps['options']>(
-    DEFAULT_MONACO_OPTIONS
+    DEFAULT_MONACO_OPTIONS,
   );
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
   const theme = useTheme();
@@ -76,9 +71,9 @@ function CollectionSettings() {
       return;
     }
 
-    let value = editorRef.current?.getValue();
+    const value = editorRef.current?.getValue();
     if (!value) return;
-    let { fields, metadata } = JSON.parse(value);
+    const { fields, metadata } = JSON.parse(value);
 
     setOptions((o) => ({ ...o, readOnly: true }));
 
@@ -90,7 +85,7 @@ function CollectionSettings() {
       return;
     }
 
-    let updates: CollectionUpdateSchema = {
+    const updates: CollectionUpdateSchema = {
       fields: fieldUpdates,
     };
     if (metadata) updates.metadata = metadata;
@@ -129,7 +124,7 @@ function CollectionSettings() {
 
       mutation.mutate({ colName: collectionId, updates });
     } catch (err) {
-      console.log('cancelled schema update');
+      console.log('cancelled schema update', err);
     }
   }, [mutation.mutate, data, markers, dialog?.prompt]);
 
@@ -205,7 +200,9 @@ function DeleteCollectionButton({
       await openConfirmDelete(collectionId);
 
       deleteMutation.mutate(collectionId);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }, [deleteMutation.mutate, collectionId]);
 
   return (

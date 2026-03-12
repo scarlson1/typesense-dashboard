@@ -27,6 +27,8 @@ import { useAsyncToast, useDialog, useUpdateCollection } from '.';
 
 const JsonEditor = lazy(() => import('../components/JsonEditor'));
 
+// BUG: collection schema uses stale value b/c it uses schema passed to the hook (does not pick up react query refresh)
+
 interface UseCollectionEditorDialogProps {
   initialOptions?: EditorProps['options'];
 }
@@ -108,6 +110,8 @@ export function useCollectionEditorDialog(
       setReadOnly(false);
       return;
     }
+
+    // TODO: add confirmation if/once useDialog context supports multiple dialogs
 
     let updates: CollectionUpdateSchema = {
       metadata,

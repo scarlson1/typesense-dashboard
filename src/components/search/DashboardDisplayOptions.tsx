@@ -131,8 +131,6 @@ export function DashboardDisplayOptions() {
     });
   }, []);
 
-  console.log('val: ', slotProps?.hitWrapper?.size);
-
   return (
     // <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
     <Stack direction='column' spacing={1.5}>

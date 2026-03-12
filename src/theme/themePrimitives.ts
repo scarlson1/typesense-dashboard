@@ -23,6 +23,7 @@ declare module '@mui/material/styles' {
   }
 
   interface PaletteColor extends ColorRange {}
+  // type PaletteColor = ColorRange
 
   interface Palette {
     baseShadow: string;

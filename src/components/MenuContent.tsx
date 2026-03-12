@@ -193,28 +193,6 @@ export function MenuContent() {
         disabled: !Boolean(selectedCollection),
       },
       {
-        text: 'Curation',
-        icon: <AutoFixHighRounded fontSize='small' />,
-        route: selectedCollection
-          ? {
-              to: '/collections/$collectionId/curation' as LinkProps['to'],
-              params: { collectionId: selectedCollection },
-            }
-          : { to: location.pathname as LinkProps['to'] },
-        disabled: !Boolean(selectedCollection),
-      },
-      {
-        text: 'Synonyms',
-        icon: <LeakAddRounded fontSize='small' />,
-        route: selectedCollection
-          ? {
-              to: '/collections/$collectionId/synonyms' as LinkProps['to'],
-              params: { collectionId: selectedCollection },
-            }
-          : { to: location.pathname as LinkProps['to'] },
-        disabled: !Boolean(selectedCollection),
-      },
-      {
         text: 'Add Documents',
         icon: <AddRounded fontSize='small' />,
         route: selectedCollection
@@ -231,6 +209,28 @@ export function MenuContent() {
         route: selectedCollection
           ? {
               to: '/collections/$collectionId/documents/export' as LinkProps['to'],
+              params: { collectionId: selectedCollection },
+            }
+          : { to: location.pathname as LinkProps['to'] },
+        disabled: !Boolean(selectedCollection),
+      },
+      {
+        text: 'Curation',
+        icon: <AutoFixHighRounded fontSize='small' />,
+        route: selectedCollection
+          ? {
+              to: '/collections/$collectionId/curation' as LinkProps['to'],
+              params: { collectionId: selectedCollection },
+            }
+          : { to: location.pathname as LinkProps['to'] },
+        disabled: !Boolean(selectedCollection),
+      },
+      {
+        text: 'Synonyms',
+        icon: <LeakAddRounded fontSize='small' />,
+        route: selectedCollection
+          ? {
+              to: '/collections/$collectionId/synonyms' as LinkProps['to'],
               params: { collectionId: selectedCollection },
             }
           : { to: location.pathname as LinkProps['to'] },

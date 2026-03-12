@@ -9,4 +9,6 @@ import { createContext } from 'react';
 
 // TODO: confirmation screen ??
 
+// TODO: support multiple dialogs - settings/state per instance (slotProps etc.) useId ??
+
 export const DialogContext = createContext<DialogCtx | null>(null);
