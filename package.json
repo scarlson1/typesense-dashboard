@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "dev:docker": "docker run -dp 5173:5173 typesense-dashboard",
     "dev:compose": "docker compose up --watch --build",
+    "dev:ngrok": "ngrok start typesense",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "analyze:bundle": "npx vite-bundle-visualizer"

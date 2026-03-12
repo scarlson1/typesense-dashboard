@@ -1,9 +1,3 @@
-// require('dotenv').config();
-
-// const fs = require('fs');
-// const path = require('path');
-// const Typesense = require('typesense');
-// const readline = require('readline');
 import dotenv from 'dotenv';
 dotenv.config({ path: '../.env.import' });
 

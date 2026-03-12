@@ -1,0 +1,7 @@
+version: '2'
+tunnels:
+  typesense:
+    proto: http
+    addr: https://localhost:443
+    host_header: localhost
+    upstream_tls_verify: false

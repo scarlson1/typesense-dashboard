@@ -109,10 +109,14 @@ function AuthComponent() {
         setCredentials(creds);
         // TODO: set credentials in context
         toast.success(`Authentication successful`, { id: 'auth' });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        toast.dismiss();
         navigate({ to: search?.redirect || '/', replace: true });
       } catch (err) {
         console.error('AUTH ERROR: ', err);
         toast.error('Failed to connect', { id: 'auth' });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        toast.dismiss();
       }
     },
   });
