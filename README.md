@@ -194,9 +194,27 @@ npx ts-node scripts/indexData.ts
 
 Find a dataset. Checkout [Typesense's example datasets](https://github.com/typesense/typesense?tab=readme-ov-file)
 
-TODO
+Demo uses [Airbnb data](https://insideairbnb.com/get-the-data/)
 
-TODO: update compose.yml to use docker volume instead of mounting volume ??
+```bash
+# download data
+# regions
+npx ts-node downloadData.ts --list-regions
+npx ts-node scripts/downloadData.ts --dry-run --regions "united-states" --file-types "listings.csv.gz"
+npx ts-node scripts/downloadData.ts --regions "united-states" --file-types "listings.csv.gz"
+# cities
+npx ts-node downloadData.ts --cities "amsterdam,london,new-york-city" --file-types "listings.csv.gz"
+
+# transform data
+npx ts-node scripts/transformData.ts
+
+# index/import into typesense
+export TYPESENSE_HOST=<typesense-host>
+export TYPESENSE_PORT=443
+export TYPESENSE_PROTOCOL=https
+export TYPESENSE_ADMIN_API_KEY=xyz123
+npx ts-node scripts/indexData.ts
+```
 
 ## Setup HTTPS with nip.io + Let's Encrypt
 
