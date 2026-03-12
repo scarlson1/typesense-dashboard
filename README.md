@@ -197,3 +197,183 @@ Find a dataset. Checkout [Typesense's example datasets](https://github.com/types
 TODO
 
 TODO: update compose.yml to use docker volume instead of mounting volume ??
+
+## Setup HTTPS with nip.io + Let's Encrypt
+
+VM Typesense instance requires TSL to connect to Github Pages dashboard.
+
+### 1. Get Your Reserved IP
+
+You already have this from Terraform output:
+
+```bash
+terraform output public_ip
+```
+
+Your nip.io domain is automatically `<your-ip>.nip.io` — no signup, no config. If your IP is `1.2.3.4` your domain is `1.2.3.4.nip.io`.
+
+---
+
+### 2. Open Port 80 in OCI Security List
+
+Certbot needs port 80 to verify domain ownership. Add this to `main.tf`:
+
+```hcl
+ingress_security_rules {
+  protocol = "6"
+  source   = "0.0.0.0/0"
+  tcp_options {
+    min = 80
+    max = 80
+  }
+}
+```
+
+Also open port 80 on the VM's iptables:
+
+```bash
+sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+sudo netfilter-persistent save
+```
+
+The chicken-and-egg problem: the reserved IP is needed before it can be added to terraform.tfvars, but the IP is created by Terraform. If the reserved IP hasn't been created, the solution is to create the reserved IP first in a separate apply:
+
+```bash
+# Step 1 - create reserved IP and instance, no attachment
+terraform apply -var="attach_reserved_ip=false"
+
+# Get the IP and update terraform.tfvars
+terraform output reserved_ip
+# set public_ip = "<output>" in terraform.tfvars
+
+# Step 2 - attach reserved IP to instance
+terraform apply -var="attach_reserved_ip=true"
+```
+
+Then `terraform apply` (if not already run in ip step)
+
+---
+
+### 3. Install Certbot on the VM
+
+```bash
+ssh ubuntu@<your-ip>
+sudo apt-get update
+sudo apt-get install -y certbot
+```
+
+---
+
+### 4. Stop Typesense Temporarily
+
+Certbot needs port 80 free to run its standalone verifier:
+
+```bash
+sudo systemctl stop typesense
+```
+
+---
+
+### 5. Issue the Certificate
+
+```bash
+sudo certbot certonly --standalone -d <your-ip>.nip.io
+```
+
+Follow the prompts — enter an email for renewal notices. Certbot will place certs at:
+
+- `/etc/letsencrypt/live/<your-ip>.nip.io/fullchain.pem`
+- `/etc/letsencrypt/live/<your-ip>.nip.io/privkey.pem`
+
+---
+
+### 6. Configure Typesense to Use the Cert
+
+```bash
+sudo tee /etc/typesense/typesense-server.ini <<EOF
+[server]
+api-key = your-typesense-api-key
+data-dir = /var/lib/typesense
+log-dir = /var/log/typesense
+api-port = 443
+enable-cors = true
+ssl-certificate = /etc/letsencrypt/live/<your-ip>.nip.io/fullchain.pem
+ssl-certificate-key = /etc/letsencrypt/live/<your-ip>.nip.io/privkey.pem
+EOF
+```
+
+Give Typesense access to the certs:
+
+```bash
+sudo chown -R typesense:typesense /etc/letsencrypt/live/<your-ip>.nip.io/
+sudo chown -R typesense:typesense /etc/letsencrypt/archive/<your-ip>.nip.io/
+```
+
+---
+
+### 7. Restart Typesense
+
+```bash
+sudo systemctl start typesense
+sudo systemctl status typesense
+```
+
+Verify:
+
+```bash
+curl https://<your-ip>.nip.io/health
+# {"ok":true}
+```
+
+---
+
+### 8. Set Up Auto-Renewal
+
+Let's Encrypt certs expire every 90 days. Automate renewal with a cron job:
+
+```bash
+sudo crontab -e
+```
+
+Add:
+
+```cron
+0 3 * * * certbot renew --quiet --pre-hook "systemctl stop typesense" --post-hook "systemctl start typesense"
+```
+
+This runs at 3am daily, only renews when within 30 days of expiry, and handles stopping/starting Typesense around the renewal.
+
+---
+
+### 9. Update Your Dashboard
+
+Connect using:
+
+- **Host:** `<your-ip>.nip.io`
+- **Port:** `443`
+- **Protocol:** `https`
+- **API Key:** your Typesense API key
+
+---
+
+### 10. Update cloud-init for Future Deploys
+
+Add this to your `cloud-init.yaml` so it's fully automated if you ever recreate the VM:
+
+```yaml
+runcmd:
+  # ... existing commands ...
+
+  # Install certbot and issue cert
+  - apt-get install -y certbot
+  - systemctl stop typesense
+  - certbot certonly --standalone --non-interactive --agree-tos --email your@email.com -d ${public_ip}.nip.io
+  - chown -R typesense:typesense /etc/letsencrypt/live/${public_ip}.nip.io/
+  - chown -R typesense:typesense /etc/letsencrypt/archive/${public_ip}.nip.io/
+  - systemctl start typesense
+
+  # Auto-renewal cron
+  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense' --post-hook 'systemctl start typesense'" | crontab -
+```
+
+Note that `${public_ip}` would need to be passed as a template variable in `cloud-init.yaml` just like `typesense_api_key`.

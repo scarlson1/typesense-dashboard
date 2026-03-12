@@ -3,18 +3,10 @@
 packages:
   - curl
   - apt-transport-https
+  - certbot
+  - iptables-persistent
 
 write_files:
-  - path: /etc/typesense/typesense-server.ini
-    permissions: '0600'
-    content: |
-      [server]
-      api-key = ${typesense_api_key}
-      data-dir = /var/lib/typesense
-      log-dir = /var/log/typesense
-      api-port = 443
-      enable-cors = true
-
   - path: /etc/systemd/system/typesense.service
     content: |
       [Unit]
@@ -35,24 +27,47 @@ write_files:
       WantedBy=multi-user.target
 
 runcmd:
-  # Install Typesense
-  - curl -sL https://dl.typesense.org/deb/public.gpg.key | apt-key add -
-  - echo "deb https://dl.typesense.org/deb stable main" > /etc/apt/sources.list.d/typesense.list
-  - apt-get update
-  - apt-get install -y typesense-server
-
-  # Directories and permissions
+  # Directories and permissions first
   - mkdir -p /var/lib/typesense /var/log/typesense /etc/typesense
   - useradd -r -s /bin/false typesense || true
-  - chown -R typesense:typesense /var/lib/typesense /var/log/typesense /etc/typesense
 
-  # OCI firewall (iptables blocks ports by default even if security list allows them)
-  - iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+  # Install Typesense binary
+  - curl -sL https://dl.typesense.org/releases/29.0/typesense-server-29.0-arm64.tar.gz -o /tmp/typesense.tar.gz
+  - tar -xzf /tmp/typesense.tar.gz -C /tmp
+  - mv /tmp/typesense-server /usr/bin/typesense-server
+  - chmod +x /usr/bin/typesense-server
+
+  # OCI firewall
   - iptables -I INPUT -p tcp --dport 22 -j ACCEPT
-  - apt-get install -y iptables-persistent
+  - iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+  - iptables -I INPUT -p tcp --dport 443 -j ACCEPT
   - netfilter-persistent save
+
+  # Issue cert (port 80 must be open, typesense not yet started)
+  - certbot certonly --standalone --non-interactive --agree-tos --email 08.writing_chime@icloud.com -d ${public_ip}.nip.io
+
+  # Write typesense config now that cert paths exist
+  - |
+    cat > /etc/typesense/typesense-server.ini <<EOF
+    [server]
+    api-key = ${typesense_api_key}
+    data-dir = /var/lib/typesense
+    log-dir = /var/log/typesense
+    api-port = 443
+    enable-cors = true
+    ssl-certificate = /etc/letsencrypt/live/${public_ip}.nip.io/fullchain.pem
+    ssl-certificate-key = /etc/letsencrypt/live/${public_ip}.nip.io/privkey.pem
+    EOF
+
+  # Fix permissions
+  - chown -R typesense:typesense /var/lib/typesense /var/log/typesense /etc/typesense
+  - chown -R typesense:typesense /etc/letsencrypt/live/${public_ip}.nip.io/
+  - chown -R typesense:typesense /etc/letsencrypt/archive/${public_ip}.nip.io/
 
   # Enable and start Typesense
   - systemctl daemon-reload
   - systemctl enable typesense
   - systemctl start typesense
+
+  # Auto-renewal cron
+  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense' --post-hook 'systemctl start typesense'" | crontab -

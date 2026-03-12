@@ -100,6 +100,16 @@ resource "oci_core_security_list" "typesense_sl" {
       max = 443
     }
   }
+
+  # nip for TLS 
+  ingress_security_rules {
+    protocol = "6"
+    source   = "0.0.0.0/0"
+    tcp_options {
+        min = 80
+        max = 80
+    }
+  }
 }
 
 # ── Subnet ───────────────────────────────────────────────────────────────────
@@ -135,13 +145,26 @@ resource "oci_core_instance" "typesense" {
 
   create_vnic_details {
     subnet_id        = oci_core_subnet.public_subnet.id
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   metadata = {
     ssh_authorized_keys = var.ssh_public_key
     user_data           = base64encode(templatefile("${path.module}/cloud-init.yaml", {
       typesense_api_key = var.typesense_api_key
+      public_ip         = var.public_ip
     }))
   }
+}
+
+# Look up the VNIC after instance creation
+data "oci_core_vnic_attachments" "typesense_vnic" {
+  count          = var.attach_reserved_ip ? 1 : 0
+  compartment_id = oci_identity_compartment.typesense.id
+  instance_id    = oci_core_instance.typesense.id
+}
+
+data "oci_core_private_ips" "typesense_private_ip" {
+  count   = var.attach_reserved_ip ? 1 : 0
+  vnic_id = data.oci_core_vnic_attachments.typesense_vnic[0].vnic_attachments[0].vnic_id
 }

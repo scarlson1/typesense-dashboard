@@ -8,3 +8,12 @@ variable "availability_domain" {}
 variable "image_ocid" {}
 variable "ssh_public_key" {}
 variable "typesense_api_key" {}
+
+variable "public_ip" {}
+variable "attach_reserved_ip" {
+  type    = bool
+  default = false
+}
+
+
+
