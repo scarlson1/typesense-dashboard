@@ -2,7 +2,8 @@ import csv from 'csvtojson';
 import { open, readdir } from 'node:fs/promises';
 import path from 'node:path';
 
-const DATA_DIR = path.resolve(__dirname, '../data/raw');
+const DIR_NAME = import.meta.dirname;
+const DATA_DIR = path.resolve(DIR_NAME, '../data/raw');
 
 async function transformData() {
   const outputFile = await open(
@@ -24,9 +25,13 @@ async function transformData() {
         const transformedRecord = Object.fromEntries(
           [
             'id',
+            'listing_url',
             'picture_url',
             'name',
+            'description',
             'host_name',
+            'host_id',
+            'host_picture_url',
             'neighbourhood_cleansed',
             'property_type',
             'room_type',

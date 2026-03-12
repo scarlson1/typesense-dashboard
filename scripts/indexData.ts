@@ -13,7 +13,8 @@ if (!process.env.TYPESENSE_PROTOCOL)
 if (!process.env.TYPESENSE_ADMIN_API_KEY)
   throw new Error('missing TYPESENSE_ADMIN_API_KEY');
 
-const DATA_DIR = path.resolve(__dirname, '../data/raw');
+const DIR_NAME = import.meta.dirname;
+const DATA_DIR = path.resolve(DIR_NAME, '../data/raw');
 const DATA_FILE = path.resolve(DATA_DIR, '..', 'transformed_dataset.jsonl');
 const CLIENT_BATCH_SIZE = 500000;
 const typesense = new Typesense.Client({
@@ -98,9 +99,8 @@ async function indexData() {
   // Update alias, and delete old collection
   let oldCollectionName;
   try {
-    oldCollectionName = await typesense.aliases(aliasName).retrieve()[
-      'collection_name'
-    ];
+    const alias = await typesense.aliases(aliasName).retrieve();
+    oldCollectionName = alias['collection_name'];
   } catch (error) {
     // Do nothing
     console.log(error);
