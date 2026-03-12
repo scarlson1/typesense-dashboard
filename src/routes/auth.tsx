@@ -88,13 +88,13 @@ function AuthComponent() {
   const toast = useAsyncToast();
   const setCredentials = useStore(
     typesenseStore,
-    (state) => state.setCredentials
+    (state) => state.setCredentials,
   );
 
   const form = useAppForm({
     ...authFormOpts,
     onSubmit: async ({ value: { node, port, protocol, apiKey, env } }) => {
-      let creds = {
+      const creds = {
         node: node.trim(),
         port: Number(port.trim()),
         protocol,
@@ -109,10 +109,14 @@ function AuthComponent() {
         setCredentials(creds);
         // TODO: set credentials in context
         toast.success(`Authentication successful`, { id: 'auth' });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        toast.dismiss();
         navigate({ to: search?.redirect || '/', replace: true });
       } catch (err) {
-        console.error(err);
+        console.error('AUTH ERROR: ', err);
         toast.error('Failed to connect', { id: 'auth' });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        toast.dismiss();
       }
     },
   });
@@ -175,14 +179,14 @@ function AuthenticatedAccounts() {
   const credentials = useStore(typesenseStore, (state) => state.credentials);
   const setCredsKey = useStore(typesenseStore, (state) => state.setCredsKey);
 
-  let credEntries = Object.entries(credentials);
+  const credEntries = Object.entries(credentials);
 
   const handleSelect = useCallback(
     (key: string) => {
       setCredsKey(key);
       navigate({ to: search?.redirect || '/', replace: true });
     },
-    [navigate, setCredsKey]
+    [navigate, setCredsKey, search?.redirect],
   );
 
   const handleLogout = useCallback(
@@ -195,7 +199,7 @@ function AuthenticatedAccounts() {
         },
       });
     },
-    [location, navigate]
+    [location, navigate],
   );
 
   if (!credEntries.length) return null;
@@ -231,7 +235,7 @@ function AuthenticatedAccounts() {
                     protocol: creds.protocol,
                     node: creds.node,
                     port: creds.port,
-                  })
+                  }),
                 );
               }}
               size='small'

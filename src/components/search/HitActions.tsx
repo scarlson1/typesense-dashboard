@@ -78,6 +78,9 @@ function DeleteDocumentIconButton({
           dialog: {
             maxWidth: 'sm',
           },
+          content: {
+            height: 'auto',
+          },
           acceptButton: {
             children: 'confirm',
           },

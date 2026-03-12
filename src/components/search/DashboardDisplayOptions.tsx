@@ -322,7 +322,7 @@ export function DashboardDisplayOptions() {
             id='display-columns'
             value={
               typeof slotProps?.hitWrapper?.size === 'number'
-                ? slotProps?.hitWrapper?.size / 12
+                ? 12 / slotProps?.hitWrapper?.size
                 : 0
             }
             onChange={handleSizeChange}

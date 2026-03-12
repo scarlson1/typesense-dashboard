@@ -272,8 +272,8 @@ function SchemaWarningAlert() {
           </Stack>
         }
       >
-        The prefilled schema is derived from the collection schema. Expect
-        imperfections, especially for nested fields and "auto" schemas.
+        The prefilled values are derived from the collection schema. Expect
+        imperfections, especially for nested and "auto" and fields.
       </Alert>
     </Collapse>
   );

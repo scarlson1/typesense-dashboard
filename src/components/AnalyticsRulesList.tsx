@@ -22,7 +22,7 @@ export function AnalyticsRulesList() {
   const { data: rules } = useSuspenseQuery({
     queryKey: analyticsQueryKeys.rules(clusterId),
     queryFn: async () => {
-      let rules = await client.analytics.rules().retrieve();
+      const rules = await client.analytics.rules().retrieve();
       return rules.rules;
     },
   });
