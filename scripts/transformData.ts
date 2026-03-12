@@ -1,10 +1,6 @@
 import csv from 'csvtojson';
 import { open, readdir } from 'node:fs/promises';
 import path from 'node:path';
-// import path from "path";
-// const fs = require('fs').promises;
-// const path = require('path');
-// const csv = require('csvtojson');
 
 const DATA_DIR = path.resolve(__dirname, '../data/raw');
 

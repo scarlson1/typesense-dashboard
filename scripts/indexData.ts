@@ -35,7 +35,14 @@ async function indexData() {
   await typesense.collections().create({
     name: collectionName,
     fields: [
+      { name: 'id', type: 'string' },
+      { name: 'listing_url', type: 'string' },
       { name: 'name', type: 'string' },
+      { name: 'description', type: 'string' },
+      { name: 'picture_url', type: 'string' },
+      { name: 'host_name', type: 'string' },
+      { name: 'host_id', type: 'string' },
+      { name: 'host_picture_url', type: 'string' },
       { name: 'neighbourhood_cleansed', type: 'string', optional: true },
       { name: 'property_type', type: 'string', facet: true },
       { name: 'room_type', type: 'string', facet: true },
@@ -72,7 +79,7 @@ async function indexData() {
       const results = await typesense
         .collections(collectionName)
         .documents()
-        .import(records);
+        .import(records, { dirty_values: 'drop' });
       const parsedResults = results.split('\n').map((r) => JSON.parse(r));
       const failedResults = parsedResults.filter((r) => r['success'] !== true);
       if (failedResults.length > 0) {
