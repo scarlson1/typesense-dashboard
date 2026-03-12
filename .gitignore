@@ -31,3 +31,14 @@ dist-ssr
 .env.ingest
 
 data/
+
+# Terraform
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+override.tf
+override.tf.json

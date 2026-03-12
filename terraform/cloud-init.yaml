@@ -1,0 +1,58 @@
+#cloud-config
+
+packages:
+  - curl
+  - apt-transport-https
+
+write_files:
+  - path: /etc/typesense/typesense-server.ini
+    permissions: '0600'
+    content: |
+      [server]
+      api-key = ${typesense_api_key}
+      data-dir = /var/lib/typesense
+      log-dir = /var/log/typesense
+      api-port = 443
+      enable-cors = true
+
+  - path: /etc/systemd/system/typesense.service
+    content: |
+      [Unit]
+      Description=Typesense Server
+      After=network.target
+
+      [Service]
+      ExecStart=/usr/bin/typesense-server --config=/etc/typesense/typesense-server.ini
+      Restart=on-failure
+      RestartSec=5s
+      StartLimitIntervalSec=60
+      StartLimitBurst=3
+      User=typesense
+      Group=typesense
+      LimitNOFILE=65536
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  # Install Typesense
+  - curl -sL https://dl.typesense.org/deb/public.gpg.key | apt-key add -
+  - echo "deb https://dl.typesense.org/deb stable main" > /etc/apt/sources.list.d/typesense.list
+  - apt-get update
+  - apt-get install -y typesense-server
+
+  # Directories and permissions
+  - mkdir -p /var/lib/typesense /var/log/typesense /etc/typesense
+  - useradd -r -s /bin/false typesense || true
+  - chown -R typesense:typesense /var/lib/typesense /var/log/typesense /etc/typesense
+
+  # OCI firewall (iptables blocks ports by default even if security list allows them)
+  - iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+  - iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+  - apt-get install -y iptables-persistent
+  - netfilter-persistent save
+
+  # Enable and start Typesense
+  - systemctl daemon-reload
+  - systemctl enable typesense
+  - systemctl start typesense

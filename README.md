@@ -155,7 +155,42 @@ volumes:
 docker compose up -d
 ```
 
-### Set up demo data
+## VM to host demo Typesense instance
+
+### 1. Create the VM
+
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
+
+`cloud-init.yaml` will install typesense and start it as a systemd service
+
+### 2. SSH into VM & run scripts
+
+[Airbnb data source](https://insideairbnb.com/get-the-data/)
+
+```bash
+ssh [username]@[hostname_or_IP_address]
+
+# download csv data for region or city
+npx ts-node scripts/downloadData.ts --cities "nashville" --file-types "listings.csv.gz" # --dry-run
+# npx ts-node scripts/downloadData.ts --dry-run --regions "united-states" --file-types "listings.csv.gz"
+
+# transform data
+npx ts-node scripts/transformData.ts
+
+# import into typesense
+export TYPESENSE_HOST=<TYPESENSE_HOST>
+export TYPESENSE_PORT=443
+export TYPESENSE_PROTOCOL=https
+export TYPESENSE_ADMIN_API_KEY=xyz
+npx ts-node scripts/indexData.ts
+```
+
+## Set up demo data
 
 Find a dataset. Checkout [Typesense's example datasets](https://github.com/typesense/typesense?tab=readme-ov-file)
 
