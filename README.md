@@ -4,7 +4,15 @@ A dashboard to manage self hosted or local [Typesense](https://typesense.org/) i
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
-[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=9KBhFin0jH0XjRRaWW8JS7ach9Bo4UxP&env=development)
+[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=x8lnee24b4AApg9R776c4PKgOoEdUdWj&env=development)
+
+If the link is not prefilling login creds, use the following:
+
+dashboard: [https://scarlson1.github.io/typesense-dashboard](https://scarlson1.github.io/typesense-dashboard/auth)
+host: 163.192.220.255.nip.io
+protocol: https
+port: 443
+api key: x8lnee24b4AApg9R776c4PKgOoEdUdWj
 
 ## Usage
 

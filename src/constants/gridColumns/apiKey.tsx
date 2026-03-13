@@ -1,3 +1,5 @@
+import { GridCellExpand } from '@/components/GridCellExpand';
+import { Typography } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import type { KeySchema } from 'typesense/lib/Typesense/Key';
@@ -39,6 +41,21 @@ export const apiKeyColumns: GridColDef<KeySchema>[] = [
     sortable: false,
     filterable: false,
     valueFormatter: (_, row) => (row.actions ? row.actions.join(', ') : ''),
+    renderCell: (params) => {
+      return (
+        <GridCellExpand
+          value={params.value ? params.value.join('') : ''}
+          popperValue={
+            params.value
+              ? params.value.map((a: string) => (
+                  <Typography variant='body2'>{a}</Typography>
+                ))
+              : ''
+          }
+          width={params.colDef.computedWidth}
+        />
+      );
+    },
   },
   {
     field: 'collections',
@@ -50,6 +67,21 @@ export const apiKeyColumns: GridColDef<KeySchema>[] = [
     filterable: false,
     valueFormatter: (_, row) =>
       row.collections ? row.collections.join(', ') : '',
+    renderCell: (params) => {
+      return (
+        <GridCellExpand
+          value={params.value ? params.value.join('') : ''}
+          popperValue={
+            params.value
+              ? params.value.map((a: string) => (
+                  <Typography variant='body2'>{a}</Typography>
+                ))
+              : ''
+          }
+          width={params.colDef.computedWidth}
+        />
+      );
+    },
   },
   {
     field: 'autodelete',
