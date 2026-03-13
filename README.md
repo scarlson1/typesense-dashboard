@@ -4,7 +4,7 @@ A dashboard to manage self hosted or local [Typesense](https://typesense.org/) i
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
-[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=QwFAhNQXC711hbpRqY0TaKHZPJ4aWfoW&env=development)
+[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=9KBhFin0jH0XjRRaWW8JS7ach9Bo4UxP&env=development)
 
 ## Usage
 
@@ -93,7 +93,7 @@ TODO -->
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
 - Delete documents by query
 - Export documents
-- Set up demo typesense instance with data
+- tanstack router hash history
 
 ## Screenshots
 
@@ -239,4 +239,7 @@ sudo ss -tlnp | grep typesense-serve
 # force recreate
 terraform taint oci_core_instance.typesense
 terraform apply -var="attach_reserved_ip=true"
+
+# reset ssh
+ssh-keygen -R 163.192.220.255
 ```
