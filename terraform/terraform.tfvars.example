@@ -1,0 +1,10 @@
+tenancy_ocid        = "ocid1.tenancy.oc1..aaaaaa..."
+user_ocid           = "ocid1.user.oc1..aaaaaaa..."
+fingerprint         = "66:..."
+private_key_path    = "~/.oci/oci_api_key.pem"
+region              = "us-chicago-1"
+availability_domain = "NzMo:US-CHICAGO-1-AD-1"
+image_ocid          = "ocid1.image.oc1.us-chicago-1.aaaaa..."  # ARM Ubuntu 22.04
+ssh_public_key      = "ssh-ed25519 AAAA... <email>"
+typesense_api_key   = "lskdjflsjd"
+public_ip           = "123.123.123.123"

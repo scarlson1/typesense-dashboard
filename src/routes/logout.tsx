@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { z } from 'zod/v4';
 import { useStore } from 'zustand';
 
-export const authSearchSchema = z.object({
+const authSearchSchema = z.object({
   redirect: z.string().optional(),
   clusterId: z.string().optional(),
 });
