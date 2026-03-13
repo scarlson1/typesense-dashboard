@@ -1,56 +1,61 @@
 name: Deploy static content to Pages
 
 on:
-  push:
-    # branches: ['main']
-    tags:
-      - 'v*.*.*'
+    push:
+        # branches: ['main']
+        tags:
+            - 'v*.*.*'
 
-  # Allows running this workflow manually from the Actions tab
-  workflow_dispatch:
+    # Allows running this workflow manually from the Actions tab
+    workflow_dispatch:
 
 # Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 concurrency:
-  group: 'pages'
-  cancel-in-progress: true
+    group: 'pages'
+    cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-      - name: Set github vars
-        id: vars
-        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: Build
-        run: npm run build
-        env:
-          VITE_APP_VERSION: ${{ steps.vars.outputs.tag }}
-          VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN}}
-          # VITE_APP_VERSION: ${{ github.event.release.tag_name }}
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload dist folder
-          path: './dist'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: '10.18.3'
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
+                  cache: 'pnpm'
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+            #   run: npm ci
+            - name: Set github vars
+              id: vars
+              run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+            - name: Build
+              run: pnpm build
+              env:
+                  VITE_APP_VERSION: ${{ steps.vars.outputs.tag }}
+                  VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN}}
+                  # VITE_APP_VERSION: ${{ github.event.release.tag_name }}
+            - name: Setup Pages
+              uses: actions/configure-pages@v5
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  # Upload dist folder
+                  path: './dist'
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4

@@ -143,13 +143,13 @@ TODO -->
 #### Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 #### Start the dashboard
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## Docker Compose
