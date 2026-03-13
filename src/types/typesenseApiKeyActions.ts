@@ -1,5 +1,7 @@
 import { z } from 'zod/v4';
 
+// docs: https://typesense.org/docs/30.1/api/api-keys.html#retrieve-an-api-key
+
 export const collectionActions = z.enum([
     'collections:create',
     'collections:delete',
