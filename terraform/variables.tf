@@ -15,5 +15,3 @@ variable "attach_reserved_ip" {
   default = false
 }
 
-
-

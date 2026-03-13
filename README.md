@@ -4,7 +4,7 @@ A dashboard to manage self hosted or local [Typesense](https://typesense.org/) i
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
-[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.225.nip.io&port=443&protocol=https&apiKey=QwFAhNQXC711hbpRqY0TaKHZPJ4aWfoW&env=development)
+[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=QwFAhNQXC711hbpRqY0TaKHZPJ4aWfoW&env=development)
 
 ## Usage
 
@@ -223,4 +223,20 @@ npx ts-node scripts/indexData.ts
 
 ```bash
 sudo systemctl status typesense-server
+
+sudo iptables -L INPUT -n | head -20
+sudo ss -tlnp | grep typesense
+
+sudo cat /etc/typesense/typesense-server.ini
+sudo systemctl cat typesense-server
+
+# typesense install runs as root --> create typesense user
+sudo systemctl restart typesense-server
+sudo journalctl -u typesense-server -f &
+sleep 3
+sudo ss -tlnp | grep typesense-serve
+
+# force recreate
+terraform taint oci_core_instance.typesense
+terraform apply -var="attach_reserved_ip=true"
 ```
