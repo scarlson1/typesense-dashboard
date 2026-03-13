@@ -54,7 +54,7 @@ export const typesenseStore = create<TypesenseStore>()(
         set((state) => {
           let creds = {};
           if (cluster) {
-            let { [cluster]: _, ...rest } = state.credentials;
+            const { [cluster]: _, ...rest } = state.credentials;
             creds = rest;
           }
           return {
@@ -67,8 +67,8 @@ export const typesenseStore = create<TypesenseStore>()(
     {
       name: 'typesense-store',
       storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
-    }
-  )
+    },
+  ),
 );
 
 export function getTypesenseClient(creds: TypesenseCreds) {

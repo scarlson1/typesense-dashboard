@@ -6,25 +6,25 @@ packages:
   - certbot
   - iptables-persistent
 
-write_files:
-  - path: /etc/systemd/system/typesense.service
-    content: |
-      [Unit]
-      Description=Typesense Server
-      After=network.target
+# write_files:
+#   - path: /etc/systemd/system/typesense.service
+#     content: |
+#       [Unit]
+#       Description=Typesense Server
+#       After=network.target
 
-      [Service]
-      ExecStart=/usr/bin/typesense-server --config=/etc/typesense/typesense-server.ini
-      Restart=on-failure
-      RestartSec=5s
-      StartLimitIntervalSec=60
-      StartLimitBurst=3
-      User=typesense
-      Group=typesense
-      LimitNOFILE=65536
+#       [Service]
+#       ExecStart=/usr/bin/typesense-server --config=/etc/typesense/typesense-server.ini
+#       Restart=on-failure
+#       RestartSec=5s
+#       StartLimitIntervalSec=60
+#       StartLimitBurst=3
+#       User=typesense
+#       Group=typesense
+#       LimitNOFILE=65536
 
-      [Install]
-      WantedBy=multi-user.target
+#       [Install]
+#       WantedBy=multi-user.target
 
 runcmd:
   # Directories and permissions first
@@ -71,8 +71,8 @@ runcmd:
 
   # Enable and start Typesense
   - systemctl daemon-reload
-  - systemctl enable typesense
-  - systemctl start typesense
+  - systemctl enable typesense-server
+  - systemctl restart typesense-server
 
   # Auto-renewal cron
-  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense' --post-hook 'systemctl start typesense'" | crontab -
+  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense-server' --post-hook 'systemctl start typesense-server'" | crontab -

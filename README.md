@@ -218,3 +218,9 @@ export TYPESENSE_PROTOCOL=https
 export TYPESENSE_ADMIN_API_KEY=xyz123
 npx ts-node scripts/indexData.ts
 ```
+
+### Troubleshooting
+
+```bash
+sudo systemctl status typesense-server
+```
