@@ -34,7 +34,7 @@ export function InstantSearch<T extends DocumentSchema>({
   initialParams = { per_page: 5 },
   debounceMs = 200,
   staleTime = 30000,
-  pageSizeOptions = [5, 10, 20, 50],
+  pageSizeOptions = [5, 10, 20, 50, 100],
   // slots,
   // slotProps,
 }: InstantSearchProps) {
@@ -53,7 +53,7 @@ export function InstantSearch<T extends DocumentSchema>({
         clusterId,
         collectionId,
         params,
-        debouncedQuery
+        debouncedQuery,
       ),
       queryFn: () =>
         client
@@ -109,7 +109,7 @@ export function InstantSearch<T extends DocumentSchema>({
       setPagination,
       pageSizeOptions,
       debouncedQuery,
-    ]
+    ],
   );
 
   return (
