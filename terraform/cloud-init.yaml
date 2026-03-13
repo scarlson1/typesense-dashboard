@@ -1,0 +1,78 @@
+#cloud-config
+
+packages:
+  - curl
+  - apt-transport-https
+  - certbot
+  - iptables-persistent
+
+write_files:
+  - path: /etc/systemd/system/typesense.service
+    content: |
+      [Unit]
+      Description=Typesense Server
+      After=network.target
+
+      [Service]
+      ExecStart=/usr/bin/typesense-server --config=/etc/typesense/typesense-server.ini
+      Restart=on-failure
+      RestartSec=5s
+      StartLimitIntervalSec=60
+      StartLimitBurst=3
+      User=typesense
+      Group=typesense
+      LimitNOFILE=65536
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  # Directories and permissions first
+  # handled by deb
+  # - mkdir -p /var/lib/typesense /var/log/typesense /etc/typesense
+  # - useradd -r -s /bin/false typesense || true
+
+  # Install Typesense binary
+  # - curl -sL https://dl.typesense.org/releases/29.0/typesense-server-29.0-arm64.tar.gz -o /tmp/typesense.tar.gz
+  # - tar -xzf /tmp/typesense.tar.gz -C /tmp
+  # - mv /tmp/typesense-server /usr/bin/typesense-server
+  # - chmod +x /usr/bin/typesense-server
+
+  # OCI firewall
+  - iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+  - iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+  - iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+  - netfilter-persistent save
+
+  # Issue cert (port 80 must be open, typesense not yet started)
+  - certbot certonly --standalone --non-interactive --agree-tos --email 08.writing_chime@icloud.com -d ${public_ip}.nip.io
+
+  # install typesense
+  - curl -O https://dl.typesense.org/releases/29.0/typesense-server-29.0-arm64.deb
+  - apt install -y ./typesense-server-29.0-arm64.deb
+
+  # Write typesense config now that cert paths exist
+  - |
+    cat > /etc/typesense/typesense-server.ini <<EOF
+    [server]
+    api-key = ${typesense_api_key}
+    data-dir = /var/lib/typesense
+    log-dir = /var/log/typesense
+    api-port = 443
+    enable-cors = true
+    ssl-certificate = /etc/letsencrypt/live/${public_ip}.nip.io/fullchain.pem
+    ssl-certificate-key = /etc/letsencrypt/live/${public_ip}.nip.io/privkey.pem
+    EOF
+
+  # Fix permissions (handled by deb)
+  # - chown -R typesense:typesense /var/lib/typesense /var/log/typesense /etc/typesense
+  # - chown -R typesense:typesense /etc/letsencrypt/live/${public_ip}.nip.io/
+  # - chown -R typesense:typesense /etc/letsencrypt/archive/${public_ip}.nip.io/
+
+  # Enable and start Typesense
+  - systemctl daemon-reload
+  - systemctl enable typesense
+  - systemctl start typesense
+
+  # Auto-renewal cron
+  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense' --post-hook 'systemctl start typesense'" | crontab -

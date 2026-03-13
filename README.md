@@ -127,7 +127,7 @@ TODO -->
 
 # Development
 
-### Run locally
+## Run locally
 
 #### Install dependencies
 
@@ -141,7 +141,7 @@ npm install
 npm run dev
 ```
 
-### Docker Compose
+## Docker Compose
 
 Update the volume paths in `compose.yml` or update `TYPESENSE_CERTS_DIR` and `TYPESENSE_DATA_PATH` environment variable in `.env.development`
 
@@ -155,10 +155,64 @@ volumes:
 docker compose up -d
 ```
 
-### Set up demo data
+## VM to host demo Typesense instance
+
+### 1. Create the VM
+
+```bash
+cd terraform
+# Step 1 - create reserved IP and instance, no attachment
+terraform apply -var="attach_reserved_ip=false"
+
+# Get the IP and update terraform.tfvars
+terraform output reserved_ip
+# set public_ip = "<output>" in terraform.tfvars
+
+# Step 2 - attach reserved IP to instance
+terraform apply -var="attach_reserved_ip=true"
+```
+
+`cloud-init.yaml`:
+
+- installs typesense and start it as a systemd service
+- configures iptables
+- configures certificates and cron for auto-renewal
+
+### Connect to typesense
+
+nip.io is used for TLS. The address to access the VM is: `https://<your-ip>.nip.io`
+
+Connect using:
+
+- **Host:** `<your-ip>.nip.io`
+- **Port:** `443`
+- **Protocol:** `https`
+- **API Key:** your Typesense API key (from `terraform.tfvars`)
+
+## Set up demo data
 
 Find a dataset. Checkout [Typesense's example datasets](https://github.com/typesense/typesense?tab=readme-ov-file)
 
-TODO
+Demo uses [Airbnb data](https://insideairbnb.com/get-the-data/)
 
-TODO: update compose.yml to use docker volume instead of mounting volume ??
+> Import script creates an alias and points `airbnb_listings` to the newly imported data upon completion (effectively overwrites; doesn't append)
+
+```bash
+# download data
+# regions
+npx ts-node downloadData.ts --list-regions
+npx ts-node scripts/downloadData.ts --dry-run --regions "united-states" --file-types "listings.csv.gz"
+npx ts-node scripts/downloadData.ts --regions "united-states" --file-types "listings.csv.gz"
+# cities
+npx ts-node downloadData.ts --cities "amsterdam,london,new-york-city" --file-types "listings.csv.gz"
+
+# transform data
+npx ts-node scripts/transformData.ts
+
+# index/import into typesense
+export TYPESENSE_HOST=<typesense-host>
+export TYPESENSE_PORT=443
+export TYPESENSE_PROTOCOL=https
+export TYPESENSE_ADMIN_API_KEY=xyz123
+npx ts-node scripts/indexData.ts
+```

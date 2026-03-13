@@ -3,14 +3,14 @@
 /**
  * Download Inside Airbnb data to data/raw/
  * Usage:
- *   npx ts-node download-airbnb-data.ts
- *   npx ts-node download-airbnb-data.ts --regions "united-states"
- *   npx ts-node download-airbnb-data.ts --regions "united-states,the-netherlands"
- *   npx ts-node download-airbnb-data.ts --cities "amsterdam,london,new-york-city"
- *   npx ts-node download-airbnb-data.ts --file-types "listings.csv.gz,reviews.csv.gz"
- *   npx ts-node download-airbnb-data.ts --concurrency 5
- *   npx ts-node download-airbnb-data.ts --dry-run
- *   npx ts-node download-airbnb-data.ts --list-regions
+ *   npx ts-node downloadData.ts
+ *   npx ts-node downloadData.ts --regions "united-states"
+ *   npx ts-node downloadData.ts --regions "united-states,the-netherlands"
+ *   npx ts-node downloadData.ts --cities "amsterdam,london,new-york-city"
+ *   npx ts-node downloadData.ts --file-types "listings.csv.gz,reviews.csv.gz"
+ *   npx ts-node downloadData.ts --concurrency 5
+ *   npx ts-node downloadData.ts --dry-run
+ *   npx ts-node downloadData.ts --list-regions
  */
 
 import * as fs from 'fs';
