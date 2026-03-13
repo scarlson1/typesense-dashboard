@@ -6,13 +6,13 @@ import { z } from 'zod/v4';
 
 // TODO: implement "remember" - use localStorage instead of sessionStorage ??
 
-const authSchema = z.object({
+export const authSchema = z.object({
   node: z.string(),
   port: z.string(),
-  protocol: z.enum(['http', 'https']),
+  protocol: z.string(), // z.enum(['http', 'https']),
   apiKey: z.string(),
   // remember: z.boolean(),
-  env: environment,
+  env: z.string(), // environment,
 });
 
 export const authFormOpts = formOptions({

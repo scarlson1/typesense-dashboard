@@ -6,25 +6,25 @@ packages:
   - certbot
   - iptables-persistent
 
-write_files:
-  - path: /etc/systemd/system/typesense.service
-    content: |
-      [Unit]
-      Description=Typesense Server
-      After=network.target
+# write_files:
+#   - path: /etc/systemd/system/typesense.service
+#     content: |
+#       [Unit]
+#       Description=Typesense Server
+#       After=network.target
 
-      [Service]
-      ExecStart=/usr/bin/typesense-server --config=/etc/typesense/typesense-server.ini
-      Restart=on-failure
-      RestartSec=5s
-      StartLimitIntervalSec=60
-      StartLimitBurst=3
-      User=typesense
-      Group=typesense
-      LimitNOFILE=65536
+#       [Service]
+#       ExecStart=/usr/bin/typesense-server --config=/etc/typesense/typesense-server.ini
+#       Restart=on-failure
+#       RestartSec=5s
+#       StartLimitIntervalSec=60
+#       StartLimitBurst=3
+#       User=typesense
+#       Group=typesense
+#       LimitNOFILE=65536
 
-      [Install]
-      WantedBy=multi-user.target
+#       [Install]
+#       WantedBy=multi-user.target
 
 runcmd:
   # Directories and permissions first
@@ -43,6 +43,24 @@ runcmd:
   - iptables -I INPUT -p tcp --dport 80 -j ACCEPT
   - iptables -I INPUT -p tcp --dport 443 -j ACCEPT
   - netfilter-persistent save
+
+  # Mount data volume
+  - |
+    ROOT_DEV="$$(findmnt -no SOURCE /)"
+    ROOT_DISK="$$(lsblk -no PKNAME "$$ROOT_DEV" 2>/dev/null || lsblk -no NAME "$$ROOT_DEV")"
+    while true; do
+      DATA_DISK="$$(lsblk -ndo NAME,TYPE | awk '$$2=="disk"{print $$1}' | grep -v "^$${ROOT_DISK}$$" | head -n1)"
+      if [ -n "$$DATA_DISK" ]; then
+        break
+      fi
+      sleep 1
+    done
+    DATA_DEV="/dev/$${DATA_DISK}"
+    blkid "$$DATA_DEV" || mkfs.ext4 -F "$$DATA_DEV"
+    mkdir -p /var/lib/typesense
+    UUID="$$(blkid -s UUID -o value "$$DATA_DEV")"
+    echo "UUID=$${UUID} /var/lib/typesense ext4 defaults,nofail 0 2" >> /etc/fstab
+    mount /var/lib/typesense
 
   # Issue cert (port 80 must be open, typesense not yet started)
   - certbot certonly --standalone --non-interactive --agree-tos --email 08.writing_chime@icloud.com -d ${public_ip}.nip.io
@@ -71,8 +89,8 @@ runcmd:
 
   # Enable and start Typesense
   - systemctl daemon-reload
-  - systemctl enable typesense
-  - systemctl start typesense
+  - systemctl enable typesense-server
+  - systemctl restart typesense-server
 
   # Auto-renewal cron
-  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense' --post-hook 'systemctl start typesense'" | crontab -
+  - echo "0 3 * * * certbot renew --quiet --pre-hook 'systemctl stop typesense-server' --post-hook 'systemctl start typesense-server'" | crontab -

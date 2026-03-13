@@ -5,7 +5,11 @@ import '@fontsource/roboto/700.css';
 import { CircularProgress } from '@mui/material';
 import * as Sentry from '@sentry/react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { createRouter, RouterProvider } from '@tanstack/react-router';
+import {
+  createHashHistory,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
@@ -26,11 +30,14 @@ Sentry.init({
   // replaysOnErrorSampleRate: 0.5,
 });
 
+const hashHistory = createHashHistory();
+
 const router = createRouter({
   routeTree,
   basepath: '/typesense-dashboard',
   scrollRestoration: true,
   defaultPreload: 'intent',
+  history: hashHistory,
   // context: {
   //   user: undefined,
   // },
@@ -79,7 +86,7 @@ if (!rootElement.innerHTML) {
         <RouterProvider router={router} />
         {/* </DialogProvider> */}
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   );
 }
 

@@ -4,6 +4,8 @@ A dashboard to manage self hosted or local [Typesense](https://typesense.org/) i
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
+[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=9KBhFin0jH0XjRRaWW8JS7ach9Bo4UxP&env=development)
+
 ## Usage
 
 #### Prerequisites
@@ -91,7 +93,7 @@ TODO -->
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
 - Delete documents by query
 - Export documents
-- Set up demo typesense instance with data
+- tanstack router hash history
 
 ## Screenshots
 
@@ -215,4 +217,29 @@ export TYPESENSE_PORT=443
 export TYPESENSE_PROTOCOL=https
 export TYPESENSE_ADMIN_API_KEY=xyz123
 npx ts-node scripts/indexData.ts
+```
+
+### Troubleshooting
+
+```bash
+sudo systemctl status typesense-server
+
+sudo iptables -L INPUT -n | head -20
+sudo ss -tlnp | grep typesense
+
+sudo cat /etc/typesense/typesense-server.ini
+sudo systemctl cat typesense-server
+
+# typesense install runs as root --> create typesense user
+sudo systemctl restart typesense-server
+sudo journalctl -u typesense-server -f &
+sleep 3
+sudo ss -tlnp | grep typesense-serve
+
+# force recreate
+terraform taint oci_core_instance.typesense
+terraform apply -var="attach_reserved_ip=true"
+
+# reset ssh
+ssh-keygen -R 163.192.220.255
 ```

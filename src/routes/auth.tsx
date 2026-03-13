@@ -1,4 +1,4 @@
-import { AuthForm, authFormOpts } from '@/components/AuthForm';
+import { AuthForm, authSchema } from '@/components/AuthForm';
 import { useAppForm, useAsyncToast } from '@/hooks';
 import type { Environment } from '@/types';
 import { getCredsKey, getTypesenseClient, typesenseStore } from '@/utils';
@@ -33,6 +33,11 @@ import { useStore } from 'zustand';
 
 export const authSearchSchema = z.object({
   redirect: z.string().optional(),
+  node: z.string().optional(),
+  port: z.coerce.string().optional(),
+  protocol: z.string().optional(), // z.enum(['http', 'https']),
+  apiKey: z.string().optional(),
+  env: z.string().optional(), // environment,
 });
 
 export const Route = createFileRoute('/auth')({
@@ -92,7 +97,18 @@ function AuthComponent() {
   );
 
   const form = useAppForm({
-    ...authFormOpts,
+    // ...authFormOpts,
+    defaultValues: {
+      node: search.node ?? '',
+      port: search.port ?? '',
+      protocol: search.protocol ?? '',
+      apiKey: search.apiKey ?? '',
+      // remember: false,
+      env: search.env ?? '',
+    },
+    validators: {
+      onChange: authSchema,
+    },
     onSubmit: async ({ value: { node, port, protocol, apiKey, env } }) => {
       const creds = {
         node: node.trim(),
