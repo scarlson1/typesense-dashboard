@@ -37,7 +37,7 @@ export const useImportDocuments = (options?: UseImportDocuments) => {
       documents,
       options,
     }: ImportDocsVars) => {
-      let res = await client
+      const res = await client
         .collections(collectionId)
         .documents()
         .import(documents, options);
@@ -52,30 +52,29 @@ export const useImportDocuments = (options?: UseImportDocuments) => {
       setResults(data);
 
       const successCount = data.reduce(
-        // @ts-ignore
-        (acc, cur) => acc + cur.success * 1,
-        0
+        (acc, cur) => acc + (cur.success ? 1 : 0),
+        0,
       );
 
       const failCount = data.reduce(
-        // @ts-ignore
-        (acc, cur) => acc + !cur.success * 1,
-        0
+        (acc, cur) => acc + (cur.success ? 0 : 1),
+        0,
       );
 
-      let severityMethod = failCount ? 'warn' : 'success';
+      const severityMethod = failCount ? 'warn' : 'success';
 
       toast[severityMethod as keyof typeof toast](
         `import complete [success: ${successCount}; failed: ${failCount}]`,
         {
           id: `import-docs`,
-        }
+        },
       );
 
       options?.onSuccess && options.onSuccess(data, vars, ctx);
     },
     onError: (err, vars, ctx) => {
-      toast.error(`importing documents...`, { id: `import-docs` });
+      console.log(err);
+      toast.error(`Error importing documents...`, { id: `import-docs` });
       options?.onError && options.onError(err, vars, ctx);
     },
     onSettled: (data, err, vars, ctx) => {

@@ -31,7 +31,7 @@ export function InstantSearch<T extends DocumentSchema>({
   client,
   clusterId,
   collectionId,
-  initialParams = { per_page: 5 },
+  initialParams = { per_page: 20 },
   debounceMs = 200,
   staleTime = 30000,
   pageSizeOptions = [5, 10, 20, 50, 100],

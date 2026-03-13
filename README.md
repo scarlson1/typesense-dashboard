@@ -4,7 +4,15 @@ A dashboard to manage self hosted or local [Typesense](https://typesense.org/) i
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
-[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=9KBhFin0jH0XjRRaWW8JS7ach9Bo4UxP&env=development)
+[View with demo data](https://scarlson1.github.io/typesense-dashboard/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=x8lnee24b4AApg9R776c4PKgOoEdUdWj&env=development)
+
+If the link is not prefilling login creds, use the following:
+
+dashboard: [https://scarlson1.github.io/typesense-dashboard](https://scarlson1.github.io/typesense-dashboard/auth)
+host: 163.192.220.255.nip.io
+protocol: https
+port: 443
+api key: x8lnee24b4AApg9R776c4PKgOoEdUdWj
 
 ## Usage
 
@@ -14,12 +22,12 @@ Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesens
 
 ### Web
 
-Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (If using github pages option, Typesense config must be configured with SSL or you'll get "ERR_NETWORK Network Error").
+Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (If using github pages option, Typesense config must be configured with TLS or you'll get "ERR_NETWORK Network Error").
 
 - [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https)
 - Self-signed certificate references: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/) / [mkcert](https://github.com/FiloSottile/mkcert)
 
-If your typesense instance is running locally, use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add SSL if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
+If your typesense instance is running locally, use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add TLS if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
 
 ```bash
 $ ngrok http https://localhost:443
@@ -93,7 +101,8 @@ TODO -->
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
 - Delete documents by query
 - Export documents
-- tanstack router hash history
+- Fix multi-cluster auth (currently overwriting existing)
+- Bug using demo key - search fails with 401 after about 10 seconds (initially loads correctly)
 
 ## Screenshots
 

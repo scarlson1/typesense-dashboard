@@ -34,13 +34,13 @@ import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 
 const SwipeableEdgeDrawer = lazy(
-  () => import('@/components/SwipeableEdgeDrawer')
+  () => import('@/components/SwipeableEdgeDrawer'),
 );
 
 // TODO: filter / display settings for mobile (number of results, pagination, etc.)
 
 export const Route = createFileRoute(
-  '/_dashboard/collections/$collectionId/documents/search/map'
+  '/_dashboard/collections/$collectionId/documents/search/map',
 )({
   component: RouteComponent,
   staticData: {
@@ -52,7 +52,7 @@ function RouteComponent() {
   const mobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const { geoFieldOptions } = useDefaultIndexParams();
   const [geoFieldName, setGeoFieldName] = useState<string | null>(
-    () => geoFieldOptions[0] || null
+    () => geoFieldOptions[0] || null,
   );
 
   const hits = useHits();
@@ -62,18 +62,18 @@ function RouteComponent() {
   const schema = useSchema(collectionId);
 
   // TODO: support geopoint[] layer type ??
-  let isGeopoint = useMemo(() => {
+  const isGeopoint = useMemo(() => {
     if (!geoFieldName) return true;
-    let field = schema.data.fields.find((f) => f.name === geoFieldName);
+    const field = schema.data.fields.find((f) => f.name === geoFieldName);
     return field?.type === 'geopoint';
   }, [schema]);
 
   if (!isGeopoint)
     throw new Error(
-      `only "geopoint" field type is supported in the current version`
+      `only "geopoint" field type is supported in the current version`,
     );
 
-  let enableMap = Boolean(geoFieldOptions.length);
+  const enableMap = Boolean(geoFieldOptions.length);
 
   if (!enableMap)
     return (

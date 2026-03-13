@@ -17,7 +17,7 @@ import { useCallback, useState, type MouseEvent } from 'react';
 import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 
 export const Route = createFileRoute(
-  '/_dashboard/collections/$collectionId/documents/search'
+  '/_dashboard/collections/$collectionId/documents/search',
 )({
   component: SearchLayout,
   staticData: {
@@ -105,7 +105,7 @@ function ViewToggleButtons() {
   const navigate = Route.useNavigate();
   const location = useLocation();
   const [view, setView] = useState(() =>
-    location.pathname.includes('map') ? 'map' : 'grid'
+    location.pathname.includes('map') ? 'map' : 'grid',
   );
 
   const { geoFieldOptions } = useDefaultIndexParams();
@@ -122,10 +122,10 @@ function ViewToggleButtons() {
   const handleViewChange = useCallback(
     (_: MouseEvent<HTMLElement>, nextView: string) => {
       setView(nextView);
-      let nextPath = nextView === 'map' ? 'map' : '.';
+      const nextPath = nextView === 'map' ? 'map' : '.';
       navigate({ to: nextPath });
     },
-    [navigate]
+    [navigate],
   );
 
   return (
