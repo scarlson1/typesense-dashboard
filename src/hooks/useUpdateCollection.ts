@@ -23,28 +23,28 @@ export function useUpdateCollection(props?: UseUpdateCollection) {
   return useMutation({
     mutationFn: ({ colName, updates }: UpdateCollectionArgs) =>
       client.collections(colName).update(updates),
-    onMutate: (vars) => {
+    onMutate: (vars, ctx) => {
       toast.loading('saving...', { id: 'update-schema' });
-      onMutate && onMutate(vars);
+      onMutate && onMutate(vars, ctx);
       return { name: vars.colName };
     },
-    onSuccess: (data, vars, ctx) => {
+    onSuccess: (data, vars, result, ctx) => {
       toast.success(`collection updated`, { id: 'update-schema' });
 
-      onSuccess && onSuccess(data, vars, ctx);
+      onSuccess && onSuccess(data, vars, result, ctx);
     },
-    onError(err, vars, ctx) {
+    onError(err, vars, result, ctx) {
       console.log('ERROR: ', err);
-      let msg = err.message ?? 'failed to update collection schema';
+      const msg = err.message ?? 'failed to update collection schema';
       toast.error(msg, { id: 'update-schema' });
 
-      onError && onError(err, vars, ctx);
+      onError && onError(err, vars, result, ctx);
     },
-    onSettled: (data, err, vars, ctx) => {
+    onSettled: (data, err, vars, result, ctx) => {
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.all(clusterId),
       });
-      onSettled && onSettled(data, err, vars, ctx);
+      onSettled && onSettled(data, err, vars, result, ctx);
     },
     ...(rest || {}),
   });
