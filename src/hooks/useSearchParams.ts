@@ -12,7 +12,7 @@ export const useSearchParams = <
   T extends DocumentSchema = DocumentSchema,
 >() => {
   const context = useContext<SearchContextValues<T, Error> | null>(
-    SearchContext
+    SearchContext,
   );
   if (context === undefined)
     throw new Error('useSearchParams must be within a InstantSearch Provider');
@@ -22,7 +22,7 @@ export const useSearchParams = <
     setParams: noop,
   };
 
-  const updateParams = useCallback((values: SearchContextParams) => {
+  const updateParams = useCallback((values: SearchContextParams<T>) => {
     setParams(({ ...prev }) => ({ ...prev, ...values }));
   }, []);
 

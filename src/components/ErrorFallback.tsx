@@ -4,11 +4,12 @@ import type { FallbackProps } from 'react-error-boundary';
 
 export function ErrorFallback({ error }: FallbackProps) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
+  const msg = error && error instanceof Error ? error.message : String(error);
 
   return (
     <div role='alert'>
       <p>Something went wrong:</p>
-      <pre style={{ color: 'red' }}>{error.message}</pre>
+      <pre style={{ color: 'red' }}>{msg}</pre>
     </div>
   );
 }

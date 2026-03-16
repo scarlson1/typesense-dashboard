@@ -15,18 +15,18 @@ import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import type { PresetCreateSchema } from 'typesense/lib/Typesense/Presets';
 import { PresetsForm } from './PresetsForm';
 
-interface UpdatePresetProps {
+interface UpdatePresetProps<T extends DocumentSchema> {
   defaultValues?: any;
   submitButtonText?: string;
-  mutationProps?: UseUpsertPresetProps;
+  mutationProps?: UseUpsertPresetProps<T>;
 }
 
-export function UpdatePreset({
+export function UpdatePreset<T extends DocumentSchema = DocumentSchema>({
   defaultValues = DEFAULT_PRESET_VALUES,
   submitButtonText = 'Submit',
   mutationProps,
-}: UpdatePresetProps) {
-  const mutation = useUpsertPreset(mutationProps);
+}: UpdatePresetProps<T>) {
+  const mutation = useUpsertPreset<T>(mutationProps);
 
   const form = useAppForm({
     ...presetsFormOpts,
@@ -35,8 +35,7 @@ export function UpdatePreset({
       try {
         // TODO: handle param value types aside from strings (arrays, numbers, etc.)
         // use zod refine / coerce ??
-        let presetValue: PresetCreateSchema<DocumentSchema, string>['value'] =
-          {};
+        let presetValue: PresetCreateSchema<T, string>['value'] = {};
         if (value.presetType === presetType.enum['Single-Collection']) {
           const x = value.searchParameters.map(
             (p: { name: ParameterKeys; value: string }) => ({
