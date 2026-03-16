@@ -8,11 +8,11 @@ Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesens
 
 If the link is not prefilling login creds, use the following:
 
-dashboard: [https://scarlson1.github.io/typesense-dashboard](https://scarlson1.github.io/typesense-dashboard/#/auth)
-host: 163.192.220.255.nip.io
-protocol: https
-port: 443
-api key: qMcPiXZZYUDfq5o6dBFPITLFgOlJf4uX
+- dashboard: [https://scarlson1.github.io/typesense-dashboard](https://scarlson1.github.io/typesense-dashboard/#/auth)
+- host: 163.192.220.255.nip.io
+- protocol: https
+- port: 443
+- api key: qMcPiXZZYUDfq5o6dBFPITLFgOlJf4uX
 
 ## Usage
 
@@ -110,7 +110,9 @@ TODO -->
 
 ![search](docs/images/search.png)
 
-![geo search](docs/images/geosearch.png)
+![geo search](docs/images/geosearch-dark.png)
+
+<!-- ![geo search](docs/images/geosearch.png) -->
 
 ![search parameters](docs/images/search_params.png)
 
@@ -129,6 +131,8 @@ TODO -->
 ![synonyms](docs/images/synonyms.png)
 
 ![analytics rules](docs/images/analytics_rules.png)
+
+![search refinements](docs/images/search-dark.png)
 
 # Alternatives
 
