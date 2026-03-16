@@ -154,6 +154,7 @@ const DashboardCollectionsCollectionIdDocumentsSearchMapRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof DashboardIndexRoute
   '/auth': typeof AuthRoute
   '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
@@ -162,9 +163,8 @@ export interface FileRoutesByFullPath {
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
-  '/': typeof DashboardIndexRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
-  '/collections': typeof DashboardCollectionsIndexRoute
+  '/collections/': typeof DashboardCollectionsIndexRoute
   '/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
   '/collections/$collectionId/curation': typeof DashboardCollectionsCollectionIdCurationRoute
   '/collections/$collectionId/synonyms': typeof DashboardCollectionsCollectionIdSynonymsRoute
@@ -226,6 +226,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/auth'
     | '/logout'
     | '/alias'
@@ -234,9 +235,8 @@ export interface FileRouteTypes {
     | '/presets'
     | '/server'
     | '/stopwords'
-    | '/'
     | '/collections/new'
-    | '/collections'
+    | '/collections/'
     | '/collections/$collectionId/config'
     | '/collections/$collectionId/curation'
     | '/collections/$collectionId/synonyms'
@@ -320,7 +320,7 @@ declare module '@tanstack/react-router' {
     '/_dashboard': {
       id: '/_dashboard'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -376,7 +376,7 @@ declare module '@tanstack/react-router' {
     '/_dashboard/collections/': {
       id: '/_dashboard/collections/'
       path: '/collections'
-      fullPath: '/collections'
+      fullPath: '/collections/'
       preLoaderRoute: typeof DashboardCollectionsIndexRouteImport
       parentRoute: typeof DashboardRoute
     }

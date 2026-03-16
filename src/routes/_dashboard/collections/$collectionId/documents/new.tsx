@@ -10,8 +10,10 @@ import type { TypesenseFieldType } from '@/types';
 import { typesenseStore } from '@/utils';
 import type { OnMount } from '@monaco-editor/react';
 import {
+  CheckRounded,
   ClearRounded,
   CloseRounded,
+  ContentCopyRounded,
   ExpandLessRounded,
   ExpandMoreRounded,
   OpenInNewRounded,
@@ -31,6 +33,7 @@ import {
   Select,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
   type SelectChangeEvent,
 } from '@mui/material';
@@ -51,7 +54,7 @@ import { useStore } from 'zustand';
 const JsonEditor = lazy(() => import('../../../../../components/JsonEditor'));
 
 export const Route = createFileRoute(
-  '/_dashboard/collections/$collectionId/documents/new'
+  '/_dashboard/collections/$collectionId/documents/new',
 )({
   component: RouteComponent,
   staticData: {
@@ -64,11 +67,11 @@ function RouteComponent() {
   const creds = useStore(typesenseStore, (state) => state.credentials);
   const currKey = useStore(typesenseStore, (state) => state.currentCredsKey);
 
-  let credentials = currKey ? creds[currKey] : null;
-  let protocol = credentials?.protocol || '[PROTOCOL]';
-  let node = credentials?.node || '[YOUR_NODE]';
-  let port = protocol === 'http' ? credentials?.port || '[PORT]' : '';
-  let collection = collectionId || '[COLLECTION_NAME]';
+  const credentials = currKey ? creds[currKey] : null;
+  const protocol = credentials?.protocol || '[PROTOCOL]';
+  const node = credentials?.node || '[YOUR_NODE]';
+  const port = protocol === 'http' ? credentials?.port || '[PORT]' : '';
+  const collection = collectionId || '[COLLECTION_NAME]';
 
   return (
     <Box sx={{ maxWidth: 920 }}>
@@ -298,8 +301,8 @@ function NewDocumentEditor() {
   const { data } = useSchema(collectionId);
 
   const value = useMemo(() => {
-    let schema = data?.fields.reduce((acc, cur) => {
-      let placeholder = getFieldPlaceholderValue(cur.type);
+    const schema = data?.fields.reduce((acc, cur) => {
+      const placeholder = getFieldPlaceholderValue(cur.type);
       return placeholder !== null ? { ...acc, [cur.name]: placeholder } : acc;
     }, {});
 
@@ -327,7 +330,7 @@ function NewDocumentEditor() {
       return toast.warn('Invalid JSON', { id: 'monaco-validation' });
     if (!val) return toast.warn(`value required`);
 
-    let formatted = toJsonLinesString(JSON.parse(val));
+    const formatted = toJsonLinesString(JSON.parse(val));
 
     mutation.mutate({
       collectionId,
@@ -451,7 +454,7 @@ function MultiDocImportResult({
 
   return (
     <>
-      {Boolean(results.length) ? (
+      {results.length ? (
         <Stack
           direction='row'
           spacing={2}
@@ -551,8 +554,34 @@ function getFieldPlaceholderValue(fieldType: TypesenseFieldType) {
 }
 
 function Code({ children }: { children: ReactNode }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    // Extract plain text from React children
+    const text = extractText(children);
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [children]);
+
   return (
-    <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2 }}>
+    <Paper sx={{ p: { xs: 1.5, sm: 2 }, my: 2, position: 'relative' }}>
+      <Stack direction='row' justifyContent='flex-end' sx={{ mb: 0.5 }}>
+        <Tooltip title={copied ? 'Copied!' : 'Copy'}>
+          <IconButton
+            size='small'
+            onClick={handleCopy}
+            sx={{ position: 'absolute', top: 6, right: 6 }}
+          >
+            {copied ? (
+              <CheckRounded fontSize='small' color='success' />
+            ) : (
+              <ContentCopyRounded fontSize='small' />
+            )}
+          </IconButton>
+        </Tooltip>
+      </Stack>
       <Typography
         variant='body2'
         color='textSecondary'
@@ -568,4 +597,18 @@ function Code({ children }: { children: ReactNode }) {
       </Typography>
     </Paper>
   );
+}
+
+// Recursively extract plain text from React children
+function extractText(node: ReactNode): string {
+  if (typeof node === 'string') return node;
+  if (typeof node === 'number') return String(node);
+  if (!node) return '';
+  if (Array.isArray(node)) return node.map(extractText).join('');
+  if (typeof node === 'object' && 'props' in node) {
+    // <br /> → newline, <code> → extract its children
+    if ((node as any).type === 'br') return '\n';
+    return extractText((node as any).props?.children);
+  }
+  return '';
 }

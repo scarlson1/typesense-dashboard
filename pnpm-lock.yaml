@@ -56,6 +56,9 @@ importers:
       '@types/mapbox-gl':
         specifier: ^3.4.1
         version: 3.5.0
+      color:
+        specifier: ^5.0.3
+        version: 5.0.3
       csvtojson:
         specifier: ^2.0.14
         version: 2.0.14
@@ -71,6 +74,9 @@ importers:
       mapbox-gl:
         specifier: ^3.13.0
         version: 3.20.0
+      monaco-editor:
+        specifier: ^0.55.1
+        version: 0.55.1
       path:
         specifier: ^0.12.7
         version: 0.12.7
