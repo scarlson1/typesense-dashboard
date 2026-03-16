@@ -56,7 +56,7 @@ function StopwordsList() {
   const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: [clusterId, 'stopwords'],
     queryFn: async () => {
-      let res = await client.stopwords().retrieve();
+      const res = await client.stopwords().retrieve();
 
       return res.stopwords;
     },
@@ -71,7 +71,7 @@ function StopwordsList() {
       toast.success(`"${vars}" deleted`, { id: `delete-${vars}` });
     },
     onError: (err, vars) => {
-      let msg = err?.message || `error deleting "${vars}"`;
+      const msg = err?.message || `error deleting "${vars}"`;
       toast.error(msg, { id: `delete-${vars}` });
     },
     onSettled: () => {
@@ -100,7 +100,10 @@ function StopwordsList() {
         flex: 1.5,
         sortable: false,
         filterable: false,
-        valueFormatter: (_, row) => row.stopwords.join(', '),
+        valueFormatter: (_, row) =>
+          Array.isArray(row.stopwords)
+            ? row.stopwords.join(', ')
+            : row.stopwords.stopwords.join(', '),
       },
       {
         field: 'locale',
@@ -134,7 +137,7 @@ function StopwordsList() {
         ],
       },
     ],
-    [mutation.mutate, mutation.isPending]
+    [mutation.mutate, mutation.isPending],
   );
 
   if (isError) {
@@ -187,7 +190,7 @@ function AddStopword() {
       toast.success(`stopwords saved [${data.id}]`, { id: 'save-stopwords' });
     },
     onError: (err, vars) => {
-      let msg = err.message || `error saving stopwords [${vars.stopwordId}]`;
+      const msg = err.message || `error saving stopwords [${vars.stopwordId}]`;
       toast.error(msg, { id: 'save-stopwords' });
     },
     onSettled: () => {
@@ -209,7 +212,9 @@ function AddStopword() {
           },
         });
         form.reset();
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 

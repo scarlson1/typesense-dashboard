@@ -61,7 +61,7 @@ const GeoSearch = ({
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo | null>(null);
   const [bounds, setBounds] = useState<[number, number, number, number] | null>(
-    null
+    null,
   );
   const debouncedBounds = useDebounce(bounds);
 
@@ -80,7 +80,7 @@ const GeoSearch = ({
         anchorY: 36,
       }),
       getPosition: (d) => {
-        let coords = d.document[geoFieldName] || [0, 0];
+        const coords = d.document[geoFieldName] || [0, 0];
         return [coords[1], coords[0]];
       },
       getSize: 36,
@@ -105,7 +105,7 @@ const GeoSearch = ({
 
   useEffect(() => {
     if (!debouncedBounds) return;
-    let filterBounds = [
+    const filterBounds = [
       debouncedBounds[1],
       debouncedBounds[0],
       debouncedBounds[3],
@@ -113,16 +113,16 @@ const GeoSearch = ({
     ];
 
     // TODO: don't overwrite other filter_by params
-    let polygonBounds = boundingBoxToPolygon(filterBounds);
+    const polygonBounds = boundingBoxToPolygon(filterBounds);
     updateParams({ filter_by: `${geoFieldName}:(${polygonBounds})` });
   }, [debouncedBounds, updateParams]);
 
   const handleViewStateChange = useCallback(
     ({ viewState }: any) => {
       // console.log('NEW VIEW STATE: ', {viewState, interactionState, oldViewState });
-      let { width, height, longitude, latitude, zoom, pitch, bearing } =
+      const { width, height, longitude, latitude, zoom, pitch, bearing } =
         viewState;
-      let test = new WebMercatorViewport({
+      const test = new WebMercatorViewport({
         width,
         height,
         longitude,
@@ -135,7 +135,7 @@ const GeoSearch = ({
       const newBounds = test.getBounds(); // [minX, minY, maxX, maxY] = minLng, minLat, maxLng, maxLat
       setBounds(newBounds);
     },
-    [geoFieldName]
+    [geoFieldName],
   );
 
   const handleCloseTooltip = () => {
@@ -235,7 +235,7 @@ export function HoverInfo({
 
   if (!(pickingInfo && pickingInfo.object)) return null;
 
-  let closeButtonSx = slots?.hit ? { left: 6 } : { right: 6 };
+  const closeButtonSx = slots?.hit ? { left: 6 } : { right: 6 };
 
   return (
     <Box

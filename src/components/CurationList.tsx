@@ -63,7 +63,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
           <AccordionDetails>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: Error) => {
+              onError={(err: unknown) => {
                 captureException(err);
               }}
             >
@@ -92,7 +92,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
                     replace_query_bool: Boolean(override.replace_query),
                     replace_query: override.replace_query || '',
                     remove_match_tokens: Boolean(
-                      override.remove_matched_tokens
+                      override.remove_matched_tokens,
                     ),
                     custom_metadata_bool: Boolean(override.metadata),
                     metadata: override.metadata
@@ -138,7 +138,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
         <AccordionDetails>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >

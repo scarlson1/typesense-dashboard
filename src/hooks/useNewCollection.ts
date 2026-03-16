@@ -23,19 +23,19 @@ export const useNewCollection = (props?: UseNewCollectionProps) => {
     ...rest,
     mutationFn: (values: CollectionCreateSchema) =>
       client.collections().create(values),
-    onSuccess: (data, vars) => {
+    onSuccess: (data, vars, result, ctx) => {
       toast.success('collection created', { id: 'new-collection' });
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.all(clusterId),
       });
 
-      onSuccess && onSuccess(data, vars, {});
+      onSuccess && onSuccess(data, vars, result, ctx);
       navigate({ from: '/collections/new', to: '..' });
     },
-    onError: (e, vars, ctx) => {
-      let msg = e.message || 'an error occurred';
+    onError: (e, vars, result, ctx) => {
+      const msg = e.message || 'an error occurred';
       toast.error(msg, { id: 'new-collection' });
-      onError && onError(e, vars, ctx);
+      onError && onError(e, vars, result, ctx);
     },
   });
 };

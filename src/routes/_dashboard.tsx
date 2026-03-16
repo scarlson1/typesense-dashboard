@@ -65,7 +65,7 @@ function RouteComponent() {
           >
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: Error) => {
+              onError={(err: unknown) => {
                 captureException(err);
               }}
             >

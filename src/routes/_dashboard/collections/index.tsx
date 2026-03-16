@@ -35,7 +35,7 @@ function CollectionsComponent() {
       <Box sx={{ py: { xs: 1, sm: 2 } }}>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: Error) => {
+          onError={(err: unknown) => {
             captureException(err);
           }}
         >

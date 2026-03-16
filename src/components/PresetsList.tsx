@@ -12,11 +12,11 @@ import {
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState, type SyntheticEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import type { SearchParams } from 'typesense/lib/Typesense/Documents';
 import type {
-  MultiSearchRequestSchema,
-  MultiSearchRequestsSchema,
-} from 'typesense/lib/Typesense/MultiSearch';
+  DocumentSchema,
+  SearchParams,
+} from 'typesense/lib/Typesense/Documents';
+import type { MultiSearchRequestsSchema } from 'typesense/lib/Typesense/MultiSearch';
 import { ErrorFallback } from './ErrorFallback';
 import { UpdatePreset } from './UpdatePreset';
 
@@ -25,7 +25,7 @@ export function PresetsList() {
   const { data: presets } = useSuspenseQuery({
     queryKey: presetQueryKeys.all(clusterId),
     queryFn: async () => {
-      let { presets } = await client.presets().retrieve();
+      const { presets } = await client.presets().retrieve();
       return presets;
     },
   });
@@ -46,7 +46,7 @@ export function PresetsList() {
   return (
     <>
       {presets.map((preset, i) => {
-        let isMulti = isMultiSearch(preset.value);
+        const isMulti = isMultiSearch(preset.value);
 
         const defaultValues = {
           presetId: preset.name,
@@ -60,11 +60,13 @@ export function PresetsList() {
                 value: v,
               })),
           multiSearchParams: isMulti
-            ? (preset.value as MultiSearchRequestsSchema).searches.map((x) =>
+            ? (
+                preset.value as MultiSearchRequestsSchema<DocumentSchema, string>
+              ).searches.map((x) =>
                 Object.entries(x).map(([k, v]) => ({
                   name: k,
                   value: v,
-                }))
+                })),
               )
             : [[EMPTY_PRESET_PARAMS], [EMPTY_PRESET_PARAMS]],
         };
@@ -156,7 +158,12 @@ function useDeletePreset() {
 }
 
 function isMultiSearch(
-  val: SearchParams | MultiSearchRequestsSchema<undefined>
-): val is MultiSearchRequestSchema {
-  return (val as MultiSearchRequestsSchema).searches !== undefined;
+  val:
+    | SearchParams<DocumentSchema, string>
+    | MultiSearchRequestsSchema<DocumentSchema, string>,
+): val is MultiSearchRequestsSchema<DocumentSchema, string> {
+  return (
+    (val as MultiSearchRequestsSchema<DocumentSchema, string>).searches !==
+    undefined
+  );
 }

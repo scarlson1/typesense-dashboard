@@ -104,11 +104,13 @@ export const CtxNumericFacetOption = (props: CtxFacetOptionProps) => {
   ) : null;
 };
 
-interface UseFacetCountsProps {}
+interface UseFacetCountsProps {
+  max_facet_values?: number;
+}
 
 // filter_by removes facet options with count of 0 (desired behavior ??)
 const useFacetCounts = (
-  options: UseFacetCountsProps = { max_facet_values: 100 }
+  options: UseFacetCountsProps = { max_facet_values: 100 },
 ) => {
   const [client, clusterId] = useTypesenseClient();
   const { debouncedQuery, collectionId, params } = useSearch();
@@ -121,12 +123,12 @@ const useFacetCounts = (
         clusterId,
         collectionId,
         restParams,
-        debouncedQuery
+        debouncedQuery,
       ),
       'facets',
     ],
     queryFn: async () => {
-      let res = await client
+      const res = await client
         .collections(collectionId)
         .documents()
         .search({
@@ -150,53 +152,55 @@ export const CtxFacetOptions = () => {
   // params?.filter_by?.split(/,(?![^\\[]*\])/) || [], // .split(',') || [],
   const filterByParams = useMemo(
     () => params?.filter_by?.split('&&').filter((x) => x) || [],
-    [params]
+    [params],
   );
 
   // merge all facets with active facets (add disable config to enable default behavior ??)
   const mergedFacets = useMemo(() => {
     return facetCounts?.map((facet: SearchResponseFacetCountSchema<object>) => {
-      let filteredFacet = data?.facet_counts?.find(
-        (f) => f.field_name === facet.field_name
+      const filteredFacet = data?.facet_counts?.find(
+        (f) => f.field_name === facet.field_name,
       );
 
-      let filterBy = filterByParams.find((f: string) =>
-        f.startsWith(facet?.field_name)
+      const filterBy = filterByParams.find((f: string) =>
+        f.startsWith(facet?.field_name),
       );
 
       // Need to get field def from collection schema to ensure "sort" property is enabled ??
       const isNumeric = facet.stats?.avg !== undefined;
 
-      let defaultMin = facet.stats?.min || 0;
-      let defaultMax = facet.stats?.max || 1000000;
+      const defaultMin = facet.stats?.min || 0;
+      const defaultMax = facet.stats?.max || 1000000;
       let numericValueRange = [defaultMin, defaultMax];
 
       if (isNumeric) {
         if (filterBy) {
-          let split = filterBy
+          const split = filterBy
             .split(':')[1]
             .replace(/[\[\]]/g, '')
             .split('..');
 
           if (split.length) {
-            let start = !isNaN(Number(split[0]))
+            const start = !isNaN(Number(split[0]))
               ? Number(split[0])
               : defaultMin;
-            let end = !isNaN(Number(split[1])) ? Number(split[1]) : defaultMax;
+            const end = !isNaN(Number(split[1]))
+              ? Number(split[1])
+              : defaultMax;
             numericValueRange = [start, end];
           }
         }
       }
 
       // TODO: "show more"
-      let countsWithNums = facet.counts.slice(0, 10).map((c) => {
-        let filteredCount = filteredFacet?.counts.find(
-          (filteredCount) => filteredCount.value === c.value
+      const countsWithNums = facet.counts.slice(0, 10).map((c) => {
+        const filteredCount = filteredFacet?.counts.find(
+          (filteredCount) => filteredCount.value === c.value,
         );
 
         let checked = false;
         if (!isNumeric) {
-          let filterValues = filterBy
+          const filterValues = filterBy
             ? filterBy
                 .split(':')[1]
                 .replace(/[\[\]]/g, '')
@@ -227,14 +231,14 @@ export const CtxFacetOptions = () => {
 
   const updateFilterParams = useCallback(
     (field: string, newFilter: string) => {
-      let filtersSansTarget = filterByParams.filter(
-        (f: string) => !f.startsWith(`${field}`)
+      const filtersSansTarget = filterByParams.filter(
+        (f: string) => !f.startsWith(`${field}`),
       );
-      let newParams = [...filtersSansTarget, newFilter].filter((x) => x);
+      const newParams = [...filtersSansTarget, newFilter].filter((x) => x);
 
       updateParams({ filter_by: newParams.join('&&') });
     },
-    [filterByParams, updateParams]
+    [filterByParams, updateParams],
   );
 
   // TODO: support filter operators
@@ -243,21 +247,21 @@ export const CtxFacetOptions = () => {
   const handleChange = useCallback(
     (
       e: ChangeEvent<HTMLInputElement>,
-      field: string
+      field: string,
       // operator: FilterOperators = '='
     ) => {
-      let existingFilter = filterByParams.find((f) =>
-        f.startsWith(`${field}:`)
+      const existingFilter = filterByParams.find((f) =>
+        f.startsWith(`${field}:`),
       );
 
       let newFilterValue = `${field}:[${e.target.value}]`;
       if (existingFilter) {
-        let prevOptions = existingFilter
+        const prevOptions = existingFilter
           .split(':')[1]
           .replace(/[\[\]]/g, '')
           .split(',');
 
-        let newOptions = e.target.checked
+        const newOptions = e.target.checked
           ? uniqueArr([...prevOptions, e.target.value])
           : prevOptions.filter((f: string) => f !== e.target.value);
 
@@ -267,19 +271,19 @@ export const CtxFacetOptions = () => {
       }
       updateFilterParams(field, newFilterValue);
     },
-    [filterByParams, updateFilterParams]
+    [filterByParams, updateFilterParams],
   );
 
   const handleNumericChangeCommitted = useCallback(
     (fieldName: string) =>
       (_: SyntheticEvent | Event, value: number | number[]) => {
-        let newFilterVal = value && Array.isArray(value) ? value : [value];
+        const newFilterVal = value && Array.isArray(value) ? value : [value];
         updateFilterParams(
           fieldName,
-          `${fieldName}:[${newFilterVal[0]}..${newFilterVal[1] ?? ''}]`
+          `${fieldName}:[${newFilterVal[0]}..${newFilterVal[1] ?? ''}]`,
         );
       },
-    [updateFilterParams]
+    [updateFilterParams],
   );
 
   return (
@@ -294,7 +298,7 @@ export const CtxFacetOptions = () => {
                 min={facetCount.stats?.min ?? 0}
                 max={facetCount.stats?.max}
                 onChangeCommitted={handleNumericChangeCommitted(
-                  facetCount.field_name
+                  facetCount.field_name,
                 )}
                 getAriaLabel={() => facetCount.field_name}
                 getAriaValueText={(val) => formatDollar(val)}
@@ -338,7 +342,7 @@ export const CtxFacetOptions = () => {
 };
 
 function ValueLabelComponent(
-  props: SliderValueLabelProps & { valueLabelDisplay: string }
+  props: SliderValueLabelProps & { valueLabelDisplay: string },
 ) {
   const { children, value, valueLabelDisplay } = props;
   const [open, setOpen] = useState(() => valueLabelDisplay === 'on');
@@ -367,16 +371,17 @@ function ValueLabelComponent(
   );
 }
 
-interface NumericFacetOptionProps extends SliderProps {}
+// interface NumericFacetOptionProps extends SliderProps {}
+type NumericFacetOptionProps = SliderProps;
 
 function NumericFacetOption(props: NumericFacetOptionProps) {
   const [value, setValue] = useState<number[] | number | undefined>(
-    props.value
+    props.value,
   );
 
   const handleChange = (
     _: Event,
-    newValue: number | number[]
+    newValue: number | number[],
     // activeThumb: number
   ) => {
     setValue(newValue);

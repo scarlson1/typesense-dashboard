@@ -66,7 +66,7 @@ export function SideMenu() {
       >
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: Error) => {
+          onError={(err: unknown) => {
             captureException(err);
           }}
         >

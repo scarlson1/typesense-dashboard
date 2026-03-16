@@ -7,12 +7,13 @@ import type {
   SearchResponse,
 } from 'typesense/lib/Typesense/Documents';
 
-export type SearchContextParams =
-  | Omit<SearchParams, 'q'>
-  | Omit<SearchParamsWithPreset, 'q'>;
+export type SearchContextParams<T extends DocumentSchema = DocumentSchema> =
+  | Omit<SearchParams<T, string>, 'q'>
+  | Omit<SearchParamsWithPreset<T, string>, 'q'>;
 
-export type PaginationParams = Pick<
-  SearchParams,
+export type PaginationParams<T extends DocumentSchema = DocumentSchema> = Pick<
+  // export type PaginationParams = Pick<
+  SearchParams<T>,
   'page' | 'per_page' | 'limit' | 'offset'
 >;
 
@@ -28,15 +29,13 @@ export type SearchContextValues<
   | 'error'
   | 'isPlaceholderData'
 > & {
-  // clusterId: string;
-  // client: Client;
   collectionId: string;
   debouncedQuery: string;
-  params: SearchContextParams;
-  setParams: Dispatch<SetStateAction<SearchContextParams>>;
+  params: SearchContextParams<TData>;
+  setParams: Dispatch<SetStateAction<SearchContextParams<TData>>>;
   setQuery: (value: string) => void;
   setPreset: (presetId: string | null) => void;
-  setPagination: (params: PaginationParams) => void;
+  setPagination: (params: PaginationParams<TData>) => void;
   pageSizeOptions: number[];
 };
 

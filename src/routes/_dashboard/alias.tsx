@@ -52,7 +52,7 @@ function RouteComponent() {
       <Box>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: Error) => {
+          onError={(err: unknown) => {
             captureException(err);
           }}
         >
@@ -95,15 +95,15 @@ function useCreateAlias(props?: UseCreateAliasProps) {
 
       return vars;
     },
-    onSuccess: (data, vars) => {
+    onSuccess: (data, vars, result, ctx) => {
       toast.success('alias created', { id: 'new-alias' });
 
-      onSuccess && onSuccess(data, vars, {});
+      onSuccess && onSuccess(data, vars, result, ctx);
     },
-    onError: (e, vars, ctx) => {
-      let msg = e.message || 'an error occurred';
+    onError: (e, vars, result, ctx) => {
+      const msg = e.message || 'an error occurred';
       toast.error(msg, { id: 'new-alias' });
-      onError && onError(e, vars, ctx);
+      onError && onError(e, vars, result, ctx);
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -118,7 +118,7 @@ function AddAlias() {
   const { data: collections } = useSuspenseQuery({
     queryKey: collectionQueryKeys.names(clusterId),
     queryFn: async () => {
-      let collectionSchemas = await client.collections().retrieve();
+      const collectionSchemas = await client.collections().retrieve();
       return collectionSchemas.map((c) => c.name);
     },
   });

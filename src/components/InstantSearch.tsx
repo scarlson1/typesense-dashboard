@@ -9,15 +9,19 @@ import { useCollectionSchema, useDebounce } from '@/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import type { Client } from 'typesense';
-import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
+import type {
+  DocumentSchema,
+  SearchParams,
+  SearchParamsWithPreset,
+} from 'typesense/lib/Typesense/Documents';
 
-export type InstantSearchProps = {
+export type InstantSearchProps<T extends DocumentSchema> = {
   // SearchContextValues & {
   clusterId: string;
   client: Client;
   collectionId: string;
   children?: ReactNode;
-  initialParams?: SearchContextParams;
+  initialParams?: SearchContextParams<T>;
   debounceMs?: number;
   // TODO: extends UseQueryOptions ??
   staleTime?: number;
@@ -37,10 +41,10 @@ export function InstantSearch<T extends DocumentSchema>({
   pageSizeOptions = [5, 10, 20, 50, 100],
   // slots,
   // slotProps,
-}: InstantSearchProps) {
+}: InstantSearchProps<T>) {
   // TODO: get default params (query_by) from CollectionProvider ??
   const { queryByOptions } = useCollectionSchema();
-  const [params, setParams] = useState<SearchContextParams>({
+  const [params, setParams] = useState<SearchContextParams<T>>({
     query_by: queryByOptions,
     ...initialParams,
   });
@@ -55,21 +59,35 @@ export function InstantSearch<T extends DocumentSchema>({
         params,
         debouncedQuery,
       ),
-      queryFn: () =>
-        client
+      queryFn: () => {
+        const { preset, ...rest } = params;
+
+        const searchParams = preset
+          ? ({ ...rest, preset } as SearchParamsWithPreset<T, string>)
+          : (rest as SearchParams<T, string>);
+
+        return client
           .collections<T>(collectionId)
           .documents()
-          .search({
-            q: debouncedQuery,
-            ...params,
-          }),
+          .search({ q: debouncedQuery, ...searchParams });
+      },
+      // queryFn: () =>
+      //   client
+      //     .collections<T>(collectionId)
+      //     .documents()
+      //     .search({
+      //       q: debouncedQuery,
+      //       ...params,
+      //     }),
       // enabled: !!debouncedQuery,
       staleTime,
       placeholderData: (previousData) => previousData,
     });
 
   const setPreset = useCallback((presetId: string | null) => {
-    setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
+    // setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
+    if (presetId) setParams((prev) => ({ ...prev, preset: presetId }));
+    else setParams(({ preset: _, ...prev }) => ({ ...prev }));
   }, []);
 
   const setPagination = useCallback((values: PaginationParams) => {

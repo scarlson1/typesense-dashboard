@@ -18,6 +18,7 @@ import { useStore } from '@tanstack/react-form';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import type {
+  DocumentSchema,
   SearchParams,
   SearchParamsWithPreset,
 } from 'typesense/lib/Typesense/Documents';
@@ -71,8 +72,8 @@ export function UpdateSearchParameters({
     ...props,
     onSubmit: async ({ value }) => {
       try {
-        let { preset } = value;
-        let newValues = formValuesToPresetSchema(value as SearchParamValues);
+        const { preset } = value;
+        const newValues = formValuesToPresetSchema(value as SearchParamValues);
 
         await mutation.mutateAsync({
           presetId: preset,
@@ -90,7 +91,7 @@ export function UpdateSearchParameters({
   // update SearchContext preset on form preset is selection
   useEffect(() => {
     if (formPresetValue !== prevFormPresetValue) {
-      let existingPreset = presets.find((p) => p.name === formPresetValue);
+      const existingPreset = presets.find((p) => p.name === formPresetValue);
       if (existingPreset?.name) setPreset(existingPreset.name);
     }
   }, [presets, formPresetValue, prevFormPresetValue]);
@@ -102,7 +103,7 @@ export function UpdateSearchParameters({
 
   const formFacetByValue = useStore(
     form.store,
-    (state) => state.values.facet_by
+    (state) => state.values.facet_by,
   );
   const prevFormFacetByValue = usePrevious(formFacetByValue);
 
@@ -145,10 +146,10 @@ export function UpdateSearchParameters({
 }
 
 function filterEmptyProperties<T extends Record<string, any>>(obj: T) {
-  let newObj: Partial<T> = {};
+  const newObj: Partial<T> = {};
   for (const [key, value] of Object.entries(obj)) {
-    let isEmptyArray = Array.isArray(value) && !value.length;
-    let isEmptyString = typeof value === 'string' && !value.trim().length;
+    const isEmptyArray = Array.isArray(value) && !value.length;
+    const isEmptyString = typeof value === 'string' && !value.trim().length;
     if (!(isEmptyArray || isEmptyString)) {
       newObj[key as keyof T] = value;
     }
@@ -157,18 +158,19 @@ function filterEmptyProperties<T extends Record<string, any>>(obj: T) {
   return newObj;
 }
 
-function formValuesToPresetSchema(
-  values: SearchParamValues
-): SearchParams | SearchParamsWithPreset {
-  let { preset, other_params, facet_by, sort_by, query_by, group_by } = values;
+function formValuesToPresetSchema<T extends DocumentSchema>(
+  values: SearchParamValues,
+): SearchParams<T, string> | SearchParamsWithPreset<T, string> {
+  const { preset, other_params, facet_by, sort_by, query_by, group_by } =
+    values;
 
-  let otherParams = other_params
+  const otherParams = other_params
     .filter(({ param }) => param)
     .map((p) => ({
       [p.param]: p.value,
     }));
 
-  let formattedValues = {
+  const formattedValues = {
     query_by, // TODO: validate query_by values
     preset: preset || undefined,
     facet_by: facet_by.join(','),
@@ -177,7 +179,7 @@ function formValuesToPresetSchema(
     ...(otherParams[0] || {}),
   };
 
-  return filterEmptyProperties<SearchParams | SearchParamsWithPreset>(
-    formattedValues
-  );
+  return filterEmptyProperties<
+    SearchParams<T> | SearchParamsWithPreset<T, string>
+  >(formattedValues);
 }

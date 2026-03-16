@@ -2,13 +2,14 @@ import type { UseSuspenseQueryResult } from '@tanstack/react-query';
 import { createContext } from 'react';
 import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 import type {
+  DocumentSchema,
   SearchParams,
   SearchParamsWithPreset,
 } from 'typesense/lib/Typesense/Documents';
 
-export type CollectionContextParams =
-  | Omit<SearchParams, 'q'>
-  | Omit<SearchParamsWithPreset, 'q'>;
+export type CollectionContextParams<T extends DocumentSchema> =
+  | Omit<SearchParams<T>, 'q'>
+  | Omit<SearchParamsWithPreset<T, string>, 'q'>;
 
 export type CollectionContextValues<TError = Error> = Pick<
   UseSuspenseQueryResult<CollectionSchema, TError>,

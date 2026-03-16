@@ -1,4 +1,5 @@
 import type {
+  DocumentSchema,
   SearchParams,
   SearchParamsWithPreset,
 } from 'typesense/lib/Typesense/Documents';
@@ -22,11 +23,12 @@ export const collectionQueryKeys = {
     ] as const,
   document: (clusterId: string, collectionId: string, docId: string) =>
     [...collectionQueryKeys.documents(clusterId, collectionId), docId] as const,
-  search: (
+  search: <T extends DocumentSchema>(
     clusterId: string,
     collectionId: string,
-    params: SearchParams | SearchParamsWithPreset,
-    q: string
+    params: SearchParams<T> | SearchParamsWithPreset<T, string>,
+    // params: SearchParams<DocumentSchema> | SearchParamsWithPreset<DocumentSchema, string>,
+    q: string,
   ) =>
     [
       ...collectionQueryKeys.documents(clusterId, collectionId),
@@ -46,7 +48,7 @@ export const collectionQueryKeys = {
   curationDetail: (
     clusterId: string,
     collectionId: string,
-    overrideId: string
+    overrideId: string,
   ) =>
     [
       ...collectionQueryKeys.collection(clusterId, collectionId),

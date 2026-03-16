@@ -23,6 +23,9 @@
         "analyze:bundle": "pnpm dlx vite-bundle-visualizer"
     },
     "dependencies": {
+        "@deck.gl/core": "^9.2.11",
+        "@deck.gl/layers": "^9.2.11",
+        "@deck.gl/react": "^9.2.11",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@fontsource/roboto": "^5.2.6",
