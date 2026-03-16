@@ -37,24 +37,24 @@ export const useUpdateDocument = (props: UseUpdateDocumentProps) => {
         .documents(docId)
         .update(updates, options),
     // ...toastHandlers,
-    onMutate: (vars) => {
-      onMutate && onMutate(vars);
-      props?.onMutate && props?.onMutate(vars);
+    onMutate: (vars, ctx) => {
+      onMutate && onMutate(vars, ctx);
+      props?.onMutate && props?.onMutate(vars, ctx);
       return vars;
     },
-    onSuccess: (data, vars, ctx) => {
-      onSuccess && onSuccess(data, vars, ctx);
-      props?.onSuccess && props?.onSuccess(data, vars, ctx);
+    onSuccess: (data, vars, result, ctx) => {
+      onSuccess && onSuccess(data, vars, result, ctx);
+      props?.onSuccess && props?.onSuccess(data, vars, result, ctx);
     },
-    onError: (err, vars, ctx) => {
-      onError && onError(err, vars, ctx);
-      props?.onError && props?.onError(err, vars, ctx);
+    onError: (err, vars, result, ctx) => {
+      onError && onError(err, vars, result, ctx);
+      props?.onError && props?.onError(err, vars, result, ctx);
     },
-    onSettled: (data, err, vars, ctx) => {
+    onSettled: (data, err, vars, result, ctx) => {
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.documents(clusterId, vars.collectionId),
       });
-      props?.onSettled && props.onSettled(data, err, vars, ctx);
+      props?.onSettled && props.onSettled(data, err, vars, result, ctx);
     },
   });
 };

@@ -78,7 +78,7 @@ if (!rootElement.innerHTML) {
       <ErrorBoundary
         FallbackComponent={LastResortErrorBoundary}
         // TODO: log errors to cloud project (Google)
-        onError={(err: Error) => {
+        onError={(err: unknown) => {
           Sentry.captureException(err);
         }}
       >
@@ -92,7 +92,7 @@ if (!rootElement.innerHTML) {
 
 function LastResortErrorBoundary({ error }: FallbackProps) {
   const msg =
-    error && error.message ? (
+    error && error instanceof Error ? (
       <div>
         <pre>{error.message}</pre>
       </div>

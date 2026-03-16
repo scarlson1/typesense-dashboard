@@ -17,7 +17,7 @@ export const useDeleteCollection = (props?: UseDeleteCollectionProps) => {
   return useMutation({
     mutationFn: (collectionId: string) =>
       client.collections(collectionId).delete(),
-    onMutate: async (collectionId) => {
+    onMutate: async (collectionId, context) => {
       await queryClient.cancelQueries({
         queryKey: collectionQueryKeys.list(clusterId, {}),
       });
@@ -29,43 +29,43 @@ export const useDeleteCollection = (props?: UseDeleteCollectionProps) => {
       queryClient.setQueryData(
         collectionQueryKeys.list(clusterId, {}),
         (data: CollectionSchema[]) =>
-          data.filter((c) => c.name !== collectionId)
+          data.filter((c) => c.name !== collectionId),
       );
 
       toast.loading(`deleting collection [${collectionId}]`, {
         id: `delete-col-${collectionId}`,
       });
-      props?.onMutate && props.onMutate(collectionId);
+      props?.onMutate && props.onMutate(collectionId, context);
 
-      let ctx: { collectionId: string; prevCollection?: CollectionSchema } = {
+      const ctx: { collectionId: string; prevCollection?: CollectionSchema } = {
         collectionId,
       };
       if (prevCollection) ctx.prevCollection = prevCollection;
       return ctx;
     },
-    onSuccess: (data, vars, ctx) => {
+    onSuccess: (data, vars, result, ctx) => {
       toast.success(`collection "${vars}" deleted`, {
         id: `delete-col-${vars}`,
       });
-      props?.onSuccess && props.onSuccess(data, vars, ctx);
+      props?.onSuccess && props.onSuccess(data, vars, result, ctx);
     },
-    onError: (err, vars, ctx) => {
-      let errMsg = err?.message || `failed to delete collection ["${vars}"]`;
+    onError: (err, vars, result, ctx) => {
+      const errMsg = err?.message || `failed to delete collection ["${vars}"]`;
       toast.error(errMsg, { id: `delete-col-${vars}` });
-      props?.onError && props.onError(err, vars, ctx);
+      props?.onError && props.onError(err, vars, result, ctx);
 
-      if (ctx?.prevCollection) {
+      if (result?.prevCollection) {
         queryClient.setQueryData(
           collectionQueryKeys.list(clusterId, {}),
-          (data: CollectionSchema[]) => [...data, ctx?.prevCollection]
+          (data: CollectionSchema[]) => [...data, result?.prevCollection],
         );
       }
     },
-    onSettled: (data, err, vars, ctx) => {
+    onSettled: (data, err, vars, result, ctx) => {
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.all(clusterId),
       });
-      props?.onSettled && props.onSettled(data, err, vars, ctx);
+      props?.onSettled && props.onSettled(data, err, vars, result, ctx);
     },
   });
 };

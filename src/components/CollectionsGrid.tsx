@@ -74,14 +74,16 @@ export function CollectionsGrid() {
               </Tooltip>
             }
             onClick={async () => {
-              let focusedEl = document.activeElement as HTMLElement;
+              const focusedEl = document.activeElement as HTMLElement;
               if (focusedEl) focusedEl.blur();
 
               try {
                 await openConfirmDelete(params.id.toString());
 
                 mutation.mutate(params.row.name);
-              } catch (err) {}
+              } catch (_: unknown) {
+                return;
+              }
             }}
             label='Delete Collection'
             disabled={mutation.isPending}
@@ -89,7 +91,7 @@ export function CollectionsGrid() {
         ],
       },
     ],
-    []
+    [],
   );
 
   if (isError)
@@ -116,7 +118,7 @@ export function CollectionsGrid() {
         pageSizeOptions={[5, 10, 20]}
         onCellDoubleClick={(params: GridCellParams<CollectionSchema>) => {
           navigate({
-            from: '/collections',
+            from: '/collections/',
             to: `$collectionId/documents/search`,
             params: { collectionId: params.row.name },
           });

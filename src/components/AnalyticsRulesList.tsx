@@ -1,4 +1,8 @@
-import { analyticsFormDefaultValues, analyticsQueryKeys } from '@/constants';
+import {
+  analyticsFormDefaultValues,
+  analyticsQueryKeys,
+  type AnalyticsRuleCreateValues,
+} from '@/constants';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';
 import { ExpandMoreRounded } from '@mui/icons-material';
@@ -76,7 +80,7 @@ export function AnalyticsRulesList() {
           <AccordionDetails>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: Error) => {
+              onError={(err: unknown) => {
                 captureException(err);
               }}
             >
@@ -84,13 +88,13 @@ export function AnalyticsRulesList() {
                 <UpdateAnalyticsRule
                   defaultValues={{
                     name: r.name,
-                    type: r.type,
+                    type: r.type as AnalyticsRuleCreateValues['type'],
                     params: {
                       source: {
                         collections: r.params.source.collections,
                       },
                       destination: {
-                        collection: r.params.destination.collection,
+                        collection: r.params.destination?.collection || '',
                       },
                       enable_auto_aggregation:
                         r.params.enable_auto_aggregation || false,
@@ -128,7 +132,7 @@ export function AnalyticsRulesList() {
         <AccordionDetails>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >

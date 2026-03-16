@@ -43,11 +43,11 @@ export const useImportDocuments = (options?: UseImportDocuments) => {
         .import(documents, options);
       return res.split('\n').map((l) => JSON.parse(l)) as MultiDocImportRes[];
     },
-    onMutate: (vars) => {
+    onMutate: (vars, ctx) => {
       toast.loading(`importing documents...`, { id: `import-docs` });
-      options?.onMutate && options.onMutate(vars);
+      options?.onMutate && options.onMutate(vars, ctx);
     },
-    onSuccess: (data, vars, ctx) => {
+    onSuccess: (data, vars, result, ctx) => {
       // TODO: import will always return 200 --> need to handle success/error for each doc
       setResults(data);
 
@@ -70,15 +70,15 @@ export const useImportDocuments = (options?: UseImportDocuments) => {
         },
       );
 
-      options?.onSuccess && options.onSuccess(data, vars, ctx);
+      options?.onSuccess && options.onSuccess(data, vars, result, ctx);
     },
-    onError: (err, vars, ctx) => {
+    onError: (err, vars, result, ctx) => {
       console.log(err);
       toast.error(`Error importing documents...`, { id: `import-docs` });
-      options?.onError && options.onError(err, vars, ctx);
+      options?.onError && options.onError(err, vars, result, ctx);
     },
-    onSettled: (data, err, vars, ctx) => {
-      options?.onSettled && options.onSettled(data, err, vars, ctx);
+    onSettled: (data, err, vars, result, ctx) => {
+      options?.onSettled && options.onSettled(data, err, vars, result, ctx);
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.documents(clusterId, vars.collectionId),
       });

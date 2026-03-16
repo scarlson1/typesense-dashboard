@@ -22,7 +22,7 @@ export const useCreateApiKey = (props?: UseNewApiKeyProps) => {
   return useMutation({
     ...rest,
     mutationFn: (values: KeyCreateSchema) => client.keys().create(values),
-    onSuccess: (data, vars) => {
+    onSuccess: (data, vars, result, ctx) => {
       toast.success('API key created', { id: 'new-api-key' });
       queryClient.invalidateQueries({
         queryKey: apiKeyQueryKeys.all(clusterId),
@@ -55,12 +55,12 @@ export const useCreateApiKey = (props?: UseNewApiKeyProps) => {
         },
       });
 
-      onSuccess && onSuccess(data, vars, {});
+      onSuccess && onSuccess(data, vars, result, ctx);
     },
-    onError: (e, vars, ctx) => {
-      let msg = e.message || 'an error occurred';
+    onError: (e, vars, result, ctx) => {
+      const msg = e.message || 'an error occurred';
       toast.error(msg, { id: 'new-api-key' });
-      onError && onError(e, vars, ctx);
+      onError && onError(e, vars, result, ctx);
     },
   });
 };

@@ -38,7 +38,7 @@ export function ServerOps() {
           </Typography>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >
@@ -63,7 +63,7 @@ export function ServerOps() {
           </Typography>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >
@@ -76,7 +76,7 @@ export function ServerOps() {
           </Typography>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >

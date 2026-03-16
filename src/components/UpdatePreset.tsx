@@ -11,6 +11,7 @@ import {
   type UseUpsertPresetProps,
 } from '@/hooks';
 import { Box } from '@mui/material';
+import type { DocumentSchema } from 'typesense/lib/Typesense/Documents';
 import type { PresetCreateSchema } from 'typesense/lib/Typesense/Presets';
 import { PresetsForm } from './PresetsForm';
 
@@ -34,12 +35,13 @@ export function UpdatePreset({
       try {
         // TODO: handle param value types aside from strings (arrays, numbers, etc.)
         // use zod refine / coerce ??
-        let presetValue: PresetCreateSchema['value'] = {};
+        let presetValue: PresetCreateSchema<DocumentSchema, string>['value'] =
+          {};
         if (value.presetType === presetType.enum['Single-Collection']) {
-          let x = value.searchParameters.map(
+          const x = value.searchParameters.map(
             (p: { name: ParameterKeys; value: string }) => ({
               [p.name]: p.value,
-            })
+            }),
           );
           presetValue = x[0];
         } else if (value.presetType === presetType.enum['Multi-Search']) {
@@ -49,8 +51,8 @@ export function UpdatePreset({
               (p: { name: MultiParameterKeys; value: string }[]) =>
                 Object.assign(
                   {},
-                  ...p.map((params) => ({ [params.name]: params.value }))
-                )
+                  ...p.map((params) => ({ [params.name]: params.value })),
+                ),
             ),
           };
         }

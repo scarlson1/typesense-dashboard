@@ -23,7 +23,7 @@ export function TypesenseMetricsAndNodes() {
         <Box sx={{ flex: '1 1 auto' }}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >
@@ -35,7 +35,7 @@ export function TypesenseMetricsAndNodes() {
         <Box sx={{ flex: '1 1 auto' }}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >
@@ -47,7 +47,7 @@ export function TypesenseMetricsAndNodes() {
         <Box sx={{ flex: '1 1 auto' }}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: Error) => {
+            onError={(err: unknown) => {
               captureException(err);
             }}
           >
@@ -73,7 +73,7 @@ function TypesenseMetrics() {
   const values = useMemo<[string, number | string][]>(() => {
     // use index when mapping or keep the cpu number from key ??
     let typesenseData = Object.entries(data).filter(([key, _]: string[]) =>
-      key.startsWith('typesense_memory')
+      key.startsWith('typesense_memory'),
     );
 
     return typesenseData.map(([key, val]) => {

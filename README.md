@@ -102,6 +102,7 @@ TODO -->
 - Delete documents by query
 - Export documents
 - Fix multi-cluster auth (currently overwriting existing)
+- save collection preset preferences in local storage
 
 ## Screenshots
 
