@@ -102,7 +102,6 @@ TODO -->
 - Delete documents by query
 - Export documents
 - Fix multi-cluster auth (currently overwriting existing)
-- Bug using demo key - search fails with 401 after about 10 seconds (initially loads correctly)
 
 ## Screenshots
 

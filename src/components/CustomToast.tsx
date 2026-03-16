@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 import type { Toast } from 'react-hot-toast';
-import { toast, useToasterStore } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { useSwipeable } from 'react-swipeable';
 
 const ToastLinearProgress = styled(LinearProgress)(() => ({
@@ -86,7 +86,7 @@ const CloseToastButton = ({
 };
 
 function useToastCountdown(t: Toast) {
-  const { pausedAt } = useToasterStore({ id: t.id });
+  // const { pausedAt } = useToasterStore({ id: t.id });
   const countStart = (t.duration || 4000) / 100;
   const [count, { startCountdown, stopCountdown }] = useCountdown({
     countStart,
@@ -94,9 +94,14 @@ function useToastCountdown(t: Toast) {
   });
 
   useEffect(() => {
-    const fn = pausedAt ? stopCountdown : startCountdown;
-    t.visible && fn(); // BUG can leave other toasts stuck on stopCountdown
-  }, [pausedAt, stopCountdown, startCountdown, t.visible]);
+    // const fn = pausedAt ? stopCountdown : startCountdown;
+    // t.visible && fn(); // BUG can leave other toasts stuck on stopCountdown
+    if (!t.visible || t.type === 'loading') return;
+    // if (pausedAt) {
+    //   stopCountdown();
+    // } else {
+    startCountdown();
+  }, [stopCountdown, startCountdown, t.visible, t.type]);
 
   const timeRemaining = (count / countStart) * 100;
 
