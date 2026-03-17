@@ -65,7 +65,7 @@ export function CollectionProvider<T extends DocumentSchema>({
   ] = useMemo(() => {
     const queryByOptions = data?.fields
       .filter(
-        (field) => field.index && QUERYABLE_FIELD_TYPES.includes(field.type)
+        (field) => field.index && QUERYABLE_FIELD_TYPES.includes(field.type),
       )
       .map((f) => f.name);
 
@@ -87,7 +87,7 @@ export function CollectionProvider<T extends DocumentSchema>({
         [
           typesenseFieldType.enum.geopoint,
           typesenseFieldType.enum['geopoint[]'],
-        ].includes(field.type as 'geopoint' | 'geopoint[]')
+        ].includes(field.type as 'geopoint' | 'geopoint[]'),
       )
       .map((f: CollectionFieldSchema) => f.name);
 
@@ -131,7 +131,7 @@ export function CollectionProvider<T extends DocumentSchema>({
       groupByOptions,
       geoFieldOptions,
       // setCollectionId,
-    ]
+    ],
   );
 
   return (

@@ -6,6 +6,7 @@ import {
 } from '@/constants';
 import {
   useAppForm,
+  useCollectionSearchPreset,
   useDefaultIndexParams,
   usePreset,
   usePrevious,
@@ -47,6 +48,10 @@ export function UpdateSearchParameters({
     facetByOptions,
     groupByOptions,
   } = useDefaultIndexParams();
+  const { getStoredPreset, setStoredPreset } = useCollectionSearchPreset(
+    clusterId,
+    collectionId,
+  );
 
   const { data: presets } = useSuspenseQuery({
     queryKey: presetQueryKeys.all(clusterId),
@@ -121,6 +126,26 @@ export function UpdateSearchParameters({
   useEffect(() => {
     updateParams(formValuesToPresetSchema(formValues as SearchParamValues));
   }, [updateParams, formValues]);
+
+  // Auto-default to first preset if nothing stored and no preset active
+  useEffect(() => {
+    if (presets?.length && !preset && !getStoredPreset()) {
+      const firstPreset = presets[0].name;
+      setPreset(firstPreset);
+      setStoredPreset(firstPreset);
+    }
+  }, [presets]); // only run when presets load
+
+  // Sync preset selection to localStorage
+  useEffect(() => {
+    if (formPresetValue !== prevFormPresetValue) {
+      const existingPreset = presets.find((p) => p.name === formPresetValue);
+      if (existingPreset?.name) {
+        setPreset(existingPreset.name);
+        setStoredPreset(existingPreset.name);
+      }
+    }
+  }, [presets, formPresetValue, prevFormPresetValue]);
 
   return (
     <Box

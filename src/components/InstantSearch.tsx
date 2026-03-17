@@ -22,6 +22,7 @@ export type InstantSearchProps<T extends DocumentSchema> = {
   collectionId: string;
   children?: ReactNode;
   initialParams?: SearchContextParams<T>;
+  initialPreset?: string | null;
   debounceMs?: number;
   // TODO: extends UseQueryOptions ??
   staleTime?: number;
@@ -36,6 +37,7 @@ export function InstantSearch<T extends DocumentSchema>({
   clusterId,
   collectionId,
   initialParams = { per_page: 20 },
+  initialPreset,
   debounceMs = 200,
   staleTime = 30000,
   pageSizeOptions = [5, 10, 20, 50, 100],
@@ -47,6 +49,7 @@ export function InstantSearch<T extends DocumentSchema>({
   const [params, setParams] = useState<SearchContextParams<T>>({
     query_by: queryByOptions,
     ...initialParams,
+    ...(initialPreset ? { preset: initialPreset } : {}),
   });
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, debounceMs);

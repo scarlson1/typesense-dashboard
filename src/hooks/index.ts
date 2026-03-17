@@ -6,6 +6,7 @@ export * from './useAsyncToast';
 export * from './useBoolean';
 export * from './useCollectionEditorDialog';
 export * from './useCollectionSchema';
+export * from './useCollectionSearchPreset';
 export * from './useCountdown';
 export * from './useCounter';
 export * from './useDebounce';

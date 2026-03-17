@@ -1,5 +1,12 @@
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
-import { useCollectionSchema, usePrevious, useSearchSlots } from '@/hooks';
+import {
+  useCollectionSchema,
+  useCollectionSearchPreset,
+  usePrevious,
+  useSearchSlots,
+  useTypesenseClient,
+  type StoredDisplayOptions,
+} from '@/hooks';
 import {
   Autocomplete,
   Button,
@@ -36,6 +43,11 @@ const filter = createFilterOptions<ImgOption>();
 export function DashboardDisplayOptions() {
   const [_, slotProps, updateSlotProps] = useSearchSlots();
   const { data: collectionSchema } = useCollectionSchema();
+  const [client, clusterId] = useTypesenseClient();
+  const { setStoredDisplayOptions } = useCollectionSearchPreset(
+    clusterId,
+    collectionSchema.name,
+  );
 
   const fieldOptions = useMemo(() => {
     return collectionSchema.fields
@@ -48,7 +60,7 @@ export function DashboardDisplayOptions() {
       collectionSchema.fields
         .filter((f) => f.type === 'image')
         .map((f) => ({ title: f.name })),
-    [collectionSchema]
+    [collectionSchema],
   );
 
   const prevSchemaName = usePrevious(collectionSchema?.name);
@@ -60,47 +72,63 @@ export function DashboardDisplayOptions() {
         },
         (_: object, srcValue: object) => {
           if (Array.isArray(srcValue)) return srcValue;
-        }
+        },
       );
   }, [collectionSchema?.name]);
 
-  const handleFieldsChange = useCallback((_: any, newVal: string[]) => {
-    updateSlotProps(
-      {
-        hit: { displayFields: newVal || [] },
-      },
-      (_: object, srcValue: object) => {
-        if (Array.isArray(srcValue)) return srcValue;
-      }
-    );
-  }, []);
+  // Helper — reads live slotProps and writes the full snapshot to storage
+  const persistDisplay = useCallback(
+    (patch: StoredDisplayOptions) => {
+      const current: StoredDisplayOptions = {
+        displayFields: slotProps.hit?.displayFields ?? [],
+        imgField: slotProps.hit?.imgField ?? '', // @ts-expect-error claude
+        backgroundSize: slotProps.hitImg?.sx?.backgroundSize ?? '',
+        columns:
+          typeof slotProps.hitWrapper?.size === 'number'
+            ? 12 / slotProps.hitWrapper.size
+            : undefined,
+      };
+      setStoredDisplayOptions({ ...current, ...patch });
+    },
+    [slotProps, setStoredDisplayOptions],
+  );
+
+  const handleFieldsChange = useCallback(
+    (_: any, newVal: string[]) => {
+      updateSlotProps(
+        {
+          hit: { displayFields: newVal || [] },
+        },
+        (_: object, srcValue: object) => {
+          if (Array.isArray(srcValue)) return srcValue;
+        },
+      );
+      persistDisplay({ displayFields: newVal || [] });
+    },
+    [persistDisplay],
+  );
 
   const handleImageChange = useCallback(
     (_: any, newValue: string | ImgOption | null) => {
+      let imgField = '';
       if (typeof newValue === 'string') {
-        updateSlotProps({
-          hit: { imgField: newValue || '' },
-        });
-        // @ts-ignore
-      } else if (newValue && newValue.inputValue) {
-        // Create a new value from the user input
-        updateSlotProps({
-          // @ts-ignore
-          hit: { imgField: newValue.inputValue },
-        });
+        imgField = newValue || '';
+      } else if (newValue?.inputValue) {
+        imgField = newValue.inputValue;
       } else {
-        updateSlotProps({
-          hit: { imgField: newValue?.title || '' },
-        });
+        imgField = newValue?.title || '';
       }
+      updateSlotProps({ hit: { imgField } });
+      persistDisplay({ imgField });
     },
-    []
+    [persistDisplay],
   );
 
   const handleSizeChange = useCallback(
     (e: SelectChangeEvent<number>) => {
-      let size = e.target.value
-        ? 12 / e.target.value
+      const columns = Number(e.target.value) || 0;
+      const size = columns
+        ? 12 / columns
         : SEARCH_DEFAULT_SLOT_PROPS.hitWrapper?.size || 12;
 
       updateSlotProps({
@@ -108,28 +136,32 @@ export function DashboardDisplayOptions() {
           size,
         },
       });
+      persistDisplay({ columns: columns || undefined });
     },
-    [updateSlotProps]
+    [updateSlotProps],
   );
 
   const handleImgSizeChange = useCallback(
     (e: SelectChangeEvent) => {
+      const backgroundSize = e.target.value || 'auto';
       updateSlotProps({
         hitImg: {
           sx: {
-            backgroundSize: e.target.value || 'auto',
+            backgroundSize,
           },
         },
       });
+      persistDisplay({ backgroundSize });
     },
-    [updateSlotProps]
+    [updateSlotProps],
   );
 
   const handleResetGrid = useCallback(() => {
     updateSlotProps({
       hitWrapper: { ...SEARCH_DEFAULT_SLOT_PROPS.hitWrapper },
     });
-  }, []);
+    persistDisplay({ columns: undefined });
+  }, [updateSlotProps, persistDisplay]);
 
   return (
     // <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
@@ -208,7 +240,7 @@ export function DashboardDisplayOptions() {
             const { inputValue } = params;
             // Suggest the creation of a new value
             const isExisting = options.some(
-              (option) => inputValue === option.title
+              (option) => inputValue === option.title,
             );
             if (inputValue !== '' && !isExisting) {
               filtered.push({
@@ -227,7 +259,6 @@ export function DashboardDisplayOptions() {
             // Add "xxx" option created dynamically
 
             if (option.inputValue) {
-              // @ts-ignore
               return option.inputValue;
             }
             // Regular option
@@ -272,7 +303,7 @@ export function DashboardDisplayOptions() {
             labelId='img-size-label'
             id='img-size'
             fullWidth
-            // @ts-ignore
+            // @ts-expect-error backgroundSize not recognized as CSS Var ??
             value={slotProps?.hitImg?.sx?.backgroundSize || ''}
             onChange={handleImgSizeChange}
             size='small'
