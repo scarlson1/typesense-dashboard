@@ -2,7 +2,11 @@ import { CollectionProvider } from '@/components/CollectionProvider';
 import { InstantSearch } from '@/components/InstantSearch';
 import { CtxRefinements } from '@/components/search';
 import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
-import { useDefaultIndexParams, useTypesenseClient } from '@/hooks';
+import {
+  useCollectionSearchPreset,
+  useDefaultIndexParams,
+  useTypesenseClient,
+} from '@/hooks';
 import { GridViewRounded, MapRounded } from '@mui/icons-material';
 import {
   Box,
@@ -29,6 +33,32 @@ function SearchLayout() {
   const { collectionId } = Route.useParams();
   const [client, clusterId] = useTypesenseClient();
 
+  const { getStoredPreset, getStoredDisplayOptions } =
+    useCollectionSearchPreset(clusterId, collectionId);
+
+  // Read once on mount — stable reference, no re-renders
+  const initialPreset = getStoredPreset();
+  const storedDisplay = getStoredDisplayOptions();
+
+  const initialSlotProps = storedDisplay
+    ? {
+        hit: {
+          ...(storedDisplay.displayFields !== undefined && {
+            displayFields: storedDisplay.displayFields,
+          }),
+          ...(storedDisplay.imgField !== undefined && {
+            imgField: storedDisplay.imgField,
+          }),
+        },
+        hitImg: storedDisplay.backgroundSize
+          ? { sx: { backgroundSize: storedDisplay.backgroundSize } }
+          : undefined,
+        hitWrapper: storedDisplay.columns
+          ? { size: 12 / storedDisplay.columns }
+          : undefined,
+      }
+    : {};
+
   return (
     <>
       <CollectionProvider
@@ -40,6 +70,7 @@ function SearchLayout() {
           collectionId={collectionId}
           client={client}
           clusterId={clusterId}
+          initialPreset={initialPreset}
         >
           <SearchSlotsProvider
             slots={{
@@ -60,9 +91,9 @@ function SearchLayout() {
                   backdropFilter: 'blur(8px) opacity(0.87)',
                 },
               },
+              ...initialSlotProps,
             }}
           >
-            {/* <Box sx={{ height: 'calc(100vh - 56px)' }}> */}
             <Box>
               <Stack
                 direction='row'
