@@ -30,10 +30,14 @@ export default tseslint.config(
         'warn',
         {
           ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
       'prefer-const': 'warn',
       'no-useless-escape': 'warn',
+      'no-extra-boolean-cast': 'off',
     },
   },
 );

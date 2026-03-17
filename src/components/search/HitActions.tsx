@@ -54,8 +54,10 @@ export function HitActions({ docData, docId, ...props }: HitActionsProps) {
   );
 }
 
-interface DeleteDocumentIconButtonProps
-  extends Omit<IconButtonProps, 'onClick'> {
+interface DeleteDocumentIconButtonProps extends Omit<
+  IconButtonProps,
+  'onClick'
+> {
   docId: string;
   collectionId: string;
 }
@@ -87,7 +89,9 @@ function DeleteDocumentIconButton({
         },
       });
       deleteMutation.mutate({ collectionId, docId });
-    } catch (error) {}
+    } catch (_) {
+      return;
+    }
   }, [deleteMutation?.mutate, dialog?.prompt, collectionId, docId]);
 
   return (
@@ -104,7 +108,7 @@ function DeleteDocumentIconButton({
 }
 
 interface EditDocumentIconButtonProps extends Omit<IconButtonProps, 'onClick'> {
-  docData: Record<string, any>;
+  docData: Record<string, unknown>;
   docId: string;
   collectionId: string;
 }
@@ -138,7 +142,7 @@ function EditDocumentIconButton({
 }
 
 interface ViewDocumentIconButtonProps extends Omit<IconButtonProps, 'onClick'> {
-  docData: Record<string, any>;
+  docData: Record<string, unknown>;
   docId: string;
 }
 
