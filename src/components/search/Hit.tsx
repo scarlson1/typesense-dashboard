@@ -68,11 +68,11 @@ export function Hit({
     setExpanded((prev) => !prev);
   }, []);
 
-  let displayFieldsArr = useMemo(() => {
+  const displayFieldsArr = useMemo(() => {
     if (!displayFields?.length) return Object.entries(hit?.document);
 
     return Object.entries(hit?.document).filter(([field]) =>
-      displayFields.includes(field)
+      displayFields.includes(field),
     );
   }, [displayFields, hit]);
 
@@ -88,7 +88,6 @@ export function Hit({
     >
       {Boolean(image) ? (
         <CardMedia
-          // component='img'
           image={image}
           title='hit image'
           {...imgProps}
@@ -96,8 +95,6 @@ export function Hit({
             height: { xs: 100, md: 120 },
             mb: 1,
             ...(imgProps?.sx || {}),
-            // objectFit: 'cover',
-            // backgroundSize: 'cover',
           }}
         />
       ) : null}
@@ -112,7 +109,7 @@ export function Hit({
           sx={{ maxHeight: 300, overflowX: 'auto' }}
         >
           {displayFieldsArr.map(([key, value]) => {
-            let snippet = hit.highlight[key]?.snippet;
+            const snippet = hit.highlight[key]?.snippet;
 
             return (
               <Stack

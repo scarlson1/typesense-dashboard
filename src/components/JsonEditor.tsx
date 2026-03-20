@@ -21,6 +21,7 @@ export default function JsonEditor({
   schema = {},
   slotProps,
   onMount: onMountProp,
+  options,
   ...props
 }: JsonEditorProps) {
   const { mode, systemMode } = useColorScheme();
@@ -38,10 +39,14 @@ export default function JsonEditor({
     <Editor
       height='90vh'
       defaultLanguage='json'
-      // theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
       theme={themeMode === 'dark' ? DARK_THEME : LIGHT_THEME}
       onMount={onMount}
       path={editorPath}
+      options={{
+        wordWrap: 'bounded',
+        wordWrapColumn: 80,
+        ...(options || {}),
+      }}
       {...props}
     />
   );
@@ -114,7 +119,7 @@ function useInitMonaco({
 
       monaco.editor.setTheme(themeMode === 'dark' ? DARK_THEME : LIGHT_THEME);
     },
-    [schema, slotProps, onMount, theme, themeMode]
+    [schema, slotProps, onMount, theme, themeMode],
   );
 
   return {

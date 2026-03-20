@@ -43,7 +43,7 @@ const filter = createFilterOptions<ImgOption>();
 export function DashboardDisplayOptions() {
   const [_, slotProps, updateSlotProps] = useSearchSlots();
   const { data: collectionSchema } = useCollectionSchema();
-  const [client, clusterId] = useTypesenseClient();
+  const [__, clusterId] = useTypesenseClient();
   const { setStoredDisplayOptions } = useCollectionSearchPreset(
     clusterId,
     collectionSchema.name,
