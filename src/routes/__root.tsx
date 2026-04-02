@@ -16,7 +16,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 //   // trpcQueryUtils: typeof trpcQueryUtils;
 //   // user: User | null | undefined;
 // }
-type RouterAppContext = 'object';
+type RouterAppContext = {};
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootComponent,

@@ -35,6 +35,7 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      '@typescript-eslint/no-empty-object-type': 'warn',
       'prefer-const': 'warn',
       'no-useless-escape': 'warn',
       'no-extra-boolean-cast': 'off',
