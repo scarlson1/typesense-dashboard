@@ -8,6 +8,7 @@ import { getArrayVal, splitIfString } from '@/utils';
 import { AddRounded, RemoveRounded } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Grid,
   IconButton,
   Link,
@@ -80,6 +81,22 @@ const SearchParamsFormFields = ({
     },
     [presets],
   );
+
+  const handleClear = useCallback(() => {
+    form.setFieldValue('preset', '');
+    form.setFieldValue('query_by', queryByOptions);
+    form.setFieldValue('sort_by', []);
+    form.setFieldValue('facet_by', []);
+    form.setFieldValue('group_by', []);
+    form.setFieldValue('other_params', [NEW_EMPTY_OTHER_PARAM]);
+  }, [form.setFieldValue, queryByOptions]);
+
+  // useEffect(() => {
+
+  //   return () => {
+
+  //   }
+  // }, [collectionId])
 
   return (
     <Grid container columnSpacing={3} rowSpacing={3}>
@@ -420,9 +437,12 @@ const SearchParamsFormFields = ({
         size={{ xs: 12 }}
         sx={{ display: 'flex', justifyContent: 'center' }}
       >
-        <form.AppForm>
-          <form.SubmitButton label={submitButtonText} />
-        </form.AppForm>
+        <Stack spacing={2} direction='row' sx={{ alignItems: 'center' }}>
+          <form.AppForm>
+            <form.SubmitButton label={submitButtonText} />
+          </form.AppForm>
+          <Button onClick={handleClear}>Clear</Button>
+        </Stack>
       </Grid>
     </Grid>
   );

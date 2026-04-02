@@ -12,10 +12,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
-export interface RouterAppContext {
-  // trpcQueryUtils: typeof trpcQueryUtils;
-  // user: User | null | undefined;
-}
+// export interface RouterAppContext {
+//   // trpcQueryUtils: typeof trpcQueryUtils;
+//   // user: User | null | undefined;
+// }
+type RouterAppContext = 'object';
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootComponent,
@@ -58,17 +59,3 @@ function RootComponent(props: { disableCustomTheme?: boolean }) {
     </>
   );
 }
-
-// export const Route = createRootRoute({
-//   component: () => (
-//     <>
-//       <AppTheme {...props} themeComponents={xThemeComponents}>
-//         <CssBaseline enableColorScheme />
-//         <Outlet />
-//         <Toaster />
-//       </AppTheme>
-//       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
-//       <ReactQueryDevtools position='bottom' buttonPosition='bottom-right' />
-//     </>
-//   ),
-// });
