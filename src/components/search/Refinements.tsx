@@ -35,14 +35,14 @@ export const Refinements = ({ children }: { children: ReactNode }) => {
   const activeRefinements = useMemo(() => {
     const { sort_by, filter_by } = params || {};
 
-    let sortByCount: number = Array.isArray(sort_by)
+    const sortByCount: number = Array.isArray(sort_by)
       ? sort_by.length
       : sort_by
         ? sort_by.split(',').length
         : 0;
 
     // TODO: handle filter combinations other than &&
-    let filterByCount: number = filter_by ? filter_by.split('&&').length : 0;
+    const filterByCount: number = filter_by ? filter_by.split('&&').length : 0;
 
     return sortByCount + filterByCount;
   }, [params?.sort_by, params?.filter_by]);

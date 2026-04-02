@@ -1,5 +1,6 @@
 import {
   DEFAULT_SEARCH_PARAMS_VALUES,
+  NEW_EMPTY_OTHER_PARAM,
   presetQueryKeys,
   searchParamsFormOpts,
   type SearchParamValues,
@@ -90,6 +91,28 @@ export function UpdateSearchParameters({
     },
   });
 
+  // reset search preset on collection change (TODO: unless multi-collection ?? or preset includes filter on current collection ??)
+  // TODO: need to move up higher ?? reset query_by and sort_by ??
+  // useEffect(() => {
+  //   const p: PresetSchema<DocumentSchema> | undefined = presets.find(
+  //     (pre) => pre.name === preset,
+  //   );
+  //   console.log('CURRENT PRESET: ', p);
+  //   if (p) {
+  //     const pre = p.value;
+
+  //     if (
+  //       // @ts-expect-error collection doesn't exist on PresetSchema ??
+  //       !(pre.collectionId == collectionId || pre.collection == collectionId)
+  //     ) {
+  //       // reset if preset does not explicitly include collection
+  //       setPreset(null);
+  //     }
+  //   } else {
+  //     setPreset(null);
+  //   }
+  // }, [collectionId, presets]);
+
   const formPresetValue = useStore(form.store, (state) => state.values.preset);
   const prevFormPresetValue = usePrevious(formPresetValue);
 
@@ -127,17 +150,21 @@ export function UpdateSearchParameters({
     updateParams(formValuesToPresetSchema(formValues as SearchParamValues));
   }, [updateParams, formValues]);
 
-  // Auto-default to first preset if nothing stored and no preset active
+  const prevCollectionId = usePrevious(collectionId);
+
+  // Auto-default to first preset if nothing stored and no preset active (desired behavior ??)
   useEffect(() => {
+    if (collectionId !== prevCollectionId) return;
     if (presets?.length && !preset && !getStoredPreset()) {
       const firstPreset = presets[0].name;
       setPreset(firstPreset);
       setStoredPreset(firstPreset);
     }
-  }, [presets]); // only run when presets load
+  }, [presets, collectionId, prevCollectionId]); // only run when presets load
 
   // Sync preset selection to localStorage
   useEffect(() => {
+    if (collectionId !== prevCollectionId) return;
     if (formPresetValue !== prevFormPresetValue) {
       const existingPreset = presets.find((p) => p.name === formPresetValue);
       if (existingPreset?.name) {
@@ -145,7 +172,34 @@ export function UpdateSearchParameters({
         setStoredPreset(existingPreset.name);
       }
     }
-  }, [presets, formPresetValue, prevFormPresetValue]);
+  }, [
+    presets,
+    formPresetValue,
+    prevFormPresetValue,
+    collectionId,
+    prevCollectionId,
+  ]);
+
+  // clear form if collection preset preference not set
+  useEffect(() => {
+    if (collectionId !== prevCollectionId) {
+      const storedPresetPref = getStoredPreset();
+      if (!storedPresetPref) {
+        form.setFieldValue('preset', '');
+        form.setFieldValue('query_by', queryByOptions);
+        form.setFieldValue('sort_by', ['']);
+        form.setFieldValue('facet_by', ['']);
+        form.setFieldValue('group_by', ['']);
+        form.setFieldValue('other_params', [NEW_EMPTY_OTHER_PARAM]);
+      }
+    }
+  }, [
+    collectionId,
+    prevCollectionId,
+    getStoredPreset,
+    form.setFieldValue,
+    queryByOptions,
+  ]);
 
   return (
     <Box

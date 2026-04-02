@@ -19,7 +19,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
 export const Route = createFileRoute(
-  '/_dashboard/collections/$collectionId/documents/search/'
+  '/_dashboard/collections/$collectionId/documents/search/',
 )({
   component: RouteComponent,
 });
@@ -110,7 +110,10 @@ function RouteComponent() {
         <Suspense>
           <Paper>
             <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
-              <UpdateSearchParameters collectionId={collectionId} />
+              <UpdateSearchParameters
+                key={`update-search-${collectionId}`}
+                collectionId={collectionId}
+              />
             </Container>
           </Paper>
         </Suspense>
@@ -127,7 +130,7 @@ function RouteComponent() {
 
         <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
           <Container maxWidth='sm' disableGutters>
-            <DashboardDisplayOptions />
+            <DashboardDisplayOptions key={`display-opts-${collectionId}`} />
           </Container>
         </Paper>
       </Stack>

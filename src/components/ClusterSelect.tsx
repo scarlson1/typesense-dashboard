@@ -74,11 +74,12 @@ export function ClusterSelect() {
         navigate({ to: '/auth' });
       } else {
         setCluster(event.target.value);
+
         // queryClient.clear();
         queryClient.refetchQueries();
       }
     },
-    [navigate]
+    [navigate, setCluster],
   );
 
   const handleOpen = useCallback(() => {
@@ -99,18 +100,18 @@ export function ClusterSelect() {
         },
       });
     },
-    [location, navigate]
+    [location, navigate],
   );
 
   const { prodCreds, devCreds, stagingCreds, testingCreds, ciCreds } =
     useMemo(() => {
-      let creds = Object.values(credentials);
+      const creds = Object.values(credentials);
 
-      let prodCreds = creds.filter((c) => c.env === 'production');
-      let devCreds = creds.filter((c) => c.env === 'development');
-      let stagingCreds = creds.filter((c) => c.env === 'staging');
-      let testingCreds = creds.filter((c) => c.env === 'testing');
-      let ciCreds = creds.filter((c) => c.env === 'ci');
+      const prodCreds = creds.filter((c) => c.env === 'production');
+      const devCreds = creds.filter((c) => c.env === 'development');
+      const stagingCreds = creds.filter((c) => c.env === 'staging');
+      const testingCreds = creds.filter((c) => c.env === 'testing');
+      const ciCreds = creds.filter((c) => c.env === 'ci');
 
       // return [prodCreds, devCreds, stagingCreds, testingCreds, ciCreds].filter(
       //   (c) => c.length
@@ -123,14 +124,14 @@ export function ClusterSelect() {
       labelId='env-select-label'
       id='env-select'
       value={cluster}
-      // @ts-ignore
+      // @ts-expect-error event typing
       onChange={handleChange}
       open={open}
       onClose={handleClose}
       onOpen={handleOpen}
       displayEmpty
       renderValue={(val) => {
-        let cred = val ? credentials[val] : null;
+        const cred = val ? credentials[val] : null;
 
         return (
           <MenuItem disableGutters sx={{ maxWidth: '100%' }}>
@@ -230,7 +231,7 @@ export function ClusterSelect() {
                       protocol: i.protocol,
                       node: i.node,
                       port: i.port,
-                    })
+                    }),
                   );
                 }}
                 size='small'
@@ -281,7 +282,7 @@ export function ClusterSelect() {
                       protocol: i.protocol,
                       node: i.node,
                       port: i.port,
-                    })
+                    }),
                   );
                 }}
                 size='small'
@@ -332,7 +333,7 @@ export function ClusterSelect() {
                       protocol: i.protocol,
                       node: i.node,
                       port: i.port,
-                    })
+                    }),
                   );
                 }}
                 size='small'
@@ -383,7 +384,7 @@ export function ClusterSelect() {
                       protocol: i.protocol,
                       node: i.node,
                       port: i.port,
-                    })
+                    }),
                   );
                 }}
                 size='small'
@@ -432,7 +433,7 @@ export function ClusterSelect() {
                       protocol: i.protocol,
                       node: i.node,
                       port: i.port,
-                    })
+                    }),
                   );
                 }}
                 size='small'

@@ -67,12 +67,15 @@ function SearchLayout() {
         clusterId={clusterId}
       >
         <InstantSearch<DocumentSchema>
+          key={`instant-search-${collectionId}`}
           collectionId={collectionId}
           client={client}
           clusterId={clusterId}
           initialPreset={initialPreset}
         >
           <SearchSlotsProvider
+            key={`search-slots-${collectionId}`}
+            collectionId={collectionId}
             slots={{
               hits: Grid,
               hitWrapper: Grid,
