@@ -126,7 +126,7 @@ export function MenuContent() {
   });
 
   const getParamCollectionId = useCallback(() => {
-    let match = matches.find((m) => m.fullPath.includes('$collectionId'));
+    const match = matches.find((m) => m.fullPath.includes('$collectionId'));
 
     if (match && 'collectionId' in match.params)
       return (match.params as { collectionId?: string }).collectionId;
@@ -136,7 +136,7 @@ export function MenuContent() {
 
   // better to pull up selected collection to context provider ??
   const [selectedCollection, setSelectedCollection] = useState<string>(() => {
-    let colId = getParamCollectionId();
+    const colId = getParamCollectionId();
     if (colId && collections.map((c) => c.name).includes(colId)) {
       return colId;
     }
@@ -147,17 +147,16 @@ export function MenuContent() {
   const prevCollection = usePrevious(selectedCollection);
   useEffect(() => {
     // only navigate if current path includes collectionId param
-    let match = matches.find((m) => m.fullPath.includes('$collectionId'));
+    const match = matches.find((m) => m.fullPath.includes('$collectionId'));
 
     if (
       selectedCollection &&
       prevCollection !== null &&
       selectedCollection !== prevCollection &&
-      match?.fullPath && // @ts-ignore
+      match?.fullPath &&
       match?.params?.collectionId !== selectedCollection
     ) {
       navigate({
-        // @ts-ignore
         to: match.fullPath,
         params: { collectionId: selectedCollection },
       });
@@ -168,19 +167,19 @@ export function MenuContent() {
   const prevClusterId = usePrevious(clusterId);
   useEffect(() => {
     if (clusterId !== prevClusterId && prevClusterId) {
-      let colId = getParamCollectionId();
+      const colId = getParamCollectionId();
       if (colId && collections.map((c) => c.name).includes(colId)) {
         setSelectedCollection(colId);
       } else {
         setSelectedCollection(
-          Boolean(collections.length) ? collections[0].name : ''
+          Boolean(collections.length) ? collections[0].name : '',
         );
       }
     }
   }, [collections, clusterId, getParamCollectionId]);
 
   const mainListItems = useMemo<MainListItem[]>(() => {
-    let collectionChildren = [
+    const collectionChildren = [
       {
         text: 'Search',
         icon: <SearchRounded fontSize='small' />,
@@ -296,7 +295,7 @@ export function MenuContent() {
     (id: string) => {
       setOpen(open === id ? null : id);
     },
-    [open]
+    [open],
   );
 
   const handleChange = useCallback((event: SelectChangeEvent) => {
@@ -371,7 +370,7 @@ export function MenuContent() {
                         // activeProps={child.route.activeProps}
                         // inactiveProps={child.route.inactiveProps}
                         selected={Boolean(
-                          matchRoute(child.route) && selectedCollection
+                          matchRoute(child.route) && selectedCollection,
                         )}
                         disabled={child.disabled}
                         sx={{ pl: 4 }}
