@@ -78,7 +78,6 @@ To use the latest pre-built docker image:
 ```bash
 docker run -d -p 443:443 ghcr.io/scarlson1/typesense-dashboard:latest
 ```
-
 ```bash
 docker run -d -p 80:80 ghcr.io/scarlson1/typesense-dashboard:latest
 ```
