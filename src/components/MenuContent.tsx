@@ -93,9 +93,10 @@ const secondaryListItems = [
 ];
 
 // https://tanstack.com/router/latest/docs/framework/react/guide/custom-link#mui-example
-interface MUIListItemButtonProps extends Omit<ListItemButtonProps, 'href'> {
-  // Add any additional props you want to pass to the button
-}
+// interface MUIListItemButtonProps extends Omit<ListItemButtonProps, 'href'> {
+//   // Add any additional props you want to pass to the button
+// }
+type MUIListItemButtonProps = Omit<ListItemButtonProps, 'href'>;
 
 const RouterListItemButtonComponent = forwardRef<
   HTMLAnchorElement,
@@ -153,10 +154,11 @@ export function MenuContent() {
       selectedCollection &&
       prevCollection !== null &&
       selectedCollection !== prevCollection &&
-      match?.fullPath &&
+      match?.fullPath && // @ts-expect-error match type
       match?.params?.collectionId !== selectedCollection
     ) {
       navigate({
+        // @ts-expect-error TODO: fix type
         to: match.fullPath,
         params: { collectionId: selectedCollection },
       });
@@ -176,7 +178,7 @@ export function MenuContent() {
         );
       }
     }
-  }, [collections, clusterId, getParamCollectionId]);
+  }, [collections, clusterId, prevClusterId, getParamCollectionId]);
 
   const mainListItems = useMemo<MainListItem[]>(() => {
     const collectionChildren = [
@@ -289,7 +291,7 @@ export function MenuContent() {
       },
       // { text: 'Stop Words', icon: <AssessmentRounded />, route: '/stop-words' },
     ];
-  }, [collections, selectedCollection]);
+  }, [selectedCollection, location.pathname]);
 
   const handleOpen = useCallback(
     (id: string) => {

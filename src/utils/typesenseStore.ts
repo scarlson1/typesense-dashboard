@@ -36,7 +36,7 @@ export function getCredsKey({
 
 export const typesenseStore = create<TypesenseStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       credentials: {}, // new Map(),
       currentCredsKey: null,
       setCredsKey: (key: string) => set(() => ({ currentCredsKey: key })),
@@ -50,19 +50,31 @@ export const typesenseStore = create<TypesenseStore>()(
           }, // state.credentials.set(getCredsKey(creds), creds),
         }));
       },
-      logout: (cluster?: string) =>
+      logout: (cluster?: string): State => {
         set((state) => {
           let creds = {};
           if (cluster) {
             const { [cluster]: _, ...rest } = state.credentials;
             creds = rest;
           }
+
+          const nextCred = Object.keys(state.credentials)[0];
+
           return {
             credentials: creds,
+            // null,
             currentCredsKey:
-              state.currentCredsKey === cluster ? null : state.currentCredsKey,
+              state.currentCredsKey === cluster
+                ? nextCred || null
+                : state.currentCredsKey,
           };
-        }),
+        });
+
+        return {
+          credentials: get().credentials,
+          currentCredsKey: get().currentCredsKey,
+        };
+      },
     }),
     {
       name: 'typesense-store',

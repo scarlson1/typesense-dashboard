@@ -4,7 +4,7 @@ A dashboard to manage self hosted or local [Typesense](https://typesense.org/) i
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
-[View with demo data](https://scarlson1.github.io/typesense-dashboard/#/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=xBhZ62xXxkrxjPgNN5DdK94Rvt6exLtS&env=development)
+[View with demo data](https://scarlson1.github.io/typesense-dashboard/#/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=q0DAf2GWCdw0LPCzM72UytDVh719h4Tk&env=development)
 
 If the link is not prefilling login creds, use the following:
 
@@ -12,7 +12,7 @@ If the link is not prefilling login creds, use the following:
 - host: 163.192.220.255.nip.io
 - protocol: https
 - port: 443
-- api key: xBhZ62xXxkrxjPgNN5DdK94Rvt6exLtS
+- api key: q0DAf2GWCdw0LPCzM72UytDVh719h4Tk
 
 ## Usage
 
@@ -256,3 +256,7 @@ terraform apply -var="attach_reserved_ip=true"
 # reset ssh
 ssh-keygen -R 163.192.220.255
 ```
+
+### TODOs
+
+- theme matching toasts
