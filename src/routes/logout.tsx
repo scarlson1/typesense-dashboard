@@ -16,13 +16,21 @@ export const Route = createFileRoute('/logout')({
 
 function RouteComponent() {
   const search = Route.useSearch();
+  const navigate = Route.useNavigate();
   const logout = useStore(typesenseStore, (state) => state.logout);
 
   useEffect(() => {
     try {
       // TODO: add loading state and show loading indicator in list item
       queryClient.cancelQueries();
-      logout(search?.clusterId);
+      // @ts-expect-error returns State
+      const { currentCredsKey } = logout(search?.clusterId);
+
+      if (!currentCredsKey) {
+        navigate({ to: '/auth', search: search });
+      }
+
+      // TODO: redirect to auth if no account ??
       queryClient.clear();
     } catch (err) {
       console.log('LOGOUT ERROR: ', err);

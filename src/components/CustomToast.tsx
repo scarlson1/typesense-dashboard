@@ -10,7 +10,7 @@ import {
   linearProgressClasses,
   styled,
 } from '@mui/material';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, type ReactNode } from 'react';
 import type { Toast } from 'react-hot-toast';
 import { toast } from 'react-hot-toast';
 import { useSwipeable } from 'react-swipeable';
@@ -96,11 +96,15 @@ function useToastCountdown(t: Toast) {
   useEffect(() => {
     // const fn = pausedAt ? stopCountdown : startCountdown;
     // t.visible && fn(); // BUG can leave other toasts stuck on stopCountdown
+    // need to file bug with react-hot-toast to fix listener corruption (with strict mode enabled)
     if (!t.visible || t.type === 'loading') return;
     // if (pausedAt) {
     //   stopCountdown();
     // } else {
+
     startCountdown();
+
+    return () => stopCountdown();
   }, [stopCountdown, startCountdown, t.visible, t.type]);
 
   const timeRemaining = (count / countStart) * 100;
@@ -131,7 +135,19 @@ const AnimatedIconWrapper = styled('div')`
     forwards;
 `;
 
-export function CustomToast({ icon, message, t }: any) {
+interface CustomToast extends Toast {
+  withProgress?: boolean;
+}
+
+export function CustomToast({
+  icon,
+  message,
+  t,
+}: {
+  icon: ReactNode;
+  message: ReactNode;
+  t: CustomToast;
+}) {
   const [timeRemaining, { stopCountdown }] = useToastCountdown(t);
 
   const handleClose = useCallback(() => {
