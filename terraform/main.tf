@@ -134,7 +134,7 @@ resource "oci_core_instance" "typesense" {
 
   shape_config {
     ocpus         = 1
-    memory_in_gbs = 6
+    memory_in_gbs = 4
   }
 
   source_details {
