@@ -2,7 +2,7 @@ resource "oci_core_volume" "typesense_data" {
   compartment_id      = oci_identity_compartment.typesense.id
   availability_domain = var.availability_domain
   display_name        = "typesense-data"
-  size_in_gbs         = 10
+  size_in_gbs         = 50
 
   lifecycle {
     prevent_destroy = true
