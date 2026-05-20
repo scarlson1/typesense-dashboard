@@ -17,7 +17,7 @@ import {
   StorageRounded,
   FrontHandRounded,
 } from '@mui/icons-material';
-import { Avatar, Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
@@ -36,6 +36,8 @@ import OptionsMenu from '@/components/OptionsMenu';
 import { collectionQueryKeys } from '@/constants';
 import { usePrevious, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
+import { typesenseStore } from '@/utils';
+import { useStore } from 'zustand';
 
 const SIDEBAR_WIDTH = 244;
 
@@ -481,58 +483,79 @@ export function Sidebar() {
         </Box>
       </Box>
 
-      <Stack
-        direction='row'
+      <SidebarFooter />
+    </Box>
+  );
+}
+
+function SidebarFooter() {
+  const creds = useStore(typesenseStore, (state) => state.credentials);
+  const currKey = useStore(typesenseStore, (state) => state.currentCredsKey);
+  const current = currKey ? creds[currKey] : null;
+  const envLabel = current?.env
+    ? current.env.charAt(0).toUpperCase() + current.env.slice(1)
+    : 'Connected';
+  const hostLabel = current
+    ? `${current.protocol}://${current.node}${
+        current.protocol === 'http' && current.port ? `:${current.port}` : ''
+      }`
+    : '—';
+  return (
+    <Stack
+      direction='row'
+      sx={{
+        borderTop: `1px solid ${designTokens.border}`,
+        mt: 1,
+        pt: 1.25,
+        gap: 1.125,
+        alignItems: 'center',
+        px: 1,
+        pb: 0.5,
+      }}
+    >
+      <Box
         sx={{
-          borderTop: `1px solid ${designTokens.border}`,
-          mt: 1,
-          pt: 1.25,
-          gap: 1.125,
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          background: designTokens.success,
+          flexShrink: 0,
+        }}
+      />
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography
+          sx={{
+            fontSize: 12.5,
+            fontWeight: 500,
+            lineHeight: 1.2,
+            color: designTokens.text,
+          }}
+        >
+          {envLabel}
+        </Typography>
+        <Typography
+          noWrap
+          title={hostLabel}
+          sx={{
+            fontSize: 11,
+            color: designTokens.textFaint,
+            mt: 0.25,
+            fontFamily: designTokens.fontMono,
+          }}
+        >
+          {hostLabel}
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          color: designTokens.textFaint,
+          display: 'flex',
           alignItems: 'center',
-          px: 1,
-          pb: 0.5,
         }}
       >
-        <Avatar
-          sx={{
-            width: 26,
-            height: 26,
-            fontSize: 11,
-            fontWeight: 600,
-            background: 'linear-gradient(135deg, #f6d365, #fda085)',
-            color: 'white',
-          }}
-        >
-          JD
-        </Avatar>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography
-            sx={{
-              fontSize: 12.5,
-              fontWeight: 500,
-              lineHeight: 1.2,
-              color: designTokens.text,
-            }}
-          >
-            John Doe
-          </Typography>
-          <Typography
-            sx={{ fontSize: 11, color: designTokens.textFaint, mt: 0.25 }}
-          >
-            dev@typesense.com
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            color: designTokens.textFaint,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <OptionsMenu />
-        </Box>
-      </Stack>
-    </Box>
+        <OptionsMenu />
+      </Box>
+    </Stack>
   );
 }
 

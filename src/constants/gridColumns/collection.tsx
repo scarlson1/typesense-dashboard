@@ -17,7 +17,7 @@ export const collectionColumns: GridColDef<CollectionSchema>[] = [
     field: 'num_documents',
     headerName: '# Documents',
     type: 'number',
-    minWidth: 100,
+    minWidth: 120,
     flex: 0.3,
     sortable: true,
     filterable: true,

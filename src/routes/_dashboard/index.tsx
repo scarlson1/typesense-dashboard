@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import { Suspense, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -34,12 +34,10 @@ function HomeComponent() {
   return (
     <Stack sx={{ minWidth: 0 }}>
       <ErrorBoundary
-        FallbackComponent={ErrorFallback}
+        fallback={<HomeHeader fallback />}
         onError={(err: unknown) => captureException(err)}
       >
-        <Suspense fallback={<HomeHeader fallback />}>
-          <HomeHeader />
-        </Suspense>
+        <HomeHeader />
       </ErrorBoundary>
 
       <Box
@@ -148,7 +146,7 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
               lineHeight: 1.15,
             }}
           >
-            Welcome back, John
+            Cluster overview
           </Typography>
           {!fallback && <HomeSubtitle />}
         </Box>
@@ -183,10 +181,12 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
 
 function ServerEyebrow() {
   const [client, clientId] = useTypesenseClient();
-  const { data } = useSuspenseQuery({
+  // /debug is admin-only; tolerate 401/403 by hiding the version.
+  const { data } = useQuery({
     queryKey: [clientId, 'debug'],
     queryFn: () => client.debug.retrieve(),
     staleTime: 1000 * 300,
+    retry: false,
   });
   const node = client.configuration.nodes[0] as
     | { host?: string; url?: string; port?: number }
@@ -196,18 +196,21 @@ function ServerEyebrow() {
   return (
     <>
       NODE-1 · {host}
-      {port ? `:${port}` : ''} · v{data?.version ?? '—'}
+      {port ? `:${port}` : ''}
+      {data?.version ? ` · v${data.version}` : ''}
     </>
   );
 }
 
 function HomeSubtitle() {
   const [client, clientId] = useTypesenseClient();
-  const { data: collections } = useSuspenseQuery({
+  const { data: collections } = useQuery({
     queryKey: [clientId, 'collections', 'list'],
     queryFn: () => client.collections().retrieve(),
     staleTime: 1000 * 60,
+    retry: false,
   });
+  if (!collections) return null;
   const docs = collections.reduce(
     (acc, c) => acc + (c.num_documents ?? 0),
     0,

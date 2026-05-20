@@ -22,7 +22,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -36,12 +36,10 @@ function RouteComponent() {
   return (
     <Stack sx={{ minWidth: 0 }}>
       <ErrorBoundary
-        FallbackComponent={ErrorFallback}
+        fallback={<ServerHeader />}
         onError={(err: unknown) => captureException(err)}
       >
-        <Suspense fallback={<ServerHeader />}>
-          <ServerHeaderConnected />
-        </Suspense>
+        <ServerHeaderConnected />
       </ErrorBoundary>
       <Box
         sx={{
@@ -116,10 +114,12 @@ function RouteComponent() {
 
 function ServerHeaderConnected() {
   const [client, clientId] = useTypesenseClient();
-  const { data } = useSuspenseQuery({
+  // /debug is admin-only; tolerate 401/403 by hiding the version.
+  const { data } = useQuery({
     queryKey: [clientId, 'debug'],
     queryFn: () => client.debug.retrieve(),
     staleTime: 1000 * 300,
+    retry: false,
   });
   const node = client.configuration.nodes[0] as
     | { host?: string; url?: string; port?: number }
@@ -128,7 +128,7 @@ function ServerHeaderConnected() {
     <ServerHeader
       host={node?.host ?? node?.url ?? '—'}
       port={node?.port}
-      version={data?.version ?? '—'}
+      version={data?.version}
     />
   );
 }
@@ -136,7 +136,7 @@ function ServerHeaderConnected() {
 function ServerHeader({
   host = '—',
   port,
-  version = '—',
+  version,
 }: {
   host?: string;
   port?: number;
@@ -149,7 +149,7 @@ function ServerHeader({
       badges={
         <>
           <Badge tone='success'>● Healthy</Badge>
-          <Badge tone='neutral'>v{version}</Badge>
+          {version ? <Badge tone='neutral'>v{version}</Badge> : null}
         </>
       }
       actions={
