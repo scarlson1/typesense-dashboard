@@ -37,12 +37,16 @@
   --ts-dangerSoft: hsl(345, 60%, 96%);
   --ts-onAccent: #ffffff;
   --ts-mark: #fef3c7;
+  --ts-heroFrom: hsl(213, 73%, 15%);
+  --ts-heroMid: hsl(212, 85%, 27%);
+  --ts-heroTo: hsl(210, 95%, 44%);
 }
 
 [data-mui-color-scheme='dark'] {
   color-scheme: dark;
   --ts-bg: #0b0f17;
   --ts-surface: #11161f;
+  /* --ts-surface: #0a2341; */
   --ts-surfaceMuted: #161c27;
   --ts-surfaceTinted: #0d1219;
   --ts-border: #232a37;
@@ -68,13 +72,21 @@
   --ts-dangerSoft: #3a1622;
   --ts-onAccent: #08111d;
   --ts-mark: #3a2f0f;
+  --ts-heroFrom: #06080d;
+  --ts-heroMid: #0b3f80;
+  --ts-heroTo: #1d4d8c;
 }
 
 html,
 body {
   margin: 0;
   padding: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

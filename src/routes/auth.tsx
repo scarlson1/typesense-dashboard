@@ -281,7 +281,7 @@ function AuthComponent() {
           display: { xs: 'none', md: 'flex' },
           flex: 1,
           position: 'relative',
-          background: `linear-gradient(135deg, ${designTokens.text} 0%, ${designTokens.accentDeep} 45%, ${designTokens.accent} 100%)`,
+          background: `linear-gradient(135deg, var(--ts-heroFrom) 0%, var(--ts-heroMid) 45%, var(--ts-heroTo) 100%)`,
           alignItems: 'center',
           justifyContent: 'center',
           p: 5,
