@@ -20,7 +20,7 @@ import {
   DownloadRounded,
   SettingsRounded,
 } from '@mui/icons-material';
-import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -87,6 +87,11 @@ function RouteComponent() {
               <Legend color='#f6b500'>Write</Legend>
               <Legend color={designTokens.textSubtle}>Delete</Legend>
             </Stack>
+            <Alert severity='warning' sx={{ mt: 1.5 }}>
+              Illustrative chart — Typesense's API does not expose historical
+              time-series for QPS/latency. Hook up an external metrics store
+              (e.g. Prometheus + Grafana) to render real history.
+            </Alert>
           </SectionCard>
 
           <Stack sx={{ gap: 1.75, minWidth: 0 }}>

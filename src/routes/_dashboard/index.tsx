@@ -19,7 +19,7 @@ import {
   LeakAddRounded,
   OpenInNewRounded,
 } from '@mui/icons-material';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
@@ -89,6 +89,11 @@ function HomeComponent() {
                 <LegendDot color='#f6b500'>Write</LegendDot>
                 <LegendDot color={designTokens.textSubtle}>Delete</LegendDot>
               </Stack>
+              <Alert severity='warning' sx={{ mt: 1.5 }}>
+                Illustrative chart — Typesense's API does not expose historical
+                time-series for QPS/latency. Hook up an external metrics store
+                (e.g. Prometheus + Grafana) to render real history.
+              </Alert>
             </SectionCard>
           </Stack>
 
