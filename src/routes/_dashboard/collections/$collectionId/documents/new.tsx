@@ -477,8 +477,8 @@ await client.collections('${collection}').documents()
         component='pre'
         sx={{
           m: 0,
-          background: designTokens.text,
-          color: '#e1e7ed',
+          background: designTokens.codeSurface,
+          color: designTokens.codeText,
           borderRadius: 1,
           p: 2,
           fontFamily: designTokens.fontMono,
@@ -579,17 +579,17 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
   return (
     <Box
       sx={{
-        background: designTokens.text,
+        background: designTokens.codeSurface,
         borderRadius: 1,
         p: 1.75,
-        color: '#e1e7ed',
+        color: designTokens.codeText,
       }}
     >
       <Typography
         sx={{
           fontSize: 11.5,
           fontWeight: 600,
-          color: '#8c9fb3',
+          color: designTokens.textFaint,
           mb: 1,
           textTransform: 'uppercase',
           letterSpacing: '0.06em',

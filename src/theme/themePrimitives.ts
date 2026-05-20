@@ -489,6 +489,8 @@ export const designTokens = {
   dangerSoft: 'var(--ts-dangerSoft)',
   onAccent: 'var(--ts-onAccent)',
   mark: 'var(--ts-mark)',
+  codeSurface: 'var(--ts-codeSurface)',
+  codeText: 'var(--ts-codeText)',
   fontMono:
     '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
 };

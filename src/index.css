@@ -40,6 +40,8 @@
   --ts-heroFrom: hsl(213, 73%, 15%);
   --ts-heroMid: hsl(212, 85%, 27%);
   --ts-heroTo: hsl(210, 95%, 44%);
+  --ts-codeSurface: hsl(213, 73%, 15%);
+  --ts-codeText: #e1e7ed;
 }
 
 [data-mui-color-scheme='dark'] {
@@ -75,6 +77,8 @@
   --ts-heroFrom: #06080d;
   --ts-heroMid: #0b3f80;
   --ts-heroTo: #1d4d8c;
+  --ts-codeSurface: #06080d;
+  --ts-codeText: #e1e7ed;
 }
 
 html,

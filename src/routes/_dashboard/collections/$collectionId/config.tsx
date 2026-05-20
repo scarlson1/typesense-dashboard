@@ -19,10 +19,16 @@ import { useConfirmDelete } from '@/hooks/useConfirmDelete';
 import { designTokens } from '@/theme/themePrimitives';
 import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import type { EditorProps, OnMount } from '@monaco-editor/react';
-import { CheckRounded, ContentCopyRounded } from '@mui/icons-material';
+import {
+  CheckRounded,
+  ContentCopyRounded,
+  LockOutlineRounded,
+  OpenInNewRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
+  Link,
   Skeleton,
   Stack,
   Typography,
@@ -187,7 +193,12 @@ function CollectionSettings() {
           py: 2.25,
           background: designTokens.surfaceTinted,
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: '1fr 300px' },
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: '1fr 300px',
+            lg: '1fr 400px',
+            xl: '1fr 460px',
+          },
           gap: 2,
           minHeight: 0,
         }}
@@ -195,9 +206,7 @@ function CollectionSettings() {
         <Box sx={{ minWidth: 0 }}>
           <SectionCard noBodyPadding>
             <Box sx={{ borderRadius: 0, overflow: 'hidden' }}>
-              <Suspense
-                fallback={<Skeleton variant='rounded' height='70vh' />}
-              >
+              <Suspense fallback={<Skeleton variant='rounded' height='70vh' />}>
                 <JsonEditor
                   height='70vh'
                   schema={COLLECTION_SCHEMA}
@@ -213,9 +222,9 @@ function CollectionSettings() {
 
         <Stack sx={{ gap: 1.5, minWidth: 0 }}>
           <CollectionSettingsCard collectionId={collectionId} />
-          <IndexingHealthCard
-            totalDocs={data.num_documents}
-          />
+
+          <IndexingHealthCard totalDocs={data.num_documents} />
+          <SchemaUpdateGuideCard />
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
             onError={(err: unknown) => captureException(err)}
@@ -228,34 +237,34 @@ function CollectionSettings() {
   );
 }
 
-function CollectionSettingsCard({
-  collectionId,
-}: {
-  collectionId: string;
-}) {
+function CollectionSettingsCard({ collectionId }: { collectionId: string }) {
   const { data } = useSchema(collectionId);
   const settings = useMemo(
     () => [
       {
         label: 'Default sorting field',
         value: data.default_sorting_field || '—',
+        locked: true,
       },
       {
         label: 'Token separators',
         value: data.token_separators?.length
           ? data.token_separators.join(' ')
           : '—',
+        locked: true,
       },
       {
         label: 'Symbols to index',
         value: data.symbols_to_index?.length
           ? data.symbols_to_index.join(' ')
           : '—',
+        locked: true,
       },
       {
         label: 'Nested fields',
         value: data.enable_nested_fields ? 'enabled' : 'disabled',
         accent: !!data.enable_nested_fields,
+        locked: true,
       },
       {
         label: 'Created',
@@ -279,12 +288,23 @@ function CollectionSettingsCard({
             gap: 1,
           }}
         >
-          <Box
-            component='span'
-            sx={{ color: designTokens.textMuted, fontSize: 12.5 }}
+          <Stack
+            direction='row'
+            sx={{ alignItems: 'center', gap: 0.5, minWidth: 0 }}
           >
-            {s.label}
-          </Box>
+            {s.locked ? (
+              <LockOutlineRounded
+                titleAccess='Fixed at creation'
+                sx={{ fontSize: 11, color: designTokens.textFaint }}
+              />
+            ) : null}
+            <Box
+              component='span'
+              sx={{ color: designTokens.textMuted, fontSize: 12.5 }}
+            >
+              {s.label}
+            </Box>
+          </Stack>
           <Box
             component='span'
             sx={{
@@ -298,6 +318,201 @@ function CollectionSettingsCard({
           </Box>
         </Stack>
       ))}
+    </SectionCard>
+  );
+}
+
+function SchemaUpdateGuideCard() {
+  return (
+    <SectionCard title='How schema updates work'>
+      <Typography
+        sx={{
+          fontSize: 12.5,
+          color: designTokens.textMuted,
+          lineHeight: 1.55,
+        }}
+      >
+        When you click <strong>Save schema</strong>, only changes to{' '}
+        <Box
+          component='code'
+          sx={{
+            fontFamily: designTokens.fontMono,
+            fontSize: 11.5,
+            px: 0.5,
+            py: 0.1,
+            borderRadius: 0.5,
+            background: designTokens.codeSurface,
+            color: designTokens.codeText,
+          }}
+        >
+          fields
+        </Box>{' '}
+        and{' '}
+        <Box
+          component='code'
+          sx={{
+            fontFamily: designTokens.fontMono,
+            fontSize: 11.5,
+            px: 0.5,
+            py: 0.1,
+            borderRadius: 0.5,
+            background: designTokens.codeSurface,
+            color: designTokens.codeText,
+          }}
+        >
+          metadata
+        </Box>{' '}
+        are diffed against the current schema and submitted to Typesense.
+      </Typography>
+
+      <Stack sx={{ gap: 0.5 }}>
+        <Stack direction='row' sx={{ alignItems: 'center', gap: 0.75 }}>
+          <Badge tone='success'>updatable</Badge>
+          <Typography
+            sx={{
+              fontSize: 12,
+              color: designTokens.textMuted,
+              fontWeight: 500,
+            }}
+          >
+            Fields only
+          </Typography>
+        </Stack>
+        <Box
+          component='ul'
+          sx={{
+            m: 0,
+            pl: 2.25,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.25,
+            fontSize: 12,
+            color: designTokens.textMuted,
+            lineHeight: 1.5,
+          }}
+        >
+          <li>Add new fields</li>
+          <li>Remove existing fields</li>
+          <li>
+            Change a field’s type or attributes — applied as a drop + re-add,
+            which re-indexes that field
+          </li>
+        </Box>
+      </Stack>
+
+      <Stack sx={{ gap: 0.5 }}>
+        <Stack direction='row' sx={{ alignItems: 'center', gap: 0.75 }}>
+          <Badge tone='warn'>fixed at creation</Badge>
+        </Stack>
+        <Box
+          component='ul'
+          sx={{
+            m: 0,
+            pl: 2.25,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.25,
+            fontSize: 12,
+            color: designTokens.textMuted,
+            lineHeight: 1.5,
+          }}
+        >
+          <li>Collection name</li>
+          <li>
+            <Box
+              component='code'
+              sx={{ fontFamily: designTokens.fontMono, fontSize: 11.5 }}
+            >
+              default_sorting_field
+            </Box>
+          </li>
+          <li>
+            <Box
+              component='code'
+              sx={{ fontFamily: designTokens.fontMono, fontSize: 11.5 }}
+            >
+              token_separators
+            </Box>{' '}
+            and{' '}
+            <Box
+              component='code'
+              sx={{ fontFamily: designTokens.fontMono, fontSize: 11.5 }}
+            >
+              symbols_to_index
+            </Box>
+          </li>
+          <li>
+            Reference fields (
+            <Box
+              component='code'
+              sx={{ fontFamily: designTokens.fontMono, fontSize: 11.5 }}
+            >
+              reference
+            </Box>{' '}
+            cannot be added via alter)
+          </li>
+        </Box>
+      </Stack>
+
+      <Box
+        sx={{
+          mt: 0.25,
+          p: 1.25,
+          borderRadius: 0.75,
+          background: designTokens.accentSoft,
+          border: `1px solid ${designTokens.accentBorder}`,
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: designTokens.accentDeep,
+            mb: 0.4,
+          }}
+        >
+          Need to change something fixed?
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: 12,
+            color: designTokens.textMuted,
+            lineHeight: 1.55,
+          }}
+        >
+          Create a new collection with the desired schema, reindex your data
+          into it, then point a{' '}
+          <Link
+            href='/aliases'
+            sx={{
+              color: designTokens.accentDeep,
+              fontWeight: 500,
+              textDecorationColor: designTokens.accentBorder,
+            }}
+          >
+            Collection Alias
+          </Link>{' '}
+          at the new collection for an atomic, zero-downtime cutover.
+        </Typography>
+        <Link
+          href='https://typesense.org/docs/latest/api/collections.html#update-or-alter-a-collection'
+          target='_blank'
+          rel='noopener noreferrer'
+          sx={{
+            mt: 0.75,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.4,
+            fontSize: 11.5,
+            fontWeight: 500,
+            color: designTokens.accentDeep,
+            textDecorationColor: designTokens.accentBorder,
+          }}
+        >
+          Typesense docs
+          <OpenInNewRounded sx={{ fontSize: 12 }} />
+        </Link>
+      </Box>
     </SectionCard>
   );
 }
