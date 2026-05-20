@@ -5,6 +5,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { designTokens } from '@/theme/themePrimitives';
 
 interface Crumb {
@@ -140,6 +141,7 @@ export const TopBar = ({ crumbs = [], rightSlot }: TopBarProps) => {
               }}
             />
           </Box>
+          <ThemeModeToggle />
         </Stack>
       )}
     </Stack>

@@ -50,7 +50,7 @@ export const dangerButtonSx: SxProps<Theme> = {
   height: 32,
   borderRadius: '6px',
   background: 'background.paper',
-  border: `1px solid ${designTokens.danger}66`,
+  border: `1px solid color-mix(in srgb, ${designTokens.danger} 40%, transparent)`,
   color: designTokens.danger,
   '&:hover': {
     background: designTokens.dangerSoft,

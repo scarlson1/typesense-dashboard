@@ -31,7 +31,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
   const { data: overrides } = useSuspenseQuery({
     queryKey: collectionQueryKeys.curation(clusterId, collectionId),
     queryFn: async () => {
-      let { overrides } = await client
+      const { overrides } = await client
         .collections(collectionId)
         .overrides()
         .retrieve();
@@ -190,7 +190,7 @@ function CurationFormComponent({
       toast.success(`curation saved [${data.id}]`, { id: 'save-curation' });
     },
     onError: (err, vars) => {
-      let msg = err.message || `error saving curation [${vars.overrideId}]`;
+      const msg = err.message || `error saving curation [${vars.overrideId}]`;
       toast.error(msg, { id: 'save-curation' });
     },
     onSettled: () => {
@@ -204,7 +204,7 @@ function CurationFormComponent({
     ...overrideFormOpts,
     defaultValues,
     onSubmit: async ({ value }) => {
-      let overrideCreate: OverrideCreateSchema = {
+      const overrideCreate: OverrideCreateSchema = {
         rule: {
           query: value.rule_query_bool ? value.rule.query : undefined,
           match: value.rule_query_bool ? value.rule.match : undefined,
@@ -242,7 +242,9 @@ function CurationFormComponent({
           params: overrideCreate,
         });
         form.reset();
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 

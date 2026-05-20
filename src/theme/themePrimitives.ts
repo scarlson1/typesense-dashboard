@@ -328,14 +328,14 @@ export const colorSchemes = {
       grey: {
         ...gray,
       },
-      divider: gray[200],
+      divider: 'var(--ts-border)',
       background: {
-        default: 'hsl(0, 0%, 100%)',
-        paper: 'hsl(0, 0%, 100%)',
+        default: 'var(--ts-bg)',
+        paper: 'var(--ts-surface)',
       },
       text: {
-        primary: gray[800],
-        secondary: gray[600],
+        primary: 'var(--ts-text)',
+        secondary: 'var(--ts-textMuted)',
         warning: orange[400],
       },
       action: {
@@ -384,14 +384,14 @@ export const colorSchemes = {
       grey: {
         ...gray,
       },
-      divider: alpha(gray[700], 0.6),
+      divider: 'var(--ts-border)',
       background: {
-        default: gray[900],
-        paper: 'hsl(220, 30%, 7%)',
+        default: 'var(--ts-bg)',
+        paper: 'var(--ts-surface)',
       },
       text: {
-        primary: 'hsl(0, 0%, 100%)',
-        secondary: gray[400],
+        primary: 'var(--ts-text)',
+        secondary: 'var(--ts-textMuted)',
       },
       action: {
         hover: alpha(gray[600], 0.2),
@@ -458,31 +458,37 @@ export const shape = {
 };
 
 // Stripe-leaning design tokens shared across redesign primitives.
-// Mirrors aT in the source design files.
+// Mirrors `aT` in the source design files. Each color is a CSS-variable
+// reference so light/dark themes flip via the `data-mui-color-scheme`
+// attribute (palettes defined in src/index.css).
 export const designTokens = {
-  surfaceMuted: 'hsl(210, 36%, 97%)',
-  surfaceTinted: 'hsl(210, 33%, 99%)',
-  border: 'hsl(218, 19%, 91%)',
-  borderStrong: 'hsl(214, 13%, 79%)',
-  text: 'hsl(213, 73%, 15%)',
-  textMuted: 'hsl(212, 22%, 33%)',
-  textFaint: 'hsl(210, 16%, 60%)',
-  textSubtle: 'hsl(212, 13%, 68%)',
-  accent: 'hsl(210, 95%, 44%)',
-  accentSoft: 'hsl(213, 86%, 95%)',
-  accentDeep: 'hsl(212, 85%, 27%)',
-  accentHover: 'hsl(211, 93%, 37%)',
-  accentBorder: 'hsl(213, 78%, 84%)',
-  success: 'hsl(149, 86%, 33%)',
-  successSoft: 'hsl(140, 56%, 93%)',
-  successBorder: 'hsl(140, 49%, 84%)',
-  successDeep: 'hsl(152, 84%, 25%)',
-  warning: 'hsl(38, 90%, 39%)',
-  warningSoft: 'hsl(45, 92%, 88%)',
-  warningBorder: 'hsl(45, 80%, 79%)',
-  warningDeep: 'hsl(36, 92%, 28%)',
-  danger: 'hsl(345, 60%, 53%)',
-  dangerSoft: 'hsl(345, 60%, 96%)',
+  bg: 'var(--ts-bg)',
+  surface: 'var(--ts-surface)',
+  surfaceMuted: 'var(--ts-surfaceMuted)',
+  surfaceTinted: 'var(--ts-surfaceTinted)',
+  border: 'var(--ts-border)',
+  borderStrong: 'var(--ts-borderStrong)',
+  text: 'var(--ts-text)',
+  textMuted: 'var(--ts-textMuted)',
+  textFaint: 'var(--ts-textFaint)',
+  textSubtle: 'var(--ts-textSubtle)',
+  accent: 'var(--ts-accent)',
+  accentSoft: 'var(--ts-accentSoft)',
+  accentDeep: 'var(--ts-accentDeep)',
+  accentHover: 'var(--ts-accentHover)',
+  accentBorder: 'var(--ts-accentBorder)',
+  success: 'var(--ts-success)',
+  successSoft: 'var(--ts-successSoft)',
+  successBorder: 'var(--ts-successBorder)',
+  successDeep: 'var(--ts-successDeep)',
+  warning: 'var(--ts-warning)',
+  warningSoft: 'var(--ts-warningSoft)',
+  warningBorder: 'var(--ts-warningBorder)',
+  warningDeep: 'var(--ts-warningDeep)',
+  danger: 'var(--ts-danger)',
+  dangerSoft: 'var(--ts-dangerSoft)',
+  onAccent: 'var(--ts-onAccent)',
+  mark: 'var(--ts-mark)',
   fontMono:
     '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
 };
