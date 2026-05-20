@@ -1,21 +1,35 @@
-import { ButtonLink } from '@/components/ButtonLink';
+import {
+  Badge,
+  SectionCard,
+  smallButtonSx,
+} from '@/components/redesign';
 import {
   ContextHits,
   CtxPageSize,
   CtxPagination,
+  CtxRefinements,
   CtxSearchError,
   CtxSearchStats,
   DashboardDisplayOptions,
   SearchBox,
 } from '@/components/search';
 import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
+import { designTokens } from '@/theme/themePrimitives';
 import {
   AddRounded,
-  ExpandMoreRounded,
   OpenInNewRounded,
 } from '@mui/icons-material';
-import { Box, Container, Link, Paper, Stack, Typography } from '@mui/material';
-import { createFileRoute } from '@tanstack/react-router';
+import {
+  Box,
+  Button,
+  Link,
+  Stack,
+  Typography,
+} from '@mui/material';
+import {
+  createFileRoute,
+  Link as RouterLink,
+} from '@tanstack/react-router';
 import { Suspense } from 'react';
 
 export const Route = createFileRoute(
@@ -28,112 +42,144 @@ function RouteComponent() {
   const { collectionId } = Route.useParams();
 
   return (
-    <>
-      <Stack direction='column' spacing={{ xs: 0.5, sm: 1, md: 2 }}>
-        <Box>
-          <SearchBox sx={{ my: 1 }} />
-          <Stack
-            direction='row'
-            spacing={1}
-            sx={{ justifyContent: 'space-between', alignItems: 'flex' }}
-          >
-            <Box>
-              <CtxSearchStats />
-            </Box>
-
-            <ButtonLink
-              to={'.'}
-              params={{ collectionId }}
-              hash='search-params'
-              endIcon={<ExpandMoreRounded />}
-              size='small'
-            >
-              Search Parameters
-            </ButtonLink>
-          </Stack>
-        </Box>
-        <CtxSearchError />
-        <ContextHits />
-
+    <Stack sx={{ gap: 2 }}>
+      {/* Search bar card */}
+      <Box
+        sx={{
+          background: 'background.paper',
+          border: `1px solid ${designTokens.border}`,
+          borderRadius: 1,
+          px: 2,
+          py: 1.75,
+        }}
+      >
         <Stack
-          direction={{ xs: 'column-reverse', sm: 'row' }}
+          direction='row'
+          sx={{ gap: 1.25, alignItems: 'center' }}
+        >
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <SearchBox sx={{ my: 0 }} />
+          </Box>
+          <CtxRefinements />
+        </Stack>
+        <Stack
+          direction='row'
           sx={{
-            display: 'flex',
             justifyContent: 'space-between',
-            alignItems: { xs: 'flex-end', sm: 'center' },
+            alignItems: 'center',
+            mt: 1.25,
+            flexWrap: 'wrap',
+            gap: 1,
           }}
         >
-          <ButtonLink
-            to='/collections/$collectionId/documents/new'
-            params={{ collectionId }}
-            size='small'
-            startIcon={<AddRounded fontSize='small' />}
-            sx={{ lineHeight: '18px', my: 1 }}
-          >
-            Add Documents
-          </ButtonLink>
-          <Stack
-            direction='row'
-            spacing={2}
-            sx={{
-              flex: '1 1 auto',
-              justifyContent: { xs: 'space-between', sm: 'flex-end' },
-              alignItems: 'center',
-              my: 1,
-              width: { xs: '100%', sm: 'auto' },
-            }}
-          >
-            <CtxPageSize />
-            <CtxPagination />
-          </Stack>
+          <CtxSearchStats />
+          <Badge tone='neutral'>fast · indexed</Badge>
         </Stack>
+      </Box>
 
-        <Box sx={{ pt: 2 }}>
-          <Typography variant='h5' gutterBottom id='search-params'>
-            Search Parameters
-          </Typography>
-          <Typography component='div' gutterBottom>
-            These settings control ranking, relevance and search fine-tuning.
-            Use a preset to save your configuration, and recall in your
-            application.{' '}
+      <CtxSearchError />
+      <ContextHits />
+
+      <Stack
+        direction={{ xs: 'column-reverse', sm: 'row' }}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-end', sm: 'center' },
+          gap: 1.5,
+        }}
+      >
+        <Button
+          component={RouterLink as React.ElementType}
+          to='/collections/$collectionId/documents/new'
+          params={{ collectionId }}
+          size='small'
+          variant='outlined'
+          startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+          sx={smallButtonSx}
+        >
+          Add documents
+        </Button>
+        <Stack
+          direction='row'
+          spacing={2}
+          sx={{
+            flex: '1 1 auto',
+            justifyContent: { xs: 'space-between', sm: 'flex-end' },
+            alignItems: 'center',
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
+          <CtxPageSize />
+          <CtxPagination />
+        </Stack>
+      </Stack>
+
+      {/* === Search Parameters === */}
+      <SectionCard
+        title={
+          <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
+            <Box id='search-params' />
+            Search parameters
+            <Badge tone='neutral'>applies to this collection</Badge>
+          </Stack>
+        }
+        description={
+          <>
+            Ranking, relevance, and query fine-tuning. These map 1:1 to
+            Typesense search params, so they work with whatever schema your
+            collection has. Save a configuration as a preset to recall from
+            your application code.{' '}
             <Link
               href='https://typesense.org/docs/29.0/api/search.html#search-parameters'
               target='_blank'
               rel='noopener noreferrer'
+              sx={{
+                color: designTokens.accent,
+                textDecoration: 'none',
+                fontWeight: 500,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
             >
               Docs
-              <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.5 }} />
+              <OpenInNewRounded fontSize='inherit' />
             </Link>
-          </Typography>
-        </Box>
-
-        <Suspense>
-          <Paper>
-            <Container maxWidth='sm' sx={{ py: { xs: 3, sm: 4 } }}>
-              <UpdateSearchParameters
-                key={`update-search-${collectionId}`}
-                collectionId={collectionId}
-              />
-            </Container>
-          </Paper>
+          </>
+        }
+      >
+        <Suspense
+          fallback={
+            <Box
+              sx={{ height: 200, background: designTokens.surfaceMuted }}
+            />
+          }
+        >
+          <UpdateSearchParameters
+            key={`update-search-${collectionId}`}
+            collectionId={collectionId}
+          />
         </Suspense>
+      </SectionCard>
 
-        <Box sx={{ pt: 2 }}>
-          <Typography variant='h6' gutterBottom>
-            Dashboard Display Options
-          </Typography>
-          <Typography variant='subtitle2'>
-            These options control the visual display of the results in the
-            search dashboard above
-          </Typography>
-        </Box>
+      {/* === Dashboard Display Options === */}
+      <SectionCard
+        title='Dashboard display'
+        description='Choose which fields render on the result cards above. Preferences are per-collection and persist in your browser — they don’t change the underlying schema.'
+      >
+        <DashboardDisplayOptions key={`display-opts-${collectionId}`} />
+      </SectionCard>
 
-        <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
-          <Container maxWidth='sm' disableGutters>
-            <DashboardDisplayOptions key={`display-opts-${collectionId}`} />
-          </Container>
-        </Paper>
-      </Stack>
-    </>
+      <Box sx={{ height: 8 }} />
+      <Typography
+        sx={{
+          fontSize: 11.5,
+          color: designTokens.textFaint,
+          textAlign: 'center',
+        }}
+      >
+        Settings save automatically per collection.
+      </Typography>
+    </Stack>
   );
 }

@@ -1,11 +1,18 @@
 import { ErrorFallback } from '@/components';
 import { AliasForm, aliasFormOpts } from '@/components/AliasForm';
 import { AliasGrid } from '@/components/AliasGrid';
+import {
+  Badge,
+  PageHeader,
+  SectionCard,
+  smallButtonSx,
+} from '@/components/redesign';
 import { aliasQueryKeys, collectionQueryKeys } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { OpenInNewRounded } from '@mui/icons-material';
-import { Box, Link, Paper, Typography } from '@mui/material';
+import { OpenInNewRounded, LinkRounded } from '@mui/icons-material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import {
   useMutation,
@@ -29,39 +36,106 @@ export const Route = createFileRoute('/_dashboard/alias')({
 
 function RouteComponent() {
   return (
-    <Box sx={{ maxWidth: 920 }}>
-      <Typography variant='h3' gutterBottom>
-        Aliases
-      </Typography>
-      <Typography>
-        Aliases are like symlinks that can point to collections.{' '}
-        <Link
-          href='https://typesense.org/docs/29.0/api/collection-alias.html'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Read the documentation
-          <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.5 }} />
-        </Link>{' '}
-        for information on how to best use aliases.
-      </Typography>
-
-      <Paper sx={{ my: 2, p: 2 }}>
-        <AddAlias />
-      </Paper>
-      <Box>
-        <ErrorBoundary
-          FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
+    <Stack sx={{ minWidth: 0 }}>
+      <PageHeader
+        title='Aliases'
+        badges={<Badge tone='neutral'>zero-downtime swaps</Badge>}
+        actions={
+          <Button
+            component='a'
+            href='https://typesense.org/docs/29.0/api/collection-alias.html'
+            target='_blank'
+            rel='noopener noreferrer'
+            variant='outlined'
+            size='small'
+            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+            sx={smallButtonSx}
+          >
+            When to use aliases
+          </Button>
+        }
+      />
+      <Box
+        sx={{
+          flex: 1,
+          px: { xs: 2.5, md: 3.5 },
+          py: 2.25,
+          background: designTokens.surfaceTinted,
+          minHeight: 0,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1.75,
+            p: 2,
+            background: 'background.paper',
+            border: `1px solid ${designTokens.border}`,
+            borderRadius: 1,
+            mb: 2,
+            alignItems: 'flex-start',
           }}
         >
-          <Suspense>
-            <AliasGrid />
-          </Suspense>
-        </ErrorBoundary>
+          <Box
+            sx={{
+              width: 28,
+              height: 28,
+              borderRadius: 0.75,
+              background: designTokens.accentSoft,
+              color: designTokens.accent,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <LinkRounded sx={{ fontSize: 16 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: designTokens.text,
+                mb: 0.4,
+              }}
+            >
+              Aliases let you swap collections with zero downtime.
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 12.5,
+                color: designTokens.textMuted,
+                lineHeight: 1.55,
+              }}
+            >
+              Point your app at the alias — and re-target it whenever you
+              re-index. The cutover is atomic; in-flight queries finish on the
+              old index, new ones land on the new one.
+            </Typography>
+          </Box>
+        </Box>
+
+        <SectionCard title='Existing aliases' noBodyPadding>
+          <Box sx={{ p: 2 }}>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: unknown) => captureException(err)}
+            >
+              <Suspense>
+                <AliasGrid />
+              </Suspense>
+            </ErrorBoundary>
+          </Box>
+        </SectionCard>
+
+        <Box sx={{ mt: 2 }}>
+          <SectionCard title='Create / update alias'>
+            <AddAlias />
+          </SectionCard>
+        </Box>
       </Box>
-    </Box>
+    </Stack>
   );
 }
 

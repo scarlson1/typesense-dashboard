@@ -32,18 +32,20 @@ export const authFormOpts = formOptions({
 export const AuthForm = withForm({
   ...authFormOpts,
   props: {
-    title: 'Login',
+    title: 'Login' as string | null,
   },
   render: ({ form, title }) => {
     return (
       <>
-        <Typography
-          component='h1'
-          variant='h4'
-          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-        >
-          {title}
-        </Typography>
+        {title ? (
+          <Typography
+            component='h1'
+            variant='h4'
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+          >
+            {title}
+          </Typography>
+        ) : null}
         <form.AppField name='node'>
           {({ TextField, state }) => (
             <TextField

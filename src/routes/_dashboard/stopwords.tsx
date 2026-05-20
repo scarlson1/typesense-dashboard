@@ -1,9 +1,16 @@
+import {
+  Badge,
+  PageHeader,
+  SectionCard,
+  smallButtonSx,
+} from '@/components/redesign';
 import { StopwordsForm } from '@/components/StopwordsForm';
 import { stopwordsFormOpts } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
 import { DeleteRounded, OpenInNewRounded } from '@mui/icons-material';
-import { Box, Link, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Stack, Tooltip, Typography } from '@mui/material';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -24,28 +31,54 @@ export const Route = createFileRoute('/_dashboard/stopwords')({
 
 function RouteComponent() {
   return (
-    <>
-      <Typography variant='h3' gutterBottom>
-        Stopwords
-      </Typography>
-      <Typography>
-        Stopwords are removed from the search query when they are present in the
-        search query.{' '}
-        <Link
-          href='https://typesense.org/docs/29.0/api/stopwords.html'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Docs <OpenInNewRounded fontSize='inherit' />
-        </Link>
-      </Typography>
-      <Paper sx={{ p: 2, mt: 2 }}>
-        <AddStopword />
-      </Paper>
-      <Box sx={{ py: 2 }}>
-        <StopwordsList />
+    <Stack sx={{ minWidth: 0 }}>
+      <PageHeader
+        title='Stopwords'
+        badges={<Badge tone='neutral'>removed at query time</Badge>}
+        actions={
+          <Button
+            component='a'
+            href='https://typesense.org/docs/29.0/api/stopwords.html'
+            target='_blank'
+            rel='noopener noreferrer'
+            variant='outlined'
+            size='small'
+            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+            sx={smallButtonSx}
+          >
+            When to use stopwords
+          </Button>
+        }
+      />
+      <Box
+        sx={{
+          flex: 1,
+          px: { xs: 2.5, md: 3.5 },
+          py: 2.25,
+          background: designTokens.surfaceTinted,
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '320px 1fr' },
+          gap: 2,
+          minHeight: 0,
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <SectionCard
+            title='Add a new set'
+            description='Stopwords are ignored at query time on fields listed in query_by.'
+          >
+            <AddStopword />
+          </SectionCard>
+        </Box>
+        <Box sx={{ minWidth: 0 }}>
+          <SectionCard title='Stopword sets' noBodyPadding>
+            <Box sx={{ p: 2 }}>
+              <StopwordsList />
+            </Box>
+          </SectionCard>
+        </Box>
       </Box>
-    </>
+    </Stack>
   );
 }
 

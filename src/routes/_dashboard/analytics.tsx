@@ -1,34 +1,57 @@
 import { AnalyticsRulesList } from '@/components/AnalyticsRulesList';
+import {
+  Badge,
+  PageHeader,
+  SectionCard,
+  smallButtonSx,
+} from '@/components/redesign';
+import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,
-  staticData: {
-    crumb: 'Analytics',
-  },
+  staticData: { crumb: 'Analytics' },
 });
 
 function RouteComponent() {
   return (
-    <>
-      <Typography variant='h3' gutterBottom>
-        Analytics Rules
-      </Typography>
-      <Typography sx={{ pb: 2 }}>
-        This section allows you to configure rules to capture search analytics.{' '}
-        <Link
-          href='https://typesense.org/docs/29.0/api/analytics-query-suggestions.html'
-          target='_blank'
-          rel='noopener noreferrer'
+    <Stack sx={{ minWidth: 0 }}>
+      <PageHeader
+        title='Analytics rules'
+        badges={<Badge tone='neutral'>capture searches</Badge>}
+        actions={
+          <Button
+            component='a'
+            href='https://typesense.org/docs/29.0/api/analytics-query-suggestions.html'
+            target='_blank'
+            rel='noopener noreferrer'
+            variant='outlined'
+            size='small'
+            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+            sx={smallButtonSx}
+          >
+            Analytics guide
+          </Button>
+        }
+      />
+      <Box
+        sx={{
+          flex: 1,
+          px: { xs: 2.5, md: 3.5 },
+          py: 2.25,
+          background: designTokens.surfaceTinted,
+          minHeight: 0,
+        }}
+      >
+        <SectionCard
+          title='Rules'
+          description='Capture searches into a separate Typesense collection for analysis, autocomplete, and reporting.'
         >
-          Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
-        </Link>
-      </Typography>
-      <Box sx={{ maxWidth: 800 }}>
-        <AnalyticsRulesList />
+          <AnalyticsRulesList />
+        </SectionCard>
       </Box>
-    </>
+    </Stack>
   );
 }

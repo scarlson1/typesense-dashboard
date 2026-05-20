@@ -1,11 +1,16 @@
 import { ErrorFallback } from '@/components';
 import { AppNavbar } from '@/components/AppNavbar';
-import { Header } from '@/components/Header';
-import { SideMenu } from '@/components/SideMenu';
+import { SidebarBoundary, TopBar } from '@/components/redesign';
+import { designTokens } from '@/theme/themePrimitives';
 import { typesenseStore } from '@/utils';
-import { alpha, Box, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useMatches,
+} from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';
 
 function isAuthenticated() {
@@ -30,49 +35,39 @@ export const Route = createFileRoute('/_dashboard')({
 });
 
 function RouteComponent() {
+  const matches = useMatches();
+  const crumbs = matches
+    .filter((m) => m.staticData.crumb)
+    .map((m) => ({ label: m.staticData.crumb as string }));
+
   return (
-    <Box sx={{ display: 'flex' }}>
-      <SideMenu />
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: 'background.default' }}>
+      <SidebarBoundary />
       <AppNavbar />
       <Box
         component='main'
-        sx={(theme) => ({
-          // TODO: use css var for AppNavbar height
-          // height: { xs: 'calc(100vh - 60px)', md: '100vh' },
+        sx={{
           flexGrow: 1,
-          backgroundColor: theme.vars
-            ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-            : alpha(theme.palette.background.default, 1),
-          overflow: 'auto',
-        })}
+          minWidth: 0,
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          background: designTokens.surfaceTinted,
+        }}
       >
-        <Stack
-          spacing={2}
-          sx={{
-            alignItems: 'center',
-            mx: 3,
-            pb: 5,
-            mt: { xs: 8, md: 0 },
+        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+          <TopBar crumbs={crumbs} />
+        </Box>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => {
+            captureException(err);
           }}
         >
-          <Header />
-          <Box
-            sx={{
-              width: '100%',
-              maxWidth: { sm: '100%', md: '1600px' },
-              pb: 5,
-            }}
-          >
-            <ErrorBoundary
-              FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => {
-                captureException(err);
-              }}
-            >
-              <Outlet />
-            </ErrorBoundary>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Outlet />
           </Box>
-        </Stack>
+        </ErrorBoundary>
       </Box>
     </Box>
   );

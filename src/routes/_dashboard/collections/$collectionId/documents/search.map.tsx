@@ -94,12 +94,11 @@ function RouteComponent() {
   return (
     <Box
       sx={{
-        position: 'fixed',
-        top: { xs: 128, md: 100 },
-        left: { xs: 0, md: 240 },
-        right: 0,
-        bottom: 0,
+        position: 'relative',
+        height: { xs: 'calc(100vh - 220px)', md: 'calc(100vh - 200px)' },
+        minHeight: 480,
         display: 'flex',
+        m: -2.5,
       }}
     >
       {mobile ? (

@@ -1,39 +1,57 @@
 import { PresetsList } from '@/components/PresetsList';
+import {
+  Badge,
+  PageHeader,
+  SectionCard,
+  smallButtonSx,
+} from '@/components/redesign';
+import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboard/presets')({
   component: RouteComponent,
-  staticData: {
-    crumb: 'Presets',
-  },
+  staticData: { crumb: 'Presets' },
 });
 
 function RouteComponent() {
   return (
-    <Box sx={{ maxWidth: 800 }}>
-      <Typography variant='h3' gutterBottom>
-        Presets
-      </Typography>
-      <Typography sx={{ textAlign: 'justify' }} gutterBottom>
-        Presets allow you to manage search parameters in Typesense, and
-        reference just the preset name in your application. This way, you can
-        change search parameters without having to make code changes.{' '}
-        <Link
-          href='https://typesense.org/docs/29.0/api/search.html#presets'
-          target='_blank'
-          rel='noopener noreferrer'
+    <Stack sx={{ minWidth: 0 }}>
+      <PageHeader
+        title='Search presets'
+        badges={<Badge tone='neutral'>reusable search configs</Badge>}
+        actions={
+          <Button
+            component='a'
+            href='https://typesense.org/docs/29.0/api/search.html#presets'
+            target='_blank'
+            rel='noopener noreferrer'
+            variant='outlined'
+            size='small'
+            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+            sx={smallButtonSx}
+          >
+            Preset docs
+          </Button>
+        }
+      />
+      <Box
+        sx={{
+          flex: 1,
+          px: { xs: 2.5, md: 3.5 },
+          py: 2.25,
+          background: designTokens.surfaceTinted,
+          minHeight: 0,
+        }}
+      >
+        <SectionCard
+          title='Saved presets'
+          description='Manage Typesense search parameter sets and reference them by name from your application. Change behaviour without code changes.'
         >
-          Read the documentation
-          <OpenInNewRounded fontSize='inherit' />
-        </Link>{' '}
-        for more information on available options.
-      </Typography>
-
-      <Box sx={{ py: 2 }}>
-        <PresetsList />
+          <PresetsList />
+        </SectionCard>
       </Box>
-    </Box>
+    </Stack>
   );
 }
