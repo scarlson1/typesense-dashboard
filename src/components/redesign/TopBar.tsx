@@ -1,12 +1,8 @@
-import {
-  NotificationsOutlined,
-  SearchRounded,
-  ChevronRightRounded,
-} from '@mui/icons-material';
-import { Box, Stack, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
 import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { designTokens } from '@/theme/themePrimitives';
+import { ChevronRightRounded } from '@mui/icons-material';
+import { Stack, Typography } from '@mui/material';
+import type { ReactNode } from 'react';
 
 interface Crumb {
   label: ReactNode;
@@ -74,7 +70,8 @@ export const TopBar = ({ crumbs = [], rightSlot }: TopBarProps) => {
       </Stack>
       {rightSlot ?? (
         <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
-          <Box
+          {/* TODO: connect search ?? */}
+          {/* <Box
             component='button'
             sx={{
               height: 28,
@@ -108,8 +105,8 @@ export const TopBar = ({ crumbs = [], rightSlot }: TopBarProps) => {
             >
               ⌘K
             </Box>
-          </Box>
-          <Box
+          </Box> */}
+          {/* <Box
             component='button'
             sx={{
               width: 28,
@@ -140,7 +137,7 @@ export const TopBar = ({ crumbs = [], rightSlot }: TopBarProps) => {
                 borderColor: 'background.paper',
               }}
             />
-          </Box>
+          </Box> */}
           <ThemeModeToggle />
         </Stack>
       )}

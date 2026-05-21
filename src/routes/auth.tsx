@@ -238,8 +238,8 @@ function AuthComponent() {
             flexWrap: 'wrap',
           }}
         >
-          <span>© 2026 Typesense Dashboard</span>
-          <span>·</span>
+          {/* <span>© 2026 Typesense Dashboard</span>
+          <span>·</span> */}
           <Link
             href='https://typesense.org/docs/'
             target='_blank'
@@ -265,7 +265,7 @@ function AuthComponent() {
           </Link>
           <Box component='span' sx={{ flex: 1 }} />
           <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
-            v0.9.4
+            v{import.meta.env.VITE_APP_VERSION}
           </Box>
         </Stack>
       </Stack>

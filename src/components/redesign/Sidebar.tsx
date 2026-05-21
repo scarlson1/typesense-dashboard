@@ -271,7 +271,7 @@ export function Sidebar() {
       sx={{
         width: SIDEBAR_WIDTH,
         flexShrink: 0,
-        background: 'background.paper',
+        background: designTokens.surface,
         borderRight: `1px solid ${designTokens.border}`,
         display: { xs: 'none', md: 'flex' },
         flexDirection: 'column',
