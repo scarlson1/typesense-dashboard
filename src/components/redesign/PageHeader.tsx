@@ -26,7 +26,7 @@ export const PageHeader = ({
       sx={{
         px: 3.5,
         pt: 2.75,
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         borderBottom: `1px solid ${designTokens.border}`,
       }}
     >

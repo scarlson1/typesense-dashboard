@@ -569,7 +569,7 @@ function DangerZoneCard() {
   return (
     <Box
       sx={{
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         border: `1px solid color-mix(in srgb, ${designTokens.danger} 20%, transparent)`,
         borderRadius: 1,
         p: 2,

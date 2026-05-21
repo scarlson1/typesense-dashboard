@@ -91,7 +91,7 @@ function AuthComponent() {
         display: 'flex',
         fontFamily: 'Inter, system-ui, sans-serif',
         color: designTokens.text,
-        background: 'background.default',
+        backgroundColor: 'background.default',
       }}
     >
       {/* Left: form */}

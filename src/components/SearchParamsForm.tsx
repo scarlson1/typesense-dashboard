@@ -5,7 +5,12 @@ import {
 } from '@/constants';
 import { usePrevious, withForm } from '@/hooks';
 import { getArrayVal, splitIfString } from '@/utils';
-import { smallButtonSx } from '@/components/redesign';
+import {
+  FieldRow,
+  fieldChipSx,
+  fieldInputSx,
+  smallButtonSx,
+} from '@/components/redesign';
 import { designTokens } from '@/theme/themePrimitives';
 import {
   AddRounded,
@@ -21,7 +26,6 @@ import {
   TextField as MuiTextField,
   Stack,
   Typography,
-  type SxProps,
   type Theme,
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
@@ -33,108 +37,6 @@ import type {
 } from 'typesense/lib/Typesense/Documents';
 import type { MultiSearchRequestsSchema } from 'typesense/lib/Typesense/MultiSearch';
 import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
-
-const LABEL_COL_WIDTH = 184;
-
-const inputSx: SxProps<Theme> = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: 'background.paper',
-    fontSize: 13,
-    minHeight: 36,
-    py: '3px',
-    px: '8px',
-    borderRadius: '6px',
-    '& fieldset': {
-      borderColor: designTokens.border,
-      transition: 'border-color 120ms ease',
-    },
-    '&:hover fieldset': {
-      borderColor: designTokens.borderStrong,
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: designTokens.accent,
-      borderWidth: 1,
-    },
-    '& input': {
-      fontSize: 13,
-      padding: '4px 4px !important',
-      fontFamily: designTokens.fontMono,
-    },
-    '& input::placeholder': {
-      color: designTokens.textFaint,
-      opacity: 1,
-    },
-  },
-};
-
-const chipSlotSx: SxProps<Theme> = {
-  height: 22,
-  fontSize: 12,
-  fontFamily: designTokens.fontMono,
-  background: designTokens.surfaceMuted,
-  border: `1px solid ${designTokens.border}`,
-  borderRadius: '4px',
-  color: designTokens.text,
-  '& .MuiChip-deleteIcon': {
-    fontSize: 14,
-    color: designTokens.textFaint,
-    '&:hover': { color: designTokens.text },
-  },
-};
-
-interface FieldRowProps {
-  label: React.ReactNode;
-  description?: React.ReactNode;
-  children: React.ReactNode;
-  align?: 'center' | 'flex-start';
-}
-
-function FieldRow({
-  label,
-  description,
-  children,
-  align = 'flex-start',
-}: FieldRowProps) {
-  return (
-    <Stack
-      direction={{ xs: 'column', sm: 'row' }}
-      spacing={{ xs: 1, sm: 3 }}
-      sx={{ alignItems: { xs: 'stretch', sm: align } }}
-    >
-      <Box
-        sx={{
-          width: { xs: '100%', sm: LABEL_COL_WIDTH },
-          flexShrink: 0,
-          pt: { xs: 0, sm: 0.875 },
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: designTokens.text,
-            lineHeight: 1.3,
-          }}
-        >
-          {label}
-        </Typography>
-        {description ? (
-          <Typography
-            sx={{
-              fontSize: 12,
-              color: designTokens.textMuted,
-              lineHeight: 1.4,
-              mt: 0.375,
-            }}
-          >
-            {description}
-          </Typography>
-        ) : null}
-      </Box>
-      <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
-    </Stack>
-  );
-}
 
 type SearchParamsFormFieldsProps = Parameters<typeof SearchParamsForm>[0];
 
@@ -225,7 +127,7 @@ const SearchParamsFormFields = ({
                 textFieldProps={{
                   label: undefined,
                   placeholder: 'Preset',
-                  sx: inputSx,
+                  sx: fieldInputSx,
                   slotProps: {
                     input: {
                       type: 'search',
@@ -261,12 +163,12 @@ const SearchParamsFormFields = ({
                 options={queryByOptions}
                 slotProps={{
                   paper: { sx: autocompletePaperSx },
-                  chip: { size: 'small', sx: chipSlotSx },
+                  chip: { size: 'small', sx: fieldChipSx },
                 }}
                 textFieldProps={{
                   label: undefined,
                   placeholder: 'Add field…',
-                  sx: inputSx,
+                  sx: fieldInputSx,
                 }}
               />
             )}
@@ -284,12 +186,12 @@ const SearchParamsFormFields = ({
                 options={sortByOptions}
                 slotProps={{
                   paper: { sx: autocompletePaperSx },
-                  chip: { size: 'small', sx: chipSlotSx },
+                  chip: { size: 'small', sx: fieldChipSx },
                 }}
                 textFieldProps={{
                   label: undefined,
                   placeholder: 'Add field…',
-                  sx: inputSx,
+                  sx: fieldInputSx,
                 }}
               />
             )}
@@ -310,12 +212,12 @@ const SearchParamsFormFields = ({
                 options={facetByOptions}
                 slotProps={{
                   paper: { sx: autocompletePaperSx },
-                  chip: { size: 'small', sx: chipSlotSx },
+                  chip: { size: 'small', sx: fieldChipSx },
                 }}
                 textFieldProps={{
                   label: undefined,
                   placeholder: 'Add field…',
-                  sx: inputSx,
+                  sx: fieldInputSx,
                 }}
               />
             )}
@@ -333,12 +235,12 @@ const SearchParamsFormFields = ({
                 options={groupByOptions}
                 slotProps={{
                   paper: { sx: autocompletePaperSx },
-                  chip: { size: 'small', sx: chipSlotSx },
+                  chip: { size: 'small', sx: fieldChipSx },
                 }}
                 textFieldProps={{
                   label: undefined,
                   placeholder: '— none —',
-                  sx: inputSx,
+                  sx: fieldInputSx,
                 }}
               />
             )}
@@ -373,12 +275,12 @@ const SearchParamsFormFields = ({
                                 {...params}
                                 onBlur={handleBlur}
                                 placeholder='Parameter name'
-                                sx={inputSx}
+                                sx={fieldInputSx}
                               />
                             )}
                             slotProps={{
                               paper: { sx: autocompletePaperSx },
-                              chip: { size: 'small', sx: chipSlotSx },
+                              chip: { size: 'small', sx: fieldChipSx },
                             }}
                           />
                         )}
@@ -392,7 +294,7 @@ const SearchParamsFormFields = ({
                             value={state.value}
                             onChange={(e) => handleChange(e.target.value)}
                             onBlur={handleBlur}
-                            sx={{ ...inputSx, flex: 1, minWidth: 0 }}
+                            sx={{ ...fieldInputSx, flex: 1, minWidth: 0 }}
                             error={state.meta.isTouched && !state.meta.isValid}
                             color={
                               state.meta.errors.length ? 'error' : 'primary'

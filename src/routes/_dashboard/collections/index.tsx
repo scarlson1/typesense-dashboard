@@ -58,7 +58,7 @@ function CollectionsComponent() {
 
         <Box
           sx={{
-            background: 'background.paper',
+            backgroundColor: 'background.paper',
             border: `1px solid ${designTokens.border}`,
             borderRadius: 1,
             overflow: 'hidden',
@@ -134,7 +134,7 @@ function StatStripFallback() {
         <Box
           key={i}
           sx={{
-            background: 'background.paper',
+            backgroundColor: 'background.paper',
             border: `1px solid ${designTokens.border}`,
             borderRadius: 1,
             height: 92,

@@ -310,7 +310,7 @@ function ViewToggleButtons() {
           color: designTokens.textMuted,
           fontSize: 12.5,
           '&.Mui-selected': {
-            background: 'background.paper',
+            backgroundColor: 'background.paper',
             color: designTokens.text,
             fontWeight: 500,
             boxShadow: '0 1px 1px rgba(0,0,0,.06)',

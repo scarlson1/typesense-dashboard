@@ -69,7 +69,7 @@ function RouteComponent() {
             display: 'flex',
             gap: 1.75,
             p: 2,
-            background: 'background.paper',
+            backgroundColor: 'background.paper',
             border: `1px solid ${designTokens.border}`,
             borderRadius: 1,
             mb: 2,

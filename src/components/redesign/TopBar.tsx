@@ -24,7 +24,7 @@ export const TopBar = ({ crumbs = [], rightSlot }: TopBarProps) => {
         alignItems: 'center',
         px: 2.75,
         gap: 1,
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         flexShrink: 0,
       }}
     >
@@ -98,7 +98,7 @@ export const TopBar = ({ crumbs = [], rightSlot }: TopBarProps) => {
                 py: '1px',
                 border: `1px solid ${designTokens.border}`,
                 borderRadius: '3px',
-                background: 'background.paper',
+                backgroundColor: 'background.paper',
                 color: designTokens.textMuted,
                 ml: 1.5,
               }}

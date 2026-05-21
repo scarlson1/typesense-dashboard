@@ -121,7 +121,7 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
         px: { xs: 3, md: 4 },
         pt: { xs: 3, md: 3.5 },
         pb: 2.25,
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         borderBottom: `1px solid ${designTokens.border}`,
       }}
     >
@@ -247,7 +247,7 @@ function MetricStripFallback() {
         <Box
           key={i}
           sx={{
-            background: 'background.paper',
+            backgroundColor: 'background.paper',
             border: `1px solid ${designTokens.border}`,
             borderRadius: 1,
             height: 88,
@@ -336,7 +336,7 @@ function ClusterStatusFallback() {
   return (
     <Box
       sx={{
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         border: `1px solid ${designTokens.border}`,
         borderRadius: 1,
         height: 180,

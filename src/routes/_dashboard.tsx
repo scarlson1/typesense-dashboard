@@ -41,7 +41,7 @@ function RouteComponent() {
     .map((m) => ({ label: m.staticData.crumb as string }));
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', background: 'background.default' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <SidebarBoundary />
       <AppNavbar />
       <Box

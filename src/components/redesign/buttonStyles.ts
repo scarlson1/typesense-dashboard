@@ -9,7 +9,7 @@ export const smallButtonSx: SxProps<Theme> = {
   borderRadius: '6px',
   borderColor: designTokens.border,
   color: designTokens.text,
-  background: 'background.paper',
+  backgroundColor: 'background.paper',
   boxShadow:
     '0 1px 1px rgba(50,50,90,.04), 0 1px 1px rgba(50,50,90,.05)',
   '&:hover': {
@@ -49,7 +49,7 @@ export const dangerButtonSx: SxProps<Theme> = {
   fontSize: 13,
   height: 32,
   borderRadius: '6px',
-  background: 'background.paper',
+  backgroundColor: 'background.paper',
   border: `1px solid color-mix(in srgb, ${designTokens.danger} 40%, transparent)`,
   color: designTokens.danger,
   '&:hover': {

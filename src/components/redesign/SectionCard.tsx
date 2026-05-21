@@ -22,7 +22,7 @@ export const SectionCard = ({
   return (
     <Box
       sx={{
-        background: 'background.paper',
+        backgroundColor: designTokens.surface,
         border: `1px solid ${designTokens.border}`,
         borderRadius: 1,
         overflow: 'hidden',

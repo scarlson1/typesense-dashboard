@@ -24,7 +24,7 @@ export const StatCard = ({
   return (
     <Box
       sx={{
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         border: `1px solid ${designTokens.border}`,
         borderRadius: 1,
         px: 2,

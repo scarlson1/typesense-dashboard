@@ -1,5 +1,11 @@
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
 import {
+  FieldRow,
+  fieldChipSx,
+  fieldInputSx,
+  ghostButtonSx,
+} from '@/components/redesign';
+import {
   useCollectionSchema,
   useCollectionSearchPreset,
   usePrevious,
@@ -7,23 +13,22 @@ import {
   useTypesenseClient,
   type StoredDisplayOptions,
 } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import {
   Autocomplete,
+  Box,
   Button,
   createFilterOptions,
-  FormControl,
-  InputLabel,
   MenuItem,
   Select,
   Stack,
   TextField,
-  Typography,
   type CSSProperties,
   type SelectChangeEvent,
+  type Theme,
 } from '@mui/material';
 import { useCallback, useEffect, useMemo } from 'react';
 
-// TODO: change hits to be grid instead of stack ??
 const imgFitOptions: CSSProperties['backgroundSize'][] = [
   'auto',
   'contain',
@@ -39,6 +44,35 @@ interface ImgOption {
   inputValue?: string;
 }
 const filter = createFilterOptions<ImgOption>();
+
+const autocompletePaperSx = {
+  border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+};
+
+const selectInputSx = {
+  ...fieldInputSx,
+  fontFamily: designTokens.fontMono,
+  fontSize: 13,
+  background: designTokens.surface,
+  borderRadius: '6px',
+  '& .MuiSelect-select': {
+    py: '8px !important',
+    px: '10px !important',
+    fontFamily: designTokens.fontMono,
+    fontSize: 13,
+    minHeight: 'unset',
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: designTokens.border,
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: designTokens.borderStrong,
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: designTokens.accent,
+    borderWidth: 1,
+  },
+};
 
 export function DashboardDisplayOptions() {
   const [_, slotProps, updateSlotProps] = useSearchSlots();
@@ -76,7 +110,6 @@ export function DashboardDisplayOptions() {
       );
   }, [collectionSchema?.name]);
 
-  // Helper — reads live slotProps and writes the full snapshot to storage
   const persistDisplay = useCallback(
     (patch: StoredDisplayOptions) => {
       const current: StoredDisplayOptions = {
@@ -163,25 +196,17 @@ export function DashboardDisplayOptions() {
     persistDisplay({ columns: undefined });
   }, [updateSlotProps, persistDisplay]);
 
+  const columnsValue =
+    typeof slotProps?.hitWrapper?.size === 'number'
+      ? 12 / slotProps?.hitWrapper?.size
+      : 0;
+
   return (
-    // <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, my: 2 }}>
-    <Stack direction='column' spacing={1.5}>
-      <Stack
-        direction='row'
-        spacing={{ xs: 0, sm: 2 }}
-        sx={{ display: 'flex', alignItems: 'center' }}
+    <Stack direction='column' spacing={2.25}>
+      <FieldRow
+        label='Display fields'
+        description='Order of chips = order shown on the card.'
       >
-        <Typography
-          sx={{
-            textAlign: 'right',
-            // flex: '0 0 auto',
-            // width: { xs: 120, sm: 150, md: 200 },
-            flex: '0 0 25%',
-            display: { xs: 'none', sm: 'block' },
-          }}
-        >
-          Display fields
-        </Typography>
         <Autocomplete
           multiple
           id='display-fields'
@@ -193,197 +218,150 @@ export function DashboardDisplayOptions() {
           value={slotProps.hit?.displayFields || []}
           onChange={handleFieldsChange}
           renderInput={(params) => (
-            <TextField {...params} label='Display Fields' />
-          )}
-          // sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
-          sx={{ minWidth: { xs: 100, sm: 120, md: 140 }, maxWidth: 500 }}
-          slotProps={{
-            paper: {
-              sx: {
-                border: (theme) => `1px solid ${theme.palette.divider}`,
-              },
-            },
-          }}
-        />
-      </Stack>
-
-      <Stack
-        direction='row'
-        spacing={{ xs: 1, sm: 2 }}
-        // useFlexGap
-        sx={{ alignItems: 'center' }}
-      >
-        <Typography
-          sx={{
-            textAlign: 'right',
-            // flex: '0 0 auto',
-            // width: { xs: 120, sm: 150, md: 200 },
-            flex: '0 0 25%',
-            display: { xs: 'none', sm: 'block' },
-          }}
-        >
-          Image field
-        </Typography>
-        <Autocomplete
-          id='image-field'
-          size='small'
-          freeSolo
-          blurOnSelect
-          selectOnFocus
-          clearOnBlur
-          options={imageFieldOptions}
-          value={slotProps?.hit?.imgField || ''}
-          onChange={handleImageChange}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
-
-            const { inputValue } = params;
-            // Suggest the creation of a new value
-            const isExisting = options.some(
-              (option) => inputValue === option.title,
-            );
-            if (inputValue !== '' && !isExisting) {
-              filtered.push({
-                inputValue,
-                title: `Add "${inputValue}"`,
-              });
-            }
-
-            return filtered;
-          }}
-          getOptionLabel={(option) => {
-            // Value selected with enter, right from the input
-            if (typeof option === 'string') {
-              return option;
-            }
-            // Add "xxx" option created dynamically
-
-            if (option.inputValue) {
-              return option.inputValue;
-            }
-            // Regular option
-            return option.title;
-          }}
-          // value={slotProps.hit?.displayFields || []}
-          noOptionsText='No fields with image types were found, but you can still type any field name here'
-          renderInput={(params) => (
             <TextField
               {...params}
-              label='Image Field'
-              helperText='The selected field is used to show an image in the results above.'
+              placeholder='Add field…'
+              sx={fieldInputSx}
             />
           )}
-          // sx={{ minWidth: { xs: 240, sm: 320, md: 380 }, maxWidth: 500 }}
-          sx={{
-            minWidth: { xs: 80, sm: 100 },
-            maxWidth: 500,
-            // flex: '0 0 40%',
-            flex: '1 1 0',
-            ml: { xs: `0 !important`, sm: `16px !important` },
-          }}
           slotProps={{
-            paper: {
-              sx: {
-                border: (theme) => `1px solid ${theme.palette.divider}`,
-              },
-            },
+            paper: { sx: autocompletePaperSx },
+            chip: { size: 'small', sx: fieldChipSx },
           }}
         />
-        {/* TODO: img fit */}
-        <FormControl
-          size='small'
-          sx={{
-            alignSelf: 'flex-start',
-            flex: '0 0 25%',
-          }}
-          fullWidth
-        >
-          <InputLabel id='img-size-label'>Image size</InputLabel>
-          <Select<string>
-            labelId='img-size-label'
-            id='img-size'
-            fullWidth
-            // @ts-expect-error backgroundSize not recognized as CSS Var ??
-            value={slotProps?.hitImg?.sx?.backgroundSize || ''}
-            onChange={handleImgSizeChange}
-            size='small'
-            label='Image size'
-            sx={{ minWidth: 80, maxWidth: 200, alignSelf: 'flex-start' }}
-            MenuProps={{
-              slotProps: {
-                paper: {
-                  elevation: 0,
-                  sx: {
-                    border: (theme) => `1px solid ${theme.palette.divider}`,
-                  },
-                },
-              },
-            }}
-          >
-            <MenuItem value={''}>{'default'}</MenuItem>
-            {imgFitOptions.map((o) => (
-              <MenuItem value={o} key={`${o}-bg-fit`}>
-                {o}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
+      </FieldRow>
 
-      <Stack
-        direction='row'
-        spacing={{ xs: 0, sm: 2 }}
-        sx={{ alignItems: 'center' }}
+      <FieldRow
+        label='Image field'
+        description='The selected field is used to show an image in the results above.'
       >
-        <Typography
-          sx={{
-            textAlign: 'right',
-            // flex: '0 0 auto',
-            // width: { xs: 120, sm: 150, md: 200 },
-            flex: '0 0 25%',
-            display: { xs: 'none', sm: 'block' },
-          }}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.25}
+          sx={{ alignItems: 'stretch' }}
         >
-          Number of columns in view
-        </Typography>
-        <FormControl size='small'>
-          <InputLabel id='display-columns-label'>Columns</InputLabel>
-          <Select
-            labelId='display-columns-label'
-            id='display-columns'
-            value={
-              typeof slotProps?.hitWrapper?.size === 'number'
-                ? 12 / slotProps?.hitWrapper?.size
-                : 0
-            }
-            onChange={handleSizeChange}
+          <Autocomplete
+            id='image-field'
             size='small'
-            label='Columns'
-            sx={{ minWidth: 100, maxWidth: 200 }}
-            MenuProps={{
-              slotProps: {
-                paper: {
-                  elevation: 0,
-                  sx: {
-                    border: (theme) => `1px solid ${theme.palette.divider}`,
+            freeSolo
+            blurOnSelect
+            selectOnFocus
+            clearOnBlur
+            options={imageFieldOptions}
+            value={slotProps?.hit?.imgField || ''}
+            onChange={handleImageChange}
+            sx={{ flex: 1, minWidth: 0 }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+              const { inputValue } = params;
+              const isExisting = options.some(
+                (option) => inputValue === option.title,
+              );
+              if (inputValue !== '' && !isExisting) {
+                filtered.push({
+                  inputValue,
+                  title: `Add "${inputValue}"`,
+                });
+              }
+              return filtered;
+            }}
+            getOptionLabel={(option) => {
+              if (typeof option === 'string') return option;
+              if (option.inputValue) return option.inputValue;
+              return option.title;
+            }}
+            noOptionsText='No fields with image types were found, but you can still type any field name here'
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder='Image field'
+                sx={fieldInputSx}
+              />
+            )}
+            slotProps={{
+              paper: { sx: autocompletePaperSx },
+            }}
+          />
+          <Box sx={{ width: { xs: '100%', sm: 180 }, flexShrink: 0 }}>
+            <Select<string>
+              labelId='img-size-label'
+              id='img-size'
+              fullWidth
+              displayEmpty
+              // @ts-expect-error backgroundSize not recognized as CSS Var
+              value={slotProps?.hitImg?.sx?.backgroundSize || ''}
+              onChange={handleImgSizeChange}
+              size='small'
+              renderValue={(v) =>
+                v ? (
+                  String(v)
+                ) : (
+                  <Box
+                    component='span'
+                    sx={{ color: designTokens.textFaint }}
+                  >
+                    Image size…
+                  </Box>
+                )
+              }
+              sx={selectInputSx}
+              MenuProps={{
+                slotProps: {
+                  paper: {
+                    elevation: 0,
+                    sx: autocompletePaperSx,
                   },
                 },
-              },
-            }}
-          >
-            <MenuItem value={0}>Default</MenuItem>
-            {selectOptions.map((o) => (
-              <MenuItem value={o} key={`${o}-columns`}>
-                {o}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Button size='small' onClick={handleResetGrid}>
-          reset
-        </Button>
-      </Stack>
+              }}
+            >
+              <MenuItem value=''>default</MenuItem>
+              {imgFitOptions.map((o) => (
+                <MenuItem value={o} key={`${o}-bg-fit`}>
+                  {o}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+        </Stack>
+      </FieldRow>
+
+      <FieldRow label='Columns in view' align='center'>
+        <Stack
+          direction='row'
+          spacing={1.25}
+          sx={{ alignItems: 'center' }}
+        >
+          <Box sx={{ width: 180 }}>
+            <Select
+              labelId='display-columns-label'
+              id='display-columns'
+              value={columnsValue}
+              onChange={handleSizeChange}
+              size='small'
+              fullWidth
+              sx={selectInputSx}
+              MenuProps={{
+                slotProps: {
+                  paper: {
+                    elevation: 0,
+                    sx: autocompletePaperSx,
+                  },
+                },
+              }}
+            >
+              <MenuItem value={0}>Default</MenuItem>
+              {selectOptions.map((o) => (
+                <MenuItem value={o} key={`${o}-columns`}>
+                  {o}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+          <Button size='small' onClick={handleResetGrid} sx={ghostButtonSx}>
+            Reset
+          </Button>
+        </Stack>
+      </FieldRow>
     </Stack>
-    // {/* </Paper> */}
   );
 }
