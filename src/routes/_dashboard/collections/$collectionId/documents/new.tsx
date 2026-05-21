@@ -12,18 +12,21 @@ import {
   useSchema,
   type MultiDocImportRes,
 } from '@/hooks';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { designTokens } from '@/theme/themePrimitives';
 import type { TypesenseFieldType } from '@/types';
 import { typesenseStore } from '@/utils';
 import type { OnMount } from '@monaco-editor/react';
 import {
+  CheckRounded,
   ClearRounded,
+  CodeRounded,
+  ContentCopyRounded,
+  EditRounded,
   ExpandLessRounded,
   ExpandMoreRounded,
   OpenInNewRounded,
   TerminalRounded,
-  CodeRounded,
-  EditRounded,
   UploadFileRounded,
 } from '@mui/icons-material';
 import {
@@ -33,6 +36,7 @@ import {
   Collapse,
   FormControl,
   FormHelperText,
+  IconButton,
   InputLabel,
   Link,
   MenuItem,
@@ -40,6 +44,8 @@ import {
   Skeleton,
   Stack,
   Typography,
+  Tooltip,
+  Zoom,
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
@@ -48,6 +54,7 @@ import {
   lazy,
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -76,10 +83,7 @@ function RouteComponent() {
         title='Add documents'
         badges={
           <Badge tone='neutral'>
-            <Box
-              component='span'
-              sx={{ fontFamily: designTokens.fontMono }}
-            >
+            <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
               {collectionId}
             </Box>
           </Badge>
@@ -165,9 +169,7 @@ function RouteComponent() {
                         ? designTokens.accentSoft
                         : 'background.paper',
                       border: `1px solid ${
-                        active
-                          ? designTokens.accentBorder
-                          : designTokens.border
+                        active ? designTokens.accentBorder : designTokens.border
                       }`,
                       cursor: 'pointer',
                     }}
@@ -209,11 +211,10 @@ function RouteComponent() {
             </Box>
           </SectionCard>
 
-          {method === 'editor' ? <NewDocumentEditor /> : (
-            <CodeSnippetCard
-              method={method}
-              collectionId={collectionId}
-            />
+          {method === 'editor' ? (
+            <NewDocumentEditor />
+          ) : (
+            <CodeSnippetCard method={method} collectionId={collectionId} />
           )}
         </Stack>
 
@@ -282,11 +283,13 @@ function NewDocumentEditor() {
       title={
         <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
           Document editor
-          <Badge tone='warn'>⚠ Prefilled from schema · expect imperfections</Badge>
+          <Badge tone='warn'>
+            ⚠ Prefilled from schema · expect imperfections
+          </Badge>
         </Stack>
       }
       footer={
-        <>
+        <Stack direction='row' spacing={1}>
           <FormControl size='small' sx={{ minWidth: 160 }}>
             <InputLabel id='action-select-label'>Action</InputLabel>
             <Select
@@ -313,9 +316,7 @@ function NewDocumentEditor() {
             </FormHelperText>
           </FormControl>
           <FormControl size='small' sx={{ minWidth: 200 }}>
-            <InputLabel id='dirty-values-select-label'>
-              Dirty values
-            </InputLabel>
+            <InputLabel id='dirty-values-select-label'>Dirty values</InputLabel>
             <Select
               label='Dirty values'
               value={dirtyValues || ''}
@@ -339,7 +340,7 @@ function NewDocumentEditor() {
           >
             Add documents
           </Button>
-        </>
+        </Stack>
       }
       noBodyPadding
     >
@@ -576,6 +577,25 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
   const node = credentials?.node || '[YOUR_NODE]';
   const port = protocol === 'http' ? credentials?.port || '[PORT]' : '';
 
+  const [, copy] = useCopyToClipboard();
+  const [copied, setCopied] = useState(false);
+
+  const curlCommand = `curl -H "X-TYPESENSE-API-KEY: $KEY" \\
+  -X POST \\
+  -T docs.jsonl \\
+  "${protocol}://${node}${port ? `:${port}` : ''}/collections/${collectionId}/documents/import?action=create"`;
+
+  const handleCopy = useCallback(async () => {
+    const success = await copy(curlCommand);
+    if (success) setCopied(true);
+  }, [copy, curlCommand]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
   return (
     <Box
       sx={{
@@ -583,20 +603,55 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
         borderRadius: 1,
         p: 1.75,
         color: designTokens.codeText,
+        position: 'relative',
       }}
     >
-      <Typography
+      <Box
         sx={{
-          fontSize: 11.5,
-          fontWeight: 600,
-          color: designTokens.textFaint,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           mb: 1,
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em',
         }}
       >
-        Equivalent cURL
-      </Typography>
+        <Typography
+          sx={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: designTokens.textFaint,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}
+        >
+          Equivalent cURL
+        </Typography>
+        <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
+          <IconButton
+            size='small'
+            onClick={handleCopy}
+            sx={{
+              color: copied ? designTokens.success : designTokens.textFaint,
+              p: 0.5,
+              position: 'relative',
+              width: 26,
+              height: 26,
+              transition: 'color 0.2s ease',
+              '&:hover': {
+                color: copied ? designTokens.success : designTokens.codeText,
+              },
+            }}
+          >
+            <Zoom in={!copied} timeout={180} unmountOnExit>
+              <ContentCopyRounded
+                sx={{ fontSize: 14, position: 'absolute' }}
+              />
+            </Zoom>
+            <Zoom in={copied} timeout={180} unmountOnExit>
+              <CheckRounded sx={{ fontSize: 16, position: 'absolute' }} />
+            </Zoom>
+          </IconButton>
+        </Tooltip>
+      </Box>
       <Box
         component='pre'
         sx={{

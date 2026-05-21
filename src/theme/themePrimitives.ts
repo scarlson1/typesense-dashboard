@@ -491,14 +491,9 @@ export const designTokens = {
   mark: 'var(--ts-mark)',
   codeSurface: 'var(--ts-codeSurface)',
   codeText: 'var(--ts-codeText)',
-  fontMono:
-    '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
+  fontMono: '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
 };
 
-// @ts-ignore
-const defaultShadows: Shadows = [
-  'none',
-  'var(--template-palette-baseShadow)',
-  ...defaultTheme.shadows.slice(2),
-];
+const defaultShadows: Shadows = [...defaultTheme.shadows];
+defaultShadows[1] = 'var(--template-palette-baseShadow)';
 export const shadows = defaultShadows;

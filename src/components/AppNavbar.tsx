@@ -7,7 +7,7 @@ import {
   Toolbar as MuiToolbar,
   Stack,
   styled,
-  tabsClasses,
+  // tabsClasses,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
@@ -24,11 +24,17 @@ const Toolbar = styled(MuiToolbar)({
   justifyContent: 'center',
   gap: '12px',
   flexShrink: 0,
-  [`& ${tabsClasses.flexContainer}`]: {
+  // '& .MuiTabs-flexContainer'
+  ['& .MuiTabs-flexContainer']: {
     gap: '8px',
     p: '8px',
     pb: 0,
   },
+  // [`& ${tabsClasses.flexContainer}`]: {
+  //   gap: '8px',
+  //   p: '8px',
+  //   pb: 0,
+  // },
 });
 
 export function AppNavbar() {

@@ -1,7 +1,8 @@
+import { Alert } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute(
-  '/_dashboard/collections/$collectionId/documents/$documentId'
+  '/_dashboard/collections/$collectionId/documents/$documentId',
 )({
   component: RouteComponent,
   // staticData: {
@@ -11,8 +12,11 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   return (
-    <div>
-      Hello "/_dashboard/collections/$collectionId/documents/$documentId"!
-    </div>
+    <>
+      <div>
+        Hello "/_dashboard/collections/$collectionId/documents/$documentId"!
+      </div>
+      <Alert severity='warning'>TODO: view not set up yet</Alert>
+    </>
   );
 }

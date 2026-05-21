@@ -408,8 +408,10 @@ export function MenuContent() {
                 slotProps={{
                   primary: {
                     component: 'div',
-                    display: 'flex',
-                    alignItems: 'center',
+                    sx: {
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
                   },
                 }}
               />

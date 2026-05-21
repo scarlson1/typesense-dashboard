@@ -1,4 +1,5 @@
-import { AuthForm, authSchema } from '@/components/AuthForm';
+import { AuthForm } from '@/components/AuthForm';
+import { authSchema } from '@/constants/authForm';
 import { useAppForm, useAsyncToast } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import type { Environment } from '@/types';
@@ -103,10 +104,7 @@ function AuthComponent() {
           minWidth: 0,
         }}
       >
-        <Stack
-          direction='row'
-          sx={{ alignItems: 'center', gap: 1.25, mb: 6 }}
-        >
+        <Stack direction='row' sx={{ alignItems: 'center', gap: 1.25, mb: 6 }}>
           <Box
             sx={{
               width: 28,
@@ -183,8 +181,8 @@ function AuthComponent() {
               lineHeight: 1.55,
             }}
           >
-            Point this dashboard at any Typesense node — local, self-hosted,
-            or Typesense Cloud. Credentials are stored in session storage only.
+            Point this dashboard at any Typesense node — local, self-hosted, or
+            Typesense Cloud. Credentials are stored in session storage only.
           </Typography>
 
           <Box
@@ -266,10 +264,7 @@ function AuthComponent() {
             <OpenInNewRounded sx={{ fontSize: 'inherit' }} />
           </Link>
           <Box component='span' sx={{ flex: 1 }} />
-          <Box
-            component='span'
-            sx={{ fontFamily: designTokens.fontMono }}
-          >
+          <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
             v0.9.4
           </Box>
         </Stack>
@@ -338,8 +333,8 @@ function AuthComponent() {
               mb: 3.5,
             }}
           >
-            Draw a radius around any point or sketch a polygon over a region
-            — the dashboard generates the matching filter_by query for you.
+            Draw a radius around any point or sketch a polygon over a region —
+            the dashboard generates the matching filter_by query for you.
             Available on Typesense v29+.
           </Typography>
 
@@ -406,13 +401,21 @@ function AuthComponent() {
               {`$ curl -H "X-TYPESENSE-API-KEY: $KEY" \\
     "https://typesense.example.com/health"
 {`}
-              <Box component='span' sx={{ color: '#a0eebf' }}>"ok"</Box>
+              <Box component='span' sx={{ color: '#a0eebf' }}>
+                "ok"
+              </Box>
               {': '}
-              <Box component='span' sx={{ color: '#9bc5ff' }}>true</Box>
+              <Box component='span' sx={{ color: '#9bc5ff' }}>
+                true
+              </Box>
               {', '}
-              <Box component='span' sx={{ color: '#a0eebf' }}>"version"</Box>
+              <Box component='span' sx={{ color: '#a0eebf' }}>
+                "version"
+              </Box>
               {': '}
-              <Box component='span' sx={{ color: '#9bc5ff' }}>"29.0"</Box>
+              <Box component='span' sx={{ color: '#9bc5ff' }}>
+                "29.0"
+              </Box>
               {'}'}
             </Box>
           </Box>
@@ -496,8 +499,7 @@ function AuthenticatedAccounts() {
             onClick={() => handleSelect(key)}
             key={key}
             sx={{
-              borderTop:
-                i === 0 ? 'none' : `1px solid ${designTokens.border}`,
+              borderTop: i === 0 ? 'none' : `1px solid ${designTokens.border}`,
               borderRadius: 0,
             }}
           >
@@ -507,12 +509,16 @@ function AuthenticatedAccounts() {
             <ListItemText
               primary={creds.name ?? creds.env ?? key}
               secondary={creds?.env ? key : ''}
-              primaryTypographyProps={{ sx: { fontSize: 13, fontWeight: 500 } }}
-              secondaryTypographyProps={{
-                sx: {
-                  fontFamily: designTokens.fontMono,
-                  fontSize: 11,
-                  color: designTokens.textFaint,
+              slotProps={{
+                primary: {
+                  sx: { fontSize: 13, fontWeight: 500 },
+                },
+                secondary: {
+                  sx: {
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 11,
+                    color: designTokens.textFaint,
+                  },
                 },
               }}
             />

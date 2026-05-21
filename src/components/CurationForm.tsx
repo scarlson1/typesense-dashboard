@@ -17,7 +17,7 @@ export const CurationForm = withForm({
   props: {
     submitButtonText: 'Submit',
   },
-  render: ({ form, submitButtonText }) => {
+  render: function CurationFormComponent({ form, submitButtonText }) {
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const {
       rule_query_bool,

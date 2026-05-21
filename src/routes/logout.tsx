@@ -35,7 +35,7 @@ function RouteComponent() {
     } catch (err) {
       console.log('LOGOUT ERROR: ', err);
     }
-  }, [search?.clusterId]);
+  }, [search?.clusterId, logout, navigate, search]);
 
   return <Navigate to={search.redirect || '/'} replace />;
 }

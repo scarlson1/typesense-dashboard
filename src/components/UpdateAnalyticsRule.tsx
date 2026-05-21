@@ -43,7 +43,7 @@ export function UpdateAnalyticsRule({
     },
     onError: (err, vars, ctx) => {
       console.log(err, vars, ctx);
-      let msg = err?.message || 'failed to save analytics rule';
+      const msg = err?.message || 'failed to save analytics rule';
       toast.error(msg, { id: `rule-updated-${vars.name}` });
     },
     onSettled: () => {
@@ -73,7 +73,9 @@ export function UpdateAnalyticsRule({
         });
 
         form.reset();
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 
@@ -98,11 +100,11 @@ function AnalyticsRuleFormComponent({
   const { data: collectionNames } = useSuspenseQuery({
     queryKey: collectionQueryKeys.names(clusterId, { withAlias: true }),
     queryFn: async () => {
-      let collections = await client.collections().retrieve();
-      let aliasRes = await client.aliases().retrieve();
+      const collections = await client.collections().retrieve();
+      const aliasRes = await client.aliases().retrieve();
 
-      let collectionNames = collections.map((c) => c.name);
-      let aliasNames = aliasRes.aliases.map((a) => a.name);
+      const collectionNames = collections.map((c) => c.name);
+      const aliasNames = aliasRes.aliases.map((a) => a.name);
 
       return [...aliasNames, ...collectionNames];
     },

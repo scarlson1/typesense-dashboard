@@ -32,7 +32,7 @@ const ApiKeyGrid = () => {
       });
 
       const keysData: KeysRetrieveSchema | undefined = queryClient.getQueryData(
-        apiKeyQueryKeys.all(clusterId)
+        apiKeyQueryKeys.all(clusterId),
       );
       const prevKeyData = keysData?.keys.find((k) => k.id === variables);
 
@@ -40,7 +40,7 @@ const ApiKeyGrid = () => {
         apiKeyQueryKeys.all(clusterId),
         (data: KeysRetrieveSchema) => ({
           keys: data.keys?.filter((k) => k.id !== variables),
-        })
+        }),
       );
 
       toast.loading(`deleting key [${variables}]...`, { id: 'delete-key' });
@@ -53,7 +53,7 @@ const ApiKeyGrid = () => {
       });
     },
     onError: (err, _, ctx) => {
-      let msg = err.message || 'failed to delete key';
+      const msg = err.message || 'failed to delete key';
       toast.error(msg, { id: 'delete-key' });
 
       if (ctx?.prevKeyData) {
@@ -61,7 +61,7 @@ const ApiKeyGrid = () => {
           apiKeyQueryKeys.all(clusterId),
           (data: KeysRetrieveSchema) => ({
             keys: [...(data.keys || []), ctx.prevKeyData],
-          })
+          }),
         );
       }
     },
@@ -103,7 +103,9 @@ const ApiKeyGrid = () => {
                   },
                 });
                 mutation.mutate(params.row.id);
-              } catch (err) {}
+              } catch (err) {
+                console.log(err);
+              }
             }}
             label='Delete Collection'
             disabled={mutation.isPending}
@@ -111,7 +113,7 @@ const ApiKeyGrid = () => {
         ],
       },
     ],
-    [mutation.isPending, mutation.mutate]
+    [mutation.isPending, mutation.mutate],
   );
 
   if (isError)
