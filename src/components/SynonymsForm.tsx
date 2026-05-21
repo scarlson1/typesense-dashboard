@@ -1,3 +1,4 @@
+import { FormField } from '@/components/redesign';
 import { withForm } from '@/hooks';
 import { Grid } from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
@@ -9,7 +10,6 @@ const synonymsSchema = z.object({
   symbols_to_index: z.string(),
   locale: z.string(),
 });
-// export type SynonymsSchema = z.infer<typeof synonymsSchema>;
 
 export const synonymsFormOpts = formOptions({
   defaultValues: {
@@ -27,65 +27,80 @@ export const SynonymsForm = withForm({
   ...synonymsFormOpts,
   render: ({ form }) => {
     return (
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6 }}>
+      <Grid container spacing={1.75}>
+        <Grid size={{ xs: 12 }}>
           <form.AppField name='synonyms'>
             {({ TextField }) => (
-              <TextField
-                id='synonyms'
-                label='Synonyms'
+              <FormField
+                label='Synonym terms'
+                hint='comma separated'
                 required
-                fullWidth
-                variant='outlined'
-                helperText='Separate words by commas'
-              />
+                htmlFor='synonyms'
+              >
+                <TextField
+                  id='synonyms'
+                  required
+                  fullWidth
+                  size='small'
+                  variant='outlined'
+                  placeholder='e.g. apartment, flat, condo'
+                />
+              </FormField>
             )}
           </form.AppField>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12 }}>
           <form.AppField name='root'>
             {({ TextField }) => (
-              <TextField
-                id='root'
+              <FormField
                 label='Root'
-                fullWidth
-                variant='outlined'
-                helperText='Leave empty to create a multi-way synonym'
-              />
+                hint='empty for multi-way'
+                htmlFor='root'
+              >
+                <TextField
+                  id='root'
+                  fullWidth
+                  size='small'
+                  variant='outlined'
+                  placeholder='e.g. apt'
+                />
+              </FormField>
             )}
           </form.AppField>
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <form.AppField name='symbols_to_index'>
             {({ TextField }) => (
-              <TextField
-                id='symbols_to_index'
-                label='Symbols to Index'
-                fullWidth
-                variant='outlined'
-                placeholder='e.g. +,-,_'
-                helperText='Separate symbols by commas'
-              />
+              <FormField label='Symbols to index' htmlFor='symbols_to_index'>
+                <TextField
+                  id='symbols_to_index'
+                  fullWidth
+                  size='small'
+                  variant='outlined'
+                  placeholder='+ # @'
+                />
+              </FormField>
             )}
           </form.AppField>
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <form.AppField name='locale'>
             {({ TextField }) => (
-              <TextField
-                id='locale'
-                label='Locale'
-                fullWidth
-                variant='outlined'
-                placeholder='e.g. en or jp'
-                helperText='Leave blank to auto-detect'
-              />
+              <FormField label='Locale' htmlFor='locale'>
+                <TextField
+                  id='locale'
+                  fullWidth
+                  size='small'
+                  variant='outlined'
+                  placeholder='auto'
+                />
+              </FormField>
             )}
           </form.AppField>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <form.AppForm>
-            <form.SubmitButton label='Add' />
+            <form.SubmitButton label='Add rule' fullWidth />
           </form.AppForm>
         </Grid>
       </Grid>

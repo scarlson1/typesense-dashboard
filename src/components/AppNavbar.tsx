@@ -11,7 +11,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { ColorModeIconDropdown } from './ColorModeIconDropdown';
+// import { ColorModeIconDropdown } from './ColorModeIconDropdown';
+import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { MenuButton } from './MenuButton';
 import SideMenuMobile from './SideMenuMobile';
 
@@ -81,7 +82,7 @@ export function AppNavbar() {
               Dashboard
             </Typography>
           </Stack>
-          <ColorModeIconDropdown />
+          <ThemeModeToggle />
           <MenuButton aria-label='menu' onClick={toggleDrawer(true)}>
             <MenuRounded />
           </MenuButton>

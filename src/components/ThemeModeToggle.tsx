@@ -40,8 +40,8 @@ const StyledButton = styled(IconButton)(({ theme }) => ({
     duration: theme.transitions.duration.standard,
   }),
   outline: 'none',
-  minHeight: '40px',
-  minWidth: '40px',
+  minHeight: '36px',
+  minWidth: '36px',
   border: '1.5px solid transparent',
   '&:hover': {
     borderColor: theme.vars.palette.grey[300], // 'var(--color-primary)',

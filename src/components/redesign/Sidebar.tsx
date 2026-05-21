@@ -17,7 +17,15 @@ import {
   StorageRounded,
   FrontHandRounded,
 } from '@mui/icons-material';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Divider,
+  MenuItem,
+  Select,
+  type SelectChangeEvent,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
@@ -368,22 +376,52 @@ export function Sidebar() {
             gap: '1px',
           }}
         >
-          {selectedCollection ? (
-            <Typography
+          {collections.length ? (
+            <Select
+              value={selectedCollection}
+              onChange={(e: SelectChangeEvent) =>
+                setSelectedCollection(e.target.value)
+              }
+              displayEmpty
+              size='small'
+              fullWidth
+              MenuProps={{ sx: { maxHeight: 360 } }}
               sx={{
-                fontSize: 11,
-                color: designTokens.textFaint,
-                px: 1.125,
-                py: 0.5,
+                my: 0.5,
+                fontSize: 12,
                 fontFamily: designTokens.fontMono,
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
+                background: designTokens.surfaceMuted,
+                borderRadius: '6px',
+                color: designTokens.text,
+                '& .MuiSelect-select': {
+                  py: 0.625,
+                  px: 1.125,
+                  minHeight: 'unset',
+                },
+                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  border: 'none',
+                },
+                '& .MuiSelect-icon': {
+                  color: designTokens.textFaint,
+                  fontSize: 16,
+                },
               }}
-              title={selectedCollection}
             >
-              {selectedCollection}
-            </Typography>
+              <MenuItem value='' sx={{ fontSize: 12 }}>
+                —
+              </MenuItem>
+              {collections.map((c) => (
+                <MenuItem
+                  key={c.name}
+                  value={c.name}
+                  sx={{ fontSize: 12, fontFamily: designTokens.fontMono }}
+                >
+                  {c.name}
+                </MenuItem>
+              ))}
+            </Select>
           ) : null}
           {collectionChildren.map((c) => (
             <SidebarLink

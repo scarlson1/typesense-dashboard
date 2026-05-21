@@ -4,6 +4,7 @@ export { PageHeader } from './PageHeader';
 export { StatCard } from './StatCard';
 export { Sparkline, BigChart } from './Sparkline';
 export { SectionCard } from './SectionCard';
+export { FormField } from './FormField';
 export { TopBar } from './TopBar';
 export { Sidebar, SidebarBoundary } from './Sidebar';
 export {
