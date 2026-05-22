@@ -14,12 +14,13 @@ export function CircularProgressWithLabel({
   value,
   ...props
 }: CircularProgressWithLabelProps) {
+  const safeValue = isFinite(value as number) ? value : 0;
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
       <Box sx={{ position: 'relative', display: 'grid' }}>
         <CircularProgress
           variant='determinate'
-          value={value}
+          value={safeValue}
           sx={{
             zIndex: 2,
             gridColumn: 1,
@@ -56,7 +57,7 @@ export function CircularProgressWithLabel({
           variant='caption'
           component='div'
           sx={{ color: 'text.secondary' }}
-        >{`${value}%`}</Typography>
+        >{`${safeValue}%`}</Typography>
       </Box>
     </Box>
   );

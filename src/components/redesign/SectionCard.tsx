@@ -42,6 +42,7 @@ export const SectionCard = ({
           <Box sx={{ flex: 1, minWidth: 0 }}>
             {title ? (
               <Typography
+                component='div'
                 sx={{
                   fontSize: 14,
                   fontWeight: 600,
@@ -54,6 +55,7 @@ export const SectionCard = ({
             ) : null}
             {description ? (
               <Typography
+                component='div'
                 sx={{
                   fontSize: 12.5,
                   color: designTokens.textMuted,

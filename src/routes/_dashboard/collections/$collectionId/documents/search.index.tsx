@@ -1,8 +1,4 @@
-import {
-  Badge,
-  SectionCard,
-  smallButtonSx,
-} from '@/components/redesign';
+import { Badge, SectionCard, smallButtonSx } from '@/components/redesign';
 import {
   ContextHits,
   CtxPageSize,
@@ -15,21 +11,9 @@ import {
 } from '@/components/search';
 import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
 import { designTokens } from '@/theme/themePrimitives';
-import {
-  AddRounded,
-  OpenInNewRounded,
-} from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Link,
-  Stack,
-  Typography,
-} from '@mui/material';
-import {
-  createFileRoute,
-  Link as RouterLink,
-} from '@tanstack/react-router';
+import { AddRounded, OpenInNewRounded } from '@mui/icons-material';
+import { Box, Button, Link, Stack, Typography } from '@mui/material';
+import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
 export const Route = createFileRoute(
@@ -45,18 +29,15 @@ function RouteComponent() {
     <Stack sx={{ gap: 2 }}>
       {/* Search bar card */}
       <Box
-        sx={{
-          backgroundColor: 'background.paper',
-          border: `1px solid ${designTokens.border}`,
-          borderRadius: 1,
-          px: 2,
-          py: 1.75,
-        }}
+      // sx={{
+      //   backgroundColor: 'background.paper',
+      //   border: `1px solid ${designTokens.border}`,
+      //   borderRadius: 1,
+      //   px: 2,
+      //   py: 1.75,
+      // }}
       >
-        <Stack
-          direction='row'
-          sx={{ gap: 1.25, alignItems: 'center' }}
-        >
+        <Stack direction='row' sx={{ gap: 1.25, alignItems: 'center' }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <SearchBox sx={{ my: 0 }} />
           </Box>
@@ -73,7 +54,7 @@ function RouteComponent() {
           }}
         >
           <CtxSearchStats />
-          <Badge tone='neutral'>fast · indexed</Badge>
+          {/* <Badge tone='neutral'>fast · indexed</Badge> */}
         </Stack>
       </Box>
 
@@ -127,8 +108,8 @@ function RouteComponent() {
           <>
             Ranking, relevance, and query fine-tuning. These map 1:1 to
             Typesense search params, so they work with whatever schema your
-            collection has. Save a configuration as a preset to recall from
-            your application code.{' '}
+            collection has. Save a configuration as a preset to recall from your
+            application code.{' '}
             <Link
               href='https://typesense.org/docs/29.0/api/search.html#search-parameters'
               target='_blank'
@@ -150,9 +131,7 @@ function RouteComponent() {
       >
         <Suspense
           fallback={
-            <Box
-              sx={{ height: 200, background: designTokens.surfaceMuted }}
-            />
+            <Box sx={{ height: 200, background: designTokens.surfaceMuted }} />
           }
         >
           <UpdateSearchParameters

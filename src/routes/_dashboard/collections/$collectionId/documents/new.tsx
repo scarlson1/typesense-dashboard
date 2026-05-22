@@ -43,22 +43,14 @@ import {
   Select,
   Skeleton,
   Stack,
-  Typography,
   Tooltip,
+  Typography,
   Zoom,
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { editor } from 'monaco-editor';
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { DocumentImportParameters } from 'typesense/lib/Typesense/Documents';
 import { useStore } from 'zustand';
 
@@ -424,6 +416,109 @@ function MultiDocImportResult({
   );
 }
 
+type SdkType =
+  | 'Javascript'
+  | 'Go'
+  | 'Python'
+  | 'PHP'
+  | 'Ruby'
+  | 'Dart'
+  | 'Java'
+  | 'Swift'
+  | 'Shell';
+
+function getSdkImportSnippet(
+  lang: SdkType,
+  {
+    node,
+    port,
+    protocol,
+    collection,
+  }: {
+    node: string | number;
+    port: number | string;
+    protocol: string;
+    collection: string;
+  },
+) {
+  switch (lang) {
+    case 'Javascript':
+      return `import Typesense from 'typesense';
+
+const client = new Typesense.Client({
+  nodes: [{ host: '${node}', port: ${port || 443}, protocol: '${protocol}' }],
+  apiKey: 'YOUR_API_KEY',
+});
+
+await client.collections('${collection}').documents()
+  .import(documentsInJsonl, { action: 'create' });`;
+
+    case 'Dart':
+      return `final file = File('documents.jsonl');
+await client.collection('companies').documents.importJSONL(file.readAsStringSync());`;
+
+    case 'Go':
+      return `params := &api.ImportDocumentsParams{
+	Action: pointer.Any(api.Create),
+}
+documentsInJsonl, err := os.Open("documents.jsonl")
+// defer close, error handling ...
+
+client.Collection("companies").Documents().ImportJsonl(context.Background(), documentsInJsonl, params)`;
+
+    case 'Java':
+      return `File myObj = new File("/books.jsonl");
+ImportDocumentsParameters queryParameters = new ImportDocumentsParameters();
+Scanner myReader = new Scanner(myObj);
+StringBuilder data = new StringBuilder();
+while (myReader.hasNextLine()) {
+    data.append(myReader.nextLine()).append("\n");
+}
+client.collections("books").documents().import_(data.toString(), queryParameters);`;
+
+    case 'PHP':
+      return `$documentsInJsonl = file_get_contents('documents.jsonl');
+client.collections['companies'].documents.import($documentsInJsonl, ['action' => 'create']);`;
+
+    case 'Python':
+      return `with open('documents.jsonl') as jsonl_file:
+  client.collections['companies'].documents.import_(jsonl_file.read().encode('utf-8'), {'action': 'create'})`;
+
+    case 'Ruby':
+      return `documents_jsonl = File.read('documents.jsonl')
+collections['companies'].documents.import(documents_jsonl, action: 'create')`;
+
+    case 'Shell':
+      return `curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \
+      -X POST \
+      -T documents.jsonl \
+      "http://localhost:8108/collections/companies/documents/import?action=create"
+
+# If you have a large JSONL file,
+#   you can split the file and
+#   parallelize the import using this one liner:
+parallel --block -5 -a documents.jsonl --tmpdir /tmp --pipepart --cat 'curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" -X POST -T {} http://localhost:8108/collections/companies/documents/import?action=create'
+`;
+
+    case 'Swift':
+      return `let urlPath = URL(fileURLWithPath: "<PATH_TO>/documents.jsonl")
+let jsonL = try Data(contentsOf: urlPath)
+
+let (data, response) = try await client.collection(name: "companies").documents().importBatch(jsonL)`;
+
+    default:
+      return `import Typesense from 'typesense';
+
+const client = new Typesense.Client({
+  nodes: [{ host: '${node}', port: ${port || 443}, protocol: '${protocol}' }],
+  apiKey: 'YOUR_API_KEY',
+});
+
+await client.collections('${collection}').documents()
+  .import(documentsInJsonl, { action: 'create' });`;
+  }
+}
+
 function CodeSnippetCard({
   method,
   collectionId,
@@ -439,6 +534,9 @@ function CodeSnippetCard({
   const port = protocol === 'http' ? credentials?.port || '[PORT]' : '';
   const collection = collectionId || '[COLLECTION_NAME]';
 
+  const [sdkLang, setSdkLang] = useState<SdkType>('Javascript');
+  const [, copy, copied] = useCopyToClipboard(2000);
+
   const url = `${protocol}://${node}${port ? `:${port}` : ''}/collections/${collection}/documents/import?action=create`;
 
   let title = '';
@@ -452,6 +550,8 @@ curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\
   -T documents.jsonl \\
   "${url}"`;
   } else if (method === 'curl') {
+    // TODO: CSV: mlr --icsv --ojsonl cat documents.csv > documents.jsonl
+    //
     title = 'Convert JSON → JSONL, then import';
     snippet = `jq -c '.[]' documents.json > documents.jsonl
 
@@ -462,18 +562,58 @@ curl -H "X-TYPESENSE-API-KEY: \${TYPESENSE_API_KEY}" \\
   -T documents.jsonl \\
   "${url}"`;
   } else {
-    title = 'JavaScript SDK';
-    snippet = `import Typesense from 'typesense';
-const client = new Typesense.Client({
-  nodes: [{ host: '${node}', port: ${port || 443}, protocol: '${protocol}' }],
-  apiKey: 'YOUR_API_KEY',
-});
-await client.collections('${collection}').documents()
-  .import(documents, { action: 'create' });`;
+    snippet = getSdkImportSnippet(sdkLang, {
+      node,
+      port,
+      protocol,
+      collection,
+    });
+    title = 'SDK';
+    //     snippet = `import Typesense from 'typesense';
+
+    // const client = new Typesense.Client({
+    //   nodes: [{ host: '${node}', port: ${port || 443}, protocol: '${protocol}' }],
+    //   apiKey: 'YOUR_API_KEY',
+    // });
+
+    // await client.collections('${collection}').documents()
+    //   .import(documentsInJsonl, { action: 'create' });`;
   }
 
+  const handleCopy = useCallback(async () => {
+    await copy(snippet);
+  }, [copy, snippet]);
+
   return (
-    <SectionCard title={title}>
+    <SectionCard
+      title={title}
+      actions={
+        method === 'sdk' ? (
+          <FormControl variant='standard' sx={{ minWidth: 100 }} size='small'>
+            {/* <InputLabel id='lang-label'>Language</InputLabel> */}
+            <Select
+              // labelId='lang-label'
+              id='lang-input'
+              size='small'
+              value={sdkLang}
+              onChange={(e: SelectChangeEvent) => {
+                setSdkLang(e.target.value as SdkType);
+              }}
+            >
+              <MenuItem value={'Javascript'}>Javascript</MenuItem>
+              <MenuItem value={'Go'}>Go</MenuItem>
+              <MenuItem value={'Python'}>Python</MenuItem>
+              <MenuItem value={'PHP'}>PHP</MenuItem>
+              <MenuItem value={'Ruby'}>Ruby</MenuItem>
+              <MenuItem value={'Dart'}>Dart</MenuItem>
+              <MenuItem value={'Java'}>Java</MenuItem>
+              <MenuItem value={'Swift'}>Swift</MenuItem>
+              <MenuItem value={'Shell'}>Shell</MenuItem>
+            </Select>
+          </FormControl>
+        ) : null
+      }
+    >
       <Box
         component='pre'
         sx={{
@@ -487,9 +627,36 @@ await client.collections('${collection}').documents()
           lineHeight: 1.6,
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-all',
+          position: 'relative',
         }}
       >
         {snippet}
+        <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
+          <IconButton
+            size='small'
+            onClick={handleCopy}
+            sx={{
+              color: copied ? designTokens.success : designTokens.textFaint,
+              p: 0.5,
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              width: 26,
+              height: 26,
+              transition: 'color 0.2s ease',
+              '&:hover': {
+                color: copied ? designTokens.success : designTokens.codeText,
+              },
+            }}
+          >
+            <Zoom in={!copied} timeout={180} unmountOnExit>
+              <ContentCopyRounded sx={{ fontSize: 14, position: 'absolute' }} />
+            </Zoom>
+            <Zoom in={copied} timeout={180} unmountOnExit>
+              <CheckRounded sx={{ fontSize: 16, position: 'absolute' }} />
+            </Zoom>
+          </IconButton>
+        </Tooltip>
       </Box>
     </SectionCard>
   );
@@ -577,8 +744,7 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
   const node = credentials?.node || '[YOUR_NODE]';
   const port = protocol === 'http' ? credentials?.port || '[PORT]' : '';
 
-  const [, copy] = useCopyToClipboard();
-  const [copied, setCopied] = useState(false);
+  const [, copy, copied] = useCopyToClipboard(2000);
 
   const curlCommand = `curl -H "X-TYPESENSE-API-KEY: $KEY" \\
   -X POST \\
@@ -586,15 +752,8 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
   "${protocol}://${node}${port ? `:${port}` : ''}/collections/${collectionId}/documents/import?action=create"`;
 
   const handleCopy = useCallback(async () => {
-    const success = await copy(curlCommand);
-    if (success) setCopied(true);
+    await copy(curlCommand);
   }, [copy, curlCommand]);
-
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 2000);
-    return () => clearTimeout(timer);
-  }, [copied]);
 
   return (
     <Box
@@ -604,6 +763,7 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
         p: 1.75,
         color: designTokens.codeText,
         position: 'relative',
+        border: (t) => `1px solid ${t.vars.palette.divider}`,
       }}
     >
       <Box
@@ -642,9 +802,7 @@ function CurlSampleCard({ collectionId }: { collectionId: string }) {
             }}
           >
             <Zoom in={!copied} timeout={180} unmountOnExit>
-              <ContentCopyRounded
-                sx={{ fontSize: 14, position: 'absolute' }}
-              />
+              <ContentCopyRounded sx={{ fontSize: 14, position: 'absolute' }} />
             </Zoom>
             <Zoom in={copied} timeout={180} unmountOnExit>
               <CheckRounded sx={{ fontSize: 16, position: 'absolute' }} />

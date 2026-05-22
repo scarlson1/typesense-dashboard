@@ -304,6 +304,8 @@ export const colorSchemes = {
         dark: gray[700],
         contrastText: gray[50],
       },
+      // Explicit channel to satisfy MUI CSS vars channel generation (gray[400] ≈ rgb(163,173,184))
+      secondaryChannel: '163 173 184',
       info: {
         light: brand[100],
         main: brand[300],
@@ -360,6 +362,8 @@ export const colorSchemes = {
         main: gray[400],
         dark: gray[700],
       },
+      // Explicit channel to satisfy MUI CSS vars channel generation (gray[400] ≈ rgb(163,173,184))
+      secondaryChannel: '163 173 184',
       info: {
         contrastText: brand[300],
         light: brand[500],
