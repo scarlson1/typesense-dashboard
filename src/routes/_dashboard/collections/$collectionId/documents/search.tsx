@@ -16,10 +16,9 @@ import {
 import { designTokens } from '@/theme/themePrimitives';
 import {
   AddRounded,
-  DownloadRounded,
   GridViewRounded,
   MapRounded,
-  SettingsRounded,
+  TuneRounded,
 } from '@mui/icons-material';
 import {
   Box,
@@ -223,24 +222,16 @@ function CollectionPageHeader({
           <Button
             variant='outlined'
             size='small'
-            startIcon={<DownloadRounded sx={{ fontSize: 14 }} />}
+            startIcon={<TuneRounded sx={{ fontSize: 14 }} />}
             sx={smallButtonSx}
-            component={RouterLink as React.ElementType}
-            to='/collections/$collectionId/documents/export'
-            params={{ collectionId }}
+            onClick={() => {
+              document.getElementById('search-params')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }}
           >
-            Export
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<SettingsRounded sx={{ fontSize: 14 }} />}
-            sx={smallButtonSx}
-            component={RouterLink as React.ElementType}
-            to='/collections/$collectionId/config'
-            params={{ collectionId }}
-          >
-            Schema
+            Search parameters
           </Button>
           <Button
             variant='contained'

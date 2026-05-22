@@ -1,10 +1,10 @@
-import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
 import {
-  FieldRow,
   fieldChipSx,
   fieldInputSx,
+  FieldRow,
   ghostButtonSx,
 } from '@/components/redesign';
+import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
 import {
   useCollectionSchema,
   useCollectionSearchPreset,
@@ -28,6 +28,8 @@ import {
   type Theme,
 } from '@mui/material';
 import { useCallback, useEffect, useMemo } from 'react';
+
+// TODO: persist display preferences to local storage (per collection)
 
 const imgFitOptions: CSSProperties['backgroundSize'][] = [
   'auto',
@@ -218,11 +220,7 @@ export function DashboardDisplayOptions() {
           value={slotProps.hit?.displayFields || []}
           onChange={handleFieldsChange}
           renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder='Add field…'
-              sx={fieldInputSx}
-            />
+            <TextField {...params} placeholder='Add field…' sx={fieldInputSx} />
           )}
           slotProps={{
             paper: { sx: autocompletePaperSx },
@@ -296,10 +294,7 @@ export function DashboardDisplayOptions() {
                 v ? (
                   String(v)
                 ) : (
-                  <Box
-                    component='span'
-                    sx={{ color: designTokens.textFaint }}
-                  >
+                  <Box component='span' sx={{ color: designTokens.textFaint }}>
                     Image size…
                   </Box>
                 )
@@ -326,11 +321,7 @@ export function DashboardDisplayOptions() {
       </FieldRow>
 
       <FieldRow label='Columns in view' align='center'>
-        <Stack
-          direction='row'
-          spacing={1.25}
-          sx={{ alignItems: 'center' }}
-        >
+        <Stack direction='row' spacing={1.25} sx={{ alignItems: 'center' }}>
           <Box sx={{ width: 180 }}>
             <Select
               labelId='display-columns-label'

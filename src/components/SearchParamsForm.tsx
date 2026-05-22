@@ -50,7 +50,18 @@ const SearchParamsFormFields = ({
   submitButtonText,
 }: SearchParamsFormFieldsProps) => {
   const presetOptions = useMemo(() => presets.map((p) => p.name), [presets]);
-  const isDirty = useStore(form.store, (state) => state.isDirty);
+  const formValues = useStore(form.store, (state) => state.values);
+
+  const hasUnsavedChanges = useMemo(() => {
+    const currentPresetName = formValues.preset;
+    if (!currentPresetName) return false;
+    const matched = presets.find((p) => p.name === currentPresetName);
+    if (!matched) return true;
+    return !isEqual(
+      omitPreset(formValues),
+      omitPreset(presetToFormValues(matched)),
+    );
+  }, [formValues, presets]);
 
   const prevQueryByOptions = usePrevious(queryByOptions);
   useEffect(() => {
@@ -63,24 +74,12 @@ const SearchParamsFormFields = ({
     (newVal: string) => {
       const existingPreset = presets.find((p) => p.name === newVal);
       if (existingPreset) {
-        const { query_by, sort_by, facet_by, group_by, ...rest } = getParams(
-          existingPreset.value,
-        );
-
-        form.setFieldValue('query_by', getArrayVal(splitIfString(query_by)));
-        form.setFieldValue('sort_by', getArrayVal(splitIfString(sort_by)));
-        form.setFieldValue('facet_by', getArrayVal(splitIfString(facet_by)));
-        form.setFieldValue('group_by', getArrayVal(splitIfString(group_by)));
-
-        let otherParams = [NEW_EMPTY_OTHER_PARAM];
-        const otherParamsEntries = Object.entries(rest);
-        if (otherParamsEntries.length) {
-          otherParams = otherParamsEntries.map(([k, v]) => ({
-            param: k,
-            value: typeof v === 'string' ? v : JSON.stringify(v),
-          }));
-        }
-        form.setFieldValue('other_params', otherParams);
+        const values = presetToFormValues(existingPreset);
+        form.setFieldValue('query_by', values.query_by);
+        form.setFieldValue('sort_by', values.sort_by);
+        form.setFieldValue('facet_by', values.facet_by);
+        form.setFieldValue('group_by', values.group_by);
+        form.setFieldValue('other_params', values.other_params);
       }
     },
     [presets],
@@ -118,7 +117,6 @@ const SearchParamsFormFields = ({
               <Autocomplete
                 freeSolo
                 autoSelect
-                disablePortal
                 label=''
                 options={presetOptions}
                 slotProps={{
@@ -156,7 +154,6 @@ const SearchParamsFormFields = ({
           <form.AppField name='query_by' mode='array'>
             {({ Autocomplete }) => (
               <Autocomplete
-                disablePortal
                 label=''
                 multiple
                 limitTags={4}
@@ -179,7 +176,6 @@ const SearchParamsFormFields = ({
           <form.AppField name='sort_by' mode='array'>
             {({ Autocomplete }) => (
               <Autocomplete
-                disablePortal
                 label=''
                 multiple
                 limitTags={4}
@@ -205,7 +201,6 @@ const SearchParamsFormFields = ({
           <form.AppField name='facet_by' mode='array'>
             {({ Autocomplete }) => (
               <Autocomplete
-                disablePortal
                 label=''
                 multiple
                 limitTags={4}
@@ -228,7 +223,6 @@ const SearchParamsFormFields = ({
           <form.AppField name='group_by' mode='array'>
             {({ Autocomplete }) => (
               <Autocomplete
-                disablePortal
                 label=''
                 multiple
                 limitTags={4}
@@ -261,7 +255,6 @@ const SearchParamsFormFields = ({
                       <form.Field name={`other_params[${i}].param`}>
                         {({ state, handleChange, handleBlur }) => (
                           <MuiAutocomplete
-                            disablePortal
                             options={filteredParamKeys}
                             sx={{ flex: 1, minWidth: 0 }}
                             value={state.value}
@@ -374,7 +367,7 @@ const SearchParamsFormFields = ({
           spacing={1}
           sx={{ alignItems: 'center', flex: 1, minWidth: 0 }}
         >
-          {isDirty ? (
+          {hasUnsavedChanges ? (
             <>
               <Box
                 sx={{
@@ -430,4 +423,31 @@ function getParams<T extends DocumentSchema = DocumentSchema>(
   if ((val as MultiSearchRequestsSchema<T, string>).searches !== undefined)
     return (val as MultiSearchRequestsSchema<T, string>).searches[0];
   return val as SearchParams<T>;
+}
+
+function presetToFormValues(preset: PresetSchema<DocumentSchema>) {
+  const { query_by, sort_by, facet_by, group_by, ...rest } = getParams(
+    preset.value,
+  );
+  let otherParams = [NEW_EMPTY_OTHER_PARAM];
+  const otherParamsEntries = Object.entries(rest);
+  if (otherParamsEntries.length) {
+    otherParams = otherParamsEntries.map(([k, v]) => ({
+      param: k,
+      value: typeof v === 'string' ? v : JSON.stringify(v),
+    }));
+  }
+  return {
+    preset: preset.name,
+    query_by: getArrayVal(splitIfString(query_by)),
+    sort_by: getArrayVal(splitIfString(sort_by)),
+    facet_by: getArrayVal(splitIfString(facet_by)),
+    group_by: getArrayVal(splitIfString(group_by)),
+    other_params: otherParams,
+  };
+}
+
+function omitPreset<T extends { preset?: unknown }>(values: T) {
+  const { preset: _preset, ...rest } = values;
+  return rest;
 }
