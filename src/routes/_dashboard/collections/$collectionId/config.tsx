@@ -1,4 +1,6 @@
 import { ErrorFallback } from '@/components';
+import { SchemaFieldEditDialog } from '@/components/SchemaFieldEditDialog';
+import { SchemaTableView } from '@/components/SchemaTableView';
 import {
   Badge,
   dangerButtonSx,
@@ -49,7 +51,10 @@ import {
   useState,
 } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
+import type {
+  CollectionFieldSchema,
+  CollectionUpdateSchema,
+} from 'typesense/lib/Typesense/Collection';
 
 const JsonEditor = lazy(() => import('../../../../components/JsonEditor'));
 
@@ -60,6 +65,8 @@ export const Route = createFileRoute(
   staticData: { crumb: 'Config' },
 });
 
+type SchemaView = 'table' | 'json';
+
 function CollectionSettings() {
   const { collectionId } = Route.useParams();
   const toast = useAsyncToast();
@@ -68,6 +75,9 @@ function CollectionSettings() {
     DEFAULT_MONACO_OPTIONS,
   );
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
+  const [view, setView] = useState<SchemaView>('table');
+  const [editingField, setEditingField] =
+    useState<CollectionFieldSchema | null>(null);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const dialog = useDialog();
@@ -79,6 +89,22 @@ function CollectionSettings() {
       setOptions((o) => ({ ...o, readOnly: false }));
     },
   });
+
+  const fieldEditMutation = useUpdateCollection({
+    onSuccess: () => setEditingField(null),
+  });
+
+  const handleSaveField = useCallback(
+    (updated: CollectionFieldSchema) => {
+      fieldEditMutation.mutate({
+        colName: collectionId,
+        updates: {
+          fields: [{ name: updated.name, drop: true }, updated],
+        },
+      });
+    },
+    [collectionId, fieldEditMutation],
+  );
 
   const handleUpdateSchema = useCallback(async () => {
     if (markers.length) {
@@ -205,7 +231,14 @@ function CollectionSettings() {
       >
         <Box sx={{ minWidth: 0 }}>
           <SectionCard noBodyPadding>
-            <Box sx={{ borderRadius: 0, overflow: 'hidden' }}>
+            <SchemaViewTabs view={view} onChange={setView} />
+            <Box
+              sx={{
+                borderRadius: 0,
+                overflow: 'hidden',
+                display: view === 'json' ? 'block' : 'none',
+              }}
+            >
               <Suspense fallback={<Skeleton variant='rounded' height='70vh' />}>
                 <JsonEditor
                   height='70vh'
@@ -217,8 +250,21 @@ function CollectionSettings() {
                 />
               </Suspense>
             </Box>
+            {view === 'table' ? (
+              <SchemaTableView
+                fields={data.fields ?? []}
+                onEditField={setEditingField}
+              />
+            ) : null}
           </SectionCard>
         </Box>
+
+        <SchemaFieldEditDialog
+          field={editingField}
+          onClose={() => setEditingField(null)}
+          onSave={handleSaveField}
+          saving={fieldEditMutation.isPending}
+        />
 
         <Stack sx={{ gap: 1.5, minWidth: 0 }}>
           <CollectionSettingsCard collectionId={collectionId} />
@@ -233,6 +279,60 @@ function CollectionSettings() {
           </ErrorBoundary>
         </Stack>
       </Box>
+    </Stack>
+  );
+}
+
+const VIEW_TABS: { value: SchemaView; label: string }[] = [
+  { value: 'table', label: 'Table' },
+  { value: 'json', label: 'JSON' },
+];
+
+function SchemaViewTabs({
+  view,
+  onChange,
+}: {
+  view: SchemaView;
+  onChange: (next: SchemaView) => void;
+}) {
+  return (
+    <Stack
+      direction='row'
+      sx={{
+        gap: 0.5,
+        px: 1.25,
+        pt: 0.5,
+        borderBottom: `1px solid ${designTokens.border}`,
+        background: designTokens.surface,
+      }}
+    >
+      {VIEW_TABS.map((t) => {
+        const active = t.value === view;
+        return (
+          <Box
+            key={t.value}
+            onClick={() => onChange(t.value)}
+            sx={{
+              px: 1.5,
+              py: 1,
+              fontSize: 13,
+              fontWeight: active ? 600 : 500,
+              color: active ? designTokens.text : designTokens.textMuted,
+              cursor: 'pointer',
+              borderBottom: active
+                ? `2px solid ${designTokens.accent}`
+                : '2px solid transparent',
+              mb: '-1px',
+              transition: 'color 120ms ease',
+              '&:hover': {
+                color: designTokens.text,
+              },
+            }}
+          >
+            {t.label}
+          </Box>
+        );
+      })}
     </Stack>
   );
 }
