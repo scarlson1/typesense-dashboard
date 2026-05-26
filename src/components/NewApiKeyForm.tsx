@@ -30,7 +30,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  Chip,
   Stack,
   TextField,
   type Theme,
@@ -141,7 +140,7 @@ const NewApiKeyForm = ({
         label='Actions'
         helperText='Pick one or more actions this key is allowed to perform.'
       >
-        <Autocomplete<ActionOption, true, false, false>
+        <Autocomplete
           multiple
           disableCloseOnSelect
           options={ACTION_OPTIONS}
@@ -157,21 +156,8 @@ const NewApiKeyForm = ({
           }
           slotProps={{
             paper: { sx: autocompletePaperSx },
+            chip: { size: 'small', sx: fieldChipSx },
           }}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => {
-              const { key, ...tagProps } = getTagProps({ index });
-              return (
-                <Chip
-                  key={key}
-                  size='small'
-                  label={option.value}
-                  sx={fieldChipSx}
-                  {...tagProps}
-                />
-              );
-            })
-          }
           renderInput={(params) => (
             <TextField
               {...params}
@@ -186,7 +172,7 @@ const NewApiKeyForm = ({
         label='Collections'
         helperText='Use * to scope this key to every collection.'
       >
-        <Autocomplete<string, true, false, true>
+        <Autocomplete
           multiple
           freeSolo
           disableCloseOnSelect
@@ -195,21 +181,8 @@ const NewApiKeyForm = ({
           onChange={(_, next) => update('collections', next as string[])}
           slotProps={{
             paper: { sx: autocompletePaperSx },
+            chip: { size: 'small', sx: fieldChipSx },
           }}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => {
-              const { key, ...tagProps } = getTagProps({ index });
-              return (
-                <Chip
-                  key={key}
-                  size='small'
-                  label={option}
-                  sx={fieldChipSx}
-                  {...tagProps}
-                />
-              );
-            })
-          }
           renderInput={(params) => (
             <TextField
               {...params}
