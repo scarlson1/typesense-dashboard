@@ -2,13 +2,16 @@ import { AnalyticsRulesList } from '@/components/AnalyticsRulesList';
 import {
   Badge,
   PageHeader,
-  SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
 import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from '@/components';
+import { captureException } from '@sentry/react';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,
@@ -45,12 +48,14 @@ function RouteComponent() {
           minHeight: 0,
         }}
       >
-        <SectionCard
-          title='Rules'
-          description='Capture searches into a separate Typesense collection for analysis, autocomplete, and reporting.'
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => captureException(err)}
         >
-          <AnalyticsRulesList />
-        </SectionCard>
+          <Suspense>
+            <AnalyticsRulesList />
+          </Suspense>
+        </ErrorBoundary>
       </Box>
     </Stack>
   );
