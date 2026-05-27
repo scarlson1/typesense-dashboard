@@ -1,9 +1,9 @@
 import { CollectionProvider } from '@/components/CollectionProvider';
-import { CollectionSwitcher } from '@/components/CollectionSwitcher';
 import { InstantSearch } from '@/components/InstantSearch';
 import {
   Badge,
   CollectionTabBar,
+  MobileCollectionScopeStrip,
   PageHeader,
   primaryButtonSx,
 } from '@/components/redesign';
@@ -115,17 +115,6 @@ function SearchLayout() {
           }}
         >
           <Stack sx={{ minWidth: 0 }}>
-            <Box
-              sx={{
-                display: { xs: 'flex', md: 'none' },
-                px: 2,
-                pt: 2,
-                pb: 0.5,
-                backgroundColor: 'background.paper',
-              }}
-            >
-              <CollectionSwitcher currentCollectionId={collectionId} />
-            </Box>
             <Suspense fallback={<CollectionPageHeader collectionId={collectionId} numDocs={0} />}>
               <CollectionPageHeaderConnected collectionId={collectionId} />
             </Suspense>
@@ -141,6 +130,7 @@ function SearchLayout() {
             >
               <Outlet />
             </Box>
+            <MobileCollectionScopeStrip currentCollectionId={collectionId} />
           </Stack>
         </SearchSlotsProvider>
       </InstantSearch>
@@ -229,9 +219,7 @@ function CollectionPageHeader({
       }
       actions={
         <>
-          <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
-            <ViewToggleButtons />
-          </Box>
+          <ViewToggleButtons />
           <Button
             variant='contained'
             size='small'

@@ -1,4 +1,4 @@
-import { SectionCard } from '@/components/redesign';
+import { MOBILE_BOTTOM_NAV_HEIGHT, SectionCard } from '@/components/redesign';
 import {
   ConfigurePanel,
   ContextHits,
@@ -36,6 +36,8 @@ import {
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense, useMemo, useState } from 'react';
+
+const SCOPE_STRIP_HEIGHT = 52;
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search/',
@@ -90,7 +92,7 @@ function RouteComponent() {
   );
 
   return (
-    <Box sx={{ pb: mobile ? '72px' : 0 }}>
+    <Box sx={{ pb: mobile ? `${SCOPE_STRIP_HEIGHT + 8}px` : 0 }}>
       <Box
         sx={{
           display: 'flex',
@@ -522,25 +524,32 @@ const MobileConfigureBar = ({
   const summary = [
     filterCount > 0 ? `${filterCount} filter${filterCount > 1 ? 's' : ''}` : null,
     perPage ? `per_page ${perPage}` : null,
+    'unsaved',
   ]
     .filter(Boolean)
     .join(' · ');
 
+  const bottomPos = MOBILE_BOTTOM_NAV_HEIGHT + SCOPE_STRIP_HEIGHT + 4;
+
   return (
-    <Box
+    <Stack
+      direction='row'
+      onClick={onOpen}
       sx={{
         position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        bottom: bottomPos,
+        left: 12,
+        right: 12,
         zIndex: (theme) => theme.zIndex.appBar,
         backgroundColor: 'background.paper',
-        borderTop: `1px solid ${designTokens.border}`,
-        px: 2,
-        py: 1.25,
-        display: 'flex',
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: '12px',
+        boxShadow: '0 4px 16px rgba(10,37,64,.1)',
+        px: 1.75,
+        py: 1,
         alignItems: 'center',
         gap: 1,
+        cursor: 'pointer',
       }}
     >
       <TuneRounded sx={{ fontSize: 18, color: designTokens.textMuted }} />
@@ -552,6 +561,7 @@ const MobileConfigureBar = ({
         </Typography>
         {summary && (
           <Typography
+            noWrap
             sx={{
               fontSize: 11.5,
               color: designTokens.textFaint,
@@ -582,7 +592,10 @@ const MobileConfigureBar = ({
         </Box>
       )}
       <IconButton
-        onClick={onOpen}
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpen();
+        }}
         size='small'
         sx={{
           width: 36,
@@ -595,6 +608,6 @@ const MobileConfigureBar = ({
       >
         <KeyboardArrowUpRounded sx={{ fontSize: 20 }} />
       </IconButton>
-    </Box>
+    </Stack>
   );
 };
