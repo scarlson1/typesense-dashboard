@@ -50,6 +50,7 @@ function RouteComponent() {
   const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const [configTab, setConfigTab] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [configCollapsed, setConfigCollapsed] = useState(false);
   const { params } = useSearch();
 
   const filterCount = useMemo(() => {
@@ -114,6 +115,9 @@ function RouteComponent() {
               display: 'flex',
               alignItems: 'center',
               gap: 1,
+              position: { xs: 'sticky', md: 'static' },
+              top: 0,
+              zIndex: { xs: 8, md: 'auto' },
             }}
           >
             <SearchRounded
@@ -222,6 +226,9 @@ function RouteComponent() {
           <MobileConfigureBar
             filterCount={filterCount}
             perPage={perPage}
+            collapsed={configCollapsed}
+            onCollapse={() => setConfigCollapsed(true)}
+            onExpand={() => setConfigCollapsed(false)}
             onOpen={() => setDrawerOpen(true)}
           />
           <Drawer
@@ -515,10 +522,16 @@ const ResultsCount = () => {
 const MobileConfigureBar = ({
   filterCount,
   perPage,
+  collapsed,
+  onCollapse,
+  onExpand,
   onOpen,
 }: {
   filterCount: number;
   perPage?: number;
+  collapsed: boolean;
+  onCollapse: () => void;
+  onExpand: () => void;
   onOpen: () => void;
 }) => {
   const summary = [
@@ -530,6 +543,36 @@ const MobileConfigureBar = ({
     .join(' · ');
 
   const bottomPos = MOBILE_BOTTOM_NAV_HEIGHT + SCOPE_STRIP_HEIGHT + 4;
+
+  if (collapsed) {
+    return (
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: bottomPos,
+          right: 12,
+          zIndex: (theme) => theme.zIndex.appBar,
+          display: 'flex',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <IconButton
+          onClick={onExpand}
+          sx={{
+            width: 44,
+            height: 44,
+            backgroundColor: 'background.paper',
+            border: `1px solid ${designTokens.border}`,
+            boxShadow: '0 4px 16px rgba(10,37,64,.1)',
+            color: designTokens.textMuted,
+            '&:hover': { borderColor: designTokens.borderStrong },
+          }}
+        >
+          <TuneRounded sx={{ fontSize: 20 }} />
+        </IconButton>
+      </Box>
+    );
+  }
 
   return (
     <Stack
@@ -552,7 +595,21 @@ const MobileConfigureBar = ({
         cursor: 'pointer',
       }}
     >
-      <TuneRounded sx={{ fontSize: 18, color: designTokens.textMuted }} />
+      <IconButton
+        size='small'
+        onClick={(e) => {
+          e.stopPropagation();
+          onCollapse();
+        }}
+        sx={{
+          width: 28,
+          height: 28,
+          color: designTokens.textMuted,
+          '&:hover': { color: designTokens.text },
+        }}
+      >
+        <CloseRounded sx={{ fontSize: 16 }} />
+      </IconButton>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
           sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text }}

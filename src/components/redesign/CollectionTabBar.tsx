@@ -27,7 +27,7 @@ export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
       sx={{
         display: { xs: 'block', md: 'none' },
         borderBottom: `1px solid ${designTokens.border}`,
-        background: 'background.paper',
+        backgroundColor: 'background.paper',
         overflowX: 'auto',
         WebkitOverflowScrolling: 'touch',
         '&::-webkit-scrollbar': { display: 'none' },

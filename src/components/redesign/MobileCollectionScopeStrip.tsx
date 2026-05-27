@@ -5,6 +5,7 @@ import {
   ArrowForwardRounded,
   CheckRounded,
   CloseRounded,
+  DatasetRounded,
   KeyboardArrowUpRounded,
   SearchRounded,
 } from '@mui/icons-material';
@@ -40,7 +41,7 @@ export function MobileCollectionScopeStrip({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [dismissed, setDismissed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const { data: collections } = useQuery({
     queryKey: collectionQueryKeys.list(clusterId, {}),
@@ -70,13 +71,11 @@ export function MobileCollectionScopeStrip({
     [navigate],
   );
 
-  if (dismissed) return null;
-
   return (
     <>
       <Box
         sx={{
-          display: { xs: 'block', md: 'none' },
+          display: { xs: collapsed ? 'flex' : 'block', md: 'none' },
           position: 'fixed',
           left: 0,
           right: 0,
@@ -86,89 +85,108 @@ export function MobileCollectionScopeStrip({
           pb: 1,
           pt: 0.75,
           pointerEvents: 'none',
+          justifyContent: 'flex-end',
         }}
       >
-        <Stack
-          direction='row'
-          onClick={() => setOpen(true)}
-          sx={{
-            pointerEvents: 'auto',
-            alignItems: 'center',
-            gap: 0.75,
-            pl: 0.5,
-            pr: 1.5,
-            py: 0.5,
-            backgroundColor: 'background.paper',
-            border: `1px solid ${designTokens.border}`,
-            borderRadius: '999px',
-            boxShadow: '0 6px 20px rgba(10,37,64,.08)',
-            cursor: 'pointer',
-            '&:hover': { borderColor: designTokens.borderStrong },
-          }}
-        >
+        {collapsed ? (
           <IconButton
-            size='small'
-            aria-label='Clear collection scope'
-            onClick={(e) => {
-              e.stopPropagation();
-              setDismissed(true);
-            }}
+            onClick={() => setCollapsed(false)}
             sx={{
-              width: 28,
-              height: 28,
+              pointerEvents: 'auto',
+              width: 44,
+              height: 44,
+              backgroundColor: 'background.paper',
+              border: `1px solid ${designTokens.border}`,
+              boxShadow: '0 6px 20px rgba(10,37,64,.08)',
               color: designTokens.textMuted,
-              '&:hover': { color: designTokens.text },
+              '&:hover': { borderColor: designTokens.borderStrong },
             }}
           >
-            <CloseRounded sx={{ fontSize: 16 }} />
+            <DatasetRounded sx={{ fontSize: 20 }} />
           </IconButton>
-          <Typography
+        ) : (
+          <Stack
+            direction='row'
+            onClick={() => setOpen(true)}
             sx={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: designTokens.textFaint,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              pointerEvents: 'auto',
+              alignItems: 'center',
+              gap: 0.75,
+              pl: 0.5,
+              pr: 1.5,
+              py: 0.5,
+              backgroundColor: 'background.paper',
+              border: `1px solid ${designTokens.border}`,
+              borderRadius: '999px',
+              boxShadow: '0 6px 20px rgba(10,37,64,.08)',
+              cursor: 'pointer',
+              '&:hover': { borderColor: designTokens.borderStrong },
             }}
           >
-            Collection
-          </Typography>
-          <Box
-            sx={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: designTokens.success,
-              flexShrink: 0,
-            }}
-          />
-          <Typography
-            noWrap
-            sx={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: designTokens.text,
-              fontFamily: designTokens.fontMono,
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
-            {currentCollectionId}
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: 12,
-              color: designTokens.textFaint,
-              fontFamily: designTokens.fontMono,
-              flexShrink: 0,
-            }}
-          >
-            {formatCount(docCount)} docs
-          </Typography>
-          <KeyboardArrowUpRounded
-            sx={{ fontSize: 18, color: designTokens.textFaint, flexShrink: 0 }}
-          />
-        </Stack>
+            <IconButton
+              size='small'
+              aria-label='Collapse collection scope'
+              onClick={(e) => {
+                e.stopPropagation();
+                setCollapsed(true);
+              }}
+              sx={{
+                width: 28,
+                height: 28,
+                color: designTokens.textMuted,
+                '&:hover': { color: designTokens.text },
+              }}
+            >
+              <CloseRounded sx={{ fontSize: 16 }} />
+            </IconButton>
+            <Typography
+              sx={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: designTokens.textFaint,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+              }}
+            >
+              Collection
+            </Typography>
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: designTokens.success,
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              noWrap
+              sx={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: designTokens.text,
+                fontFamily: designTokens.fontMono,
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              {currentCollectionId}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 12,
+                color: designTokens.textFaint,
+                fontFamily: designTokens.fontMono,
+                flexShrink: 0,
+              }}
+            >
+              {formatCount(docCount)} docs
+            </Typography>
+            <KeyboardArrowUpRounded
+              sx={{ fontSize: 18, color: designTokens.textFaint, flexShrink: 0 }}
+            />
+          </Stack>
+        )}
       </Box>
 
       <Drawer
