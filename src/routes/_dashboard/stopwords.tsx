@@ -1,40 +1,91 @@
 import {
   Badge,
   PageHeader,
-  SectionCard,
+  primaryButtonSx,
   smallButtonSx,
+  dangerButtonSx,
 } from '@/components/redesign';
-import { StopwordsForm } from '@/components/StopwordsForm';
-import { stopwordsFormOpts } from '@/constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
+import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';
-import { DeleteRounded, OpenInNewRounded } from '@mui/icons-material';
-import { Box, Button, Stack, Tooltip, Typography } from '@mui/material';
 import {
-  DataGrid,
-  GridActionsCellItem,
-  type GridColDef,
-} from '@mui/x-data-grid';
+  AddRounded,
+  DeleteOutlineRounded,
+  OpenInNewRounded,
+  SearchRounded,
+} from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Stack,
+  TextField as MuiTextField,
+  Typography,
+} from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { StopwordSchema } from 'typesense/lib/Typesense/Stopword';
 import type { StopwordCreateSchema } from 'typesense/lib/Typesense/Stopwords';
 
 export const Route = createFileRoute('/_dashboard/stopwords')({
   component: RouteComponent,
-  staticData: {
-    crumb: 'Stopwords',
-  },
+  staticData: { crumb: 'Stopwords' },
 });
 
 function RouteComponent() {
+  const [client, clusterId] = useTypesenseClient();
+  const { data: stopwordSets, isLoading } = useQuery({
+    queryKey: [clusterId, 'stopwords'],
+    queryFn: async () => {
+      const res = await client.stopwords().retrieve();
+      return res.stopwords;
+    },
+  });
+
+  const sets: StopwordSetDescriptor[] = useMemo(
+    () =>
+      (stopwordSets ?? []).map((s) => {
+        const words = Array.isArray(s.stopwords)
+          ? s.stopwords
+          : s.stopwords?.stopwords ?? [];
+        return {
+          id: s.id,
+          locale: s.locale ?? '',
+          words,
+          count: words.length,
+        };
+      }),
+    [stopwordSets],
+  );
+
+  const totalWords = useMemo(
+    () => sets.reduce((sum, s) => sum + s.count, 0),
+    [sets],
+  );
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedId === null && sets.length > 0) {
+      setSelectedId(sets[0].id);
+    }
+    if (selectedId && !sets.find((s) => s.id === selectedId)) {
+      setSelectedId(sets[0]?.id ?? null);
+    }
+  }, [sets, selectedId]);
+
+  const selectedSet = sets.find((s) => s.id === selectedId) ?? null;
+
+  const badgeText =
+    sets.length > 0
+      ? `${sets.length} set${sets.length === 1 ? '' : 's'} · ${totalWords} words`
+      : 'removed at query time';
+
   return (
     <Stack sx={{ minWidth: 0 }}>
       <PageHeader
         title='Stopwords'
-        badges={<Badge tone='neutral'>removed at query time</Badge>}
+        badges={<Badge tone='neutral'>{badgeText}</Badge>}
         actions={
           <Button
             component='a'
@@ -56,156 +107,517 @@ function RouteComponent() {
           px: { xs: 2.5, md: 3.5 },
           py: 2.25,
           background: designTokens.surfaceTinted,
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: '320px 1fr' },
-          gap: 2,
           minHeight: 0,
+          display: 'flex',
+          gap: 2,
+          alignItems: 'flex-start',
         }}
       >
-        <Box sx={{ minWidth: 0 }}>
-          <SectionCard
-            title='Add a new set'
-            description='Stopwords are ignored at query time on fields listed in query_by.'
-          >
-            <AddStopword />
-          </SectionCard>
-        </Box>
-        <Box sx={{ minWidth: 0 }}>
-          <SectionCard title='Stopword sets' noBodyPadding>
-            <Box sx={{ p: 2 }}>
-              <StopwordsList />
-            </Box>
-          </SectionCard>
+        {/* Left: sets sidebar */}
+        <SetsSidebar
+          sets={sets}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
+
+        {/* Right: editor */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {selectedSet ? (
+            <StopwordEditor
+              key={selectedSet.id}
+              set={selectedSet}
+            />
+          ) : (
+            <NewSetPanel onCreated={(id) => setSelectedId(id)} />
+          )}
         </Box>
       </Box>
     </Stack>
   );
 }
 
-function StopwordsList() {
-  const toast = useAsyncToast();
-  const [client, clusterId] = useTypesenseClient();
+// ─── Types ──────────────────────────────────────────
 
-  const { data, isLoading, isFetching, isError, error } = useQuery({
-    queryKey: [clusterId, 'stopwords'],
-    queryFn: async () => {
-      const res = await client.stopwords().retrieve();
+interface StopwordSetDescriptor {
+  id: string;
+  locale: string;
+  words: string[];
+  count: number;
+}
 
-      return res.stopwords;
-    },
-  });
+// ─── Sidebar ────────────────────────────────────────
 
-  const mutation = useMutation({
-    mutationFn: (id: string) => client.stopwords(id).delete(),
-    onMutate: (vars) => {
-      toast.loading(`deleting [${vars}]`, { id: `delete-${vars}` });
-    },
-    onSuccess: (_, vars) => {
-      toast.success(`"${vars}" deleted`, { id: `delete-${vars}` });
-    },
-    onError: (err, vars) => {
-      const msg = err?.message || `error deleting "${vars}"`;
-      toast.error(msg, { id: `delete-${vars}` });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: [clusterId, 'stopwords'],
-      });
-    },
-  });
-
-  const columns = useMemo<GridColDef<StopwordSchema>[]>(
-    () => [
-      {
-        field: 'id',
-        headerName: 'ID',
-        type: 'string',
-        minWidth: 120,
-        flex: 1,
-        sortable: false,
-        filterable: false,
-      },
-      {
-        field: 'stopwords',
-        headerName: 'Description',
-        type: 'string',
-        minWidth: 160,
-        flex: 1.5,
-        sortable: false,
-        filterable: false,
-        valueFormatter: (_, row) =>
-          Array.isArray(row.stopwords)
-            ? row.stopwords.join(', ')
-            : row.stopwords.stopwords.join(', '),
-      },
-      {
-        field: 'locale',
-        headerName: 'Locale',
-        type: 'string',
-        minWidth: 80,
-        flex: 0.4,
-        sortable: false,
-        filterable: false,
-      },
-      {
-        headerName: 'Actions',
-        field: 'grid-actions',
-        type: 'actions',
-        minWidth: 60,
-        maxWidth: 80,
-        flex: 1,
-        getActions: (params) => [
-          <GridActionsCellItem
-            icon={
-              <Tooltip placement='top' title='delete'>
-                <DeleteRounded fontSize='small' />
-              </Tooltip>
-            }
-            onClick={async () => {
-              mutation.mutate(params.row.id);
-            }}
-            label='Delete Stopword Set'
-            disabled={mutation.isPending}
-          />,
-        ],
-      },
-    ],
-    [mutation.mutate, mutation.isPending],
-  );
-
-  if (isError) {
-    return <Typography>{error?.message || 'an error occurred'}</Typography>;
-  }
-
+function SetsSidebar({
+  sets,
+  selectedId,
+  onSelect,
+}: {
+  sets: StopwordSetDescriptor[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+}) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 267,
-        maxHeight: {
-          xs: 'calc(100vh - 140px)',
-          md: 'calc(100vh - 160px)',
-        },
-        width: '100%',
-      }}
-    >
-      <DataGrid
-        rows={data || []}
-        columns={columns}
-        loading={isLoading || isFetching}
-        pageSizeOptions={[5, 10, 20]}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10, page: 0 } },
+    <Box sx={{ width: 260, flexShrink: 0 }}>
+      <Typography
+        sx={{
+          fontSize: 11,
+          fontWeight: 600,
+          color: designTokens.textFaint,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          mb: 0.75,
+          px: '2px',
         }}
-      />
+      >
+        Sets
+      </Typography>
+      <Stack spacing={0.5}>
+        {sets.map((s) => {
+          const selected = selectedId === s.id;
+          return (
+            <Box
+              key={s.id}
+              component='button'
+              type='button'
+              onClick={() => onSelect(s.id)}
+              sx={{
+                width: '100%',
+                textAlign: 'left',
+                px: 1.5,
+                py: 1.125,
+                borderRadius: '7px',
+                background: selected
+                  ? designTokens.accentSoft
+                  : designTokens.surface,
+                border: `1px solid ${selected ? designTokens.accentBorder : designTokens.border}`,
+                cursor: 'pointer',
+                font: 'inherit',
+                transition: 'all 120ms ease',
+                '&:hover': {
+                  borderColor: selected
+                    ? designTokens.accentBorder
+                    : designTokens.borderStrong,
+                },
+              }}
+            >
+              <Stack
+                direction='row'
+                sx={{ alignItems: 'center', gap: 0.75, mb: 0.5 }}
+              >
+                <Typography
+                  sx={{
+                    flex: 1,
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: selected
+                      ? designTokens.accentDeep
+                      : designTokens.text,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {s.id}
+                </Typography>
+                {s.locale ? (
+                  <Box
+                    component='span'
+                    sx={{
+                      fontFamily: designTokens.fontMono,
+                      fontSize: 10.5,
+                      color: designTokens.textFaint,
+                      px: 0.75,
+                      py: '1px',
+                      background: designTokens.surface,
+                      border: `1px solid ${designTokens.border}`,
+                      borderRadius: '4px',
+                    }}
+                  >
+                    {s.locale}
+                  </Box>
+                ) : null}
+              </Stack>
+              <Typography
+                sx={{ fontSize: 11.5, color: designTokens.textMuted }}
+              >
+                {s.count} words
+              </Typography>
+            </Box>
+          );
+        })}
+
+        <Button
+          type='button'
+          onClick={() => onSelect(null)}
+          startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+          sx={{
+            mt: 0.75,
+            justifyContent: 'flex-start',
+            px: 1.5,
+            py: 1.125,
+            borderRadius: '7px',
+            border: `1px dashed ${selectedId === null ? designTokens.accent : designTokens.borderStrong}`,
+            background:
+              selectedId === null
+                ? designTokens.accentSoft
+                : 'transparent',
+            color:
+              selectedId === null
+                ? designTokens.accentDeep
+                : designTokens.textMuted,
+            fontSize: 12.5,
+            fontWeight: 500,
+            textTransform: 'none',
+            '&:hover': {
+              background:
+                selectedId === null
+                  ? designTokens.accentSoft
+                  : designTokens.surfaceMuted,
+              borderColor: designTokens.accent,
+            },
+          }}
+        >
+          New set
+        </Button>
+      </Stack>
     </Box>
   );
 }
 
-function AddStopword() {
+// ─── Editor: word chips ─────────────────────────────
+
+function StopwordEditor({ set }: { set: StopwordSetDescriptor }) {
   const toast = useAsyncToast();
   const [client, clusterId] = useTypesenseClient();
+
+  const [words, setWords] = useState<string[]>(set.words);
+  const [addInput, setAddInput] = useState('');
+  const [filter, setFilter] = useState('');
+
+  const filteredWords = filter
+    ? words.filter((w) => w.toLowerCase().includes(filter.toLowerCase()))
+    : words;
+
+  const saveMutation = useMutation({
+    mutationFn: (params: StopwordCreateSchema) =>
+      client.stopwords().upsert(set.id, params),
+    onMutate: () => {
+      toast.loading(`saving ${set.id}`, { id: 'save-stopwords' });
+    },
+    onSuccess: () => {
+      toast.success(`${set.id} saved`, { id: 'save-stopwords' });
+    },
+    onError: (err) => {
+      toast.error(err.message || 'save failed', { id: 'save-stopwords' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [clusterId, 'stopwords'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => client.stopwords(set.id).delete(),
+    onMutate: () => {
+      toast.loading(`deleting ${set.id}`, { id: 'del-stopwords' });
+    },
+    onSuccess: () => {
+      toast.success(`${set.id} deleted`, { id: 'del-stopwords' });
+    },
+    onError: (err) => {
+      toast.error(err.message || 'delete failed', { id: 'del-stopwords' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [clusterId, 'stopwords'] });
+    },
+  });
+
+  const handleAdd = () => {
+    const newWords = addInput
+      .split(/[,\s]+/)
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w && !words.includes(w));
+    if (newWords.length) {
+      setWords((prev) => [...prev, ...newWords]);
+    }
+    setAddInput('');
+  };
+
+  const handleRemove = (word: string) => {
+    setWords((prev) => prev.filter((w) => w !== word));
+  };
+
+  const handleSave = () => {
+    saveMutation.mutate({
+      stopwords: words,
+      locale: set.locale || undefined,
+    });
+  };
+
+  return (
+    <Box
+      sx={{
+        background: designTokens.surface,
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: 1,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Header */}
+      <Stack
+        direction='row'
+        sx={{
+          px: 2.25,
+          py: 1.75,
+          borderBottom: `1px solid ${designTokens.border}`,
+          alignItems: 'center',
+          gap: 1.25,
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
+            sx={{
+              fontFamily: designTokens.fontMono,
+              fontSize: 14,
+              fontWeight: 600,
+              color: designTokens.text,
+            }}
+          >
+            {set.id}
+          </Typography>
+          <Typography
+            sx={{ fontSize: 11.5, color: designTokens.textMuted, mt: 0.25 }}
+          >
+            {set.count} words
+            {set.locale ? ` · locale ${set.locale}` : ''}
+          </Typography>
+        </Box>
+        <Button
+          variant='outlined'
+          size='small'
+          onClick={() => deleteMutation.mutate()}
+          disabled={deleteMutation.isPending}
+          startIcon={<DeleteOutlineRounded sx={{ fontSize: 14 }} />}
+          sx={dangerButtonSx}
+        >
+          Delete
+        </Button>
+        <Button
+          variant='contained'
+          size='small'
+          disableElevation
+          onClick={handleSave}
+          disabled={saveMutation.isPending}
+          sx={primaryButtonSx}
+        >
+          Save
+        </Button>
+      </Stack>
+
+      {/* Filter bar */}
+      <Stack
+        direction='row'
+        sx={{
+          px: 2.25,
+          py: 1.25,
+          borderBottom: `1px solid ${designTokens.border}`,
+          alignItems: 'center',
+          gap: 1.25,
+          background: designTokens.surfaceTinted,
+        }}
+      >
+        <Box
+          sx={{
+            flex: 1,
+            maxWidth: 280,
+            height: 30,
+            border: `1px solid ${designTokens.border}`,
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            px: 1.25,
+            gap: 1,
+            background: designTokens.surface,
+          }}
+        >
+          <SearchRounded
+            sx={{ fontSize: 14, color: designTokens.textFaint }}
+          />
+          <Box
+            component='input'
+            value={filter}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFilter(e.target.value)
+            }
+            placeholder='Filter words…'
+            sx={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              fontSize: 12.5,
+              fontFamily: 'inherit',
+              background: 'transparent',
+              color: designTokens.text,
+              '&::placeholder': { color: designTokens.textFaint },
+            }}
+          />
+        </Box>
+        <Box sx={{ flex: 1 }} />
+        <Typography
+          sx={{
+            fontSize: 11.5,
+            color: designTokens.textFaint,
+          }}
+        >
+          {words.length} words
+        </Typography>
+      </Stack>
+
+      {/* Add input + chips */}
+      <Box sx={{ px: 2.25, py: 2 }}>
+        {/* Add row */}
+        <Stack
+          direction='row'
+          sx={{
+            p: 1,
+            border: `1px dashed ${designTokens.borderStrong}`,
+            borderRadius: '7px',
+            background: designTokens.surfaceTinted,
+            alignItems: 'center',
+            gap: 1,
+            mb: 1.75,
+          }}
+        >
+          <AddRounded
+            sx={{ fontSize: 14, color: designTokens.textFaint }}
+          />
+          <Box
+            component='input'
+            value={addInput}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setAddInput(e.target.value)
+            }
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAdd();
+              }
+            }}
+            placeholder='Add words separated by space or comma…'
+            sx={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              fontSize: 12.5,
+              fontFamily: 'inherit',
+              background: 'transparent',
+              color: designTokens.text,
+              '&::placeholder': { color: designTokens.textFaint },
+            }}
+          />
+          <Button
+            size='small'
+            variant='contained'
+            disableElevation
+            onClick={handleAdd}
+            sx={{
+              ...primaryButtonSx,
+              height: 26,
+              fontSize: 12,
+              px: 1.5,
+              minWidth: 'auto',
+            }}
+          >
+            Add
+          </Button>
+        </Stack>
+
+        {/* Word chips */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+          {filteredWords.map((word) => (
+            <Box
+              key={word}
+              component='span'
+              sx={{
+                fontFamily: designTokens.fontMono,
+                fontSize: 12,
+                px: 1.25,
+                py: '4px',
+                background: designTokens.surfaceMuted,
+                border: `1px solid ${designTokens.border}`,
+                borderRadius: '5px',
+                color: designTokens.text,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.75,
+              }}
+            >
+              {word}
+              <Box
+                component='span'
+                onClick={() => handleRemove(word)}
+                sx={{
+                  color: designTokens.textFaint,
+                  cursor: 'pointer',
+                  fontSize: 11.5,
+                  lineHeight: 1,
+                  '&:hover': { color: designTokens.danger },
+                }}
+              >
+                ×
+              </Box>
+            </Box>
+          ))}
+          {filteredWords.length === 0 && (
+            <Typography
+              sx={{ fontSize: 12.5, color: designTokens.textFaint }}
+            >
+              {filter ? 'No matching words.' : 'No words yet. Add some above.'}
+            </Typography>
+          )}
+        </Box>
+      </Box>
+
+      {/* Footer */}
+      <Stack
+        direction='row'
+        sx={{
+          px: 2.25,
+          py: 1.25,
+          borderTop: `1px solid ${designTokens.border}`,
+          background: designTokens.surfaceTinted,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Typography sx={{ fontSize: 11.5, color: designTokens.textFaint }}>
+          Stopwords are ignored at query time on fields listed in{' '}
+          <Box
+            component='span'
+            sx={{
+              fontFamily: designTokens.fontMono,
+              color: designTokens.textMuted,
+            }}
+          >
+            query_by
+          </Box>
+          .
+        </Typography>
+      </Stack>
+    </Box>
+  );
+}
+
+// ─── New set panel ──────────────────────────────────
+
+function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
+  const toast = useAsyncToast();
+  const [client, clusterId] = useTypesenseClient();
+
+  const [id, setId] = useState('');
+  const [wordsInput, setWordsInput] = useState('');
+  const [locale, setLocale] = useState('');
+
   const mutation = useMutation({
     mutationFn: ({
       stopwordId,
@@ -214,54 +626,148 @@ function AddStopword() {
       stopwordId: string;
       params: StopwordCreateSchema;
     }) => client.stopwords().upsert(stopwordId, params),
-    onMutate: (vars) => {
-      toast.loading(`saving stopword set [${vars.stopwordId}]`, {
-        id: 'save-stopwords',
-      });
+    onMutate: () => {
+      toast.loading('creating stopword set', { id: 'save-stopwords' });
     },
     onSuccess: (data) => {
-      toast.success(`stopwords saved [${data.id}]`, { id: 'save-stopwords' });
+      toast.success(`${data.id} created`, { id: 'save-stopwords' });
+      onCreated(data.id);
     },
-    onError: (err, vars) => {
-      const msg = err.message || `error saving stopwords [${vars.stopwordId}]`;
-      toast.error(msg, { id: 'save-stopwords' });
+    onError: (err) => {
+      toast.error(err.message || 'create failed', { id: 'save-stopwords' });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: [clusterId, 'stopwords'],
-      });
+      queryClient.invalidateQueries({ queryKey: [clusterId, 'stopwords'] });
     },
   });
 
-  const form = useAppForm({
-    ...stopwordsFormOpts,
-    onSubmit: async ({ value }) => {
-      try {
-        await mutation.mutateAsync({
-          stopwordId: value.stopwordId,
-          params: {
-            stopwords: value.stopwords.split(',').map((w) => w.trim()),
-            locale: value.locale,
-          },
-        });
-        form.reset();
-      } catch (err) {
-        console.log(err);
-      }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id.trim()) return;
+    const words = wordsInput
+      .split(/[,\s]+/)
+      .map((w) => w.trim())
+      .filter(Boolean);
+    mutation.mutate({
+      stopwordId: id.trim(),
+      params: { stopwords: words, locale: locale || undefined },
+    });
+  };
+
+  const compactInputSx = {
+    '& .MuiOutlinedInput-root': {
+      backgroundColor: designTokens.surface,
+      fontSize: 12.5,
+      fontFamily: designTokens.fontMono,
+      minHeight: 32,
+      borderRadius: '6px',
+      '& fieldset': { borderColor: designTokens.border },
+      '&:hover fieldset': { borderColor: designTokens.borderStrong },
+      '&.Mui-focused fieldset': {
+        borderColor: designTokens.accent,
+        borderWidth: 1,
+      },
+      '& input': {
+        fontSize: 12.5,
+        fontFamily: designTokens.fontMono,
+        padding: '6px 10px !important',
+      },
     },
-  });
+  };
+
+  const labelSx = {
+    fontSize: 10.5,
+    fontWeight: 700,
+    color: designTokens.textFaint,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.06em',
+    mb: 0.75,
+    mt: 1.5,
+  };
 
   return (
     <Box
       component='form'
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        form.handleSubmit();
+      onSubmit={handleSubmit}
+      sx={{
+        background: designTokens.surface,
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: 1,
+        p: 2.5,
+        maxWidth: 480,
       }}
-      noValidate
     >
-      <StopwordsForm form={form} />
+      <Typography
+        sx={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: designTokens.text,
+          mb: 0.5,
+        }}
+      >
+        New stopword set
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: 12,
+          color: designTokens.textMuted,
+          lineHeight: 1.5,
+          mb: 1.5,
+        }}
+      >
+        Stopwords are ignored at query time on fields listed in query_by.
+      </Typography>
+
+      <Typography sx={labelSx}>Set ID</Typography>
+      <MuiTextField
+        value={id}
+        onChange={(e) => setId(e.target.value)}
+        placeholder='e.g. english_common'
+        fullWidth
+        size='small'
+        required
+        sx={compactInputSx}
+      />
+
+      <Typography sx={labelSx}>Words (comma or space separated)</Typography>
+      <MuiTextField
+        value={wordsInput}
+        onChange={(e) => setWordsInput(e.target.value)}
+        placeholder='the, a, an, of, and, in, to'
+        fullWidth
+        size='small'
+        multiline
+        minRows={3}
+        sx={{
+          ...compactInputSx,
+          '& .MuiOutlinedInput-root': {
+            ...compactInputSx['& .MuiOutlinedInput-root'],
+            minHeight: 'auto',
+          },
+        }}
+      />
+
+      <Typography sx={labelSx}>Locale</Typography>
+      <MuiTextField
+        value={locale}
+        onChange={(e) => setLocale(e.target.value)}
+        placeholder='en (optional)'
+        fullWidth
+        size='small'
+        sx={compactInputSx}
+      />
+
+      <Button
+        type='submit'
+        variant='contained'
+        fullWidth
+        disableElevation
+        disabled={mutation.isPending || !id.trim()}
+        startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+        sx={{ ...primaryButtonSx, height: 36, mt: 2 }}
+      >
+        Create set
+      </Button>
     </Box>
   );
 }
