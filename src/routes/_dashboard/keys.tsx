@@ -1,12 +1,11 @@
 import {
   Badge,
   PageHeader,
-  SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
 import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Box, Button, Skeleton, Stack } from '@mui/material';
+import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 
@@ -45,30 +44,68 @@ function RouteComponent() {
           px: { xs: 2.5, md: 3.5 },
           py: 2.25,
           background: designTokens.surfaceTinted,
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: '1fr 380px' },
-          gap: 2,
+          display: 'flex',
+          gap: 2.25,
+          alignItems: 'flex-start',
           minHeight: 0,
         }}
       >
-        <Box sx={{ minWidth: 0 }}>
-          <SectionCard title='Existing keys' noBodyPadding>
-            <Box sx={{ p: 2 }}>
-              <Suspense fallback={<Skeleton variant='rounded' height={300} />}>
-                <ApiKeyGrid />
-              </Suspense>
-            </Box>
-          </SectionCard>
-        </Box>
-        <Box sx={{ minWidth: 0 }}>
-          <SectionCard
-            title='Create new key'
-            description='Scope this key to specific collections and actions. The full secret will be shown once.'
+        {/* Left: keys table */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box
+            sx={{
+              background: designTokens.surface,
+              border: `1px solid ${designTokens.border}`,
+              borderRadius: 1,
+              overflow: 'hidden',
+            }}
           >
-            <Suspense fallback={<Skeleton variant='rounded' height={260} />}>
-              <NewApiKeyEditor />
+            <Suspense
+              fallback={<Skeleton variant='rounded' height={300} sx={{ m: 2 }} />}
+            >
+              <ApiKeyGrid />
             </Suspense>
-          </SectionCard>
+          </Box>
+        </Box>
+
+        {/* Right: create panel */}
+        <Box
+          sx={{
+            width: 340,
+            flexShrink: 0,
+            background: designTokens.surface,
+            border: `1px solid ${designTokens.border}`,
+            borderRadius: 1,
+            p: 2.25,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: designTokens.text,
+              mb: 0.5,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Create new key
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: 12,
+              color: designTokens.textMuted,
+              lineHeight: 1.5,
+              mb: 1.5,
+            }}
+          >
+            Scope this key to specific collections and actions. The full
+            secret will be shown once.
+          </Typography>
+          <Suspense
+            fallback={<Skeleton variant='rounded' height={260} />}
+          >
+            <NewApiKeyEditor />
+          </Suspense>
         </Box>
       </Box>
     </Stack>

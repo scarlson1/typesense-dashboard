@@ -615,7 +615,8 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
   const [client, clusterId] = useTypesenseClient();
 
   const [id, setId] = useState('');
-  const [wordsInput, setWordsInput] = useState('');
+  const [words, setWords] = useState<string[]>([]);
+  const [wordDraft, setWordDraft] = useState('');
   const [locale, setLocale] = useState('');
 
   const mutation = useMutation({
@@ -641,16 +642,55 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
     },
   });
 
+  const flushDraft = () => {
+    const newWords = wordDraft
+      .split(/[,\s]+/)
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w && !words.includes(w));
+    if (newWords.length) setWords((prev) => [...prev, ...newWords]);
+    setWordDraft('');
+  };
+
+  const handleWordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (/[,\s]/.test(val.slice(-1))) {
+      const newWords = val
+        .split(/[,\s]+/)
+        .map((w) => w.trim().toLowerCase())
+        .filter((w) => w && !words.includes(w));
+      if (newWords.length) setWords((prev) => [...prev, ...newWords]);
+      setWordDraft('');
+    } else {
+      setWordDraft(val);
+    }
+  };
+
+  const handleWordKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      flushDraft();
+    }
+    if (e.key === 'Backspace' && !wordDraft && words.length) {
+      setWords((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const removeWord = (word: string) => {
+    setWords((prev) => prev.filter((w) => w !== word));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!id.trim()) return;
-    const words = wordsInput
+    const finalWords = [...words];
+    const trailing = wordDraft
       .split(/[,\s]+/)
-      .map((w) => w.trim())
-      .filter(Boolean);
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w && !finalWords.includes(w));
+    finalWords.push(...trailing);
     mutation.mutate({
       stopwordId: id.trim(),
-      params: { stopwords: words, locale: locale || undefined },
+      params: { stopwords: finalWords, locale: locale || undefined },
     });
   };
 
@@ -729,23 +769,87 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
         sx={compactInputSx}
       />
 
-      <Typography sx={labelSx}>Words (comma or space separated)</Typography>
-      <MuiTextField
-        value={wordsInput}
-        onChange={(e) => setWordsInput(e.target.value)}
-        placeholder='the, a, an, of, and, in, to'
-        fullWidth
-        size='small'
-        multiline
-        minRows={3}
+      <Typography sx={labelSx}>Words</Typography>
+      <Box
         sx={{
-          ...compactInputSx,
-          '& .MuiOutlinedInput-root': {
-            ...compactInputSx['& .MuiOutlinedInput-root'],
-            minHeight: 'auto',
+          border: `1px solid ${designTokens.border}`,
+          borderRadius: '6px',
+          background: designTokens.surface,
+          p: 0.875,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 0.625,
+          alignItems: 'center',
+          minHeight: 34,
+          cursor: 'text',
+          transition: 'border-color 120ms ease',
+          '&:focus-within': {
+            borderColor: designTokens.accent,
           },
         }}
-      />
+        onClick={(e) => {
+          const input = (e.currentTarget as HTMLElement).querySelector('input');
+          input?.focus();
+        }}
+      >
+        {words.map((w) => (
+          <Box
+            key={w}
+            component='span'
+            sx={{
+              fontFamily: designTokens.fontMono,
+              fontSize: 12,
+              px: 1,
+              py: '3px',
+              background: designTokens.surfaceMuted,
+              border: `1px solid ${designTokens.border}`,
+              borderRadius: '5px',
+              color: designTokens.text,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.625,
+            }}
+          >
+            {w}
+            <Box
+              component='span'
+              onClick={(e) => {
+                e.stopPropagation();
+                removeWord(w);
+              }}
+              sx={{
+                color: designTokens.textFaint,
+                cursor: 'pointer',
+                fontSize: 11,
+                lineHeight: 1,
+                '&:hover': { color: designTokens.danger },
+              }}
+            >
+              ×
+            </Box>
+          </Box>
+        ))}
+        <Box
+          component='input'
+          value={wordDraft}
+          onChange={handleWordInputChange}
+          onKeyDown={handleWordKeyDown}
+          onBlur={flushDraft}
+          placeholder={words.length === 0 ? 'type words, press space or comma…' : ''}
+          sx={{
+            flex: 1,
+            minWidth: 120,
+            border: 'none',
+            outline: 'none',
+            fontSize: 12.5,
+            fontFamily: designTokens.fontMono,
+            background: 'transparent',
+            color: designTokens.text,
+            py: '2px',
+            '&::placeholder': { color: designTokens.textFaint, opacity: 1 },
+          }}
+        />
+      </Box>
 
       <Typography sx={labelSx}>Locale</Typography>
       <MuiTextField

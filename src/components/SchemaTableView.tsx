@@ -35,34 +35,8 @@ export const SchemaTableView = ({
 }: SchemaTableViewProps) => {
   return (
     <Box sx={{ width: '100%', overflowX: 'auto' }}>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: GRID_TEMPLATE,
-          alignItems: 'center',
-          px: 2,
-          py: 1.25,
-          gap: 1,
-          borderBottom: `1px solid ${designTokens.border}`,
-          background: designTokens.surfaceTinted,
-          fontSize: 10.5,
-          fontWeight: 600,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: designTokens.textFaint,
-        }}
-      >
-        <Box>Field</Box>
-        <Box>Type</Box>
-        {FLAG_COLUMNS.map((c) => (
-          <Box key={c.key}>{c.label}</Box>
-        ))}
-        <Box />
-      </Box>
-
-      {fields.map((field) => (
+      <Box sx={{ minWidth: 'max-content', width: '100%' }}>
         <Box
-          key={field.name}
           sx={{
             display: 'grid',
             gridTemplateColumns: GRID_TEMPLATE,
@@ -71,11 +45,38 @@ export const SchemaTableView = ({
             py: 1.25,
             gap: 1,
             borderBottom: `1px solid ${designTokens.border}`,
-            transition: 'background 120ms ease',
-            '&:last-of-type': { borderBottom: 'none' },
-            '&:hover': { background: designTokens.surfaceTinted },
+            background: designTokens.surfaceTinted,
+            fontSize: 10.5,
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: designTokens.textFaint,
           }}
         >
+          <Box>Field</Box>
+          <Box>Type</Box>
+          {FLAG_COLUMNS.map((c) => (
+            <Box key={c.key}>{c.label}</Box>
+          ))}
+          <Box />
+        </Box>
+
+        {fields.map((field) => (
+          <Box
+            key={field.name}
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: GRID_TEMPLATE,
+              alignItems: 'center',
+              px: 2,
+              py: 1.25,
+              gap: 1,
+              borderBottom: `1px solid ${designTokens.border}`,
+              transition: 'background 120ms ease',
+              '&:last-of-type': { borderBottom: 'none' },
+              '&:hover': { background: designTokens.surfaceTinted },
+            }}
+          >
           <Box
             sx={{
               fontFamily: designTokens.fontMono,
@@ -127,6 +128,7 @@ export const SchemaTableView = ({
           </Stack>
         </Box>
       ))}
+      </Box>
     </Box>
   );
 };
