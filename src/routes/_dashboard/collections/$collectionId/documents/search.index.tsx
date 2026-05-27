@@ -45,7 +45,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { collectionId } = Route.useParams();
-  const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const [configTab, setConfigTab] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { params } = useSearch();
@@ -90,111 +90,131 @@ function RouteComponent() {
   );
 
   return (
-    <Stack sx={{ gap: 2, pb: mobile ? '64px' : 0 }}>
-      {/* ── Search bar ── */}
+    <Box sx={{ pb: mobile ? '72px' : 0 }}>
       <Box
         sx={{
-          backgroundColor: 'background.paper',
-          border: `1px solid ${designTokens.border}`,
-          borderRadius: 1,
-          px: 1.5,
-          py: 1,
           display: 'flex',
-          alignItems: 'center',
-          gap: 1,
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 2, md: 2.5 },
+          alignItems: 'flex-start',
         }}
       >
-        <SearchRounded
-          sx={{ fontSize: 18, color: designTokens.textFaint, flexShrink: 0 }}
-        />
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <SearchBox
-            placeholder='Search...'
-            variant='standard'
-            size='small'
+        {/* ── Main content (left) ── */}
+        <Stack sx={{ flex: 1, minWidth: 0, gap: 2, width: '100%' }}>
+          {/* Search bar */}
+          <Box
             sx={{
-              my: 0,
-              '& .MuiInput-root': {
-                fontSize: 14,
-                '&:before, &:after': { display: 'none' },
-              },
-              '& .MuiFormHelperText-root': { display: 'none' },
+              backgroundColor: 'background.paper',
+              border: `1px solid ${designTokens.border}`,
+              borderRadius: 1,
+              px: 1.5,
+              py: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
             }}
-          />
-        </Box>
+          >
+            <SearchRounded
+              sx={{ fontSize: 18, color: designTokens.textFaint, flexShrink: 0 }}
+            />
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <SearchBox
+                placeholder='Search...'
+                variant='standard'
+                size='small'
+                sx={{
+                  my: 0,
+                  '& .MuiInput-root': {
+                    fontSize: 14,
+                    '&:before, &:after': { display: 'none' },
+                  },
+                  '& .MuiFormHelperText-root': { display: 'none' },
+                }}
+              />
+            </Box>
+            {/* Inline stats: desktop (md+) only */}
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                alignItems: 'center',
+              }}
+            >
+              <CompactStats />
+            </Box>
+            {/* Refinements filter icon: mobile (xs/sm) only */}
+            <Box sx={{ display: { xs: 'contents', md: 'none' } }}>
+              <CtxRefinements />
+            </Box>
+          </Box>
+
+          {/* ── Stats line + sort indicator ── */}
+          <Stack
+            direction='row'
+            sx={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              mt: -1,
+            }}
+          >
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+              <CompactStatsLine />
+            </Box>
+            <Box sx={{ flex: 1 }} />
+            <SortIndicator />
+          </Stack>
+
+          {/* ── Filter chips ── */}
+          <ActiveFilterChips />
+
+          <CtxSearchError />
+          <ContextHits />
+
+          {/* ── Pagination ── */}
+          <Stack
+            direction={{ xs: 'column-reverse', md: 'row' }}
+            sx={{
+              justifyContent: 'space-between',
+              alignItems: { xs: 'flex-end', md: 'center' },
+              gap: 1.5,
+            }}
+          >
+            <ResultsCount />
+            <Stack
+              direction='row'
+              spacing={2}
+              sx={{
+                flex: '1 1 auto',
+                justifyContent: { xs: 'space-between', md: 'flex-end' },
+                alignItems: 'center',
+                width: { xs: '100%', md: 'auto' },
+              }}
+            >
+              <CtxPageSize />
+              <CtxPagination />
+            </Stack>
+          </Stack>
+        </Stack>
+
+        {/* ── Desktop sidebar (md+) ── */}
         <Box
-          sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            width: { md: 340, lg: 380 },
+            flexShrink: 0,
+            position: 'sticky',
+            top: 16,
+            alignSelf: 'flex-start',
+            maxHeight: 'calc(100vh - 32px)',
+            overflowY: 'auto',
+          }}
         >
-          <CompactStats />
-        </Box>
-        {/* Refinements filter icon: mobile only */}
-        <Box sx={{ display: { xs: 'contents', sm: 'none' } }}>
-          <CtxRefinements />
+          <SectionCard noBodyPadding>{configPanel}</SectionCard>
         </Box>
       </Box>
 
-      {/* ── Stats + Configure + Sort ── */}
-      <Stack
-        direction='row'
-        sx={{
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 0.5,
-          mt: -1,
-        }}
-      >
-        <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
-          <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-            <CompactStatsLine />
-          </Box>
-          {/* Desktop: Configure indicator button */}
-          <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-            <ConfigureIndicator filterCount={filterCount} />
-          </Box>
-        </Stack>
-        <SortIndicator />
-      </Stack>
-
-      {/* ── Filter chips ── */}
-      <ActiveFilterChips />
-
-      <CtxSearchError />
-      <ContextHits />
-
-      {/* ── Pagination ── */}
-      <Stack
-        direction={{ xs: 'column-reverse', sm: 'row' }}
-        sx={{
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-end', sm: 'center' },
-          gap: 1.5,
-        }}
-      >
-        <ResultsCount />
-        <Stack
-          direction='row'
-          spacing={2}
-          sx={{
-            flex: '1 1 auto',
-            justifyContent: { xs: 'space-between', sm: 'flex-end' },
-            alignItems: 'center',
-            width: { xs: '100%', sm: 'auto' },
-          }}
-        >
-          <CtxPageSize />
-          <CtxPagination />
-        </Stack>
-      </Stack>
-
-      {/* ── Desktop: inline configure panel ── */}
-      {!mobile && (
-        <Box id='configure-panel' sx={{ scrollMarginTop: 16 }}>
-          <SectionCard noBodyPadding>{configPanel}</SectionCard>
-        </Box>
-      )}
-
-      {/* ── Mobile: bottom bar + drawer ── */}
+      {/* ── Mobile bottom bar + drawer ── */}
       {mobile && (
         <>
           <MobileConfigureBar
@@ -216,7 +236,7 @@ function RouteComponent() {
               },
             }}
           >
-            <Box sx={{ px: 2, pt: 1.5, pb: 2 }}>
+            <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
               <Stack
                 direction='row'
                 sx={{
@@ -225,10 +245,7 @@ function RouteComponent() {
                   mb: 0.5,
                 }}
               >
-                <Stack
-                  direction='row'
-                  sx={{ alignItems: 'center', gap: 1 }}
-                >
+                <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
                   <TuneRounded
                     sx={{ fontSize: 18, color: designTokens.textMuted }}
                   />
@@ -259,7 +276,7 @@ function RouteComponent() {
           </Drawer>
         </>
       )}
-    </Stack>
+    </Box>
   );
 }
 
@@ -280,7 +297,9 @@ const RefineTabContent = () => (
       >
         Sort by
       </Typography>
-      <CtxSortBy />
+      <Box sx={{ '& .MuiFormControl-root': { width: '100%' } }}>
+        <CtxSortBy />
+      </Box>
     </Box>
     <CtxFacetOptions />
   </Stack>
@@ -361,62 +380,6 @@ const CompactStatsLine = () => {
         <CircularProgress size={10} />
       </Fade>
     </Stack>
-  );
-};
-
-// ── Configure indicator button (desktop stats line) ──
-
-const ConfigureIndicator = ({ filterCount }: { filterCount: number }) => {
-  const handleClick = () => {
-    document
-      .getElementById('configure-panel')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  return (
-    <Button
-      size='small'
-      onClick={handleClick}
-      startIcon={<TuneRounded sx={{ fontSize: 14 }} />}
-      sx={{
-        textTransform: 'none',
-        fontSize: 12.5,
-        fontWeight: 500,
-        color: designTokens.textMuted,
-        px: 1,
-        minWidth: 'auto',
-        borderRadius: '6px',
-        border: `1px solid ${designTokens.border}`,
-        background: designTokens.surface,
-        '&:hover': {
-          background: designTokens.surfaceMuted,
-          borderColor: designTokens.borderStrong,
-        },
-      }}
-    >
-      Configure
-      {filterCount > 0 && (
-        <Box
-          component='span'
-          sx={{
-            ml: 0.75,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 18,
-            height: 18,
-            borderRadius: '9px',
-            fontSize: 11,
-            fontWeight: 600,
-            px: 0.5,
-            backgroundColor: designTokens.accent,
-            color: designTokens.onAccent,
-          }}
-        >
-          {filterCount}
-        </Box>
-      )}
-    </Button>
   );
 };
 

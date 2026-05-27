@@ -5,27 +5,33 @@ import {
   SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
+import { analyticsQueryKeys } from '@/constants';
+import { useTypesenseClient } from '@/hooks';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { designTokens } from '@/theme/themePrimitives';
 import {
   CheckRounded,
   ContentCopyRounded,
+  DownloadRounded,
   OpenInNewRounded,
 } from '@mui/icons-material';
 import {
   Box,
   Button,
   IconButton,
+  Skeleton,
   Stack,
   Tooltip,
   Typography,
   Zoom,
 } from '@mui/material';
-import { createFileRoute } from '@tanstack/react-router';
-import { Suspense, useCallback } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { ErrorFallback } from '@/components';
 import { captureException } from '@sentry/react';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { Suspense, useCallback, useMemo } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import type { AnalyticsRuleSchema } from 'typesense/lib/Typesense/AnalyticsRule';
+import { ErrorFallback } from '@/components';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,
@@ -71,11 +77,216 @@ function RouteComponent() {
               <AnalyticsRulesList />
             </Suspense>
           </ErrorBoundary>
-          <EnableAnalyticsCard />
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense fallback={<EnableAnalyticsCard />}>
+              <AnalyticsInsight />
+            </Suspense>
+          </ErrorBoundary>
         </Stack>
       </Box>
     </Stack>
   );
+}
+
+function AnalyticsInsight() {
+  const [client, clusterId] = useTypesenseClient();
+  const { data: rules } = useSuspenseQuery({
+    queryKey: analyticsQueryKeys.rules(clusterId),
+    queryFn: async () => {
+      const res = await client.analytics.rules().retrieve();
+      return res.rules;
+    },
+  });
+
+  if (rules.length === 0) return <EnableAnalyticsCard />;
+
+  const popularRule = rules.find(
+    (r) =>
+      r.type === 'popular_queries' && Boolean(r.params.destination?.collection),
+  );
+
+  if (!popularRule) return <EnableAnalyticsCard />;
+
+  return <PopularQueriesCard rule={popularRule} />;
+}
+
+interface PopularQueryHit {
+  q: string;
+  count: number;
+}
+
+function PopularQueriesCard({ rule }: { rule: AnalyticsRuleSchema }) {
+  const [client] = useTypesenseClient();
+  const destination = rule.params.destination?.collection ?? '';
+
+  const { data: hits, isLoading } = useQuery({
+    queryKey: ['analytics', 'popular-queries', destination],
+    queryFn: async () => {
+      const res = await client
+        .collections(destination)
+        .documents()
+        .search({
+          q: '*',
+          query_by: 'q',
+          sort_by: 'count:desc',
+          per_page: 5,
+        });
+      return (
+        res.hits?.map((h) => h.document as PopularQueryHit).filter((d) => d.q) ??
+        []
+      );
+    },
+    enabled: Boolean(destination),
+    retry: false,
+  });
+
+  const max = useMemo(
+    () => Math.max(1, ...(hits?.map((h) => h.count) ?? [0])),
+    [hits],
+  );
+
+  const handleDownloadCsv = useCallback(() => {
+    if (!hits?.length) return;
+    const csv = ['query,count', ...hits.map((h) => `${escapeCsv(h.q)},${h.count}`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `popular-queries-${destination}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [hits, destination]);
+
+  return (
+    <SectionCard
+      title={
+        <Stack
+          direction='row'
+          sx={{ alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}
+        >
+          <Typography
+            component='span'
+            sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}
+          >
+            Popular queries
+          </Typography>
+          <Typography
+            component='span'
+            sx={{
+              fontSize: 12,
+              color: designTokens.textFaint,
+              fontFamily: designTokens.fontMono,
+            }}
+          >
+            · top {hits?.length ?? 5}
+          </Typography>
+        </Stack>
+      }
+      description={
+        <>
+          collected via{' '}
+          <Box component='code' sx={inlineCodeSx}>
+            {rule.name}
+          </Box>
+        </>
+      }
+      actions={
+        <Button
+          variant='outlined'
+          size='small'
+          startIcon={<DownloadRounded sx={{ fontSize: 13 }} />}
+          sx={smallButtonSx}
+          onClick={handleDownloadCsv}
+          disabled={!hits?.length}
+        >
+          CSV
+        </Button>
+      }
+    >
+      {isLoading ? (
+        <Stack spacing={1.25}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant='rectangular' height={14} />
+          ))}
+        </Stack>
+      ) : !hits?.length ? (
+        <Box sx={{ py: 2, textAlign: 'center' }}>
+          <Typography sx={{ fontSize: 13, color: designTokens.textMuted }}>
+            No queries captured yet.
+          </Typography>
+          <Typography
+            sx={{ fontSize: 12, color: designTokens.textFaint, mt: 0.5 }}
+          >
+            Once your application sends search traffic, the most popular queries
+            will appear here.
+          </Typography>
+        </Box>
+      ) : (
+        <Stack spacing={1.25}>
+          {hits.map((h) => (
+            <Stack
+              key={h.q}
+              direction='row'
+              sx={{ alignItems: 'center', gap: 1.5 }}
+            >
+              <Typography
+                sx={{
+                  flex: '0 0 28%',
+                  fontFamily: designTokens.fontMono,
+                  fontSize: 12.5,
+                  color: designTokens.text,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {h.q}
+              </Typography>
+              <Box
+                sx={{
+                  flex: 1,
+                  height: 10,
+                  background: designTokens.surfaceMuted,
+                  borderRadius: '5px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${(h.count / max) * 100}%`,
+                    height: '100%',
+                    background: designTokens.accent,
+                    borderRadius: '5px',
+                    transition: 'width 200ms ease',
+                  }}
+                />
+              </Box>
+              <Typography
+                sx={{
+                  flex: '0 0 64px',
+                  textAlign: 'right',
+                  fontFamily: designTokens.fontMono,
+                  fontSize: 12.5,
+                  color: designTokens.textMuted,
+                }}
+              >
+                {h.count.toLocaleString()}
+              </Typography>
+            </Stack>
+          ))}
+        </Stack>
+      )}
+    </SectionCard>
+  );
+}
+
+function escapeCsv(value: string) {
+  if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
+  return value;
 }
 
 const ENABLE_COMMAND = `./typesense-server --data-dir=/path/to/data --api-key=abcd \\

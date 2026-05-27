@@ -1,6 +1,10 @@
 import { ErrorFallback } from '@/components';
-import { AppNavbar } from '@/components/AppNavbar';
-import { SidebarBoundary, TopBar } from '@/components/redesign';
+import {
+  MOBILE_BOTTOM_NAV_HEIGHT,
+  MobileBottomNav,
+  SidebarBoundary,
+  TopBar,
+} from '@/components/redesign';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseStore } from '@/utils';
 import { Box } from '@mui/material';
@@ -43,7 +47,6 @@ function RouteComponent() {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <SidebarBoundary />
-      <AppNavbar />
       <Box
         component='main'
         sx={{
@@ -53,13 +56,15 @@ function RouteComponent() {
           display: 'flex',
           flexDirection: 'column',
           background: designTokens.surfaceTinted,
+          pb: {
+            xs: `calc(${MOBILE_BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom))`,
+            md: 0,
+          },
         }}
       >
         <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <TopBar crumbs={crumbs} />
         </Box>
-        {/* Spacer for the fixed mobile AppBar */}
-        <Box sx={{ display: { xs: 'block', md: 'none' }, height: 64, flexShrink: 0 }} />
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
           onError={(err: unknown) => {
@@ -71,6 +76,7 @@ function RouteComponent() {
           </Box>
         </ErrorBoundary>
       </Box>
+      <MobileBottomNav />
     </Box>
   );
 }
