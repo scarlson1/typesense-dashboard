@@ -1,7 +1,7 @@
-import { CollectionSwitcher } from '@/components/CollectionSwitcher';
 import {
   Badge,
   CollectionTabBar,
+  MobileCollectionScopeStrip,
   PageHeader,
   smallButtonSx,
 } from '@/components/redesign';
@@ -27,17 +27,6 @@ function RouteComponent() {
 
   return (
     <Stack sx={{ minWidth: 0 }}>
-      <Box
-        sx={{
-          display: { xs: 'flex', md: 'none' },
-          px: 2,
-          pt: 2,
-          pb: 0.5,
-          backgroundColor: 'background.paper',
-        }}
-      >
-        <CollectionSwitcher currentCollectionId={collectionId} />
-      </Box>
       <PageHeader
         title='Curation rules'
         badges={<Badge tone='neutral'>{collectionId}</Badge>}
@@ -76,6 +65,7 @@ function RouteComponent() {
           </Suspense>
         </ErrorBoundary>
       </Box>
+      <MobileCollectionScopeStrip currentCollectionId={collectionId} />
     </Stack>
   );
 }

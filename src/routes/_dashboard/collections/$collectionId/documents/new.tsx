@@ -1,7 +1,7 @@
-import { CollectionSwitcher } from '@/components/CollectionSwitcher';
 import {
   Badge,
   CollectionTabBar,
+  MobileCollectionScopeStrip,
   PageHeader,
   primaryButtonSx,
   SectionCard,
@@ -73,17 +73,6 @@ function RouteComponent() {
 
   return (
     <Stack sx={{ minWidth: 0 }}>
-      <Box
-        sx={{
-          display: { xs: 'flex', md: 'none' },
-          px: 2,
-          pt: 2,
-          pb: 0.5,
-          backgroundColor: 'background.paper',
-        }}
-      >
-        <CollectionSwitcher currentCollectionId={collectionId} />
-      </Box>
       <PageHeader
         title='Add documents'
         badges={
@@ -229,6 +218,7 @@ function RouteComponent() {
           <CurlSampleCard collectionId={collectionId} />
         </Stack>
       </Box>
+      <MobileCollectionScopeStrip currentCollectionId={collectionId} />
     </Stack>
   );
 }
@@ -295,8 +285,11 @@ function NewDocumentEditor() {
         </Stack>
       }
       footer={
-        <Stack direction='row' spacing={1}>
-          <FormControl size='small' sx={{ minWidth: 160 }}>
+        <Stack
+          direction='row'
+          sx={{ flexWrap: 'wrap', gap: 1 }}
+        >
+          <FormControl size='small' sx={{ minWidth: 120, flex: '1 1 auto' }}>
             <InputLabel id='action-select-label'>Action</InputLabel>
             <Select
               label='Action'
@@ -321,7 +314,7 @@ function NewDocumentEditor() {
               </Link>
             </FormHelperText>
           </FormControl>
-          <FormControl size='small' sx={{ minWidth: 200 }}>
+          <FormControl size='small' sx={{ minWidth: 120, flex: '1 1 auto' }}>
             <InputLabel id='dirty-values-select-label'>Dirty values</InputLabel>
             <Select
               label='Dirty values'
@@ -337,12 +330,12 @@ function NewDocumentEditor() {
               <MenuItem value='reject'>reject</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ flex: 1 }} />
+          <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }} />
           <Button
             onClick={handleSubmit}
             disabled={Boolean(markers.length)}
             variant='contained'
-            sx={primaryButtonSx}
+            sx={{ ...primaryButtonSx, flex: { xs: '1 1 100%', md: '0 0 auto' } }}
           >
             Add documents
           </Button>

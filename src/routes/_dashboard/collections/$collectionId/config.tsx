@@ -1,5 +1,5 @@
 import { ErrorFallback } from '@/components';
-import { CollectionSwitcher } from '@/components/CollectionSwitcher';
+import { MobileCollectionScopeStrip } from '@/components/redesign';
 import { SchemaFieldEditDialog } from '@/components/SchemaFieldEditDialog';
 import { SchemaTableView } from '@/components/SchemaTableView';
 import {
@@ -179,17 +179,6 @@ function CollectionSettings() {
 
   return (
     <Stack sx={{ minWidth: 0 }}>
-      <Box
-        sx={{
-          display: { xs: 'flex', md: 'none' },
-          px: 2,
-          pt: 2,
-          pb: 0.5,
-          backgroundColor: 'background.paper',
-        }}
-      >
-        <CollectionSwitcher currentCollectionId={collectionId} />
-      </Box>
       <PageHeader
         title='Schema'
         badges={
@@ -284,6 +273,7 @@ function CollectionSettings() {
           </ErrorBoundary>
         </Stack>
       </Box>
+      <MobileCollectionScopeStrip currentCollectionId={collectionId} />
     </Stack>
   );
 }
