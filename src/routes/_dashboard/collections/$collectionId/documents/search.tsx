@@ -1,13 +1,12 @@
 import { CollectionProvider } from '@/components/CollectionProvider';
+import { CollectionSwitcher } from '@/components/CollectionSwitcher';
 import { InstantSearch } from '@/components/InstantSearch';
 import {
   Badge,
   CollectionTabBar,
   PageHeader,
   primaryButtonSx,
-  smallButtonSx,
 } from '@/components/redesign';
-import { CtxRefinements } from '@/components/search';
 import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
 import {
   useCollectionSearchPreset,
@@ -19,7 +18,6 @@ import {
   AddRounded,
   GridViewRounded,
   MapRounded,
-  TuneRounded,
 } from '@mui/icons-material';
 import {
   Box,
@@ -117,6 +115,17 @@ function SearchLayout() {
           }}
         >
           <Stack sx={{ minWidth: 0 }}>
+            <Box
+              sx={{
+                display: { xs: 'flex', md: 'none' },
+                px: 2,
+                pt: 2,
+                pb: 0.5,
+                backgroundColor: 'background.paper',
+              }}
+            >
+              <CollectionSwitcher currentCollectionId={collectionId} />
+            </Box>
             <Suspense fallback={<CollectionPageHeader collectionId={collectionId} numDocs={0} />}>
               <CollectionPageHeaderConnected collectionId={collectionId} />
             </Suspense>
@@ -222,20 +231,6 @@ function CollectionPageHeader({
         <>
           <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
             <ViewToggleButtons />
-            <Button
-              variant='outlined'
-              size='small'
-              startIcon={<TuneRounded sx={{ fontSize: 14 }} />}
-              sx={smallButtonSx}
-              onClick={() => {
-                document.getElementById('search-params')?.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }}
-            >
-              Search parameters
-            </Button>
           </Box>
           <Button
             variant='contained'

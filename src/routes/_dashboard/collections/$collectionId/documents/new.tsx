@@ -1,3 +1,4 @@
+import { CollectionSwitcher } from '@/components/CollectionSwitcher';
 import {
   Badge,
   CollectionTabBar,
@@ -72,6 +73,17 @@ function RouteComponent() {
 
   return (
     <Stack sx={{ minWidth: 0 }}>
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          px: 2,
+          pt: 2,
+          pb: 0.5,
+          backgroundColor: 'background.paper',
+        }}
+      >
+        <CollectionSwitcher currentCollectionId={collectionId} />
+      </Box>
       <PageHeader
         title='Add documents'
         badges={

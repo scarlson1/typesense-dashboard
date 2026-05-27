@@ -213,7 +213,20 @@ const NewApiKeyForm = ({
             slotProps={{
               textField: {
                 placeholder: 'Never',
-                sx: fieldInputSx,
+                sx: [
+                  fieldInputSx,
+                  {
+                    '& .MuiOutlinedInput-root': {
+                      '& .MuiPickersSectionList-root': {
+                        padding: '4px 4px',
+                      },
+                      '& .MuiPickersSectionList-sectionContent': {
+                        fontSize: 13,
+                        fontFamily: designTokens.fontMono,
+                      },
+                    },
+                  },
+                ],
                 fullWidth: true,
               },
               nextIconButton: { size: 'small' },

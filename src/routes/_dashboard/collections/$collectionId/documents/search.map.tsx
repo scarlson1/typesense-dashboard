@@ -4,18 +4,24 @@ import {
   CtxPageSize,
   CtxPagination,
   CtxSearchError,
-  CtxSearchStats,
   DashboardDisplayOptions,
   SearchBox,
 } from '@/components/search';
-import { useDefaultIndexParams, useHits, useSchema } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
+import { useDefaultIndexParams, useHits, useSearch, useSchema } from '@/hooks';
 import { typesenseFieldType } from '@/types';
-import { OpenInNewRounded, SettingsRounded } from '@mui/icons-material';
+import {
+  OpenInNewRounded,
+  SearchRounded,
+  SettingsRounded,
+} from '@mui/icons-material';
 import {
   Alert,
   AlertTitle,
   Box,
+  CircularProgress,
   ClickAwayListener,
+  Fade,
   FormControl,
   IconButton,
   InputLabel,
@@ -36,8 +42,6 @@ import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 const SwipeableEdgeDrawer = lazy(
   () => import('@/components/SwipeableEdgeDrawer'),
 );
-
-// TODO: filter / display settings for mobile (number of results, pagination, etc.)
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search/map',
@@ -61,7 +65,6 @@ function RouteComponent() {
   const { collectionId } = Route.useParams();
   const schema = useSchema(collectionId);
 
-  // TODO: support geopoint[] layer type ??
   const isGeopoint = useMemo(() => {
     if (!geoFieldName) return true;
     const field = schema.data.fields.find((f) => f.name === geoFieldName);
@@ -142,12 +145,7 @@ function RouteComponent() {
 
       <Box sx={{ flex: '1 1 auto', height: '100%' }}>
         {geoFieldName ? (
-          <Paper
-            sx={{
-              height: '100%',
-              position: 'relative',
-            }}
-          >
+          <Paper sx={{ height: '100%', position: 'relative' }}>
             <GeoSearch geoFieldName={geoFieldName} />
           </Paper>
         ) : (
@@ -162,46 +160,62 @@ function RouteComponent() {
             minWidth: 0,
             height: '100%',
             px: 2,
-            // overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
           <Stack
             direction='column'
-            spacing={{ xs: 0.5, sm: 1, md: 2 }}
+            spacing={1}
             sx={{ flex: '1 1 auto', overflowY: 'auto' }}
           >
+            {/* Search bar card */}
             <Box
               sx={{
-                bgcolor: 'background.default',
-                pb: 1,
+                bgcolor: 'background.paper',
+                border: `1px solid ${designTokens.border}`,
+                borderRadius: 1,
+                px: 1.25,
+                py: 0.75,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
                 position: 'sticky',
                 top: 0,
                 zIndex: 10,
               }}
             >
-              <Stack
-                direction='row'
-                spacing={1}
+              <SearchRounded
                 sx={{
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  my: 1,
+                  fontSize: 16,
+                  color: designTokens.textFaint,
+                  flexShrink: 0,
                 }}
-              >
-                <SearchBox sx={{ mb: 1 }} />
-                <DisplayOptionsButton
-                  setGeoFieldName={setGeoFieldName}
-                  geoFieldName={geoFieldName || ''}
-                  geoFieldOptions={geoFieldOptions}
+              />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <SearchBox
+                  placeholder='Search…'
+                  variant='standard'
+                  size='small'
+                  sx={{
+                    my: 0,
+                    '& .MuiInput-root': {
+                      fontSize: 13,
+                      '&:before, &:after': { display: 'none' },
+                    },
+                    '& .MuiFormHelperText-root': { display: 'none' },
+                  }}
                 />
-              </Stack>
-
-              <CtxSearchStats />
-              <CtxSearchError />
+              </Box>
+              <MapCompactStats />
+              <DisplayOptionsButton
+                setGeoFieldName={setGeoFieldName}
+                geoFieldName={geoFieldName || ''}
+                geoFieldOptions={geoFieldOptions}
+              />
             </Box>
 
+            <CtxSearchError />
             <ContextHits hitWrapperProps={{ size: 12 }} />
           </Stack>
 
@@ -211,6 +225,42 @@ function RouteComponent() {
         </Box>
       ) : null}
     </Box>
+  );
+}
+
+function MapCompactStats() {
+  const { data, isLoading, isFetching } = useSearch();
+  if (!data?.found && !isLoading && !isFetching) return null;
+
+  return (
+    <Stack
+      direction='row'
+      spacing={0.5}
+      sx={{
+        alignItems: 'center',
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {data?.found !== undefined ? (
+        <Typography
+          component='span'
+          sx={{
+            fontSize: 11.5,
+            color: designTokens.textFaint,
+            fontFamily: designTokens.fontMono,
+          }}
+        >
+          {data.found.toLocaleString()}
+          {data.search_time_ms !== undefined
+            ? ` · ${data.search_time_ms}ms`
+            : ''}
+        </Typography>
+      ) : null}
+      <Fade in={isLoading || isFetching}>
+        <CircularProgress size={10} />
+      </Fade>
+    </Stack>
   );
 }
 
@@ -249,16 +299,26 @@ function DisplayOptionsButton({
       <IconButton
         ref={anchorRef}
         size='small'
-        aria-controls={open ? 'composition-menu' : undefined}
+        aria-controls={open ? 'map-settings-menu' : undefined}
         aria-expanded={open ? 'true' : undefined}
         aria-haspopup='true'
         onClick={handleToggle}
         sx={{
+          width: 28,
+          height: 28,
+          borderRadius: '6px',
+          color: designTokens.textFaint,
+          border: `1px solid ${designTokens.border}`,
+          background: designTokens.surface,
+          flexShrink: 0,
           zIndex: (theme) => theme.zIndex.drawer + 2,
-          pointerEvents: 'auto',
+          '&:hover': {
+            color: designTokens.text,
+            borderColor: designTokens.borderStrong,
+          },
         }}
       >
-        <SettingsRounded fontSize='inherit' />
+        <SettingsRounded sx={{ fontSize: 14 }} />
       </IconButton>
       <Popper
         open={open}
@@ -271,32 +331,32 @@ function DisplayOptionsButton({
           <Paper
             ref={paperRef}
             sx={{
-              width: 500,
+              width: 400,
               maxWidth: '90vw',
-              py: { xs: 2, sm: 3 },
-              px: 1.5,
+              p: 2,
               bgcolor: 'background.paper',
-              border: (theme) => `1px solid ${theme.vars.palette.divider}`,
+              border: `1px solid ${designTokens.border}`,
               zIndex: 2200,
               maxHeight: '70vh',
               overflowY: 'auto',
+              borderRadius: 1,
+              boxShadow:
+                '0 4px 12px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.06)',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', pb: 2 }}>
-              <Typography
-                sx={{
-                  textAlign: 'right',
-                  flex: '0 0 25%',
-                  mr: 2,
-                  display: { xs: 'none', sm: 'block' },
-                }}
-              >
-                Geo field
-              </Typography>
-              <FormControl
-                sx={{ minWidth: 120, flex: '1 1 auto' }}
-                size='small'
-              >
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: designTokens.text,
+                mb: 1.5,
+              }}
+            >
+              Map settings
+            </Typography>
+
+            <Stack spacing={1.5}>
+              <FormControl fullWidth size='small'>
                 <InputLabel id='geo-field-label'>Geo field</InputLabel>
                 <Select
                   labelId='geo-field-label'
@@ -312,22 +372,39 @@ function DisplayOptionsButton({
                   ))}
                 </Select>
               </FormControl>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', pb: 2 }}>
-              <Typography
+
+              <Stack direction='row' sx={{ alignItems: 'center', gap: 1.5 }}>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    color: designTokens.text,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Hits per page
+                </Typography>
+                <CtxPageSize />
+              </Stack>
+
+              <Box
                 sx={{
-                  textAlign: 'right',
-                  flex: '0 0 25%',
-                  mr: 2,
-                  display: { xs: 'none', sm: 'block' },
+                  pt: 1.5,
+                  borderTop: `1px solid ${designTokens.border}`,
                 }}
               >
-                Hits limit
-              </Typography>
-              <CtxPageSize />
-            </Box>
-
-            <DashboardDisplayOptions />
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: designTokens.text,
+                    mb: 1,
+                  }}
+                >
+                  Display fields
+                </Typography>
+                <DashboardDisplayOptions />
+              </Box>
+            </Stack>
           </Paper>
         </ClickAwayListener>
       </Popper>
