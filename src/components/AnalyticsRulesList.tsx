@@ -69,8 +69,9 @@ export function AnalyticsRulesList() {
     <Box
       sx={{
         display: 'flex',
+        flexDirection: { xs: 'column', lg: 'row' },
         gap: 2,
-        alignItems: 'flex-start',
+        alignItems: { lg: 'flex-start' },
         width: '100%',
       }}
     >
@@ -223,7 +224,7 @@ export function AnalyticsRulesList() {
       </Box>
 
       {/* Right: form panel */}
-      <Box sx={{ width: 300, flexShrink: 0 }}>
+      <Box sx={{ width: { xs: '100%', lg: 300 }, flexShrink: 0 }}>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
           onError={(err: unknown) => captureException(err)}

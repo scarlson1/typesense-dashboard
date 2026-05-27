@@ -24,8 +24,8 @@ export const PageHeader = ({
   return (
     <Box
       sx={{
-        px: 3.5,
-        pt: 2.75,
+        px: { xs: 2, md: 3.5 },
+        pt: { xs: 2, md: 2.75 },
         backgroundColor: 'background.paper',
         borderBottom: `1px solid ${designTokens.border}`,
       }}
@@ -37,6 +37,9 @@ export const PageHeader = ({
             color: designTokens.textFaint,
             fontFamily: designTokens.fontMono,
             mb: 0.75,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {eyebrow}
@@ -44,14 +47,18 @@ export const PageHeader = ({
       ) : null}
       <Stack
         direction='row'
-        sx={{ alignItems: 'flex-start', gap: 1.75, mb: 1.75 }}
+        sx={{
+          alignItems: 'flex-start',
+          gap: { xs: 1, sm: 1.75 },
+          mb: 1.75,
+        }}
       >
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography
             component='h1'
             sx={{
               m: 0,
-              fontSize: 22,
+              fontSize: { xs: 18, md: 22 },
               fontWeight: 600,
               letterSpacing: '-0.025em',
               color: designTokens.text,
@@ -62,21 +69,43 @@ export const PageHeader = ({
               flexWrap: 'wrap',
             }}
           >
-            {title}
+            <Box
+              component='span'
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {title}
+            </Box>
             {badges}
           </Typography>
         </Box>
         {actions ? (
           <Stack
             direction='row'
-            sx={{ gap: 1, alignItems: 'center', flexShrink: 0 }}
+            sx={{
+              gap: 1,
+              alignItems: 'center',
+              flexShrink: 0,
+              flexWrap: 'wrap',
+            }}
           >
             {actions}
           </Stack>
         ) : null}
       </Stack>
       {tabs ? (
-        <Stack direction='row' sx={{ gap: 0.5, mt: 0.75 }}>
+        <Stack
+          direction='row'
+          sx={{
+            gap: 0.5,
+            mt: 0.75,
+            display: { xs: 'none', md: 'flex' },
+          }}
+        >
           {tabs.map((t) => {
             const active = t === activeTab;
             return (

@@ -298,13 +298,13 @@ export const colorSchemes = {
         dark: brand[700],
         contrastText: brand[50],
       },
+      primaryChannel: '6 112 219',
       secondary: {
         light: gray[200],
         main: gray[400],
         dark: gray[700],
         contrastText: gray[50],
       },
-      // Explicit channel to satisfy MUI CSS vars channel generation (gray[400] ≈ rgb(163,173,184))
       secondaryChannel: '163 173 184',
       info: {
         light: brand[100],
@@ -331,9 +331,12 @@ export const colorSchemes = {
         ...gray,
       },
       divider: 'var(--ts-border)',
+      dividerChannel: '228 231 236',
       background: {
         default: 'var(--ts-bg)',
         paper: 'var(--ts-surface)',
+        defaultChannel: '255 255 255',
+        paperChannel: '255 255 255',
       },
       text: {
         primary: 'var(--ts-text)',
@@ -356,13 +359,13 @@ export const colorSchemes = {
         main: brand[400],
         dark: brand[700],
       },
+      primaryChannel: '6 112 219',
       secondary: {
         contrastText: gray[50],
         light: gray[300],
         main: gray[400],
         dark: gray[700],
       },
-      // Explicit channel to satisfy MUI CSS vars channel generation (gray[400] ≈ rgb(163,173,184))
       secondaryChannel: '163 173 184',
       info: {
         contrastText: brand[300],
@@ -389,9 +392,12 @@ export const colorSchemes = {
         ...gray,
       },
       divider: 'var(--ts-border)',
+      dividerChannel: '35 42 55',
       background: {
         default: 'var(--ts-bg)',
         paper: 'var(--ts-surface)',
+        defaultChannel: '11 15 23',
+        paperChannel: '17 22 31',
       },
       text: {
         primary: 'var(--ts-text)',

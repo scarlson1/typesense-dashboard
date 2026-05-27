@@ -45,8 +45,9 @@ function RouteComponent() {
           py: 2.25,
           background: designTokens.surfaceTinted,
           display: 'flex',
+          flexDirection: { xs: 'column', lg: 'row' },
           gap: 2.25,
-          alignItems: 'flex-start',
+          alignItems: { lg: 'flex-start' },
           minHeight: 0,
         }}
       >
@@ -71,7 +72,7 @@ function RouteComponent() {
         {/* Right: create panel */}
         <Box
           sx={{
-            width: 340,
+            width: { xs: '100%', lg: 340 },
             flexShrink: 0,
             background: designTokens.surface,
             border: `1px solid ${designTokens.border}`,

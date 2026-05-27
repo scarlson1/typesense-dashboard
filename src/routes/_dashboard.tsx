@@ -58,6 +58,8 @@ function RouteComponent() {
         <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <TopBar crumbs={crumbs} />
         </Box>
+        {/* Spacer for the fixed mobile AppBar */}
+        <Box sx={{ display: { xs: 'block', md: 'none' }, height: 64, flexShrink: 0 }} />
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
           onError={(err: unknown) => {

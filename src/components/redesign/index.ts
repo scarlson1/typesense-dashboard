@@ -19,3 +19,4 @@ export {
   ghostButtonSx,
   dangerButtonSx,
 } from './buttonStyles';
+export { CollectionTabBar } from './CollectionTabBar';

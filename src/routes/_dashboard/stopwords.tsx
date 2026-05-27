@@ -109,8 +109,9 @@ function RouteComponent() {
           background: designTokens.surfaceTinted,
           minHeight: 0,
           display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
           gap: 2,
-          alignItems: 'flex-start',
+          alignItems: { md: 'flex-start' },
         }}
       >
         {/* Left: sets sidebar */}
@@ -157,7 +158,7 @@ function SetsSidebar({
   onSelect: (id: string | null) => void;
 }) {
   return (
-    <Box sx={{ width: 260, flexShrink: 0 }}>
+    <Box sx={{ width: { xs: '100%', md: 260 }, flexShrink: 0 }}>
       <Typography
         sx={{
           fontSize: 11,

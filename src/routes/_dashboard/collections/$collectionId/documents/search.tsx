@@ -2,6 +2,7 @@ import { CollectionProvider } from '@/components/CollectionProvider';
 import { InstantSearch } from '@/components/InstantSearch';
 import {
   Badge,
+  CollectionTabBar,
   PageHeader,
   primaryButtonSx,
   smallButtonSx,
@@ -119,6 +120,7 @@ function SearchLayout() {
             <Suspense fallback={<CollectionPageHeader collectionId={collectionId} numDocs={0} />}>
               <CollectionPageHeaderConnected collectionId={collectionId} />
             </Suspense>
+            <CollectionTabBar collectionId={collectionId} />
             <Box
               sx={{
                 flex: 1,
@@ -218,21 +220,23 @@ function CollectionPageHeader({
       }
       actions={
         <>
-          <ViewToggleButtons />
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<TuneRounded sx={{ fontSize: 14 }} />}
-            sx={smallButtonSx}
-            onClick={() => {
-              document.getElementById('search-params')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-          >
-            Search parameters
-          </Button>
+          <Box sx={{ display: { xs: 'none', md: 'contents' } }}>
+            <ViewToggleButtons />
+            <Button
+              variant='outlined'
+              size='small'
+              startIcon={<TuneRounded sx={{ fontSize: 14 }} />}
+              sx={smallButtonSx}
+              onClick={() => {
+                document.getElementById('search-params')?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }}
+            >
+              Search parameters
+            </Button>
+          </Box>
           <Button
             variant='contained'
             size='small'
@@ -242,7 +246,12 @@ function CollectionPageHeader({
             to='/collections/$collectionId/documents/new'
             params={{ collectionId }}
           >
-            Add documents
+            <Box component='span' sx={{ display: { xs: 'none', sm: 'inline' } }}>
+              Add documents
+            </Box>
+            <Box component='span' sx={{ display: { xs: 'inline', sm: 'none' } }}>
+              Add
+            </Box>
           </Button>
         </>
       }

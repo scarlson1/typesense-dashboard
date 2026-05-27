@@ -89,8 +89,9 @@ export function PresetsList() {
     <Box
       sx={{
         display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
         gap: 2,
-        alignItems: 'flex-start',
+        alignItems: { md: 'flex-start' },
         width: '100%',
       }}
     >
@@ -152,7 +153,7 @@ function Sidebar({
   onSelect,
 }: SidebarProps) {
   return (
-    <Box sx={{ width: 260, flexShrink: 0 }}>
+    <Box sx={{ width: { xs: '100%', md: 260 }, flexShrink: 0 }}>
       <Stack
         direction='row'
         sx={{ alignItems: 'center', mb: 0.875, px: '2px' }}

@@ -3,6 +3,7 @@ import { SchemaFieldEditDialog } from '@/components/SchemaFieldEditDialog';
 import { SchemaTableView } from '@/components/SchemaTableView';
 import {
   Badge,
+  CollectionTabBar,
   dangerButtonSx,
   PageHeader,
   primaryButtonSx,
@@ -30,9 +31,11 @@ import {
 import {
   Box,
   Button,
+  IconButton,
   Link,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
@@ -187,30 +190,20 @@ function CollectionSettings() {
           </>
         }
         actions={
-          <>
-            <Button
-              variant='outlined'
-              size='small'
-              startIcon={<ContentCopyRounded sx={{ fontSize: 14 }} />}
-              sx={smallButtonSx}
-              onClick={handleCopyJSON}
-            >
-              Copy as JSON
-            </Button>
-            <Button
-              variant='contained'
-              size='small'
-              startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
-              sx={primaryButtonSx}
-              onClick={() => handleUpdateSchema()}
-              loading={mutation.isPending}
-              disabled={Boolean(markers.length)}
-            >
-              Save schema
-            </Button>
-          </>
+          <Button
+            variant='contained'
+            size='small'
+            startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
+            sx={primaryButtonSx}
+            onClick={() => handleUpdateSchema()}
+            loading={mutation.isPending}
+            disabled={Boolean(markers.length)}
+          >
+            Save schema
+          </Button>
         }
       />
+      <CollectionTabBar collectionId={collectionId} />
 
       <Box
         sx={{
@@ -231,7 +224,7 @@ function CollectionSettings() {
       >
         <Box sx={{ minWidth: 0 }}>
           <SectionCard noBodyPadding>
-            <SchemaViewTabs view={view} onChange={setView} />
+            <SchemaViewTabs view={view} onChange={setView} onCopyJSON={handleCopyJSON} />
             <Box
               sx={{
                 borderRadius: 0,
@@ -291,9 +284,11 @@ const VIEW_TABS: { value: SchemaView; label: string }[] = [
 function SchemaViewTabs({
   view,
   onChange,
+  onCopyJSON,
 }: {
   view: SchemaView;
   onChange: (next: SchemaView) => void;
+  onCopyJSON: () => void;
 }) {
   return (
     <Stack
@@ -304,6 +299,7 @@ function SchemaViewTabs({
         pt: 0.5,
         borderBottom: `1px solid ${designTokens.border}`,
         background: designTokens.surface,
+        alignItems: 'center',
       }}
     >
       {VIEW_TABS.map((t) => {
@@ -333,6 +329,42 @@ function SchemaViewTabs({
           </Box>
         );
       })}
+      <Box sx={{ flex: 1 }} />
+      <Tooltip title='Copy as JSON'>
+        <IconButton
+          size='small'
+          onClick={onCopyJSON}
+          sx={{
+            width: 28,
+            height: 28,
+            borderRadius: '6px',
+            color: designTokens.textFaint,
+            border: `1px solid ${designTokens.border}`,
+            background: designTokens.surface,
+            display: { xs: 'inline-flex', md: 'none' },
+            '&:hover': {
+              color: designTokens.text,
+              borderColor: designTokens.borderStrong,
+            },
+          }}
+        >
+          <ContentCopyRounded sx={{ fontSize: 13 }} />
+        </IconButton>
+      </Tooltip>
+      <Button
+        variant='outlined'
+        size='small'
+        startIcon={<ContentCopyRounded sx={{ fontSize: 13 }} />}
+        onClick={onCopyJSON}
+        sx={{
+          ...smallButtonSx,
+          height: 28,
+          fontSize: 12,
+          display: { xs: 'none', md: 'inline-flex' },
+        }}
+      >
+        Copy as JSON
+      </Button>
     </Stack>
   );
 }

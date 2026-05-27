@@ -1,5 +1,6 @@
 import {
   Badge,
+  CollectionTabBar,
   PageHeader,
   SectionCard,
   smallButtonSx,
@@ -56,6 +57,7 @@ function RouteComponent() {
           </>
         }
       />
+      <CollectionTabBar collectionId={collectionId} />
 
       <Box
         sx={{

@@ -51,8 +51,9 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
     <Box
       sx={{
         display: 'flex',
+        flexDirection: { xs: 'column', lg: 'row' },
         gap: 2,
-        alignItems: 'flex-start',
+        alignItems: { lg: 'flex-start' },
         width: '100%',
       }}
     >
@@ -85,7 +86,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
       </Box>
 
       {/* Right: form panel */}
-      <Box sx={{ width: 320, flexShrink: 0 }}>
+      <Box sx={{ width: { xs: '100%', lg: 320 }, flexShrink: 0 }}>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
           onError={(err: unknown) => captureException(err)}
