@@ -1,5 +1,6 @@
 import { ErrorFallback } from '@/components';
 import { CollectionsGrid } from '@/components/CollectionsGrid';
+import { collectionQueryKeys } from '@/constants';
 import {
   Badge,
   PageHeader,
@@ -13,13 +14,15 @@ import { formatBytes } from '@/utils';
 import {
   AddRounded,
   DownloadRounded,
+  FiberManualRecordRounded,
 } from '@mui/icons-material';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button, Stack, Typography, useMediaQuery, type Theme } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute, Link as RouterLink, useNavigate } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { formatDistanceToNow } from 'date-fns';
 
 export const Route = createFileRoute('/_dashboard/collections/')({
   component: CollectionsComponent,
@@ -27,6 +30,8 @@ export const Route = createFileRoute('/_dashboard/collections/')({
 });
 
 function CollectionsComponent() {
+  const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+
   return (
     <Stack sx={{ minWidth: 0 }}>
       <ErrorBoundary
@@ -41,36 +46,49 @@ function CollectionsComponent() {
       <Box
         sx={{
           flex: 1,
-          px: { xs: 3, md: 4 },
+          px: { xs: 2, md: 4 },
           py: 2.5,
           background: designTokens.surfaceTinted,
           minHeight: 0,
         }}
       >
-        <ErrorBoundary
-          FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => captureException(err)}
-        >
-          <Suspense fallback={<StatStripFallback />}>
-            <StatStrip />
-          </Suspense>
-        </ErrorBoundary>
-
-        <Box
-          sx={{
-            backgroundColor: 'background.paper',
-            border: `1px solid ${designTokens.border}`,
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}
-        >
+        {mobile ? (
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
             onError={(err: unknown) => captureException(err)}
           >
-            <CollectionsGrid />
+            <Suspense fallback={null}>
+              <MobileCollectionList />
+            </Suspense>
           </ErrorBoundary>
-        </Box>
+        ) : (
+          <>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: unknown) => captureException(err)}
+            >
+              <Suspense fallback={<StatStripFallback />}>
+                <StatStrip />
+              </Suspense>
+            </ErrorBoundary>
+
+            <Box
+              sx={{
+                backgroundColor: 'background.paper',
+                border: `1px solid ${designTokens.border}`,
+                borderRadius: 1,
+                overflow: 'hidden',
+              }}
+            >
+              <ErrorBoundary
+                FallbackComponent={ErrorFallback}
+                onError={(err: unknown) => captureException(err)}
+              >
+                <CollectionsGrid />
+              </ErrorBoundary>
+            </Box>
+          </>
+        )}
       </Box>
     </Stack>
   );
@@ -208,6 +226,109 @@ function StatStrip() {
         sub='requests/sec'
       />
     </Box>
+  );
+}
+
+function MobileCollectionList() {
+  const [client, clusterId] = useTypesenseClient();
+  const navigate = useNavigate();
+  const { data: collections } = useQuery({
+    queryKey: collectionQueryKeys.list(clusterId, {}),
+    queryFn: () => client.collections().retrieve(),
+  });
+
+  if (!collections?.length) return null;
+
+  return (
+    <Stack sx={{ gap: 1.25 }}>
+      {collections.map((c) => {
+        const docs = c.num_documents ?? 0;
+        const created = (c as { created_at?: number }).created_at;
+        const updatedLabel = created
+          ? `updated ${formatDistanceToNow(new Date(created * 1000), { addSuffix: true })}`
+          : '';
+        return (
+          <Box
+            key={c.name}
+            onClick={() =>
+              navigate({
+                to: '/collections/$collectionId/documents/search',
+                params: { collectionId: c.name },
+              })
+            }
+            sx={{
+              backgroundColor: 'background.paper',
+              border: `1px solid ${designTokens.border}`,
+              borderRadius: 1.5,
+              px: 2,
+              py: 1.75,
+              cursor: 'pointer',
+              '&:hover': { borderColor: designTokens.borderStrong },
+            }}
+          >
+            <Stack
+              direction='row'
+              sx={{ alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}
+            >
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Stack direction='row' sx={{ alignItems: 'center', gap: 0.75 }}>
+                  <FiberManualRecordRounded
+                    sx={{ fontSize: 8, color: designTokens.success, flexShrink: 0 }}
+                  />
+                  <Typography
+                    noWrap
+                    sx={{
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: designTokens.text,
+                    }}
+                  >
+                    {c.name.replace(/_/g, ' ')}
+                  </Typography>
+                </Stack>
+                <Typography
+                  noWrap
+                  sx={{
+                    fontSize: 12,
+                    color: designTokens.textFaint,
+                    fontFamily: designTokens.fontMono,
+                    mt: 0.25,
+                    pl: 1.75,
+                  }}
+                >
+                  {c.name}
+                </Typography>
+              </Box>
+              <Typography
+                sx={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: designTokens.textMuted,
+                  fontFamily: designTokens.fontMono,
+                  flexShrink: 0,
+                  pt: 0.25,
+                }}
+              >
+                {docs.toLocaleString()}
+              </Typography>
+            </Stack>
+            {updatedLabel && (
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  color: designTokens.textFaint,
+                  fontFamily: designTokens.fontMono,
+                  mt: 0.75,
+                  pl: 1.75,
+                }}
+              >
+                {updatedLabel}
+              </Typography>
+            )}
+          </Box>
+        );
+      })}
+    </Stack>
   );
 }
 

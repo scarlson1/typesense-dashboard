@@ -80,7 +80,14 @@ export const PageHeader = ({
             >
               {title}
             </Box>
-            {badges}
+            {badges ? (
+              <Box
+                component='span'
+                sx={{ display: { xs: 'none', md: 'contents' } }}
+              >
+                {badges}
+              </Box>
+            ) : null}
           </Typography>
         </Box>
         {actions ? (

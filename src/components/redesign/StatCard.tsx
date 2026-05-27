@@ -72,11 +72,17 @@ export const StatCard = ({
       {children}
       <Stack
         direction='row'
-        sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 0.5,
+          flexWrap: 'nowrap',
+        }}
       >
         {sub ? (
           <Typography
-            sx={{ fontSize: 11.5, color: designTokens.textMuted }}
+            noWrap
+            sx={{ fontSize: 11.5, color: designTokens.textMuted, minWidth: 0 }}
           >
             {sub}
           </Typography>
@@ -85,12 +91,14 @@ export const StatCard = ({
         )}
         {delta ? (
           <Typography
+            noWrap
             sx={{
               fontSize: 11.5,
               color: deltaPositive
                 ? designTokens.successDeep
                 : designTokens.textMuted,
               fontWeight: 500,
+              flexShrink: 0,
             }}
           >
             {delta}

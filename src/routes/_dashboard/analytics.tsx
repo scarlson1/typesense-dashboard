@@ -1,3 +1,4 @@
+import { ErrorFallback } from '@/components';
 import { AnalyticsRulesList } from '@/components/AnalyticsRulesList';
 import {
   Badge,
@@ -31,12 +32,13 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Suspense, useCallback, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import type { AnalyticsRuleSchema } from 'typesense/lib/Typesense/AnalyticsRule';
-import { ErrorFallback } from '@/components';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,
   staticData: { crumb: 'Analytics' },
 });
+
+// TODO: move enable analytics and analytics to Analytics Rules List layout (or refactor to move layout to this file)
 
 function RouteComponent() {
   return (
@@ -125,18 +127,16 @@ function PopularQueriesCard({ rule }: { rule: AnalyticsRuleSchema }) {
   const { data: hits, isLoading } = useQuery({
     queryKey: ['analytics', 'popular-queries', destination],
     queryFn: async () => {
-      const res = await client
-        .collections(destination)
-        .documents()
-        .search({
-          q: '*',
-          query_by: 'q',
-          sort_by: 'count:desc',
-          per_page: 5,
-        });
+      const res = await client.collections(destination).documents().search({
+        q: '*',
+        query_by: 'q',
+        sort_by: 'count:desc',
+        per_page: 5,
+      });
       return (
-        res.hits?.map((h) => h.document as PopularQueryHit).filter((d) => d.q) ??
-        []
+        res.hits
+          ?.map((h) => h.document as PopularQueryHit)
+          .filter((d) => d.q) ?? []
       );
     },
     enabled: Boolean(destination),
@@ -150,7 +150,10 @@ function PopularQueriesCard({ rule }: { rule: AnalyticsRuleSchema }) {
 
   const handleDownloadCsv = useCallback(() => {
     if (!hits?.length) return;
-    const csv = ['query,count', ...hits.map((h) => `${escapeCsv(h.q)},${h.count}`)].join('\n');
+    const csv = [
+      'query,count',
+      ...hits.map((h) => `${escapeCsv(h.q)},${h.count}`),
+    ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

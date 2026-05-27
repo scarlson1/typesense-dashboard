@@ -1,11 +1,11 @@
 import { ErrorFallback } from '@/components';
 import {
-  BigChart,
   Badge,
-  SectionCard,
-  StatCard,
-  smallButtonSx,
+  BigChart,
   primaryButtonSx,
+  SectionCard,
+  smallButtonSx,
+  StatCard,
 } from '@/components/redesign';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -135,10 +135,7 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
       >
         {fallback ? '—' : <ServerEyebrow />}
       </Typography>
-      <Stack
-        direction='row'
-        sx={{ alignItems: 'flex-start', gap: 2 }}
-      >
+      <Stack direction='row' sx={{ alignItems: 'flex-start', gap: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Typography
             component='h1'
@@ -153,7 +150,9 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
           >
             Cluster overview
           </Typography>
-          {!fallback && <HomeSubtitle />}
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            {!fallback && <HomeSubtitle />}
+          </Box>
         </Box>
         <Stack direction='row' sx={{ gap: 1 }}>
           <Button
@@ -166,7 +165,7 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
             startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
             sx={smallButtonSx}
           >
-            Open docs
+            Docs
           </Button>
           <Button
             component={RouterLink as React.ElementType}
@@ -216,10 +215,7 @@ function HomeSubtitle() {
     retry: false,
   });
   if (!collections) return null;
-  const docs = collections.reduce(
-    (acc, c) => acc + (c.num_documents ?? 0),
-    0,
-  );
+  const docs = collections.reduce((acc, c) => acc + (c.num_documents ?? 0), 0);
   return (
     <Typography
       sx={{ fontSize: 13.5, color: designTokens.textMuted, mt: 0.75 }}
@@ -573,4 +569,3 @@ function LegendDot({
     </Stack>
   );
 }
-
