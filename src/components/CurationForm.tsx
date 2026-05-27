@@ -1,38 +1,84 @@
 import { overrideFormOpts, overrideQueryMatch } from '@/constants';
 import { withForm } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
+import { primaryButtonSx } from '@/components/redesign';
+import { CheckRounded } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Collapse,
-  FormHelperText,
-  Grid,
   Skeleton,
   Stack,
+  Switch,
+  TextField as MuiTextField,
   Typography,
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { Suspense, useEffect, useState } from 'react';
 
+const labelSx = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: designTokens.textFaint,
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.06em',
+  mb: 0.75,
+  mt: 1.5,
+};
+
+const compactInputSx = {
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: designTokens.surface,
+    fontSize: 12.5,
+    fontFamily: designTokens.fontMono,
+    minHeight: 32,
+    borderRadius: '6px',
+    '& fieldset': {
+      borderColor: designTokens.border,
+      transition: 'border-color 120ms ease',
+    },
+    '&:hover fieldset': { borderColor: designTokens.borderStrong },
+    '&.Mui-focused fieldset': {
+      borderColor: designTokens.accent,
+      borderWidth: 1,
+    },
+    '& input': {
+      fontSize: 12.5,
+      fontFamily: designTokens.fontMono,
+      padding: '6px 10px !important',
+    },
+    '& input::placeholder': {
+      color: designTokens.textMuted,
+      opacity: 1,
+    },
+  },
+};
+
+const switchRowSx = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  py: 0.5,
+};
+
+const switchLabelSx = {
+  fontSize: 12,
+  color: designTokens.text,
+  fontWeight: 500,
+};
+
 export const CurationForm = withForm({
   ...overrideFormOpts,
   props: {
-    submitButtonText: 'Submit',
+    submitButtonText: 'Save override',
   },
   render: function CurationFormComponent({ form, submitButtonText }) {
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-    const {
-      rule_query_bool,
-      rule_filter_bool,
-      rule_tags_bool,
-      filter_by_bool,
-      sort_by_bool,
-      replace_query_bool,
-      custom_metadata_bool,
-      effective_from_ts_bool,
-      effective_to_ts_bool,
-    } = useStore(form.store, (state) => ({
+    const bools = useStore(form.store, (state) => ({
       rule_query_bool: state.values.rule_query_bool,
       rule_filter_bool: state.values.rule_filter_bool,
       rule_tags_bool: state.values.rule_tags_bool,
+      rule_match: state.values.rule.match,
       filter_by_bool: state.values.filter_by_bool,
       sort_by_bool: state.values.sort_by_bool,
       replace_query_bool: state.values.replace_query_bool,
@@ -42,408 +88,439 @@ export const CurationForm = withForm({
     }));
 
     useEffect(() => {
-      setExpanded({
-        rule_query_bool,
-        rule_filter_bool,
-        rule_tags_bool,
-        filter_by_bool,
-        sort_by_bool,
-        replace_query_bool,
-        custom_metadata_bool,
-        effective_from_ts_bool,
-        effective_to_ts_bool,
-      });
+      setExpanded(bools);
     }, [
-      rule_query_bool,
-      rule_filter_bool,
-      rule_tags_bool,
-      filter_by_bool,
-      sort_by_bool,
-      replace_query_bool,
-      custom_metadata_bool,
-      effective_from_ts_bool,
-      effective_to_ts_bool,
+      bools.rule_query_bool,
+      bools.rule_filter_bool,
+      bools.rule_tags_bool,
+      bools.filter_by_bool,
+      bools.sort_by_bool,
+      bools.replace_query_bool,
+      bools.custom_metadata_bool,
+      bools.effective_from_ts_bool,
+      bools.effective_to_ts_bool,
     ]);
 
     return (
-      <Grid container rowSpacing={2} columnSpacing={3}>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <form.AppField name='overrideId'>
-            {({ TextField }) => (
-              <TextField
-                id='overrideId'
-                label='Override Name'
-                placeholder='e.g. curate-songs'
-                required
+      <Box>
+        {/* Override name */}
+        <form.AppField name='overrideId'>
+          {({ state, handleChange, handleBlur }) => (
+            <MuiTextField
+              value={state.value}
+              onChange={(e) => handleChange(e.target.value)}
+              onBlur={handleBlur}
+              placeholder='override_name'
+              fullWidth
+              size='small'
+              required
+              error={state.meta.isTouched && !state.meta.isValid}
+              sx={compactInputSx}
+            />
+          )}
+        </form.AppField>
+
+        {/* Trigger type */}
+        <Typography sx={labelSx}>Trigger</Typography>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: 0.625,
+            mb: 1.5,
+          }}
+        >
+          <TriggerButton
+            label='exact'
+            active={bools.rule_query_bool && bools.rule_match === 'exact' && !bools.rule_filter_bool}
+            onClick={() => {
+              form.setFieldValue('rule_query_bool', true);
+              form.setFieldValue('rule_filter_bool', false);
+              form.setFieldValue('rule.match', 'exact');
+            }}
+          />
+          <TriggerButton
+            label='contains'
+            active={bools.rule_query_bool && bools.rule_match === 'contains' && !bools.rule_filter_bool}
+            onClick={() => {
+              form.setFieldValue('rule_query_bool', true);
+              form.setFieldValue('rule_filter_bool', false);
+              form.setFieldValue('rule.match', 'contains');
+            }}
+          />
+          <TriggerButton
+            label='filter'
+            active={bools.rule_filter_bool}
+            onClick={() => {
+              form.setFieldValue('rule_query_bool', false);
+              form.setFieldValue('rule_filter_bool', true);
+            }}
+          />
+        </Box>
+
+        {/* Query (when query trigger) */}
+        <Collapse in={bools.rule_query_bool} unmountOnExit>
+          <Typography sx={labelSx}>Query</Typography>
+          <form.AppField name='rule.query'>
+            {({ state, handleChange, handleBlur }) => (
+              <MuiTextField
+                value={state.value}
+                onChange={(e) => handleChange(e.target.value)}
+                onBlur={handleBlur}
+                placeholder='e.g. nashville'
                 fullWidth
-                variant='outlined'
+                size='small'
+                sx={compactInputSx}
               />
             )}
           </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 12 }}>
-          <Typography variant='h6' color='primary' gutterBottom>
-            Rules
-          </Typography>
-          <Stack direction='column' spacing={0.5}>
-            <form.AppField name='rule_query_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='rule_query_bool'
-                  label='Curate by Search Query'
-                  value='rule_query_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['rule_query_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Stack direction='row' spacing={2} sx={{ ml: 4 }}>
-                <form.AppField name='rule.query'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='rule.query'
-                      placeholder='e.g. pop'
-                      required={rule_query_bool}
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                </form.AppField>
-                <form.AppField name='rule.match'>
-                  {({ Select }) => (
-                    <Select
-                      id='rule.match'
-                      label='Match'
-                      defaultValue={overrideQueryMatch.enum.contains}
-                      required={rule_query_bool}
-                      variant='outlined'
-                      options={overrideQueryMatch.options}
-                    />
-                  )}
-                </form.AppField>
-              </Stack>
-            </Collapse>
-            <form.AppField name='rule_filter_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='rule_filter_bool'
-                  label='Curate by Filter'
-                  value='rule_filter_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['rule_filter_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Box sx={{ pl: 4 }}>
-                <form.AppField name='rule.filter_by'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='rule.filter_by'
-                      label='Filter By'
-                      placeholder='e.g. genre:pop'
-                      required={rule_filter_bool}
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                </form.AppField>
-              </Box>
-            </Collapse>
-            <form.AppField name='rule_tags_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='rule_tags_bool'
-                  label='Curate by Tags'
-                  value='rule_tags_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['rule_tags_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Box sx={{ pl: 4 }}>
-                <form.AppField name='rule.tags'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='rule.tags'
-                      label='Tags'
-                      placeholder='e.g. clothes, shoes'
-                      required={rule_tags_bool}
-                      fullWidth
-                      variant='outlined'
-                      helperText='Separate tags by commas'
-                    />
-                  )}
-                </form.AppField>
-              </Box>
-            </Collapse>
-          </Stack>
-        </Grid>
+        </Collapse>
 
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <Typography variant='h6' color='primary' gutterBottom>
-            Actions
-          </Typography>
-          <Stack direction='column' spacing={0.5}>
-            <form.AppField name='filter_by_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='filter_by_bool'
-                  label='Filter Documents'
-                  value='filter_by_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['filter_by_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Box sx={{ pl: 4 }}>
-                <form.AppField name='filter_by'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='filter_by'
-                      placeholder='e.g. field:=value or field:={field}'
-                      required={filter_by_bool}
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                </form.AppField>
-              </Box>
-            </Collapse>
+        {/* Filter (when filter trigger) */}
+        <Collapse in={bools.rule_filter_bool} unmountOnExit>
+          <Typography sx={labelSx}>Filter by</Typography>
+          <form.AppField name='rule.filter_by'>
+            {({ state, handleChange, handleBlur }) => (
+              <MuiTextField
+                value={state.value}
+                onChange={(e) => handleChange(e.target.value)}
+                onBlur={handleBlur}
+                placeholder='e.g. genre:=pop'
+                fullWidth
+                size='small'
+                sx={compactInputSx}
+              />
+            )}
+          </form.AppField>
+        </Collapse>
 
-            <form.AppField name='sort_by_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='sort_by_bool'
-                  label='Sort Documents'
-                  value='sort_by_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['sort_by_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Box sx={{ pl: 4 }}>
-                <form.AppField name='sort_by'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='sort_by'
-                      required={sort_by_bool}
-                      placeholder='e.g. field1:asc,field2:desc'
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                </form.AppField>
-              </Box>
-            </Collapse>
+        {/* Tags */}
+        <Collapse in={bools.rule_tags_bool} unmountOnExit>
+          <Typography sx={labelSx}>Tags</Typography>
+          <form.AppField name='rule.tags'>
+            {({ state, handleChange, handleBlur }) => (
+              <MuiTextField
+                value={state.value}
+                onChange={(e) => handleChange(e.target.value)}
+                onBlur={handleBlur}
+                placeholder='tag1, tag2'
+                fullWidth
+                size='small'
+                sx={compactInputSx}
+              />
+            )}
+          </form.AppField>
+        </Collapse>
 
-            <form.AppField name='replace_query_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='replace_query_bool'
-                  label='Replace Query'
-                  value='replace_query_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['replace_query_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Box sx={{ pl: 4 }}>
-                <form.AppField name='replace_query'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='replace_query'
-                      placeholder='e.g. replacement query'
-                      required={replace_query_bool}
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                </form.AppField>
-              </Box>
-            </Collapse>
-
-            <form.AppField name='remove_match_tokens'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='remove_match_tokens'
-                  label='Remove Matched Tokens'
-                  value='remove_match_tokens'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-
-            <form.AppField name='filter_curated_hits'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='filter_curated_hits'
-                  label='Apply Filters to Curated Items'
-                  value='filter_curated_hits'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-
-            <form.AppField name='custom_metadata_bool'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='custom_metadata_bool'
-                  label='Custom Metadata'
-                  value='custom_metadata_bool'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-            <Collapse
-              in={Boolean(expanded['custom_metadata_bool'])}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Box sx={{ pl: 4 }}>
-                <form.AppField name='metadata'>
-                  {({ TextField }) => (
-                    <TextField
-                      id='metadata'
-                      placeholder='e.g. { "cta": 100 }'
-                      required={custom_metadata_bool}
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                </form.AppField>
-              </Box>
-            </Collapse>
-
-            <form.AppField name='stop_processing'>
-              {({ Checkbox }) => (
-                <Checkbox
-                  id='stop_processing'
-                  label='Stop Rule Processing After This Rule'
-                  value='stop_processing'
-                  sx={{ p: 0.75 }}
-                />
-              )}
-            </form.AppField>
-          </Stack>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <Typography variant='h6' color='primary'>
-            Options
-          </Typography>
-          <Stack direction='column' spacing={0.5}>
-            <Box>
-              <form.AppField name='effective_from_ts_bool'>
-                {({ Checkbox }) => (
-                  <>
-                    <Checkbox
-                      id='effective_from_ts_bool'
-                      label='Effective From'
-                      value='effective_from_ts_bool'
-                      sx={{ p: 0.75 }}
-                    />
-                    <FormHelperText sx={{ pl: 3 }}>
-                      When disabled, the override is effective immediately.
-                    </FormHelperText>
-                  </>
+        {/* Actions section */}
+        <Typography sx={{ ...labelSx, mt: 2 }}>Actions</Typography>
+        <Stack spacing={0.25}>
+          <SwitchRow
+            label='Filter documents'
+            field='filter_by_bool'
+            form={form}
+          />
+          <Collapse in={Boolean(expanded['filter_by_bool'])} unmountOnExit>
+            <Box sx={{ pl: 0, pb: 0.75 }}>
+              <form.AppField name='filter_by'>
+                {({ state, handleChange, handleBlur }) => (
+                  <MuiTextField
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    placeholder='field:=value'
+                    fullWidth
+                    size='small'
+                    sx={compactInputSx}
+                  />
                 )}
               </form.AppField>
-              <Collapse
-                in={Boolean(expanded['effective_from_ts_bool'])}
-                timeout='auto'
-                unmountOnExit
-              >
-                <Box sx={{ pl: 3 }}>
-                  <Suspense
-                    fallback={<Skeleton variant='rounded' height={54} />}
-                  >
-                    <form.AppField name='effective_from_ts'>
-                      {({ DatePicker }) => (
-                        <DatePicker
-                          slotProps={{
-                            textField: {
-                              required: effective_from_ts_bool,
-                            },
-                          }}
-                        />
-                      )}
-                    </form.AppField>
-                  </Suspense>
-                </Box>
-              </Collapse>
             </Box>
-            <Box>
-              <form.AppField name='effective_to_ts_bool'>
-                {({ Checkbox }) => (
-                  <>
-                    <Checkbox
-                      id='effective_to_ts_bool'
-                      label='Effective Until'
-                      value='effective_to_ts_bool'
-                      sx={{ p: 0.75 }}
-                    />
-                    <FormHelperText sx={{ pl: 3 }}>
-                      When disabled, the override is effective indefinitely.
-                    </FormHelperText>
-                  </>
+          </Collapse>
+
+          <SwitchRow
+            label='Sort documents'
+            field='sort_by_bool'
+            form={form}
+          />
+          <Collapse in={Boolean(expanded['sort_by_bool'])} unmountOnExit>
+            <Box sx={{ pb: 0.75 }}>
+              <form.AppField name='sort_by'>
+                {({ state, handleChange, handleBlur }) => (
+                  <MuiTextField
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    placeholder='field:asc'
+                    fullWidth
+                    size='small'
+                    sx={compactInputSx}
+                  />
                 )}
               </form.AppField>
-              <Collapse
-                in={Boolean(expanded['effective_to_ts_bool'])}
-                timeout='auto'
-                unmountOnExit
-              >
-                <Box sx={{ pl: 3 }}>
-                  <Suspense
-                    fallback={<Skeleton variant='rounded' height={54} />}
-                  >
-                    <form.AppField name='effective_to_ts'>
-                      {({ DatePicker }) => (
-                        <DatePicker
-                          slotProps={{
-                            textField: {
-                              required: effective_to_ts_bool,
-                            },
-                          }}
-                        />
-                      )}
-                    </form.AppField>
-                  </Suspense>
-                </Box>
-              </Collapse>
             </Box>
-          </Stack>
-        </Grid>
+          </Collapse>
 
-        <Grid size={{ xs: 12 }}>
-          <form.AppForm>
-            <form.SubmitButton label={submitButtonText} />
-          </form.AppForm>
-        </Grid>
-      </Grid>
+          <SwitchRow
+            label='Replace query'
+            field='replace_query_bool'
+            form={form}
+          />
+          <Collapse in={Boolean(expanded['replace_query_bool'])} unmountOnExit>
+            <Box sx={{ pb: 0.75 }}>
+              <form.AppField name='replace_query'>
+                {({ state, handleChange, handleBlur }) => (
+                  <MuiTextField
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    placeholder='replacement query'
+                    fullWidth
+                    size='small'
+                    sx={compactInputSx}
+                  />
+                )}
+              </form.AppField>
+            </Box>
+          </Collapse>
+
+          <SwitchRow
+            label='Remove matched tokens'
+            field='remove_match_tokens'
+            form={form}
+          />
+          <SwitchRow
+            label='Filter curated hits'
+            field='filter_curated_hits'
+            form={form}
+          />
+          <SwitchRow
+            label='Tags trigger'
+            field='rule_tags_bool'
+            form={form}
+          />
+          <SwitchRow
+            label='Custom metadata'
+            field='custom_metadata_bool'
+            form={form}
+          />
+          <Collapse in={Boolean(expanded['custom_metadata_bool'])} unmountOnExit>
+            <Box sx={{ pb: 0.75 }}>
+              <form.AppField name='metadata'>
+                {({ state, handleChange, handleBlur }) => (
+                  <MuiTextField
+                    value={state.value}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                    placeholder='{ "key": "value" }'
+                    fullWidth
+                    size='small'
+                    error={state.meta.isTouched && !state.meta.isValid}
+                    sx={compactInputSx}
+                  />
+                )}
+              </form.AppField>
+            </Box>
+          </Collapse>
+
+          <SwitchRow
+            label='Stop processing'
+            field='stop_processing'
+            form={form}
+          />
+        </Stack>
+
+        {/* Schedule */}
+        <Typography sx={{ ...labelSx, mt: 2 }}>Schedule</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            p: '3px',
+            borderRadius: '6px',
+            background: designTokens.surfaceMuted,
+            border: `1px solid ${designTokens.border}`,
+            mb: 1.75,
+          }}
+        >
+          <SegmentButton
+            active={!bools.effective_from_ts_bool && !bools.effective_to_ts_bool}
+            onClick={() => {
+              form.setFieldValue('effective_from_ts_bool', false);
+              form.setFieldValue('effective_to_ts_bool', false);
+            }}
+          >
+            Always
+          </SegmentButton>
+          <SegmentButton
+            active={bools.effective_from_ts_bool || bools.effective_to_ts_bool}
+            onClick={() => {
+              form.setFieldValue('effective_from_ts_bool', true);
+              form.setFieldValue('effective_to_ts_bool', true);
+            }}
+          >
+            Date range
+          </SegmentButton>
+        </Box>
+        <Collapse
+          in={bools.effective_from_ts_bool || bools.effective_to_ts_bool}
+          unmountOnExit
+        >
+          <Stack spacing={1} sx={{ mb: 1.5 }}>
+            <Suspense fallback={<Skeleton variant='rounded' height={32} />}>
+              <form.AppField name='effective_from_ts'>
+                {({ DatePicker }) => (
+                  <DatePicker
+                    label='From'
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        sx: compactInputSx,
+                        required: bools.effective_from_ts_bool,
+                      },
+                    }}
+                  />
+                )}
+              </form.AppField>
+            </Suspense>
+            <Suspense fallback={<Skeleton variant='rounded' height={32} />}>
+              <form.AppField name='effective_to_ts'>
+                {({ DatePicker }) => (
+                  <DatePicker
+                    label='Until'
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        sx: compactInputSx,
+                        required: bools.effective_to_ts_bool,
+                      },
+                    }}
+                  />
+                )}
+              </form.AppField>
+            </Suspense>
+          </Stack>
+        </Collapse>
+
+        {/* Submit */}
+        <form.AppForm>
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type='submit'
+                variant='contained'
+                fullWidth
+                disableElevation
+                startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
+                loading={isSubmitting}
+                disabled={!canSubmit}
+                sx={{ ...primaryButtonSx, height: 36, mt: 0.5 }}
+              >
+                {submitButtonText}
+              </Button>
+            )}
+          </form.Subscribe>
+        </form.AppForm>
+      </Box>
     );
   },
 });
+
+function TriggerButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Box
+      component='button'
+      type='button'
+      onClick={onClick}
+      sx={{
+        py: '6px',
+        px: 1,
+        borderRadius: '5px',
+        fontSize: 11.5,
+        fontWeight: 500,
+        border: `1px solid ${active ? designTokens.accentBorder : designTokens.border}`,
+        background: active ? designTokens.accentSoft : designTokens.surface,
+        color: active ? designTokens.accentDeep : designTokens.text,
+        cursor: 'pointer',
+        font: 'inherit',
+        transition: 'all 120ms ease',
+        '&:hover': {
+          borderColor: active
+            ? designTokens.accentBorder
+            : designTokens.borderStrong,
+        },
+      }}
+    >
+      {label}
+    </Box>
+  );
+}
+
+function SwitchRow({
+  label,
+  field,
+  form,
+}: {
+  label: string;
+  field: string;
+  form: any;
+}) {
+  return (
+    <form.Field name={field}>
+      {({ state, handleChange }: any) => (
+        <Box sx={switchRowSx}>
+          <Typography sx={switchLabelSx}>{label}</Typography>
+          <Switch
+            size='small'
+            checked={Boolean(state.value)}
+            onChange={(_, checked) => handleChange(checked)}
+          />
+        </Box>
+      )}
+    </form.Field>
+  );
+}
+
+function SegmentButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Box
+      component='button'
+      type='button'
+      onClick={onClick}
+      sx={{
+        flex: 1,
+        py: '5px',
+        px: 1,
+        borderRadius: '4px',
+        background: active ? designTokens.surface : 'transparent',
+        border: 'none',
+        fontSize: 11.5,
+        fontWeight: 500,
+        color: active ? designTokens.text : designTokens.textMuted,
+        cursor: 'pointer',
+        font: 'inherit',
+        boxShadow: active ? '0 1px 1px rgba(0,0,0,.05)' : 'none',
+        transition: 'all 120ms ease',
+      }}
+    >
+      {children}
+    </Box>
+  );
+}

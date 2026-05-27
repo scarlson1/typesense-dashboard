@@ -1,10 +1,5 @@
 import { PresetsList } from '@/components/PresetsList';
-import {
-  Badge,
-  PageHeader,
-  SectionCard,
-  smallButtonSx,
-} from '@/components/redesign';
+import { Badge, PageHeader, smallButtonSx } from '@/components/redesign';
 import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
@@ -45,12 +40,7 @@ function RouteComponent() {
           minHeight: 0,
         }}
       >
-        <SectionCard
-          title='Saved presets'
-          description='Manage Typesense search parameter sets and reference them by name from your application. Change behaviour without code changes.'
-        >
-          <PresetsList />
-        </SectionCard>
+        <PresetsList />
       </Box>
     </Stack>
   );

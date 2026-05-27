@@ -4,14 +4,16 @@ import { AliasGrid } from '@/components/AliasGrid';
 import {
   Badge,
   PageHeader,
-  SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
 import { aliasQueryKeys, collectionQueryKeys } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { OpenInNewRounded, LinkRounded } from '@mui/icons-material';
+import {
+  OpenInNewRounded,
+  LinkRounded,
+} from '@mui/icons-material';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import {
@@ -64,9 +66,10 @@ function RouteComponent() {
           minHeight: 0,
         }}
       >
-        <Box
+        {/* Explainer card */}
+        <Stack
+          direction='row'
           sx={{
-            display: 'flex',
             gap: 1.75,
             p: 2,
             backgroundColor: 'background.paper',
@@ -114,25 +117,44 @@ function RouteComponent() {
               old index, new ones land on the new one.
             </Typography>
           </Box>
-        </Box>
+        </Stack>
 
-        <SectionCard title='Existing aliases' noBodyPadding>
-          <Box sx={{ p: 2 }}>
+        {/* Combined table + inline form card */}
+        <Box
+          sx={{
+            background: designTokens.surface,
+            border: `1px solid ${designTokens.border}`,
+            borderRadius: 1,
+            overflow: 'hidden',
+          }}
+        >
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense>
+              <AliasGrid />
+            </Suspense>
+          </ErrorBoundary>
+
+          {/* Inline add/upsert footer */}
+          <Box
+            sx={{
+              px: 2,
+              py: 1.75,
+              borderTop: `1px solid ${designTokens.border}`,
+              background: designTokens.surfaceTinted,
+            }}
+          >
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
               onError={(err: unknown) => captureException(err)}
             >
               <Suspense>
-                <AliasGrid />
+                <AddAlias />
               </Suspense>
             </ErrorBoundary>
           </Box>
-        </SectionCard>
-
-        <Box sx={{ mt: 2 }}>
-          <SectionCard title='Create / update alias'>
-            <AddAlias />
-          </SectionCard>
         </Box>
       </Box>
     </Stack>
@@ -165,13 +187,10 @@ function useCreateAlias(props?: UseCreateAliasProps) {
     }) => client.aliases().upsert(name, mapping),
     onMutate: (vars) => {
       toast.loading(`creating alias "${vars.name}"`, { id: 'new-alias' });
-      // TODO: optimistic update
-
       return vars;
     },
     onSuccess: (data, vars, result, ctx) => {
       toast.success('alias created', { id: 'new-alias' });
-
       onSuccess && onSuccess(data, vars, result, ctx);
     },
     onError: (e, vars, result, ctx) => {

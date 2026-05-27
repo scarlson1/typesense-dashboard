@@ -1,14 +1,17 @@
 import {
   Badge,
   PageHeader,
-  SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
 import { CurationList } from '@/components/CurationList';
 import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from '@/components';
+import { captureException } from '@sentry/react';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/curation',
@@ -50,18 +53,14 @@ function RouteComponent() {
           minHeight: 0,
         }}
       >
-        <SectionCard
-          title='Overrides'
-          description='Pin, hide, or re-rank specific documents when a query matches a rule.'
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => captureException(err)}
         >
-          <Typography sx={{ fontSize: 12, color: designTokens.textMuted }}>
-            Curation rules apply per query and persist for the life of the
-            collection. Schedule a date range to run promotional overrides.
-          </Typography>
-          <Box sx={{ mt: 1 }}>
+          <Suspense>
             <CurationList collectionId={collectionId} />
-          </Box>
-        </SectionCard>
+          </Suspense>
+        </ErrorBoundary>
       </Box>
     </Stack>
   );
