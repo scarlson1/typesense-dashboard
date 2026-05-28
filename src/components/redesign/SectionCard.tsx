@@ -101,8 +101,10 @@ export const SectionCard = ({
             borderTop: `1px solid ${designTokens.border}`,
             background: designTokens.surfaceTinted,
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
             gap: 1,
+            minWidth: 0,
           }}
         >
           {footer}

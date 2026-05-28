@@ -1,6 +1,6 @@
 # Typesense Dashboard
 
-A dashboard to manage self hosted or local [Typesense](https://typesense.org/) instances. Support `v29` and `v30`.
+A dashboard to manage self hosted or local [Typesense](https://typesense.org/) instances.
 
 Reference the [Typesense docs](https://typesense.org/docs/guide/install-typesense.html) to set up a new cluster.
 
@@ -13,6 +13,10 @@ If the link is not prefilling login creds, use the following:
 - protocol: https
 - port: 443
 - api key: q0DAf2GWCdw0LPCzM72UytDVh719h4Tk
+
+## Supported Versions
+
+Intended to be compatible with `v29` and `v30`.
 
 ## Usage
 

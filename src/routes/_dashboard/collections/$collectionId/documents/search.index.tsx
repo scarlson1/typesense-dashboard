@@ -116,7 +116,7 @@ function RouteComponent() {
               alignItems: 'center',
               gap: 1,
               position: { xs: 'sticky', md: 'static' },
-              top: 0,
+              top: { xs: 60, md: 'auto' },
               zIndex: { xs: 8, md: 'auto' },
             }}
           >

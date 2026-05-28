@@ -28,6 +28,9 @@ export const PageHeader = ({
         pt: { xs: 2, md: 2.75 },
         backgroundColor: 'background.paper',
         borderBottom: `1px solid ${designTokens.border}`,
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
       }}
     >
       {eyebrow ? (
