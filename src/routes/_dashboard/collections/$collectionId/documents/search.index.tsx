@@ -279,6 +279,8 @@ function RouteComponent() {
                   maxHeight: '88vh',
                   borderTopLeftRadius: 12,
                   borderTopRightRadius: 12,
+                  backgroundColor: designTokens.surface,
+                  backgroundImage: 'none',
                 },
               },
             }}
