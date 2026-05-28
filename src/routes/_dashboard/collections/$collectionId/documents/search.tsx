@@ -120,9 +120,9 @@ function SearchLayout() {
               minWidth: 0,
               height: {
                 xs: `calc(100dvh - ${MOBILE_BOTTOM_NAV_HEIGHT}px - env(safe-area-inset-bottom))`,
-                md: 'auto',
+                md: 'calc(100dvh - 48px)',
               },
-              overflow: { xs: 'hidden', md: 'visible' },
+              overflow: 'hidden',
             }}
           >
             <Box sx={{ flexShrink: 0 }}>
@@ -140,9 +140,9 @@ function SearchLayout() {
                 py: 2.5,
                 background: designTokens.surfaceTinted,
                 minHeight: 0,
-                display: { xs: 'flex', md: 'block' },
-                flexDirection: { xs: 'column', md: 'unset' },
-                overflow: { xs: 'hidden', md: 'visible' },
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
               }}
             >
               <Outlet />

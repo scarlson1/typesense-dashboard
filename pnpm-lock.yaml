@@ -108,8 +108,8 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2(react@19.2.4)
       typesense:
-        specifier: ^2.0.3
-        version: 2.1.0(@babel/runtime@7.29.2)
+        specifier: ^3.0.6
+        version: 3.0.6(@babel/runtime@7.29.2)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -1953,44 +1953,44 @@ packages:
     resolution: {integrity: sha512-zm6xx8UT/Xy2oSr2ZXD0pZo7Jx2XsCoID2IUh9YSTFRu7z+WdwYTRk6LhUftm1crwqbuoF6I8zAFeCMw0YjwDg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@vaadin/a11y-base@24.9.14':
-    resolution: {integrity: sha512-ropoBCS9H8sobwZneDbQaqOvOB5ZS8Mn7w9j2WMhSgclUaPIZbGOTV6er58DfaEIx0kWfLgN0Lpqu+1Fc0ssbA==}
+  '@vaadin/a11y-base@24.9.15':
+    resolution: {integrity: sha512-BgZRgVI4VMW/lEENvigbMZe0Cgez5AfVqT2fMW5FoYqAJHulck8cRkFE/bahulop1iQ34fH9kU86mg7qnjNoBg==}
 
-  '@vaadin/checkbox@24.9.14':
-    resolution: {integrity: sha512-IRR8xNlbTy46G5hddstP1u3qpDy+GOlzQvxcdcL5Off4KtgFBuvBLHHQSQ2frolMP4sjLbeUsaagPWV/lhJ4wQ==}
+  '@vaadin/checkbox@24.9.15':
+    resolution: {integrity: sha512-1Y/E+LJMEZcQ03M4sgqVpXAX1F373I98ydZ63qeq1+K/x/TqE+cyfHOpKI/tmbgZz+2nmn2XJlQuiY+EyasFpQ==}
 
-  '@vaadin/component-base@24.9.14':
-    resolution: {integrity: sha512-xTwQJaoSUhWA1xBDls8q6QkNsIlhnQRDCqt/gmLg4ixzjceajPpaobVjIoTeit9a86wwQOK0kkvPTHDM9Yku6Q==}
+  '@vaadin/component-base@24.9.15':
+    resolution: {integrity: sha512-db1aG+TvOd5r4H2Sfj1tKr9w5B7sRi5qsBMKnbuNg9KnBlqaU1EIKG5+WbD28UdGk/+0OfwNo3my9a60O3a/RQ==}
 
-  '@vaadin/field-base@24.9.14':
-    resolution: {integrity: sha512-+B2Q/Q4MzFmBfz/nFdH2RS6YYTt3JvaAgibM1bLJRihiOG2UodKy7FGik3dVcYSdEZR+jBabUNj4YwsQwuKiXw==}
+  '@vaadin/field-base@24.9.15':
+    resolution: {integrity: sha512-czcNaONALqkyJKv7tAkzTUdKQC+osnYCRKRFm9LS/XqAt+gzeqybLdHocSlNutFq7PSG/IvHeoXM+ZNE29zWtQ==}
 
-  '@vaadin/grid@24.9.14':
-    resolution: {integrity: sha512-kC84mI8wZF8hVWKGIUpLWDR1HvagfySVoB9rt4RBx3sy7C+CGBnw3pHWLMMmED5soMsxuA3AWf27ut7naCudPQ==}
+  '@vaadin/grid@24.9.15':
+    resolution: {integrity: sha512-YpUNnzBffn4r6CPNP1EBrgqbafJQPrbz8YS6aZbSAh5O+Moc2zANCFnxf37FRZX71V+DuIzMOB4qA47Uc2Zyuw==}
 
-  '@vaadin/icon@24.9.14':
-    resolution: {integrity: sha512-o2XrPtXmVX1TFa8Sr/MelnBok9o5Eczs1W6cNMm2kaeD5O8yN5EU+G8Q71po1iBDE4Y+C86zXhcvkGvLlMrIpA==}
+  '@vaadin/icon@24.9.15':
+    resolution: {integrity: sha512-Z2HmxAWMqHISyXMuSHjc7b0Nkq0jeGrUHQ7yUKGkEIdRjXaY+4WfPjSPTACLodACla370bxUBjkizQOzMEtvEg==}
 
-  '@vaadin/input-container@24.9.14':
-    resolution: {integrity: sha512-jWtpkbVOKr9MuH5Q2BnwHfzUFii3eZRBET/bxwn2gzRg4pt9KXazBJZ49SCkMYIaAqgAbkJ0vjgbC2+3OVNZYg==}
+  '@vaadin/input-container@24.9.15':
+    resolution: {integrity: sha512-pQ/Lq1hnMeXXuen3ijKYIykSJ/GVnxZlhHalv3dDWMBazNa43DvahSD+0kK5/IMh1NTM8Y8DlLbWhbiXIKaCNg==}
 
-  '@vaadin/lit-renderer@24.9.14':
-    resolution: {integrity: sha512-knpWn6+/GEJb5x/Ec7JP6JI+FAPPTKDs1XnJZ+PP+2lWo4jrW3OszG9IZK53H2KU4KrDs6iQFQ/qVzzj/71zvA==}
+  '@vaadin/lit-renderer@24.9.15':
+    resolution: {integrity: sha512-Gvg63xSiA6I+0GXmA4O3VjyoWAvizHbB8lsTdfZ/NzPGm26sV04fKe0lsiQAcR1aNGVJY7W36LH2t+9u18kFCQ==}
 
-  '@vaadin/text-field@24.9.14':
-    resolution: {integrity: sha512-ve1is6xG0NopENh122ZgbN/BEffPbWcd37O+2Us4FbgUazcCm2z8AlgGNcroQo+bDDoMfsE7NjY+OfxsS5tPhA==}
+  '@vaadin/text-field@24.9.15':
+    resolution: {integrity: sha512-YzxpyOXAX88ee8OztmjN9d9TfSHeSIQ4ka5tDU7eYFOFNU44lHUxdVqIwuw8arGNQfUneC7SOi1mSGF6JXbcGA==}
 
   '@vaadin/vaadin-development-mode-detector@2.0.7':
     resolution: {integrity: sha512-9FhVhr0ynSR3X2ao+vaIEttcNU5XfzCbxtmYOV8uIRnUCtNgbvMOIcyGBvntsX9I5kvIP2dV3cFAOG9SILJzEA==}
 
-  '@vaadin/vaadin-lumo-styles@24.9.14':
-    resolution: {integrity: sha512-jbvnSjvYX0mA4etq382XZ7IObfdQeoDt+v7F4cnJCJUXbGv2lYmESaOofSQnb1RBqST/5KXGk/GWIbRftCu7Qg==}
+  '@vaadin/vaadin-lumo-styles@24.9.15':
+    resolution: {integrity: sha512-CMr2Xwu5kRMu/cvcPf5ODPCJY2bcmsVv+RkQGDxdM0UEJz96T9ztxg2yjUaA/06DJceyQy0u/GYjTSFOggNy4w==}
 
-  '@vaadin/vaadin-material-styles@24.9.14':
-    resolution: {integrity: sha512-2Bl9XtNb6sGE+GpiGxqSRm/RhcU4e9oTEkzHauq8JGmBBvR/15h5CoLGPzzCRKuQpiuwrjhp3Qnz7p8KJiRaAg==}
+  '@vaadin/vaadin-material-styles@24.9.15':
+    resolution: {integrity: sha512-uAqr3FbbjXgVz89RJ6n5VF96gdjv3LuT0VUMWu8Zg6bFp9pwq4wn3Nn+ILfEWvSrHx1zAlEkwV9UIVybVd/pFw==}
 
-  '@vaadin/vaadin-themable-mixin@24.9.14':
-    resolution: {integrity: sha512-t0igrcLaC1MeS//YUHymtGq9pjFfao4vnZTXcNrKDmi5JAozqPDPL916+Nos6/dVWVw1pcctmXdG9Z+joAxc9w==}
+  '@vaadin/vaadin-themable-mixin@24.9.15':
+    resolution: {integrity: sha512-RtEO1Fu0Prpa+dN9uIm1lMqs2MFPLV/JiZitcFZLHMnS4PnNC/Fadc1oThmmtvjre/HyJuAaukyRo4c1jHdDNA==}
 
   '@vaadin/vaadin-usage-statistics@2.1.3':
     resolution: {integrity: sha512-8r4TNknD7OJQADe3VygeofFR7UNAXZ2/jjBFP5dgI8+2uMfnuGYgbuHivasKr9WSQ64sPej6m8rDoM1uSllXjQ==}
@@ -2089,8 +2089,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.13.6:
-    resolution: {integrity: sha512-ChTCHMouEe2kn713WHbQGcuYrr6fXTBiu460OTwWrWob16g1bXn4vtz07Ope7ewMozJAnEquLk5lWQWtBig9DQ==}
+  axios@1.16.1:
+    resolution: {integrity: sha512-caYkukvroVPO8KrzuJEb50Hm07KwfBZPEC3VeFHTsqWHvKTsy54hjJz9BS/cdaypROE2rH6xvm9mHX4fgWkr3A==}
 
   babel-dead-code-elimination@1.0.12:
     resolution: {integrity: sha512-GERT7L2TiYcYDtYk1IpD+ASAYXjKbLTDPhBtYj7X1NuRMDTMtAx9kyBenub1Ev41lo91OHCKdmP+egTDmfQ7Ig==}
@@ -2559,16 +2559,16 @@ packages:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
 
-  es-object-atoms@1.1.1:
-    resolution: {integrity: sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==}
+  es-object-atoms@1.1.2:
+    resolution: {integrity: sha512-HWcBoN6NileqtSydK2FqHbS/LoDd2pqrnQHLyJzBj4kOp/ky2MWMN694xOfkK8/SnUsW2DH7EfyVlydKCsm1Zw==}
     engines: {node: '>= 0.4'}
 
   es-set-tostringtag@2.1.0:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
     engines: {node: '>= 0.4'}
 
-  es-toolkit@1.46.1:
-    resolution: {integrity: sha512-5eNtXOs3tbfxXOj04tjjseeWkRWaoCjdEI+96DgwzZoe6c9juL49pXlzAFTI72aWC9Y8p7168g6XIKjh7k6pyQ==}
+  es-toolkit@1.47.0:
+    resolution: {integrity: sha512-n1GuoD0WEQZMBk5tttoZSqwgyLx01oqa5XsBmCHwPyNe1S9jPBEmtR2pSgp2kJuWE3ciFZ6yRHmY4pM4C3OOkw==}
 
   esbuild@0.25.12:
     resolution: {integrity: sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==}
@@ -2742,8 +2742,8 @@ packages:
   focus-trap@7.8.0:
     resolution: {integrity: sha512-/yNdlIkpWbM0ptxno3ONTuf+2g318kh2ez3KSeZN5dZ8YC6AAmgeWz+GasYYiBJPFaYcSAPeu4GfhUaChzIJXA==}
 
-  follow-redirects@1.15.11:
-    resolution: {integrity: sha512-deG2P0JfjrTxl50XGCDyfI97ZGVCxIpfKYmfyrQ54n5FO/0gfIES8C/Psl6kWVDolizcaaxZJnTS0QSMxvnsBQ==}
+  follow-redirects@1.16.0:
+    resolution: {integrity: sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -2860,10 +2860,6 @@ packages:
 
   has-tostringtag@1.0.2:
     resolution: {integrity: sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==}
-    engines: {node: '>= 0.4'}
-
-  hasown@2.0.2:
-    resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
   hasown@2.0.3:
@@ -3382,6 +3378,10 @@ packages:
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
+  proxy-from-env@2.1.0:
+    resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
+    engines: {node: '>=10'}
+
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -3723,8 +3723,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typesense@2.1.0:
-    resolution: {integrity: sha512-a/IRTL+dRXlpRDU4UodyGj8hl5xBz3nKihVRd/KfSFAfFPGcpdX6lxIgwdXy3O6VLNNiEsN8YwIsPHQPVT0vNw==}
+  typesense@3.0.6:
+    resolution: {integrity: sha512-d3LL1qOLS8FCRxgAOqH+uDuK+VVA+/HYI1frU9fjYVwOg68mg/dX6XTtZ4yKKAkDCasB/se5uh/ZpMdOz/uJNg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@babel/runtime': ^7.23.2
@@ -3930,7 +3930,7 @@ snapshots:
       '@arcgis/toolkit': 4.34.9
       '@esri/arcgis-html-sanitizer': 4.1.0
       '@esri/calcite-components': 3.3.3
-      '@vaadin/grid': 24.9.14
+      '@vaadin/grid': 24.9.15
       '@zip.js/zip.js': 2.8.26
       luxon: 3.7.2
       marked: 16.3.0
@@ -4559,7 +4559,7 @@ snapshots:
       '@types/sortablejs': 1.15.9
       color: 5.0.3
       composed-offset-position: 0.0.6(@floating-ui/utils@0.2.11)
-      es-toolkit: 1.46.1
+      es-toolkit: 1.47.0
       focus-trap: 7.8.0
       interactjs: 1.10.27
       lit: 3.3.3
@@ -5845,26 +5845,26 @@ snapshots:
       '@typescript-eslint/types': 8.57.0
       eslint-visitor-keys: 5.0.1
 
-  '@vaadin/a11y-base@24.9.14':
+  '@vaadin/a11y-base@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
-      '@vaadin/component-base': 24.9.14
+      '@vaadin/component-base': 24.9.15
       lit: 3.3.3
 
-  '@vaadin/checkbox@24.9.14':
+  '@vaadin/checkbox@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
-      '@vaadin/a11y-base': 24.9.14
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/field-base': 24.9.14
-      '@vaadin/vaadin-lumo-styles': 24.9.14
-      '@vaadin/vaadin-material-styles': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/a11y-base': 24.9.15
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/field-base': 24.9.15
+      '@vaadin/vaadin-lumo-styles': 24.9.15
+      '@vaadin/vaadin-material-styles': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
       lit: 3.3.3
 
-  '@vaadin/component-base@24.9.14':
+  '@vaadin/component-base@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
@@ -5872,79 +5872,79 @@ snapshots:
       '@vaadin/vaadin-usage-statistics': 2.1.3
       lit: 3.3.3
 
-  '@vaadin/field-base@24.9.14':
+  '@vaadin/field-base@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
-      '@vaadin/a11y-base': 24.9.14
-      '@vaadin/component-base': 24.9.14
+      '@vaadin/a11y-base': 24.9.15
+      '@vaadin/component-base': 24.9.15
       lit: 3.3.3
 
-  '@vaadin/grid@24.9.14':
+  '@vaadin/grid@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
-      '@vaadin/a11y-base': 24.9.14
-      '@vaadin/checkbox': 24.9.14
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/lit-renderer': 24.9.14
-      '@vaadin/text-field': 24.9.14
-      '@vaadin/vaadin-lumo-styles': 24.9.14
-      '@vaadin/vaadin-material-styles': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/a11y-base': 24.9.15
+      '@vaadin/checkbox': 24.9.15
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/lit-renderer': 24.9.15
+      '@vaadin/text-field': 24.9.15
+      '@vaadin/vaadin-lumo-styles': 24.9.15
+      '@vaadin/vaadin-material-styles': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
       lit: 3.3.3
 
-  '@vaadin/icon@24.9.14':
+  '@vaadin/icon@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/vaadin-lumo-styles': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/vaadin-lumo-styles': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
       lit: 3.3.3
 
-  '@vaadin/input-container@24.9.14':
+  '@vaadin/input-container@24.9.15':
     dependencies:
       '@polymer/polymer': 3.5.2
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/vaadin-lumo-styles': 24.9.14
-      '@vaadin/vaadin-material-styles': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/vaadin-lumo-styles': 24.9.15
+      '@vaadin/vaadin-material-styles': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
       lit: 3.3.3
 
-  '@vaadin/lit-renderer@24.9.14':
+  '@vaadin/lit-renderer@24.9.15':
     dependencies:
       lit: 3.3.3
 
-  '@vaadin/text-field@24.9.14':
+  '@vaadin/text-field@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
-      '@vaadin/a11y-base': 24.9.14
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/field-base': 24.9.14
-      '@vaadin/input-container': 24.9.14
-      '@vaadin/vaadin-lumo-styles': 24.9.14
-      '@vaadin/vaadin-material-styles': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/a11y-base': 24.9.15
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/field-base': 24.9.15
+      '@vaadin/input-container': 24.9.15
+      '@vaadin/vaadin-lumo-styles': 24.9.15
+      '@vaadin/vaadin-material-styles': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
       lit: 3.3.3
 
   '@vaadin/vaadin-development-mode-detector@2.0.7': {}
 
-  '@vaadin/vaadin-lumo-styles@24.9.14':
+  '@vaadin/vaadin-lumo-styles@24.9.15':
     dependencies:
       '@polymer/polymer': 3.5.2
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/icon': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/icon': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
 
-  '@vaadin/vaadin-material-styles@24.9.14':
+  '@vaadin/vaadin-material-styles@24.9.15':
     dependencies:
       '@polymer/polymer': 3.5.2
-      '@vaadin/component-base': 24.9.14
-      '@vaadin/vaadin-themable-mixin': 24.9.14
+      '@vaadin/component-base': 24.9.15
+      '@vaadin/vaadin-themable-mixin': 24.9.15
 
-  '@vaadin/vaadin-themable-mixin@24.9.14':
+  '@vaadin/vaadin-themable-mixin@24.9.15':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       lit: 3.3.3
@@ -6037,13 +6037,15 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.13.6:
+  axios@1.16.1:
     dependencies:
-      follow-redirects: 1.15.11
+      follow-redirects: 1.16.0
       form-data: 4.0.5
-      proxy-from-env: 1.1.0
+      https-proxy-agent: 5.0.1
+      proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   babel-dead-code-elimination@1.0.12:
     dependencies:
@@ -6550,7 +6552,7 @@ snapshots:
 
   es-errors@1.3.0: {}
 
-  es-object-atoms@1.1.1:
+  es-object-atoms@1.1.2:
     dependencies:
       es-errors: 1.3.0
 
@@ -6559,9 +6561,9 @@ snapshots:
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.3
 
-  es-toolkit@1.46.1: {}
+  es-toolkit@1.47.0: {}
 
   esbuild@0.25.12:
     optionalDependencies:
@@ -6791,14 +6793,14 @@ snapshots:
     dependencies:
       tabbable: 6.4.0
 
-  follow-redirects@1.15.11: {}
+  follow-redirects@1.16.0: {}
 
   form-data@4.0.5:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
-      hasown: 2.0.2
+      hasown: 2.0.3
       mime-types: 2.1.35
 
   fs-extra@11.3.4:
@@ -6825,18 +6827,18 @@ snapshots:
       call-bind-apply-helpers: 1.0.2
       es-define-property: 1.0.1
       es-errors: 1.3.0
-      es-object-atoms: 1.1.1
+      es-object-atoms: 1.1.2
       function-bind: 1.1.2
       get-proto: 1.0.1
       gopd: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.2
+      hasown: 2.0.3
       math-intrinsics: 1.1.0
 
   get-proto@1.0.1:
     dependencies:
       dunder-proto: 1.0.1
-      es-object-atoms: 1.1.1
+      es-object-atoms: 1.1.2
 
   get-tsconfig@4.13.6:
     dependencies:
@@ -6908,10 +6910,6 @@ snapshots:
     dependencies:
       has-symbols: 1.1.0
 
-  hasown@2.0.2:
-    dependencies:
-      function-bind: 1.1.2
-
   hasown@2.0.3:
     dependencies:
       function-bind: 1.1.2
@@ -6979,7 +6977,7 @@ snapshots:
 
   is-core-module@2.16.1:
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.3
 
   is-date-object@1.1.0:
     dependencies:
@@ -7382,6 +7380,8 @@ snapshots:
 
   proxy-from-env@1.1.0: {}
 
+  proxy-from-env@2.1.0: {}
+
   punycode@2.3.1: {}
 
   quadbin@0.4.2:
@@ -7710,14 +7710,15 @@ snapshots:
 
   typescript@5.8.3: {}
 
-  typesense@2.1.0(@babel/runtime@7.29.2):
+  typesense@3.0.6(@babel/runtime@7.29.2):
     dependencies:
       '@babel/runtime': 7.29.2
-      axios: 1.13.6
+      axios: 1.16.1
       loglevel: 1.9.2
       tslib: 2.8.1
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   typewise-core@1.2.0: {}
 

@@ -1,19 +1,25 @@
+import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
-import { Box, Stack } from '@mui/material';
-import { Link, useMatchRoute } from '@tanstack/react-router';
+import {
+  Box,
+  Box as MuiBox,
+  Stack,
+  type BoxProps as MuiBoxProps,
+} from '@mui/material';
+import { createLink, useMatchRoute } from '@tanstack/react-router';
+import { useMemo } from 'react';
+
+const CustomMuiLinkComponent = (props: MuiBoxProps<'a'>) => {
+  return <MuiBox component='a' {...props} />;
+};
+
+export const RouterBoxLink = createLink(CustomMuiLinkComponent);
 
 interface Tab {
   label: string;
   to: string;
+  hide?: boolean;
 }
-
-const TABS: Tab[] = [
-  { label: 'Search', to: '/collections/$collectionId/documents/search' },
-  { label: 'Documents', to: '/collections/$collectionId/documents/new' },
-  { label: 'Schema', to: '/collections/$collectionId/config' },
-  { label: 'Synonyms', to: '/collections/$collectionId/synonyms' },
-  { label: 'Curation', to: '/collections/$collectionId/curation' },
-];
 
 interface CollectionTabBarProps {
   collectionId: string;
@@ -21,6 +27,25 @@ interface CollectionTabBarProps {
 
 export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
   const matchRoute = useMatchRoute();
+  const { is30Plus } = useTypesenseVersion();
+
+  const tabs = useMemo<Tab[]>(() => {
+    return [
+      { label: 'Search', to: '/collections/$collectionId/documents/search' },
+      { label: 'Documents', to: '/collections/$collectionId/documents/new' },
+      { label: 'Schema', to: '/collections/$collectionId/config' },
+      {
+        label: 'Synonyms',
+        to: '/collections/$collectionId/synonyms',
+        hide: is30Plus,
+      },
+      {
+        label: 'Curation',
+        to: '/collections/$collectionId/curation',
+        hide: is30Plus,
+      },
+    ].filter((x) => !x.hide);
+  }, [is30Plus]);
 
   return (
     <Box
@@ -42,7 +67,7 @@ export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
           minWidth: 'max-content',
         }}
       >
-        {TABS.map((tab) => {
+        {tabs.map((tab) => {
           const active = Boolean(
             matchRoute({
               to: tab.to,
@@ -51,9 +76,9 @@ export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
             }),
           );
           return (
-            <Box
+            <RouterBoxLink
               key={tab.label}
-              component={Link}
+              // component={Link}
               to={tab.to}
               params={{ collectionId }}
               sx={{
@@ -74,7 +99,7 @@ export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
               }}
             >
               {tab.label}
-            </Box>
+            </RouterBoxLink>
           );
         })}
       </Stack>

@@ -95,10 +95,10 @@ function RouteComponent() {
   return (
     <Box
       sx={{
-        height: { xs: '100%', md: 'auto' },
-        display: { xs: 'flex', md: 'block' },
-        flexDirection: { xs: 'column', md: 'unset' },
-        minHeight: { xs: 0, md: 'unset' },
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
       }}
     >
       <Box
@@ -107,8 +107,8 @@ function RouteComponent() {
           flexDirection: { xs: 'column', md: 'row' },
           gap: { xs: 2, md: 2.5 },
           alignItems: 'flex-start',
-          flex: { xs: 1, md: 'unset' },
-          minHeight: { xs: 0, md: 'unset' },
+          flex: 1,
+          minHeight: 0,
           width: '100%',
         }}
       >
@@ -119,8 +119,9 @@ function RouteComponent() {
             minWidth: 0,
             gap: 2,
             width: '100%',
-            height: { xs: '100%', md: 'auto' },
-            minHeight: { xs: 0, md: 'unset' },
+            height: '100%',
+            minHeight: 0,
+            overflow: 'hidden',
           }}
         >
           {/* Search bar */}
@@ -198,12 +199,12 @@ function RouteComponent() {
             <CtxSearchError />
           </Box>
 
-          {/* ── Results (scrollable on mobile) ── */}
+          {/* ── Results ── */}
           <Box
             sx={{
-              flex: { xs: 1, md: 'unset' },
-              minHeight: { xs: 0, md: 'unset' },
-              overflowY: { xs: 'auto', md: 'visible' },
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
               overflowX: 'hidden',
               mx: { xs: -2.5, md: 0 },
               px: { xs: 2.5, md: 0 },
@@ -247,10 +248,8 @@ function RouteComponent() {
             display: { xs: 'none', md: 'block' },
             width: { md: 340, lg: 380 },
             flexShrink: 0,
-            position: 'sticky',
-            top: 16,
             alignSelf: 'flex-start',
-            maxHeight: 'calc(100vh - 32px)',
+            maxHeight: '100%',
             overflowY: 'auto',
           }}
         >

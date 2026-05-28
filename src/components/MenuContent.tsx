@@ -1,5 +1,6 @@
 import { collectionQueryKeys } from '@/constants';
 import { usePrevious, useTypesenseClient } from '@/hooks';
+import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import {
   AddRounded,
   AutoFixHighRounded,
@@ -52,6 +53,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+// import type { CollectionSchema } from 'typesense/lib/Typesense/Collection';
 
 // TODO: clean up syncing collectionId between select/context/url
 // TODO: fix collection select not updating on $collectionId change
@@ -62,6 +64,7 @@ interface MainListItem {
   route: LinkProps; // LinkProps['to'];
   disabled?: boolean;
   children?: Omit<MainListItem, 'children'>[];
+  hide?: boolean;
 }
 
 const secondaryListItems = [
@@ -117,6 +120,7 @@ export function MenuContent() {
   const matches = useMatches();
   const navigate = useNavigate();
   const location = useLocation();
+  const { is30Plus } = useTypesenseVersion();
   const [open, setOpen] = useState<string | null>('Collections');
 
   const [typesense, clusterId] = useTypesenseClient();
@@ -225,6 +229,7 @@ export function MenuContent() {
             }
           : { to: location.pathname as LinkProps['to'] },
         disabled: !Boolean(selectedCollection),
+        hide: is30Plus,
       },
       {
         text: 'Synonyms',
@@ -236,6 +241,7 @@ export function MenuContent() {
             }
           : { to: location.pathname as LinkProps['to'] },
         disabled: !Boolean(selectedCollection),
+        hide: is30Plus,
       },
       {
         text: 'Collection Settings',
@@ -248,50 +254,66 @@ export function MenuContent() {
           : { to: location.pathname as LinkProps['to'] },
         disabled: !Boolean(selectedCollection),
       },
-    ];
+    ].filter((m) => !Boolean(m.hide));
 
     return [
-      { text: 'Home', icon: <HomeRounded />, route: { to: '/' } },
-      // { text: 'Server Status', icon: <AnalyticsRounded />, route: '/status' },
+      {
+        text: 'Home',
+        icon: <HomeRounded />,
+        route: { to: '/' as LinkProps['to'] },
+      },
       {
         text: 'Collections',
         icon: <DatasetRounded fontSize='small' />,
-        route: { to: '/collections' },
+        route: { to: '/collections' as LinkProps['to'] },
         children: collectionChildren,
       },
       {
         text: 'Aliases',
         icon: <CompareArrowsRounded fontSize='small' />,
-        route: { to: '/alias' },
+        route: { to: '/alias' as LinkProps['to'] },
       },
       {
         text: 'API Keys',
         icon: <KeyRounded fontSize='small' />,
-        route: { to: '/keys' },
+        route: { to: '/keys' as LinkProps['to'] },
       },
       {
         text: 'Analytics Rules',
         icon: <InsightsRounded fontSize='small' />,
-        route: { to: '/analytics' },
+        route: { to: '/analytics' as LinkProps['to'] },
       },
       {
         text: 'Presets',
         icon: <TroubleshootRounded fontSize='small' />,
-        route: { to: '/presets' },
+        route: { to: '/presets' as LinkProps['to'] },
       },
+
       {
         text: 'Stopwords',
         icon: <FrontHandRounded fontSize='small' />,
-        route: { to: '/stopwords' },
+        route: { to: '/stopwords' as LinkProps['to'] },
+      },
+      {
+        text: 'Curation',
+        icon: <AutoFixHighRounded fontSize='small' />,
+        route: { to: '/curation' as LinkProps['to'] },
+        hide: !is30Plus,
+      },
+      {
+        text: 'Synonyms',
+        icon: <LeakAddRounded fontSize='small' />,
+        route: { to: '/synonyms' as LinkProps['to'] },
+        hide: !is30Plus,
       },
       {
         text: 'Cluster Config',
         icon: <SettingsInputSvideoRounded fontSize='small' />,
-        route: { to: '/server' },
+        route: { to: '/server' as LinkProps['to'] },
       },
       // { text: 'Stop Words', icon: <AssessmentRounded />, route: '/stop-words' },
-    ];
-  }, [selectedCollection, location.pathname]);
+    ].filter((m) => !Boolean(m.hide));
+  }, [selectedCollection, location.pathname, is30Plus]);
 
   const handleOpen = useCallback(
     (id: string) => {

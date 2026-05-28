@@ -524,3 +524,5 @@ Use code with caution.New v30 Global Scope DefinitionIn v30, because curation se
   "collections": ["tenant_a_products"]
 }
 ```
+
+v30 API keys need new actions such as synonym_sets:_, synonym_sets/items:_, curation_sets:_, and curation_sets/items:_; old synonyms:_ and overrides:_ keys will 401 on the new endpoints.

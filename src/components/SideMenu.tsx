@@ -29,8 +29,7 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export function SideMenu() {
-  // const user = useUser();
-  // TODO: get user/server info from context
+  // TODO: get user/server info from context - use cluster node instead ??
   const user = {
     displayName: 'John Doe',
     email: 'dev@typesense.com',

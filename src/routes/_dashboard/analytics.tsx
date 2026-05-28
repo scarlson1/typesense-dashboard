@@ -9,6 +9,7 @@ import {
 import { analyticsQueryKeys } from '@/constants';
 import { useTypesenseClient } from '@/hooks';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
+import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
 import {
   CheckRounded,
@@ -32,6 +33,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Suspense, useCallback, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import type { AnalyticsRuleSchema } from 'typesense/lib/Typesense/AnalyticsRule';
+import type { AnalyticsRuleSchemaV1 } from 'typesense/lib/Typesense/AnalyticsRuleV1';
+import type {
+  DocumentSchema,
+  SearchResponse,
+} from 'typesense/lib/Typesense/Documents';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,
@@ -95,24 +101,49 @@ function RouteComponent() {
 
 function AnalyticsInsight() {
   const [client, clusterId] = useTypesenseClient();
+  const { is30Plus } = useTypesenseVersion();
+
   const { data: rules } = useSuspenseQuery({
     queryKey: analyticsQueryKeys.rules(clusterId),
     queryFn: async () => {
-      const res = await client.analytics.rules().retrieve();
-      return res.rules;
+      if (!is30Plus) {
+        const res = await client.analyticsV1.rules().retrieve();
+
+        return res.rules as AnalyticsRuleSchemaV1[];
+      } else {
+        return await client.analytics.rules().retrieve();
+      }
     },
   });
 
   if (rules.length === 0) return <EnableAnalyticsCard />;
 
-  const popularRule = rules.find(
-    (r) =>
-      r.type === 'popular_queries' && Boolean(r.params.destination?.collection),
-  );
+  const popularRule = rules.find((r) => {
+    if (!is30Plus)
+      return (
+        r.type === 'popular_queries' &&
+        Boolean((r as AnalyticsRuleSchemaV1).params.destination?.collection)
+      );
+
+    return (
+      r.type === 'popular_queries' &&
+      Boolean((r as AnalyticsRuleSchema).params?.destination_collection)
+    );
+  });
 
   if (!popularRule) return <EnableAnalyticsCard />;
 
-  return <PopularQueriesCard rule={popularRule} />;
+  const destination = is30Plus
+    ? (popularRule as AnalyticsRuleSchemaV1).params.destination?.collection
+    : (popularRule as AnalyticsRuleSchema).params?.destination_collection;
+
+  return (
+    <PopularQueriesCard
+      // rule={popularRule}
+      name={popularRule.name}
+      destination={destination || ''}
+    />
+  );
 }
 
 interface PopularQueryHit {
@@ -120,19 +151,26 @@ interface PopularQueryHit {
   count: number;
 }
 
-function PopularQueriesCard({ rule }: { rule: AnalyticsRuleSchema }) {
+function PopularQueriesCard({
+  // rule,
+  name,
+  destination,
+}: {
+  // rule: AnalyticsRuleSchema;
+  name: string;
+  destination: string;
+}) {
   const [client] = useTypesenseClient();
-  const destination = rule.params.destination?.collection ?? '';
 
   const { data: hits, isLoading } = useQuery({
     queryKey: ['analytics', 'popular-queries', destination],
     queryFn: async () => {
-      const res = await client.collections(destination).documents().search({
+      const res = (await client.collections(destination).documents().search({
         q: '*',
         query_by: 'q',
         sort_by: 'count:desc',
         per_page: 5,
-      });
+      })) as SearchResponse<DocumentSchema>;
       return (
         res.hits
           ?.map((h) => h.document as PopularQueryHit)
@@ -192,7 +230,7 @@ function PopularQueriesCard({ rule }: { rule: AnalyticsRuleSchema }) {
         <>
           collected via{' '}
           <Box component='code' sx={inlineCodeSx}>
-            {rule.name}
+            {name}
           </Box>
         </>
       }

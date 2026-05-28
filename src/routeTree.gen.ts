@@ -13,10 +13,12 @@ import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
+import { Route as DashboardSynonymsRouteImport } from './routes/_dashboard/synonyms'
 import { Route as DashboardStopwordsRouteImport } from './routes/_dashboard/stopwords'
 import { Route as DashboardServerRouteImport } from './routes/_dashboard/server'
 import { Route as DashboardPresetsRouteImport } from './routes/_dashboard/presets'
 import { Route as DashboardKeysRouteImport } from './routes/_dashboard/keys'
+import { Route as DashboardCurationRouteImport } from './routes/_dashboard/curation'
 import { Route as DashboardAnalyticsRouteImport } from './routes/_dashboard/analytics'
 import { Route as DashboardAliasRouteImport } from './routes/_dashboard/alias'
 import { Route as DashboardCollectionsIndexRouteImport } from './routes/_dashboard/collections/index'
@@ -50,6 +52,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSynonymsRoute = DashboardSynonymsRouteImport.update({
+  id: '/synonyms',
+  path: '/synonyms',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardStopwordsRoute = DashboardStopwordsRouteImport.update({
   id: '/stopwords',
   path: '/stopwords',
@@ -68,6 +75,11 @@ const DashboardPresetsRoute = DashboardPresetsRouteImport.update({
 const DashboardKeysRoute = DashboardKeysRouteImport.update({
   id: '/keys',
   path: '/keys',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCurationRoute = DashboardCurationRouteImport.update({
+  id: '/curation',
+  path: '/curation',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
@@ -152,10 +164,12 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
   '/analytics': typeof DashboardAnalyticsRoute
+  '/curation': typeof DashboardCurationRoute
   '/keys': typeof DashboardKeysRoute
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
+  '/synonyms': typeof DashboardSynonymsRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
   '/collections/': typeof DashboardCollectionsIndexRoute
   '/collections/$collectionId/config': typeof DashboardCollectionsCollectionIdConfigRoute
@@ -173,10 +187,12 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
   '/analytics': typeof DashboardAnalyticsRoute
+  '/curation': typeof DashboardCurationRoute
   '/keys': typeof DashboardKeysRoute
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
+  '/synonyms': typeof DashboardSynonymsRoute
   '/': typeof DashboardIndexRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
   '/collections': typeof DashboardCollectionsIndexRoute
@@ -196,10 +212,12 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/_dashboard/alias': typeof DashboardAliasRoute
   '/_dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/_dashboard/curation': typeof DashboardCurationRoute
   '/_dashboard/keys': typeof DashboardKeysRoute
   '/_dashboard/presets': typeof DashboardPresetsRoute
   '/_dashboard/server': typeof DashboardServerRoute
   '/_dashboard/stopwords': typeof DashboardStopwordsRoute
+  '/_dashboard/synonyms': typeof DashboardSynonymsRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/collections/new': typeof DashboardCollectionsNewRoute
   '/_dashboard/collections/': typeof DashboardCollectionsIndexRoute
@@ -221,10 +239,12 @@ export interface FileRouteTypes {
     | '/logout'
     | '/alias'
     | '/analytics'
+    | '/curation'
     | '/keys'
     | '/presets'
     | '/server'
     | '/stopwords'
+    | '/synonyms'
     | '/collections/new'
     | '/collections/'
     | '/collections/$collectionId/config'
@@ -242,10 +262,12 @@ export interface FileRouteTypes {
     | '/logout'
     | '/alias'
     | '/analytics'
+    | '/curation'
     | '/keys'
     | '/presets'
     | '/server'
     | '/stopwords'
+    | '/synonyms'
     | '/'
     | '/collections/new'
     | '/collections'
@@ -264,10 +286,12 @@ export interface FileRouteTypes {
     | '/logout'
     | '/_dashboard/alias'
     | '/_dashboard/analytics'
+    | '/_dashboard/curation'
     | '/_dashboard/keys'
     | '/_dashboard/presets'
     | '/_dashboard/server'
     | '/_dashboard/stopwords'
+    | '/_dashboard/synonyms'
     | '/_dashboard/'
     | '/_dashboard/collections/new'
     | '/_dashboard/collections/'
@@ -318,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/synonyms': {
+      id: '/_dashboard/synonyms'
+      path: '/synonyms'
+      fullPath: '/synonyms'
+      preLoaderRoute: typeof DashboardSynonymsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/stopwords': {
       id: '/_dashboard/stopwords'
       path: '/stopwords'
@@ -344,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/keys'
       fullPath: '/keys'
       preLoaderRoute: typeof DashboardKeysRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/curation': {
+      id: '/_dashboard/curation'
+      path: '/curation'
+      fullPath: '/curation'
+      preLoaderRoute: typeof DashboardCurationRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/analytics': {
@@ -461,10 +499,12 @@ const DashboardCollectionsCollectionIdDocumentsSearchRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardAliasRoute: typeof DashboardAliasRoute
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardCurationRoute: typeof DashboardCurationRoute
   DashboardKeysRoute: typeof DashboardKeysRoute
   DashboardPresetsRoute: typeof DashboardPresetsRoute
   DashboardServerRoute: typeof DashboardServerRoute
   DashboardStopwordsRoute: typeof DashboardStopwordsRoute
+  DashboardSynonymsRoute: typeof DashboardSynonymsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardCollectionsNewRoute: typeof DashboardCollectionsNewRoute
   DashboardCollectionsIndexRoute: typeof DashboardCollectionsIndexRoute
@@ -480,10 +520,12 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAliasRoute: DashboardAliasRoute,
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardCurationRoute: DashboardCurationRoute,
   DashboardKeysRoute: DashboardKeysRoute,
   DashboardPresetsRoute: DashboardPresetsRoute,
   DashboardServerRoute: DashboardServerRoute,
   DashboardStopwordsRoute: DashboardStopwordsRoute,
+  DashboardSynonymsRoute: DashboardSynonymsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardCollectionsNewRoute: DashboardCollectionsNewRoute,
   DashboardCollectionsIndexRoute: DashboardCollectionsIndexRoute,

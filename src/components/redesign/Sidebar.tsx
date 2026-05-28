@@ -1,21 +1,29 @@
+import { ClusterSelect } from '@/components/ClusterSelect';
+import { ErrorFallback } from '@/components/ErrorFallback';
+import OptionsMenu from '@/components/OptionsMenu';
+import { collectionQueryKeys } from '@/constants';
+import { usePrevious, useTypesenseClient } from '@/hooks';
+import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
+import { designTokens } from '@/theme/themePrimitives';
+import { typesenseStore } from '@/utils';
 import {
   AddRounded,
+  AutoFixHighRounded,
   CompareArrowsRounded,
   DatasetRounded,
   ExpandMoreRounded,
+  FrontHandRounded,
   GitHub,
   HelpOutlineRounded,
   HomeRounded,
   InsightsRounded,
   KeyRounded,
-  AutoFixHighRounded,
   LeakAddRounded,
   OpenInNewRounded,
   SearchRounded,
   SettingsInputSvideoRounded,
   StarBorderRounded,
   StorageRounded,
-  FrontHandRounded,
 } from '@mui/icons-material';
 import {
   Box,
@@ -28,32 +36,26 @@ import {
 } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import type { LinkComponent } from '@tanstack/react-router';
 import {
   createLink,
   useMatches,
   useMatchRoute,
   useNavigate,
 } from '@tanstack/react-router';
-import type { LinkComponent, LinkProps } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ClusterSelect } from '@/components/ClusterSelect';
-import { ErrorFallback } from '@/components/ErrorFallback';
-import OptionsMenu from '@/components/OptionsMenu';
-import { collectionQueryKeys } from '@/constants';
-import { usePrevious, useTypesenseClient } from '@/hooks';
-import { designTokens } from '@/theme/themePrimitives';
-import { typesenseStore } from '@/utils';
 import { useStore } from 'zustand';
 
 const SIDEBAR_WIDTH = 244;
 
-const RouterAnchor = forwardRef<HTMLAnchorElement, React.HTMLProps<HTMLAnchorElement>>(
-  function RouterAnchor(props, ref) {
-    return <a ref={ref} {...props} />;
-  },
-);
+const RouterAnchor = forwardRef<
+  HTMLAnchorElement,
+  React.HTMLProps<HTMLAnchorElement>
+>(function RouterAnchor(props, ref) {
+  return <a ref={ref} {...props} />;
+});
 const CreatedNavLink = createLink(RouterAnchor);
 export const NavLink: LinkComponent<typeof RouterAnchor> = (props) => (
   <CreatedNavLink preload='intent' {...props} />
@@ -138,9 +140,7 @@ function SidebarLink({
       </Box>
     );
   }
-  const linkProps = params
-    ? { to, params }
-    : { to };
+  const linkProps = params ? { to, params } : { to };
   return (
     <NavLink
       {...(linkProps as unknown as React.ComponentProps<typeof NavLink>)}
@@ -187,6 +187,7 @@ export function Sidebar() {
   const matches = useMatches();
   const navigate = useNavigate();
   const [typesense, clusterId] = useTypesenseClient();
+  const { is30Plus } = useTypesenseVersion();
 
   const { data: collections } = useSuspenseQuery({
     queryKey: collectionQueryKeys.all(clusterId),
@@ -243,34 +244,37 @@ export function Sidebar() {
   // Note: design's "Workspace" grouping puts search/curation/etc under
   // Collections. We preserve current route layout but mirror that grouping.
   const collectionChildren = useMemo(
-    () => [
-      {
-        text: 'Search',
-        icon: <SearchRounded fontSize='small' />,
-        to: '/collections/$collectionId/documents/search',
-      },
-      {
-        text: 'Add documents',
-        icon: <AddRounded fontSize='small' />,
-        to: '/collections/$collectionId/documents/new',
-      },
-      {
-        text: 'Curation',
-        icon: <AutoFixHighRounded fontSize='small' />,
-        to: '/collections/$collectionId/curation',
-      },
-      {
-        text: 'Synonyms',
-        icon: <LeakAddRounded fontSize='small' />,
-        to: '/collections/$collectionId/synonyms',
-      },
-      {
-        text: 'Schema',
-        icon: <StorageRounded fontSize='small' />,
-        to: '/collections/$collectionId/config',
-      },
-    ],
-    [],
+    () =>
+      [
+        {
+          text: 'Search',
+          icon: <SearchRounded fontSize='small' />,
+          to: '/collections/$collectionId/documents/search',
+        },
+        {
+          text: 'Add documents',
+          icon: <AddRounded fontSize='small' />,
+          to: '/collections/$collectionId/documents/new',
+        },
+        {
+          text: 'Curation',
+          icon: <AutoFixHighRounded fontSize='small' />,
+          to: '/collections/$collectionId/curation',
+          hide: is30Plus,
+        },
+        {
+          text: 'Synonyms',
+          icon: <LeakAddRounded fontSize='small' />,
+          to: '/collections/$collectionId/synonyms',
+          hide: is30Plus,
+        },
+        {
+          text: 'Schema',
+          icon: <StorageRounded fontSize='small' />,
+          to: '/collections/$collectionId/config',
+        },
+      ].filter((x) => !x.hide),
+    [is30Plus],
   );
 
   return (
@@ -455,6 +459,20 @@ export function Sidebar() {
           icon={<FrontHandRounded fontSize='small' />}
           label='Stopwords'
         />
+        {is30Plus ? (
+          <SidebarLink
+            to='/curation'
+            icon={<FrontHandRounded fontSize='small' />}
+            label='Curation'
+          />
+        ) : null}
+        {is30Plus ? (
+          <SidebarLink
+            to='/synonyms'
+            icon={<FrontHandRounded fontSize='small' />}
+            label='Synonyms'
+          />
+        ) : null}
 
         <Typography sx={headerLabelSx}>Cluster</Typography>
 
