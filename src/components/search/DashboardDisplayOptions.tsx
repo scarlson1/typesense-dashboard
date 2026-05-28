@@ -1,5 +1,4 @@
 import {
-  fieldChipSx,
   fieldInputSx,
   FieldRow,
   ghostButtonSx,
@@ -213,18 +212,56 @@ export function DashboardDisplayOptions() {
           multiple
           id='display-fields'
           size='small'
-          limitTags={4}
-          blurOnSelect
           fullWidth
+          disableCloseOnSelect
           options={fieldOptions}
           value={slotProps.hit?.displayFields || []}
           onChange={handleFieldsChange}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => {
+              const { key, onDelete } = getTagProps({ index });
+              return (
+                <Box
+                  key={key}
+                  component='span'
+                  sx={{
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 12,
+                    px: 0.875,
+                    py: '2px',
+                    background: designTokens.surfaceMuted,
+                    border: `1px solid ${designTokens.border}`,
+                    borderRadius: '4px',
+                    color: designTokens.text,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {option}
+                  <Box
+                    component='span'
+                    onClick={onDelete}
+                    sx={{
+                      color: designTokens.textFaint,
+                      cursor: 'pointer',
+                      fontSize: 11,
+                      lineHeight: 1,
+                      '&:hover': { color: designTokens.danger },
+                    }}
+                  >
+                    ×
+                  </Box>
+                </Box>
+              );
+            })
+          }
           renderInput={(params) => (
             <TextField {...params} placeholder='Add field…' sx={fieldInputSx} />
           )}
           slotProps={{
             paper: { sx: autocompletePaperSx },
-            chip: { size: 'small', sx: fieldChipSx },
           }}
         />
       </FieldRow>

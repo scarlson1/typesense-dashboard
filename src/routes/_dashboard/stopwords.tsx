@@ -63,10 +63,10 @@ function RouteComponent() {
     [sets],
   );
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
-    if (selectedId === null && sets.length > 0) {
+    if (selectedId === undefined && sets.length > 0) {
       setSelectedId(sets[0].id);
     }
     if (selectedId && !sets.find((s) => s.id === selectedId)) {
@@ -74,7 +74,7 @@ function RouteComponent() {
     }
   }, [sets, selectedId]);
 
-  const selectedSet = sets.find((s) => s.id === selectedId) ?? null;
+  const selectedSet = selectedId ? (sets.find((s) => s.id === selectedId) ?? null) : null;
 
   const badgeText =
     sets.length > 0

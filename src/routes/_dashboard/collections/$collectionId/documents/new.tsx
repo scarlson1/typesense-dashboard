@@ -279,16 +279,11 @@ function NewDocumentEditor() {
       title={
         <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
           Document editor
-          <Badge tone='warn'>
-            ⚠ Prefilled from schema · expect imperfections
-          </Badge>
+          <Badge tone='warn'>⚠ Prefilled from schema</Badge>
         </Stack>
       }
       footer={
-        <Stack
-          direction='row'
-          sx={{ flexWrap: 'wrap', gap: 1 }}
-        >
+        <Stack direction='row' sx={{ flexWrap: 'wrap', gap: 1 }}>
           <FormControl size='small' sx={{ minWidth: 120, flex: '1 1 auto' }}>
             <InputLabel id='action-select-label'>Action</InputLabel>
             <Select
@@ -335,7 +330,10 @@ function NewDocumentEditor() {
             onClick={handleSubmit}
             disabled={Boolean(markers.length)}
             variant='contained'
-            sx={{ ...primaryButtonSx, flex: { xs: '1 1 100%', md: '0 0 auto' } }}
+            sx={{
+              ...primaryButtonSx,
+              flex: { xs: '1 1 100%', md: '0 0 auto' },
+            }}
           >
             Add documents
           </Button>

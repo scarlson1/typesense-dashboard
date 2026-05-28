@@ -62,22 +62,35 @@ const BottomNavItem = ({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 0.25,
+        gap: 0.375,
         py: 0.75,
-        color: isActive ? designTokens.accent : designTokens.textMuted,
         cursor: 'pointer',
         userSelect: 'none',
-        transition: 'color 120ms',
-        '& svg': { fontSize: 22 },
       }}
     >
-      {icon}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 52,
+          height: 28,
+          borderRadius: '14px',
+          background: isActive ? designTokens.accentSoft : 'transparent',
+          color: isActive ? designTokens.accent : designTokens.textMuted,
+          transition: 'background 150ms, color 150ms',
+          '& svg': { fontSize: 22 },
+        }}
+      >
+        {icon}
+      </Box>
       <Typography
         sx={{
           fontSize: 10.5,
           fontWeight: isActive ? 600 : 500,
           lineHeight: 1,
           letterSpacing: '-0.005em',
+          color: isActive ? designTokens.accent : designTokens.textMuted,
         }}
       >
         {label}
@@ -133,7 +146,9 @@ export function MobileBottomNav() {
           zIndex: (theme) => theme.zIndex.appBar + 1,
           height: MOBILE_BOTTOM_NAV_HEIGHT,
           backgroundColor: 'background.paper',
-          borderTop: `1px solid ${designTokens.border}`,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          boxShadow: '0 -2px 16px rgba(0,0,0,0.08)',
           pb: 'env(safe-area-inset-bottom)',
           alignItems: 'stretch',
         }}

@@ -212,17 +212,31 @@ const NewApiKeyForm = ({
             }}
             slotProps={{
               textField: {
-                placeholder: 'Never',
                 sx: [
                   fieldInputSx,
                   {
                     '& .MuiOutlinedInput-root': {
+                      py: 0,
                       '& .MuiPickersSectionList-root': {
                         padding: '4px 4px',
+                        fontSize: 13,
+                        fontFamily: designTokens.fontMono,
+                        color: designTokens.text,
+                      },
+                      '& .MuiPickersSectionList-section': {
+                        fontSize: 13,
+                        fontFamily: designTokens.fontMono,
                       },
                       '& .MuiPickersSectionList-sectionContent': {
                         fontSize: 13,
                         fontFamily: designTokens.fontMono,
+                      },
+                      '& .MuiInputAdornment-root': {
+                        marginLeft: 0,
+                        '& button': {
+                          padding: '4px',
+                          color: designTokens.textFaint,
+                        },
                       },
                     },
                   },

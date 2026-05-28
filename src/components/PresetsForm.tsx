@@ -7,6 +7,7 @@ import {
 } from '@/constants';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
+import { useState } from 'react';
 import {
   AddRounded,
   DeleteOutlineRounded,
@@ -341,6 +342,122 @@ function MultiSearchSection({ form }: { form: any }) {
   );
 }
 
+function ChipInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const chips = value
+    ? value
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+  const [draft, setDraft] = useState('');
+
+  const commit = (input: string) => {
+    const newChips = input
+      .split(/[,\s]+/)
+      .map((s) => s.trim())
+      .filter((s) => s && !chips.includes(s));
+    if (newChips.length) onChange([...chips, ...newChips].join(','));
+    setDraft('');
+  };
+
+  const remove = (chip: string) => {
+    onChange(chips.filter((c) => c !== chip).join(','));
+  };
+
+  return (
+    <Box
+      sx={{
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: '5px',
+        background: designTokens.surface,
+        px: 0.75,
+        py: 0.5,
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 0.5,
+        alignItems: 'center',
+        minHeight: 32,
+        cursor: 'text',
+        transition: 'border-color 120ms ease',
+        '&:focus-within': { borderColor: designTokens.accent },
+      }}
+      onClick={(e) => {
+        (e.currentTarget as HTMLElement).querySelector('input')?.focus();
+      }}
+    >
+      {chips.map((chip) => (
+        <Box
+          key={chip}
+          component='span'
+          sx={{
+            fontFamily: designTokens.fontMono,
+            fontSize: 12,
+            px: 0.875,
+            py: '2px',
+            background: designTokens.surfaceMuted,
+            border: `1px solid ${designTokens.border}`,
+            borderRadius: '4px',
+            color: designTokens.text,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
+          {chip}
+          <Box
+            component='span'
+            onClick={(e) => { e.stopPropagation(); remove(chip); }}
+            sx={{
+              color: designTokens.textFaint,
+              cursor: 'pointer',
+              fontSize: 11,
+              lineHeight: 1,
+              '&:hover': { color: designTokens.danger },
+            }}
+          >
+            ×
+          </Box>
+        </Box>
+      ))}
+      <Box
+        component='input'
+        value={draft}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          const val = e.target.value;
+          if (/[,]/.test(val.slice(-1))) commit(val);
+          else setDraft(val);
+        }}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Enter') { e.preventDefault(); commit(draft); }
+          if (e.key === 'Backspace' && !draft && chips.length) {
+            onChange(chips.slice(0, -1).join(','));
+          }
+        }}
+        onBlur={() => { if (draft.trim()) commit(draft); }}
+        placeholder={chips.length === 0 ? 'value' : ''}
+        sx={{
+          flex: 1,
+          minWidth: 60,
+          border: 'none',
+          outline: 'none',
+          fontSize: 12.5,
+          fontFamily: designTokens.fontMono,
+          background: 'transparent',
+          color: designTokens.text,
+          py: '2px',
+          '&::placeholder': { color: designTokens.textFaint, opacity: 1 },
+        }}
+      />
+    </Box>
+  );
+}
+
 interface ParameterRowProps {
   form: any;
   index: number;
@@ -371,55 +488,23 @@ function ParameterRow({
             if (isKnown) {
               return (
                 <Box
+                  onClick={() => handleChange('')}
                   sx={{
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 12.5,
+                    color: designTokens.text,
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                    cursor: 'text',
+                    py: '6px',
+                    px: '2px',
                     minHeight: 32,
                     display: 'flex',
                     alignItems: 'center',
-                    px: '2px',
                   }}
+                  title={nameVal}
                 >
-                  <Box
-                    component='span'
-                    sx={{
-                      fontFamily: designTokens.fontMono,
-                      fontSize: 12,
-                      px: 1,
-                      py: '3px',
-                      background: designTokens.accentSoft,
-                      border: `1px solid ${designTokens.accentBorder}`,
-                      borderRadius: '5px',
-                      color: designTokens.accentDeep,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 0.625,
-                      maxWidth: '100%',
-                    }}
-                  >
-                    <Box
-                      component='span'
-                      sx={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {nameVal}
-                    </Box>
-                    <Box
-                      component='span'
-                      onClick={() => handleChange('')}
-                      sx={{
-                        color: designTokens.textFaint,
-                        cursor: 'pointer',
-                        fontSize: 11,
-                        lineHeight: 1,
-                        flexShrink: 0,
-                        '&:hover': { color: designTokens.danger },
-                      }}
-                    >
-                      ×
-                    </Box>
-                  </Box>
+                  {nameVal}
                 </Box>
               );
             }
@@ -433,9 +518,6 @@ function ParameterRow({
                 onChange={(_, newVal) =>
                   handleChange(typeof newVal === 'string' ? newVal : '')
                 }
-                onInputChange={(_, newVal, reason) => {
-                  if (reason === 'input') handleChange(newVal);
-                }}
                 blurOnSelect
                 autoHighlight
                 renderInput={(params) => (
@@ -456,16 +538,10 @@ function ParameterRow({
 
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <form.Field name={valueField}>
-          {({ state, handleChange, handleBlur }: any) => (
-            <MuiTextField
+          {({ state, handleChange }: { state: { value: string }; handleChange: (val: string) => void }) => (
+            <ChipInput
               value={state.value ?? ''}
-              onChange={(e) => handleChange(e.target.value)}
-              onBlur={handleBlur}
-              placeholder='value'
-              fullWidth
-              size='small'
-              error={state.meta.isTouched && !state.meta.isValid}
-              sx={inlineInputSx}
+              onChange={handleChange}
             />
           )}
         </form.Field>

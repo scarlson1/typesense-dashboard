@@ -39,7 +39,11 @@ const TABS: { value: TabValue; label: string }[] = [
   { value: 'json', label: 'JSON' },
 ];
 
-const NewApiKeyEditor = () => {
+interface NewApiKeyEditorProps {
+  onSuccess?: () => void;
+}
+
+const NewApiKeyEditor = ({ onSuccess }: NewApiKeyEditorProps) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
   const [tab, setTab] = useState<TabValue>('form');
@@ -54,6 +58,7 @@ const NewApiKeyEditor = () => {
       setTimeout(() => {
         editorRef.current?.getAction('editor.action.formatDocument')?.run();
       }, 100);
+      onSuccess?.();
     },
   });
 

@@ -43,33 +43,68 @@ function RouteComponent() {
         title='Aliases'
         badges={<Badge tone='neutral'>zero-downtime swaps</Badge>}
         actions={
-          <Button
-            component='a'
-            href='https://typesense.org/docs/29.0/api/collection-alias.html'
-            target='_blank'
-            rel='noopener noreferrer'
-            variant='outlined'
-            size='small'
-            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
-            sx={smallButtonSx}
-          >
-            When to use aliases
-          </Button>
+          <Stack direction='row' gap={1} alignItems='center'>
+            <Button
+              component='a'
+              href='https://typesense.org/docs/29.0/api/collection-alias.html'
+              target='_blank'
+              rel='noopener noreferrer'
+              variant='outlined'
+              size='small'
+              startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+              sx={{ ...smallButtonSx, display: { xs: 'none', md: 'inline-flex' } }}
+            >
+              When to use aliases
+            </Button>
+          </Stack>
         }
       />
+
+      {/* Mobile count strip */}
+      <Box
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          px: 2.5,
+          pb: 1.5,
+          backgroundColor: 'background.paper',
+          borderBottom: `1px solid ${designTokens.border}`,
+        }}
+      >
+        <ErrorBoundary FallbackComponent={ErrorFallback} onError={(err: unknown) => captureException(err)}>
+          <Suspense>
+            <AliasCountChip />
+          </Suspense>
+        </ErrorBoundary>
+      </Box>
+
       <Box
         sx={{
           flex: 1,
-          px: { xs: 2.5, md: 3.5 },
-          py: 2.25,
+          px: { xs: 0, md: 3.5 },
+          py: { xs: 0, md: 2.25 },
           background: designTokens.surfaceTinted,
           minHeight: 0,
         }}
       >
-        {/* Explainer card */}
+        {/* Mobile info strip */}
+        <Box
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            px: 2,
+            py: 1.5,
+            background: designTokens.accentSoft,
+          }}
+        >
+          <Typography sx={{ fontSize: 13, color: designTokens.accentDeep, lineHeight: 1.55 }}>
+            Point your app at an alias — re-target it on re-index and the cutover is atomic.
+          </Typography>
+        </Box>
+
+        {/* Desktop explainer card */}
         <Stack
           direction='row'
           sx={{
+            display: { xs: 'none', md: 'flex' },
             gap: 1.75,
             p: 2,
             backgroundColor: 'background.paper',
@@ -95,23 +130,10 @@ function RouteComponent() {
             <LinkRounded sx={{ fontSize: 16 }} />
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography
-              sx={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: designTokens.text,
-                mb: 0.4,
-              }}
-            >
+            <Typography sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text, mb: 0.4 }}>
               Aliases let you swap collections with zero downtime.
             </Typography>
-            <Typography
-              sx={{
-                fontSize: 12.5,
-                color: designTokens.textMuted,
-                lineHeight: 1.55,
-              }}
-            >
+            <Typography sx={{ fontSize: 12.5, color: designTokens.textMuted, lineHeight: 1.55 }}>
               Point your app at the alias — and re-target it whenever you
               re-index. The cutover is atomic; in-flight queries finish on the
               old index, new ones land on the new one.
@@ -123,8 +145,9 @@ function RouteComponent() {
         <Box
           sx={{
             background: designTokens.surface,
-            border: `1px solid ${designTokens.border}`,
-            borderRadius: 1,
+            border: { xs: 'none', md: `1px solid ${designTokens.border}` },
+            borderTop: { xs: `1px solid ${designTokens.border}`, md: `1px solid ${designTokens.border}` },
+            borderRadius: { xs: 0, md: 1 },
             overflow: 'hidden',
           }}
         >
@@ -158,6 +181,35 @@ function RouteComponent() {
         </Box>
       </Box>
     </Stack>
+  );
+}
+
+function AliasCountChip() {
+  const [client, clusterId] = useTypesenseClient();
+  const { data } = useSuspenseQuery({
+    queryKey: aliasQueryKeys.all(clusterId),
+    queryFn: async () => {
+      const res = await client.aliases().retrieve();
+      return res.aliases || [];
+    },
+  });
+  const count = data.length;
+  return (
+    <Box
+      component='span'
+      sx={{
+        display: 'inline-block',
+        fontSize: 12.5,
+        color: designTokens.textMuted,
+        background: designTokens.surfaceMuted,
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: '100px',
+        px: 1.25,
+        py: 0.375,
+      }}
+    >
+      {count} alias{count !== 1 ? 'es' : ''}
+    </Box>
   );
 }
 

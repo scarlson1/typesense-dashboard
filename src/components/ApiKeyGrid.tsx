@@ -131,189 +131,186 @@ const ApiKeyGrid = () => {
     );
   }
 
+  const actionChipSx = {
+    fontFamily: designTokens.fontMono,
+    fontSize: 11,
+    px: 0.75,
+    py: '1px',
+    background: designTokens.surfaceMuted,
+    border: `1px solid ${designTokens.border}`,
+    borderRadius: '3px',
+    color: designTokens.textMuted,
+    whiteSpace: 'nowrap' as const,
+  };
+
+  const copyButtonSx = {
+    width: 22,
+    height: 22,
+    border: `1px solid ${designTokens.border}`,
+    borderRadius: '4px',
+    background: designTokens.surface,
+    color: designTokens.textFaint,
+    '&:hover': { borderColor: designTokens.borderStrong },
+  };
+
+  const deleteButtonSx = {
+    width: 26,
+    height: 26,
+    borderRadius: '5px',
+    color: designTokens.textFaint,
+    '&:hover': { color: designTokens.danger, background: designTokens.dangerSoft },
+  };
+
   return (
-    <TableContainer>
-      <Table size='small' sx={{ tableLayout: 'auto' }}>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ ...thSx, width: 40, px: 0.75 }} />
-            <TableCell sx={thSx}>Description</TableCell>
-            <TableCell sx={thSx}>Key</TableCell>
-            <TableCell sx={thSx}>Actions</TableCell>
-            <TableCell sx={thSx}>Collections</TableCell>
-            <TableCell sx={thSx}>Created</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {keys.map((k, i) => (
-            <TableRow
-              key={k.id}
-              sx={{
-                '& td': {
-                  px: 1.75,
-                  py: 1.5,
-                  border: 'none',
-                  borderTop:
-                    i === 0 ? 'none' : `1px solid ${designTokens.border}`,
-                  verticalAlign: 'top',
-                },
-                '&:hover': { background: designTokens.surfaceMuted },
-              }}
-            >
-              {/* Delete */}
-              <TableCell sx={{ px: 0.75, width: 40 }}>
-                <Tooltip title='Delete key'>
-                  <IconButton
-                    size='small'
-                    onClick={() => handleDelete(k)}
-                    disabled={mutation.isPending}
-                    sx={{
-                      width: 26,
-                      height: 26,
-                      borderRadius: '5px',
-                      color: designTokens.textFaint,
-                      '&:hover': {
-                        color: designTokens.danger,
-                        background: designTokens.dangerSoft,
-                      },
-                    }}
-                  >
-                    <DeleteOutlineRounded sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
+    <>
+      {/* Mobile card list */}
+      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+        {keys.map((k, i) => (
+          <Box
+            key={k.id}
+            sx={{
+              px: 2,
+              py: 1.625,
+              borderTop: i === 0 ? 'none' : `1px solid ${designTokens.border}`,
+            }}
+          >
+            {/* Description + badge */}
+            <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 0.625 }}>
+              <Typography sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}>
+                {k.description || `Key #${k.id}`}
+              </Typography>
+              <KeyTypeBadge actions={k.actions} />
+            </Stack>
 
-              {/* Description + type badge */}
-              <TableCell>
-                <Typography
-                  sx={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: designTokens.text,
-                    mb: 0.5,
-                  }}
-                >
-                  {k.description || `Key #${k.id}`}
-                </Typography>
-                <KeyTypeBadge actions={k.actions} />
-              </TableCell>
+            {/* Key prefix + copy */}
+            <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 0.875 }}>
+              <Typography
+                component='span'
+                sx={{ fontFamily: designTokens.fontMono, fontSize: 12.5, color: designTokens.text }}
+              >
+                {k.value_prefix}
+                <Box component='span' sx={{ color: designTokens.textSubtle }}>•••••••••••</Box>
+              </Typography>
+              <Tooltip title='Copy prefix'>
+                <IconButton size='small' onClick={() => handleCopy(k.value_prefix)} sx={copyButtonSx}>
+                  <ContentCopyOutlined sx={{ fontSize: 11 }} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
 
-              {/* Key prefix + masked */}
-              <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                <Stack
-                  direction='row'
-                  spacing={0.75}
-                  sx={{ alignItems: 'center' }}
-                >
-                  <Typography
-                    component='span'
-                    sx={{
-                      fontFamily: designTokens.fontMono,
-                      fontSize: 12.5,
-                      color: designTokens.text,
-                    }}
-                  >
-                    {k.value_prefix}
-                    <Box
-                      component='span'
-                      sx={{ color: designTokens.textSubtle }}
-                    >
-                      •••••••••••••••
-                    </Box>
-                  </Typography>
-                  <Tooltip title='Copy prefix'>
+            {/* Actions + collection scope */}
+            <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, flex: 1 }}>
+                {k.actions?.map((a) => (
+                  <Box key={a} component='span' sx={actionChipSx}>{a}</Box>
+                ))}
+              </Box>
+              <Typography
+                sx={{ fontSize: 12, fontFamily: designTokens.fontMono, color: designTokens.textMuted, flexShrink: 0 }}
+              >
+                {k.collections?.includes('*') ? 'all collections' : (k.collections?.join(', ') ?? '—')}
+              </Typography>
+            </Stack>
+          </Box>
+        ))}
+      </Box>
+
+      {/* Desktop table */}
+      <TableContainer sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Table size='small' sx={{ tableLayout: 'auto' }}>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ ...thSx, width: 40, px: 0.75 }} />
+              <TableCell sx={thSx}>Description</TableCell>
+              <TableCell sx={thSx}>Key</TableCell>
+              <TableCell sx={thSx}>Actions</TableCell>
+              <TableCell sx={thSx}>Collections</TableCell>
+              <TableCell sx={thSx}>Created</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {keys.map((k, i) => (
+              <TableRow
+                key={k.id}
+                sx={{
+                  '& td': {
+                    px: 1.75,
+                    py: 1.5,
+                    border: 'none',
+                    borderTop: i === 0 ? 'none' : `1px solid ${designTokens.border}`,
+                    verticalAlign: 'top',
+                  },
+                  '&:hover': { background: designTokens.surfaceMuted },
+                }}
+              >
+                <TableCell sx={{ px: 0.75, width: 40 }}>
+                  <Tooltip title='Delete key'>
                     <IconButton
                       size='small'
-                      onClick={() =>
-                        handleCopy(k.value_prefix)
-                      }
-                      sx={{
-                        width: 22,
-                        height: 22,
-                        border: `1px solid ${designTokens.border}`,
-                        borderRadius: '4px',
-                        background: designTokens.surface,
-                        color: designTokens.textFaint,
-                        '&:hover': {
-                          borderColor: designTokens.borderStrong,
-                        },
-                      }}
+                      onClick={() => handleDelete(k)}
+                      disabled={mutation.isPending}
+                      sx={deleteButtonSx}
                     >
-                      <ContentCopyOutlined sx={{ fontSize: 11 }} />
+                      <DeleteOutlineRounded sx={{ fontSize: 14 }} />
                     </IconButton>
                   </Tooltip>
-                </Stack>
-              </TableCell>
+                </TableCell>
 
-              {/* Actions chips */}
-              <TableCell>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 0.5,
-                  }}
-                >
-                  {k.actions?.map((a) => (
-                    <Box
-                      key={a}
+                <TableCell>
+                  <Typography sx={{ fontSize: 13, fontWeight: 500, color: designTokens.text, mb: 0.5 }}>
+                    {k.description || `Key #${k.id}`}
+                  </Typography>
+                  <KeyTypeBadge actions={k.actions} />
+                </TableCell>
+
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <Stack direction='row' spacing={0.75} sx={{ alignItems: 'center' }}>
+                    <Typography
                       component='span'
-                      sx={{
-                        fontFamily: designTokens.fontMono,
-                        fontSize: 11,
-                        px: 0.75,
-                        py: '1px',
-                        background: designTokens.surfaceMuted,
-                        border: `1px solid ${designTokens.border}`,
-                        borderRadius: '3px',
-                        color: designTokens.textMuted,
-                        whiteSpace: 'nowrap',
-                      }}
+                      sx={{ fontFamily: designTokens.fontMono, fontSize: 12.5, color: designTokens.text }}
                     >
-                      {a}
-                    </Box>
-                  ))}
-                </Box>
-              </TableCell>
+                      {k.value_prefix}
+                      <Box component='span' sx={{ color: designTokens.textSubtle }}>•••••••••••••••</Box>
+                    </Typography>
+                    <Tooltip title='Copy prefix'>
+                      <IconButton size='small' onClick={() => handleCopy(k.value_prefix)} sx={copyButtonSx}>
+                        <ContentCopyOutlined sx={{ fontSize: 11 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </Stack>
+                </TableCell>
 
-              {/* Collections */}
-              <TableCell>
-                <Typography
-                  sx={{
-                    fontSize: 12,
-                    fontFamily: designTokens.fontMono,
-                    color: designTokens.textMuted,
-                  }}
-                >
-                  {k.collections?.includes('*') ? (
-                    <Box component='span' sx={{ color: designTokens.text }}>
-                      all collections
-                    </Box>
-                  ) : (
-                    k.collections?.join(', ') ?? '—'
-                  )}
-                </Typography>
-              </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {k.actions?.map((a) => (
+                      <Box key={a} component='span' sx={actionChipSx}>{a}</Box>
+                    ))}
+                  </Box>
+                </TableCell>
 
-              {/* Created / Expires */}
-              <TableCell>
-                <Typography
-                  sx={{ fontSize: 12, color: designTokens.textMuted }}
-                >
-                  {k.expires_at
-                    ? new Date(k.expires_at * 1000).toLocaleDateString(
-                        undefined,
-                        { month: 'short', day: '2-digit', year: 'numeric' },
-                      )
-                    : '—'}
-                </Typography>
-              </TableCell>
+                <TableCell>
+                  <Typography sx={{ fontSize: 12, fontFamily: designTokens.fontMono, color: designTokens.textMuted }}>
+                    {k.collections?.includes('*') ? (
+                      <Box component='span' sx={{ color: designTokens.text }}>all collections</Box>
+                    ) : (k.collections?.join(', ') ?? '—')}
+                  </Typography>
+                </TableCell>
 
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                <TableCell>
+                  <Typography sx={{ fontSize: 12, color: designTokens.textMuted }}>
+                    {k.expires_at
+                      ? new Date(k.expires_at * 1000).toLocaleDateString(undefined, {
+                          month: 'short', day: '2-digit', year: 'numeric',
+                        })
+                      : '—'}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 };
 
