@@ -126,15 +126,18 @@ function AddSynonym({ collectionId }: AddSynonymProps) {
   const form = useAppForm({
     ...synonymsFormOpts,
     onSubmit: async ({ value }) => {
+      const symbolsRaw = value.symbols_to_index
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
       const params: SynonymCreateSchema = {
-        ...value,
-        synonyms: value.synonyms.split(',').map((s) => s.trim()),
-        symbols_to_index: value.symbols_to_index
-          .split(',')
-          .map((s) => s.trim()),
+        synonyms: value.synonyms.split(',').map((s) => s.trim()).filter(Boolean),
+        root: value.type === 'one-way' && value.root.trim() ? value.root.trim() : undefined,
+        symbols_to_index: symbolsRaw.length ? symbolsRaw : undefined,
+        locale: value.locale.trim() || undefined,
       };
       try {
-        await mutation.mutateAsync({ synonymId: value.synonyms, params });
+        await mutation.mutateAsync({ synonymId: value.synonymId.trim(), params });
         form.reset();
       } catch (err) {
         // swallow - toast handled in mutation

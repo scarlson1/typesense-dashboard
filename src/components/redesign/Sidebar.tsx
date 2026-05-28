@@ -462,14 +462,14 @@ export function Sidebar() {
         {is30Plus ? (
           <SidebarLink
             to='/curation'
-            icon={<FrontHandRounded fontSize='small' />}
+            icon={<AutoFixHighRounded fontSize='small' />}
             label='Curation'
           />
         ) : null}
         {is30Plus ? (
           <SidebarLink
             to='/synonyms'
-            icon={<FrontHandRounded fontSize='small' />}
+            icon={<LeakAddRounded fontSize='small' />}
             label='Synonyms'
           />
         ) : null}

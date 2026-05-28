@@ -130,6 +130,10 @@ interface OverrideCardProps {
 
 function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
   const hasSchedule = override.effective_from_ts || override.effective_to_ts;
+  const now = Math.floor(Date.now() / 1000);
+  const isActive =
+    (!override.effective_from_ts || override.effective_from_ts <= now) &&
+    (!override.effective_to_ts || override.effective_to_ts >= now);
 
   const matchText = override.rule.query
     ? `${override.rule.match === 'contains' ? 'name:contains:' : ''}${override.rule.query}`
@@ -189,7 +193,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
         >
           {override.id}
         </Typography>
-        {override.stop_processing === false ? (
+        {isActive ? (
           <Badge tone='success' size={10}>
             ● active
           </Badge>

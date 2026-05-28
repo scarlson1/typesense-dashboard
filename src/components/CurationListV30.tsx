@@ -148,6 +148,10 @@ function CurationItemCard({
   onEdit,
 }: CurationItemCardProps) {
   const hasSchedule = item.effective_from_ts || item.effective_to_ts;
+  const now = Math.floor(Date.now() / 1000);
+  const isActive =
+    (!item.effective_from_ts || item.effective_from_ts <= now) &&
+    (!item.effective_to_ts || item.effective_to_ts >= now);
 
   const matchText = item.rule.query
     ? `${item.rule.match === 'contains' ? 'contains:' : ''}${item.rule.query}`
@@ -222,7 +226,7 @@ function CurationItemCard({
             </Typography>
           )}
         </Stack>
-        {item.stop_processing === false ? (
+        {isActive ? (
           <Badge tone='success' size={10}>
             ● active
           </Badge>

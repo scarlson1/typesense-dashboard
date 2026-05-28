@@ -157,13 +157,6 @@ const groupHeaderSx = {
   borderBottom: `1px solid ${designTokens.border}`,
 };
 
-const monoLabelSx = {
-  fontFamily: designTokens.fontMono,
-  fontSize: 12.5,
-  color: designTokens.text,
-  fontWeight: 500,
-  lineHeight: 1.3,
-};
 
 const rowDeleteBtnSx = {
   width: 26,
@@ -378,19 +371,55 @@ function ParameterRow({
             if (isKnown) {
               return (
                 <Box
-                  onClick={() => handleChange('')}
                   sx={{
-                    ...monoLabelSx,
-                    cursor: 'text',
-                    py: '6px',
-                    px: '2px',
                     minHeight: 32,
                     display: 'flex',
                     alignItems: 'center',
+                    px: '2px',
                   }}
-                  title={nameVal}
                 >
-                  {nameVal}
+                  <Box
+                    component='span'
+                    sx={{
+                      fontFamily: designTokens.fontMono,
+                      fontSize: 12,
+                      px: 1,
+                      py: '3px',
+                      background: designTokens.accentSoft,
+                      border: `1px solid ${designTokens.accentBorder}`,
+                      borderRadius: '5px',
+                      color: designTokens.accentDeep,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.625,
+                      maxWidth: '100%',
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {nameVal}
+                    </Box>
+                    <Box
+                      component='span'
+                      onClick={() => handleChange('')}
+                      sx={{
+                        color: designTokens.textFaint,
+                        cursor: 'pointer',
+                        fontSize: 11,
+                        lineHeight: 1,
+                        flexShrink: 0,
+                        '&:hover': { color: designTokens.danger },
+                      }}
+                    >
+                      ×
+                    </Box>
+                  </Box>
                 </Box>
               );
             }
