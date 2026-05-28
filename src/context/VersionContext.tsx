@@ -1,12 +1,12 @@
 import { createContext } from 'react';
 
-type SupportedVersion = 'v29' | 'v30';
-
-interface VersionContextValues {
-  version: SupportedVersion;
+export interface VersionInfo {
+  major: number;
+  raw: string;
+  is30Plus: boolean;
 }
 
-export const VersionContext = createContext<VersionContextValues | null>(null);
+export const VersionContext = createContext<VersionInfo | null>(null);
 
 if (import.meta.env.DEV) {
   VersionContext.displayName = 'VersionContext';

@@ -5,6 +5,7 @@ import {
   SidebarBoundary,
   TopBar,
 } from '@/components/redesign';
+import { VersionProvider } from '@/components/VersionProvider';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseStore } from '@/utils';
 import { Box } from '@mui/material';
@@ -45,38 +46,46 @@ function RouteComponent() {
     .map((m) => ({ label: m.staticData.crumb as string }));
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <SidebarBoundary />
+    <VersionProvider>
       <Box
-        component='main'
         sx={{
-          flexGrow: 1,
-          minWidth: 0,
-          minHeight: '100vh',
           display: 'flex',
-          flexDirection: 'column',
-          background: designTokens.surfaceTinted,
-          pb: {
-            xs: `calc(${MOBILE_BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom))`,
-            md: 0,
-          },
+          minHeight: '100vh',
+          backgroundColor: 'background.default',
         }}
       >
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-          <TopBar crumbs={crumbs} />
-        </Box>
-        <ErrorBoundary
-          FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
+        <SidebarBoundary />
+        <Box
+          component='main'
+          sx={{
+            flexGrow: 1,
+            minWidth: 0,
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            background: designTokens.surfaceTinted,
+            pb: {
+              xs: `calc(${MOBILE_BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom))`,
+              md: 0,
+            },
           }}
         >
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Outlet />
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            <TopBar crumbs={crumbs} />
           </Box>
-        </ErrorBoundary>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => {
+              captureException(err);
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Outlet />
+            </Box>
+          </ErrorBoundary>
+        </Box>
+        <MobileBottomNav />
       </Box>
-      <MobileBottomNav />
-    </Box>
+    </VersionProvider>
   );
 }

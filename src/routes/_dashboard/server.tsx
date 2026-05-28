@@ -16,10 +16,7 @@ import {
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { formatBytes } from '@/utils';
-import {
-  DownloadRounded,
-  SettingsRounded,
-} from '@mui/icons-material';
+import { DownloadRounded, SettingsRounded } from '@mui/icons-material';
 import { Alert, Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
@@ -126,9 +123,11 @@ function ServerHeaderConnected() {
     staleTime: 1000 * 300,
     retry: false,
   });
+
   const node = client.configuration.nodes[0] as
     | { host?: string; url?: string; port?: number }
     | undefined;
+
   return (
     <ServerHeader
       host={node?.host ?? node?.url ?? '—'}

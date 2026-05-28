@@ -88,13 +88,11 @@ export function InstantSearch<T extends DocumentSchema>({
     });
 
   const setPreset = useCallback((presetId: string | null) => {
-    // setParams((prev) => ({ ...prev, preset: presetId ?? undefined }));
     if (presetId) setParams((prev) => ({ ...prev, preset: presetId }));
     else setParams(({ preset: _, ...prev }) => ({ ...prev }));
   }, []);
 
   const setPagination = useCallback((values: PaginationParams) => {
-    // { page, per_page, limit, offset, ...prev }
     setParams(({ ...prev }) => ({ ...prev, ...values }));
   }, []);
 
