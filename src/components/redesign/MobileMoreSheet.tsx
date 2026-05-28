@@ -1,5 +1,6 @@
-import { typesenseStore } from '@/utils';
+import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
+import { typesenseStore } from '@/utils';
 import {
   CloseRounded,
   DarkModeRounded,
@@ -218,6 +219,7 @@ const ThemeToggle = () => {
 export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { is30Plus } = useTypesenseVersion();
   const creds = useStore(typesenseStore, (s) => s.credentials);
   const currKey = useStore(typesenseStore, (s) => s.currentCredsKey);
   const current = currKey ? creds[currKey] : null;
@@ -318,21 +320,31 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
           label='Analytics rules'
           to='/analytics'
         />
-        <SheetItem
-          icon={<StarBorderRounded />}
-          label='Presets'
-          to='/presets'
-        />
+        <SheetItem icon={<StarBorderRounded />} label='Presets' to='/presets' />
         <SheetItem
           icon={<FrontHandRounded />}
           label='Stopwords'
           to='/stopwords'
         />
         <SheetItem
-          icon={<SettingsInputSvideoRounded />}
-          label='Cluster config'
-          to='/server'
+          icon={<FrontHandRounded />}
+          label='Curation'
+          to='/curation'
         />
+        {is30Plus ? (
+          <SheetItem
+            icon={<FrontHandRounded />}
+            label='Synonyms'
+            to='/synonyms'
+          />
+        ) : null}
+        {is30Plus ? (
+          <SheetItem
+            icon={<SettingsInputSvideoRounded />}
+            label='Cluster config'
+            to='/server'
+          />
+        ) : null}
       </Box>
 
       <Divider sx={{ borderColor: designTokens.border }} />
@@ -353,7 +365,9 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
         }
       />
 
-      <Box sx={{ p: 2, pt: 1.5, pb: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+      <Box
+        sx={{ p: 2, pt: 1.5, pb: 'calc(env(safe-area-inset-bottom) + 16px)' }}
+      >
         <Button
           fullWidth
           variant='outlined'

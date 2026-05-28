@@ -1,12 +1,9 @@
-import { apiKeyQueryKeys } from '@/constants';
 import { Badge } from '@/components/redesign';
-import { designTokens } from '@/theme/themePrimitives';
+import { apiKeyQueryKeys } from '@/constants';
 import { useAsyncToast, useDialog, useTypesenseClient } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import {
-  ContentCopyOutlined,
-  DeleteOutlineRounded,
-} from '@mui/icons-material';
+import { ContentCopyOutlined, DeleteOutlineRounded } from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -55,8 +52,9 @@ const ApiKeyGrid = () => {
       await queryClient.cancelQueries({
         queryKey: apiKeyQueryKeys.all(clusterId),
       });
-      const keysData: KeysRetrieveSchema | undefined =
-        queryClient.getQueryData(apiKeyQueryKeys.all(clusterId));
+      const keysData: KeysRetrieveSchema | undefined = queryClient.getQueryData(
+        apiKeyQueryKeys.all(clusterId),
+      );
       const prevKeyData = keysData?.keys.find((k) => k.id === variables);
       queryClient.setQueryData(
         apiKeyQueryKeys.all(clusterId),
@@ -158,7 +156,10 @@ const ApiKeyGrid = () => {
     height: 26,
     borderRadius: '5px',
     color: designTokens.textFaint,
-    '&:hover': { color: designTokens.danger, background: designTokens.dangerSoft },
+    '&:hover': {
+      color: designTokens.danger,
+      background: designTokens.dangerSoft,
+    },
   };
 
   return (
@@ -175,40 +176,78 @@ const ApiKeyGrid = () => {
             }}
           >
             {/* Description + badge */}
-            <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 0.625 }}>
-              <Typography sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}>
+            <Stack
+              direction='row'
+              sx={{
+                mb: 0.625,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}
+              >
                 {k.description || `Key #${k.id}`}
               </Typography>
               <KeyTypeBadge actions={k.actions} />
             </Stack>
 
             {/* Key prefix + copy */}
-            <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 0.875 }}>
+            <Stack
+              direction='row'
+              spacing={0.75}
+              sx={{ mb: 0.875, alignItems: 'center' }}
+            >
               <Typography
                 component='span'
-                sx={{ fontFamily: designTokens.fontMono, fontSize: 12.5, color: designTokens.text }}
+                sx={{
+                  fontFamily: designTokens.fontMono,
+                  fontSize: 12.5,
+                  color: designTokens.text,
+                }}
               >
                 {k.value_prefix}
-                <Box component='span' sx={{ color: designTokens.textSubtle }}>•••••••••••</Box>
+                <Box component='span' sx={{ color: designTokens.textSubtle }}>
+                  •••••••••••
+                </Box>
               </Typography>
               <Tooltip title='Copy prefix'>
-                <IconButton size='small' onClick={() => handleCopy(k.value_prefix)} sx={copyButtonSx}>
+                <IconButton
+                  size='small'
+                  onClick={() => handleCopy(k.value_prefix || '')}
+                  sx={copyButtonSx}
+                >
                   <ContentCopyOutlined sx={{ fontSize: 11 }} />
                 </IconButton>
               </Tooltip>
             </Stack>
 
             {/* Actions + collection scope */}
-            <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, flex: 1 }}>
+            <Stack
+              direction='row'
+              spacing={1}
+              sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}
+            >
+              <Box
+                sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, flex: 1 }}
+              >
                 {k.actions?.map((a) => (
-                  <Box key={a} component='span' sx={actionChipSx}>{a}</Box>
+                  <Box key={a} component='span' sx={actionChipSx}>
+                    {a}
+                  </Box>
                 ))}
               </Box>
               <Typography
-                sx={{ fontSize: 12, fontFamily: designTokens.fontMono, color: designTokens.textMuted, flexShrink: 0 }}
+                sx={{
+                  fontSize: 12,
+                  fontFamily: designTokens.fontMono,
+                  color: designTokens.textMuted,
+                  flexShrink: 0,
+                }}
               >
-                {k.collections?.includes('*') ? 'all collections' : (k.collections?.join(', ') ?? '—')}
+                {k.collections?.includes('*')
+                  ? 'all collections'
+                  : (k.collections?.join(', ') ?? '—')}
               </Typography>
             </Stack>
           </Box>
@@ -237,7 +276,8 @@ const ApiKeyGrid = () => {
                     px: 1.75,
                     py: 1.5,
                     border: 'none',
-                    borderTop: i === 0 ? 'none' : `1px solid ${designTokens.border}`,
+                    borderTop:
+                      i === 0 ? 'none' : `1px solid ${designTokens.border}`,
                     verticalAlign: 'top',
                   },
                   '&:hover': { background: designTokens.surfaceMuted },
@@ -257,23 +297,47 @@ const ApiKeyGrid = () => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ fontSize: 13, fontWeight: 500, color: designTokens.text, mb: 0.5 }}>
+                  <Typography
+                    sx={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: designTokens.text,
+                      mb: 0.5,
+                    }}
+                  >
                     {k.description || `Key #${k.id}`}
                   </Typography>
                   <KeyTypeBadge actions={k.actions} />
                 </TableCell>
 
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                  <Stack direction='row' spacing={0.75} sx={{ alignItems: 'center' }}>
+                  <Stack
+                    direction='row'
+                    spacing={0.75}
+                    sx={{ alignItems: 'center' }}
+                  >
                     <Typography
                       component='span'
-                      sx={{ fontFamily: designTokens.fontMono, fontSize: 12.5, color: designTokens.text }}
+                      sx={{
+                        fontFamily: designTokens.fontMono,
+                        fontSize: 12.5,
+                        color: designTokens.text,
+                      }}
                     >
                       {k.value_prefix}
-                      <Box component='span' sx={{ color: designTokens.textSubtle }}>•••••••••••••••</Box>
+                      <Box
+                        component='span'
+                        sx={{ color: designTokens.textSubtle }}
+                      >
+                        •••••••••••••••
+                      </Box>
                     </Typography>
                     <Tooltip title='Copy prefix'>
-                      <IconButton size='small' onClick={() => handleCopy(k.value_prefix)} sx={copyButtonSx}>
+                      <IconButton
+                        size='small'
+                        onClick={() => handleCopy(k.value_prefix || '')}
+                        sx={copyButtonSx}
+                      >
                         <ContentCopyOutlined sx={{ fontSize: 11 }} />
                       </IconButton>
                     </Tooltip>
@@ -283,25 +347,44 @@ const ApiKeyGrid = () => {
                 <TableCell>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {k.actions?.map((a) => (
-                      <Box key={a} component='span' sx={actionChipSx}>{a}</Box>
+                      <Box key={a} component='span' sx={actionChipSx}>
+                        {a}
+                      </Box>
                     ))}
                   </Box>
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ fontSize: 12, fontFamily: designTokens.fontMono, color: designTokens.textMuted }}>
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      fontFamily: designTokens.fontMono,
+                      color: designTokens.textMuted,
+                    }}
+                  >
                     {k.collections?.includes('*') ? (
-                      <Box component='span' sx={{ color: designTokens.text }}>all collections</Box>
-                    ) : (k.collections?.join(', ') ?? '—')}
+                      <Box component='span' sx={{ color: designTokens.text }}>
+                        all collections
+                      </Box>
+                    ) : (
+                      (k.collections?.join(', ') ?? '—')
+                    )}
                   </Typography>
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ fontSize: 12, color: designTokens.textMuted }}>
+                  <Typography
+                    sx={{ fontSize: 12, color: designTokens.textMuted }}
+                  >
                     {k.expires_at
-                      ? new Date(k.expires_at * 1000).toLocaleDateString(undefined, {
-                          month: 'short', day: '2-digit', year: 'numeric',
-                        })
+                      ? new Date(k.expires_at * 1000).toLocaleDateString(
+                          undefined,
+                          {
+                            month: 'short',
+                            day: '2-digit',
+                            year: 'numeric',
+                          },
+                        )
                       : '—'}
                   </Typography>
                 </TableCell>
@@ -317,8 +400,7 @@ const ApiKeyGrid = () => {
 function KeyTypeBadge({ actions }: { actions?: string[] }) {
   if (!actions?.length) return null;
   const isAdmin = actions.includes('*');
-  const isSearch =
-    actions.length === 1 && actions[0] === 'documents:search';
+  const isSearch = actions.length === 1 && actions[0] === 'documents:search';
   if (isAdmin) return <Badge tone='warn'>● admin</Badge>;
   if (isSearch) return <Badge tone='indigo'>search</Badge>;
   return <Badge tone='neutral'>scoped</Badge>;

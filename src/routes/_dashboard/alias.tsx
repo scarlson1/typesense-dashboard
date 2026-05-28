@@ -1,19 +1,12 @@
 import { ErrorFallback } from '@/components';
 import { AliasForm, aliasFormOpts } from '@/components/AliasForm';
 import { AliasGrid } from '@/components/AliasGrid';
-import {
-  Badge,
-  PageHeader,
-  smallButtonSx,
-} from '@/components/redesign';
+import { Badge, PageHeader, smallButtonSx } from '@/components/redesign';
 import { aliasQueryKeys, collectionQueryKeys } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import {
-  OpenInNewRounded,
-  LinkRounded,
-} from '@mui/icons-material';
+import { LinkRounded, OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import {
@@ -43,7 +36,7 @@ function RouteComponent() {
         title='Aliases'
         badges={<Badge tone='neutral'>zero-downtime swaps</Badge>}
         actions={
-          <Stack direction='row' gap={1} alignItems='center'>
+          <Stack direction='row' sx={{ alignItems: 'center', gap: 1 }}>
             <Button
               component='a'
               href='https://typesense.org/docs/29.0/api/collection-alias.html'
@@ -52,7 +45,10 @@ function RouteComponent() {
               variant='outlined'
               size='small'
               startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
-              sx={{ ...smallButtonSx, display: { xs: 'none', md: 'inline-flex' } }}
+              sx={{
+                ...smallButtonSx,
+                display: { xs: 'none', md: 'inline-flex' },
+              }}
             >
               When to use aliases
             </Button>
@@ -70,7 +66,10 @@ function RouteComponent() {
           borderBottom: `1px solid ${designTokens.border}`,
         }}
       >
-        <ErrorBoundary FallbackComponent={ErrorFallback} onError={(err: unknown) => captureException(err)}>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => captureException(err)}
+        >
           <Suspense>
             <AliasCountChip />
           </Suspense>
@@ -95,8 +94,15 @@ function RouteComponent() {
             background: designTokens.accentSoft,
           }}
         >
-          <Typography sx={{ fontSize: 13, color: designTokens.accentDeep, lineHeight: 1.55 }}>
-            Point your app at an alias — re-target it on re-index and the cutover is atomic.
+          <Typography
+            sx={{
+              fontSize: 13,
+              color: designTokens.accentDeep,
+              lineHeight: 1.55,
+            }}
+          >
+            Point your app at an alias — re-target it on re-index and the
+            cutover is atomic.
           </Typography>
         </Box>
 
@@ -130,10 +136,23 @@ function RouteComponent() {
             <LinkRounded sx={{ fontSize: 16 }} />
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text, mb: 0.4 }}>
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: designTokens.text,
+                mb: 0.4,
+              }}
+            >
               Aliases let you swap collections with zero downtime.
             </Typography>
-            <Typography sx={{ fontSize: 12.5, color: designTokens.textMuted, lineHeight: 1.55 }}>
+            <Typography
+              sx={{
+                fontSize: 12.5,
+                color: designTokens.textMuted,
+                lineHeight: 1.55,
+              }}
+            >
               Point your app at the alias — and re-target it whenever you
               re-index. The cutover is atomic; in-flight queries finish on the
               old index, new ones land on the new one.
@@ -146,7 +165,10 @@ function RouteComponent() {
           sx={{
             background: designTokens.surface,
             border: { xs: 'none', md: `1px solid ${designTokens.border}` },
-            borderTop: { xs: `1px solid ${designTokens.border}`, md: `1px solid ${designTokens.border}` },
+            borderTop: {
+              xs: `1px solid ${designTokens.border}`,
+              md: `1px solid ${designTokens.border}`,
+            },
             borderRadius: { xs: 0, md: 1 },
             overflow: 'hidden',
           }}

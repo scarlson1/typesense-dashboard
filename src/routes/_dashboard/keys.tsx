@@ -7,7 +7,11 @@ import {
 import { apiKeyQueryKeys } from '@/constants';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { AddRounded, CloseRounded, OpenInNewRounded } from '@mui/icons-material';
+import {
+  AddRounded,
+  CloseRounded,
+  OpenInNewRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -65,7 +69,7 @@ function RouteComponent() {
         title='API keys'
         badges={<Badge tone='neutral'>scoped access tokens</Badge>}
         actions={
-          <Stack direction='row' gap={1} alignItems='center'>
+          <Stack direction='row' sx={{ gap: 1, alignItems: 'center' }}>
             <Button
               variant='contained'
               size='small'
@@ -87,7 +91,10 @@ function RouteComponent() {
               variant='outlined'
               size='small'
               startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
-              sx={{ ...smallButtonSx, display: { xs: 'none', md: 'inline-flex' } }}
+              sx={{
+                ...smallButtonSx,
+                display: { xs: 'none', md: 'inline-flex' },
+              }}
             >
               Scoped key docs
             </Button>
@@ -127,13 +134,18 @@ function RouteComponent() {
             sx={{
               background: designTokens.surface,
               border: { xs: 'none', md: `1px solid ${designTokens.border}` },
-              borderTop: { xs: `1px solid ${designTokens.border}`, md: `1px solid ${designTokens.border}` },
+              borderTop: {
+                xs: `1px solid ${designTokens.border}`,
+                md: `1px solid ${designTokens.border}`,
+              },
               borderRadius: { xs: 0, md: 1 },
               overflow: 'hidden',
             }}
           >
             <Suspense
-              fallback={<Skeleton variant='rounded' height={300} sx={{ m: 2 }} />}
+              fallback={
+                <Skeleton variant='rounded' height={300} sx={{ m: 2 }} />
+              }
             >
               <ApiKeyGrid />
             </Suspense>
@@ -153,12 +165,23 @@ function RouteComponent() {
           }}
         >
           <Typography
-            sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text, mb: 0.5, letterSpacing: '-0.01em' }}
+            sx={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: designTokens.text,
+              mb: 0.5,
+              letterSpacing: '-0.01em',
+            }}
           >
             Create new key
           </Typography>
           <Typography
-            sx={{ fontSize: 12, color: designTokens.textMuted, lineHeight: 1.5, mb: 1.5 }}
+            sx={{
+              fontSize: 12,
+              color: designTokens.textMuted,
+              lineHeight: 1.5,
+              mb: 1.5,
+            }}
           >
             Scope this key to specific collections and actions. The full secret
             will be shown once.
@@ -209,15 +232,36 @@ function RouteComponent() {
             pt: 1,
           }}
         >
-          <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 0.5 }}>
-            <Typography sx={{ fontSize: 16, fontWeight: 600, color: designTokens.text, letterSpacing: '-0.01em' }}>
+          <Stack
+            direction='row'
+            sx={{
+              mb: 0.5,
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: designTokens.text,
+                letterSpacing: '-0.01em',
+              }}
+            >
               Create new key
             </Typography>
             <IconButton size='small' onClick={() => setDrawerOpen(false)}>
               <CloseRounded sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
-          <Typography sx={{ fontSize: 12, color: designTokens.textMuted, lineHeight: 1.5, mb: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 12,
+              color: designTokens.textMuted,
+              lineHeight: 1.5,
+              mb: 2,
+            }}
+          >
             Scope this key to specific collections and actions. The full secret
             will be shown once.
           </Typography>

@@ -1,12 +1,12 @@
+import { smallButtonSx } from '@/components/redesign';
 import { aliasQueryKeys } from '@/constants';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { smallButtonSx, dangerButtonSx } from '@/components/redesign';
 import {
+  ArrowForwardRounded,
   DeleteOutlineRounded,
   LinkRounded,
-  ArrowForwardRounded,
 } from '@mui/icons-material';
 import {
   Box,
@@ -91,17 +91,24 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
             sx={{
               px: 2,
               py: 1.625,
-              borderTop:
-                i === 0 ? 'none' : `1px solid ${designTokens.border}`,
+              borderTop: i === 0 ? 'none' : `1px solid ${designTokens.border}`,
             }}
           >
             <Stack
               direction='row'
-              justifyContent='space-between'
-              alignItems='center'
+              sx={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
             >
-              <Stack direction='row' spacing={0.75} alignItems='center'>
-                <LinkRounded sx={{ fontSize: 14, color: designTokens.accent }} />
+              <Stack
+                direction='row'
+                spacing={0.75}
+                sx={{ alignItems: 'center' }}
+              >
+                <LinkRounded
+                  sx={{ fontSize: 14, color: designTokens.accent }}
+                />
                 <Typography
                   sx={{
                     fontFamily: designTokens.fontMono,
@@ -113,13 +120,23 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
                   {alias.name}
                 </Typography>
               </Stack>
-              <Stack direction='row' spacing={0.5} alignItems='center'>
+              <Stack
+                direction='row'
+                spacing={0.5}
+                sx={{ alignItems: 'center' }}
+              >
                 {onRepoint ? (
                   <Button
                     size='small'
                     variant='outlined'
                     onClick={() => onRepoint(alias)}
-                    sx={{ ...smallButtonSx, height: 26, fontSize: 11.5, px: 1, minWidth: 'auto' }}
+                    sx={{
+                      ...smallButtonSx,
+                      height: 26,
+                      fontSize: 11.5,
+                      px: 1,
+                      minWidth: 'auto',
+                    }}
                   >
                     Re-point
                   </Button>
@@ -134,7 +151,10 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
                       height: 26,
                       borderRadius: '5px',
                       color: designTokens.textFaint,
-                      '&:hover': { color: designTokens.danger, background: designTokens.dangerSoft },
+                      '&:hover': {
+                        color: designTokens.danger,
+                        background: designTokens.dangerSoft,
+                      },
                     }}
                   >
                     <DeleteOutlineRounded sx={{ fontSize: 14 }} />
@@ -145,8 +165,7 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
             <Stack
               direction='row'
               spacing={0.75}
-              alignItems='center'
-              sx={{ mt: 0.5, pl: 0.125 }}
+              sx={{ mt: 0.5, pl: 0.125, alignItems: 'center' }}
             >
               <ArrowForwardRounded
                 sx={{ fontSize: 13, color: designTokens.textFaint }}
@@ -209,8 +228,14 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
                 }}
               >
                 <TableCell>
-                  <Stack direction='row' spacing={1} sx={{ alignItems: 'center' }}>
-                    <LinkRounded sx={{ fontSize: 14, color: designTokens.accent }} />
+                  <Stack
+                    direction='row'
+                    spacing={1}
+                    sx={{ alignItems: 'center' }}
+                  >
+                    <LinkRounded
+                      sx={{ fontSize: 14, color: designTokens.accent }}
+                    />
                     <Typography
                       sx={{
                         fontFamily: designTokens.fontMono,
@@ -224,8 +249,14 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  <Stack direction='row' spacing={1} sx={{ alignItems: 'center' }}>
-                    <ArrowForwardRounded sx={{ fontSize: 13, color: designTokens.textFaint }} />
+                  <Stack
+                    direction='row'
+                    spacing={1}
+                    sx={{ alignItems: 'center' }}
+                  >
+                    <ArrowForwardRounded
+                      sx={{ fontSize: 13, color: designTokens.textFaint }}
+                    />
                     <Box
                       component='span'
                       sx={{
@@ -254,7 +285,13 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
                         size='small'
                         variant='outlined'
                         onClick={() => onRepoint(alias)}
-                        sx={{ ...smallButtonSx, height: 28, fontSize: 12, px: 1.25, minWidth: 'auto' }}
+                        sx={{
+                          ...smallButtonSx,
+                          height: 28,
+                          fontSize: 12,
+                          px: 1.25,
+                          minWidth: 'auto',
+                        }}
                       >
                         Re-point
                       </Button>
@@ -269,7 +306,10 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
                           height: 26,
                           borderRadius: '5px',
                           color: designTokens.textFaint,
-                          '&:hover': { color: designTokens.danger, background: designTokens.dangerSoft },
+                          '&:hover': {
+                            color: designTokens.danger,
+                            background: designTokens.dangerSoft,
+                          },
                         }}
                       >
                         <DeleteOutlineRounded sx={{ fontSize: 14 }} />
