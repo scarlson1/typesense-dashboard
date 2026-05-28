@@ -40,6 +40,10 @@ export const collectionQueryKeys = {
       ...collectionQueryKeys.collection(clusterId, collectionId),
       'synonyms',
     ] as const,
+  synonymSets: (clusterId: string) => [
+    ...collectionQueryKeys.all(clusterId),
+    'synonymSets',
+  ],
   curation: (clusterId: string, collectionId: string) =>
     [
       ...collectionQueryKeys.collection(clusterId, collectionId),
@@ -55,6 +59,8 @@ export const collectionQueryKeys = {
       'curation',
       overrideId,
     ] as const,
+  curationSets: (clusterId: string) =>
+    [...collectionQueryKeys.all(clusterId), 'curationSets'] as const,
 };
 
 export const apiKeyQueryKeys = {

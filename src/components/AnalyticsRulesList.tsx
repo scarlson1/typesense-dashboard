@@ -63,7 +63,10 @@ export function AnalyticsRulesList() {
   });
   const toast = useAsyncToast();
   const deleteMutation = useMutation({
-    mutationFn: (name: string) => client.analytics.rules(name).delete(),
+    mutationFn: (name: string) =>
+      is30Plus
+        ? client.analytics.rules(name).delete()
+        : client.analyticsV1.rules(name).delete(),
     onMutate: (vars) => {
       toast.info(`deleting ["${vars}"]`, { id: `${vars}-delete` });
     },

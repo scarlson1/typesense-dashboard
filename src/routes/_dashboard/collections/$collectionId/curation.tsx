@@ -1,3 +1,5 @@
+import { ErrorFallback } from '@/components';
+import { CurationList } from '@/components/CurationList';
 import {
   Badge,
   CollectionTabBar,
@@ -5,15 +7,13 @@ import {
   PageHeader,
   smallButtonSx,
 } from '@/components/redesign';
-import { CurationList } from '@/components/CurationList';
 import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
+import { captureException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ErrorFallback } from '@/components';
-import { captureException } from '@sentry/react';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/curation',
@@ -41,7 +41,7 @@ function RouteComponent() {
             startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
             sx={smallButtonSx}
           >
-            Curation docs
+            Docs
           </Button>
         }
       />

@@ -134,8 +134,8 @@ function AnalyticsInsight() {
   if (!popularRule) return <EnableAnalyticsCard />;
 
   const destination = is30Plus
-    ? (popularRule as AnalyticsRuleSchemaV1).params.destination?.collection
-    : (popularRule as AnalyticsRuleSchema).params?.destination_collection;
+    ? (popularRule as AnalyticsRuleSchema).params?.destination_collection
+    : (popularRule as AnalyticsRuleSchemaV1).params.destination?.collection;
 
   return (
     <PopularQueriesCard

@@ -14,37 +14,37 @@ import {
 import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, type ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import type { OverrideSchema } from 'typesense/lib/Typesense/Override';
-import type { OverrideCreateSchema } from 'typesense/lib/Typesense/Overrides';
+import type {
+  CurationObjectSchema,
+  CurationRuleSchema,
+} from 'typesense/lib/Typesense/CurationSets';
 import { CurationForm } from './CurationForm';
 import { ErrorFallback } from './ErrorFallback';
 import { Badge, smallButtonSx } from './redesign';
 
-interface CurationListProps {
-  collectionId: string;
-}
-
-export const CurationList = ({ collectionId }: CurationListProps) => {
+export const CurationListV30 = () => {
   const [client, clusterId] = useTypesenseClient();
-  const { data: overrides } = useSuspenseQuery({
-    queryKey: collectionQueryKeys.curation(clusterId, collectionId),
-    queryFn: async () => {
-      const { overrides } = await client
-        .collections(collectionId)
-        .overrides()
-        .retrieve();
-      return overrides;
-    },
+  const { data } = useSuspenseQuery({
+    queryKey: collectionQueryKeys.curationSets(clusterId),
+    queryFn: () => client.curationSets().retrieve(),
   });
 
-  const [editingId, setEditingId] = useState<string | null>('__new__');
+  // Track editing by { setName, itemId } pair — items are scoped to a set in v30
+  const [editingKey, setEditingKey] = useState<
+    { setName: string; itemId: string } | '__new__'
+  >('__new__');
 
-  const editingOverride =
-    editingId === '__new__'
+  const editingEntry =
+    editingKey === '__new__'
       ? null
-      : (overrides.find((o) => o.id === editingId) ?? null);
+      : (data
+          .find((s) => s.name === editingKey.setName)
+          ?.items.find((item) => item.id === editingKey.itemId) ?? null);
+
+  const editingSetName =
+    editingKey !== '__new__' ? editingKey.setName : undefined;
 
   return (
     <Box
@@ -56,7 +56,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
         width: '100%',
       }}
     >
-      {/* Left: override cards */}
+      {/* Left: one card per item (flattened across all sets) */}
       <Box
         sx={{
           flex: 1,
@@ -66,7 +66,7 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
           gap: 1.5,
         }}
       >
-        {overrides.length === 0 ? (
+        {data.length === 0 ? (
           <Box
             sx={{
               background: designTokens.surface,
@@ -81,14 +81,23 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
             </Typography>
           </Box>
         ) : (
-          overrides.map((override) => (
-            <OverrideCard
-              key={override.id}
-              override={override}
-              isSelected={editingId === override.id}
-              onEdit={() => setEditingId(override.id)}
-            />
-          ))
+          data.flatMap((curationSet) =>
+            curationSet.items.map((item) => (
+              <CurationItemCard
+                key={`${curationSet.name}::${item.id}`}
+                setName={curationSet.name}
+                item={item}
+                isSelected={
+                  editingKey !== '__new__' &&
+                  editingKey.setName === curationSet.name &&
+                  editingKey.itemId === item.id
+                }
+                onEdit={() =>
+                  setEditingKey({ setName: curationSet.name, itemId: item.id })
+                }
+              />
+            )),
+          )
         )}
       </Box>
 
@@ -99,20 +108,21 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
           onError={(err: unknown) => captureException(err)}
         >
           <Suspense>
-            {editingId === '__new__' || !editingOverride ? (
+            {editingKey === '__new__' || !editingEntry ? (
               <CurationFormCard
                 key='__new__'
-                collectionId={collectionId}
                 isNew
-                onSaved={(id) => setEditingId(id)}
+                onSaved={(setName, itemId) =>
+                  setEditingKey({ setName, itemId })
+                }
               />
             ) : (
               <CurationFormCard
-                key={editingOverride.id}
-                collectionId={collectionId}
-                override={editingOverride}
+                key={`${editingSetName}::${editingEntry.id}`}
+                setName={editingSetName!}
+                item={editingEntry}
                 onSaved={() => {}}
-                onCancel={() => setEditingId('__new__')}
+                onCancel={() => setEditingKey('__new__')}
               />
             )}
           </Suspense>
@@ -122,35 +132,38 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
   );
 };
 
-interface OverrideCardProps {
-  override: OverrideSchema;
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+interface CurationItemCardProps {
+  setName: string;
+  item: CurationObjectSchema;
   isSelected: boolean;
   onEdit: () => void;
 }
 
-function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
-  const hasSchedule = override.effective_from_ts || override.effective_to_ts;
+function CurationItemCard({
+  setName,
+  item,
+  isSelected,
+  onEdit,
+}: CurationItemCardProps) {
+  const hasSchedule = item.effective_from_ts || item.effective_to_ts;
 
-  const matchText = override.rule.query
-    ? `${override.rule.match === 'contains' ? 'name:contains:' : ''}${override.rule.query}`
-    : override.rule.filter_by
-      ? override.rule.filter_by
-      : (override.rule.tags?.join(', ') ?? '—');
+  const matchText = item.rule.query
+    ? `${item.rule.match === 'contains' ? 'contains:' : ''}${item.rule.query}`
+    : item.rule.filter_by
+      ? item.rule.filter_by
+      : (item.rule.tags?.join(', ') ?? '—');
 
   const scheduleText = (() => {
     if (!hasSchedule) return 'always';
-    const from = override.effective_from_ts
-      ? new Date(override.effective_from_ts * 1000).toLocaleDateString(
-          undefined,
-          { month: 'short', day: 'numeric' },
-        )
-      : '';
-    const to = override.effective_to_ts
-      ? new Date(override.effective_to_ts * 1000).toLocaleDateString(
-          undefined,
-          { month: 'short', day: 'numeric' },
-        )
-      : '';
+    const fmt = (ts: number) =>
+      new Date(ts * 1000).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+      });
+    const from = item.effective_from_ts ? fmt(item.effective_from_ts) : '';
+    const to = item.effective_to_ts ? fmt(item.effective_to_ts) : '';
     if (from && to) return `${from}–${to}`;
     if (from) return `from ${from}`;
     return `until ${to}`;
@@ -166,7 +179,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
         transition: 'border-color 120ms ease',
       }}
     >
-      {/* Card header */}
+      {/* Header */}
       <Stack
         direction='row'
         sx={{
@@ -179,17 +192,37 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
         }}
       >
         <AutoFixHighRounded sx={{ fontSize: 15, color: designTokens.accent }} />
-        <Typography
-          sx={{
-            fontFamily: designTokens.fontMono,
-            fontSize: 13,
-            fontWeight: 600,
-            color: designTokens.text,
-          }}
-        >
-          {override.id}
-        </Typography>
-        {override.stop_processing === false ? (
+        <Stack sx={{ flex: 1, minWidth: 0, gap: 0.25 }}>
+          <Typography
+            sx={{
+              fontFamily: designTokens.fontMono,
+              fontSize: 13,
+              fontWeight: 600,
+              color: designTokens.text,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {item.id}
+          </Typography>
+          {/* Show set name when item ID differs from set name */}
+          {item.id !== setName && (
+            <Typography
+              sx={{
+                fontFamily: designTokens.fontMono,
+                fontSize: 11,
+                color: designTokens.textFaint,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              set: {setName}
+            </Typography>
+          )}
+        </Stack>
+        {item.stop_processing === false ? (
           <Badge tone='success' size={10}>
             ● active
           </Badge>
@@ -198,7 +231,6 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
             paused
           </Badge>
         )}
-        <Box sx={{ flex: 1 }} />
         <Button
           size='small'
           variant='outlined'
@@ -226,7 +258,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
         </IconButton>
       </Stack>
 
-      {/* Card body: WHEN / THEN */}
+      {/* Body: WHEN / THEN */}
       <Box
         sx={{
           display: 'grid',
@@ -254,15 +286,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
           >
             {matchText}
           </Box>
-          <Stack
-            direction='row'
-            spacing={0.75}
-            sx={{
-              alignItems: 'center',
-              fontSize: 11.5,
-              color: designTokens.textMuted,
-            }}
-          >
+          <Stack direction='row' spacing={0.75} sx={{ alignItems: 'center' }}>
             <SettingsRounded
               sx={{ fontSize: 12, color: designTokens.textFaint }}
             />
@@ -275,7 +299,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
         {/* THEN */}
         <Box>
           <SectionLabel>Then</SectionLabel>
-          {override.includes && override.includes.length > 0 && (
+          {item.includes && item.includes.length > 0 && (
             <Box sx={{ mb: 1 }}>
               <Typography
                 sx={{ fontSize: 11, color: designTokens.textFaint, mb: 0.5 }}
@@ -287,7 +311,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
                 spacing={0.625}
                 sx={{ flexWrap: 'wrap', gap: 0.625 }}
               >
-                {override.includes.map((inc) => (
+                {item.includes.map((inc) => (
                   <Box
                     key={inc.id}
                     component='span'
@@ -328,7 +352,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
               </Stack>
             </Box>
           )}
-          {override.excludes && override.excludes.length > 0 && (
+          {item.excludes && item.excludes.length > 0 && (
             <Box>
               <Typography
                 sx={{ fontSize: 11, color: designTokens.textFaint, mb: 0.5 }}
@@ -340,7 +364,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
                 spacing={0.625}
                 sx={{ flexWrap: 'wrap', gap: 0.625 }}
               >
-                {override.excludes.map((ex) => (
+                {item.excludes.map((ex) => (
                   <Box
                     key={ex.id}
                     component='span'
@@ -361,10 +385,10 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
               </Stack>
             </Box>
           )}
-          {(!override.includes || override.includes.length === 0) &&
-            (!override.excludes || override.excludes.length === 0) && (
+          {(!item.includes || item.includes.length === 0) &&
+            (!item.excludes || item.excludes.length === 0) && (
               <Box>
-                {override.filter_by && (
+                {item.filter_by && (
                   <Typography
                     sx={{
                       fontSize: 12,
@@ -372,10 +396,10 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
                       fontFamily: designTokens.fontMono,
                     }}
                   >
-                    filter: {override.filter_by}
+                    filter: {item.filter_by}
                   </Typography>
                 )}
-                {override.sort_by && (
+                {item.sort_by && (
                   <Typography
                     sx={{
                       fontSize: 12,
@@ -383,10 +407,10 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
                       fontFamily: designTokens.fontMono,
                     }}
                   >
-                    sort: {override.sort_by}
+                    sort: {item.sort_by}
                   </Typography>
                 )}
-                {override.replace_query && (
+                {item.replace_query && (
                   <Typography
                     sx={{
                       fontSize: 12,
@@ -394,18 +418,16 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
                       fontFamily: designTokens.fontMono,
                     }}
                   >
-                    replace: {override.replace_query}
+                    replace: {item.replace_query}
                   </Typography>
                 )}
-                {!override.filter_by &&
-                  !override.sort_by &&
-                  !override.replace_query && (
-                    <Typography
-                      sx={{ fontSize: 11.5, color: designTokens.textFaint }}
-                    >
-                      —
-                    </Typography>
-                  )}
+                {!item.filter_by && !item.sort_by && !item.replace_query && (
+                  <Typography
+                    sx={{ fontSize: 11.5, color: designTokens.textFaint }}
+                  >
+                    —
+                  </Typography>
+                )}
               </Box>
             )}
         </Box>
@@ -414,7 +436,7 @@ function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <Typography
       sx={{
@@ -431,18 +453,20 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ── Form panel ────────────────────────────────────────────────────────────────
+
 interface CurationFormCardProps {
-  collectionId: string;
   isNew?: boolean;
-  override?: OverrideSchema;
-  onSaved: (id: string) => void;
+  setName?: string; // undefined when isNew
+  item?: CurationObjectSchema; // undefined when isNew
+  onSaved: (setName: string, itemId: string) => void;
   onCancel?: () => void;
 }
 
 function CurationFormCard({
-  collectionId,
   isNew,
-  override,
+  setName,
+  item,
   onSaved,
   onCancel,
 }: CurationFormCardProps) {
@@ -450,18 +474,28 @@ function CurationFormCard({
   const [client, clusterId] = useTypesenseClient();
 
   const mutation = useMutation({
-    mutationFn: ({
-      collectionId,
-      overrideId,
+    mutationFn: async ({
+      resolvedSetName,
+      resolvedItemId,
       params,
+      creating,
     }: {
-      collectionId: string;
-      overrideId: string;
-      params: OverrideCreateSchema;
-    }) =>
-      client.collections(collectionId).overrides().upsert(overrideId, params),
+      resolvedSetName: string;
+      resolvedItemId: string;
+      params: Omit<CurationObjectSchema, 'id'>;
+      creating: boolean;
+    }) => {
+      if (creating) {
+        // Ensure set container exists before adding the item
+        await client.curationSets(resolvedSetName).upsert({ items: [] });
+      }
+      return client
+        .curationSets(resolvedSetName)
+        .items(resolvedItemId)
+        .upsert({ id: resolvedItemId, ...params } as CurationObjectSchema);
+    },
     onMutate: (vars) => {
-      toast.loading(`saving curation [${vars.overrideId}]`, {
+      toast.loading(`saving curation [${vars.resolvedItemId}]`, {
         id: 'save-curation',
       });
     },
@@ -469,46 +503,48 @@ function CurationFormCard({
       toast.success(`curation saved [${data.id}]`, { id: 'save-curation' });
     },
     onError: (err, vars) => {
-      const msg = err.message || `error saving curation [${vars.overrideId}]`;
+      const msg =
+        err.message || `error saving curation [${vars.resolvedItemId}]`;
       toast.error(msg, { id: 'save-curation' });
     },
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.curation(clusterId, collectionId),
+        queryKey: collectionQueryKeys.curationSets(clusterId),
       });
     },
   });
 
-  const defaultValues = override
+  // Populate form from existing item when editing
+  const defaultValues = item
     ? {
-        overrideId: override.id,
-        rule_query_bool: Boolean(override.rule.query),
-        rule_filter_bool: Boolean(override.rule.filter_by),
-        rule_tags_bool: Boolean(override.rule.tags),
+        overrideId: item.id,
+        rule_query_bool: Boolean(item.rule.query),
+        rule_filter_bool: Boolean(item.rule.filter_by),
+        rule_tags_bool: Boolean(item.rule.tags),
         rule: {
-          query: override.rule.query || '',
-          match: (override.rule.match as 'exact' | 'contains') || 'exact',
-          filter_by: override.rule.filter_by || '',
-          tags: override.rule.tags ? override.rule.tags.join(', ') : '',
+          query: item.rule.query || '',
+          match: (item.rule.match as 'exact' | 'contains') || 'exact',
+          filter_by: item.rule.filter_by || '',
+          tags: item.rule.tags ? item.rule.tags.join(', ') : '',
         },
-        filter_by_bool: Boolean(override.filter_by),
-        filter_by: override.filter_by || '',
-        sort_by_bool: Boolean(override.sort_by),
-        sort_by: override.sort_by || '',
-        filter_curated_hits: Boolean(override.filter_curated_hits),
-        replace_query_bool: Boolean(override.replace_query),
-        replace_query: override.replace_query || '',
-        remove_match_tokens: Boolean(override.remove_matched_tokens),
-        custom_metadata_bool: Boolean(override.metadata),
-        metadata: override.metadata ? JSON.stringify(override.metadata) : '',
-        stop_processing: Boolean(override.stop_processing),
-        effective_from_ts_bool: Boolean(override.effective_from_ts),
-        effective_from_ts: override.effective_from_ts
-          ? new Date(override.effective_from_ts * 1000)
+        filter_by_bool: Boolean(item.filter_by),
+        filter_by: item.filter_by || '',
+        sort_by_bool: Boolean(item.sort_by),
+        sort_by: item.sort_by || '',
+        filter_curated_hits: Boolean(item.filter_curated_hits),
+        replace_query_bool: Boolean(item.replace_query),
+        replace_query: item.replace_query || '',
+        remove_match_tokens: Boolean(item.remove_matched_tokens),
+        custom_metadata_bool: Boolean(item.metadata),
+        metadata: item.metadata ? JSON.stringify(item.metadata) : '',
+        stop_processing: Boolean(item.stop_processing),
+        effective_from_ts_bool: Boolean(item.effective_from_ts),
+        effective_from_ts: item.effective_from_ts
+          ? new Date(item.effective_from_ts * 1000)
           : new Date(),
-        effective_to_ts_bool: Boolean(override.effective_to_ts),
-        effective_to_ts: override.effective_to_ts
-          ? new Date(override.effective_to_ts * 1000)
+        effective_to_ts_bool: Boolean(item.effective_to_ts),
+        effective_to_ts: item.effective_to_ts
+          ? new Date(item.effective_to_ts * 1000)
           : new Date(),
       }
     : defaultOverrideValues;
@@ -517,15 +553,20 @@ function CurationFormCard({
     ...overrideFormOpts,
     defaultValues,
     onSubmit: async ({ value }) => {
-      const overrideCreate: OverrideCreateSchema = {
+      // For new entries, overrideId is the set name; item ID matches set name.
+      // For edits, setName and item.id are fixed from props.
+      const resolvedSetName = isNew ? value.overrideId : setName!;
+      const resolvedItemId = isNew ? value.overrideId : item!.id;
+
+      const params: Omit<CurationObjectSchema, 'id'> = {
         rule: {
           query: value.rule_query_bool ? value.rule.query : undefined,
           match: value.rule_query_bool ? value.rule.match : undefined,
           filter_by: value.rule_filter_bool ? value.rule.filter_by : undefined,
-          tags: value.rule.tags
-            ? value.rule.tags.split(', ').map((t: string) => t.trim())
+          tags: value.rule_tags_bool
+            ? value.rule.tags.split(',').map((t: string) => t.trim())
             : undefined,
-        },
+        } as CurationRuleSchema,
         filter_by: value.filter_by_bool ? value.filter_by : undefined,
         sort_by: value.sort_by_bool ? value.sort_by : undefined,
         remove_matched_tokens: value.remove_match_tokens,
@@ -547,13 +588,14 @@ function CurationFormCard({
 
       try {
         const result = await mutation.mutateAsync({
-          collectionId,
-          overrideId: value.overrideId,
-          params: overrideCreate,
+          resolvedSetName,
+          resolvedItemId,
+          params,
+          creating: Boolean(isNew),
         });
         if (isNew) {
           form.reset();
-          onSaved(result.id);
+          onSaved(resolvedSetName, result.id);
         }
       } catch (err) {
         console.log(err);
@@ -577,7 +619,6 @@ function CurationFormCard({
         p: 2,
       }}
     >
-      {/* Panel header */}
       <Stack direction='row' spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
         <Box
           sx={{
@@ -602,7 +643,7 @@ function CurationFormCard({
             letterSpacing: '-0.005em',
           }}
         >
-          {isNew ? 'New override' : `Edit: ${override?.id}`}
+          {isNew ? 'New curation' : `Edit: ${item?.id}`}
         </Typography>
       </Stack>
       <Typography
@@ -618,10 +659,10 @@ function CurationFormCard({
 
       <CurationForm
         form={form}
-        submitButtonText={isNew ? 'Save override' : 'Update'}
+        submitButtonText={isNew ? 'Save curation' : 'Update'}
       />
 
-      {!isNew && onCancel ? (
+      {!isNew && onCancel && (
         <Button
           type='button'
           variant='text'
@@ -636,7 +677,7 @@ function CurationFormCard({
         >
           Cancel editing
         </Button>
-      ) : null}
+      )}
     </Box>
   );
 }

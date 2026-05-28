@@ -12,8 +12,8 @@ import {
 import { CtxFacetOptions } from '@/components/search/FacetOptions';
 import { CtxSortBy } from '@/components/search/SortBy';
 import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
-import { designTokens } from '@/theme/themePrimitives';
 import { useSearch } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import {
   ClearRounded,
   CloseRounded,
@@ -117,7 +117,7 @@ function RouteComponent() {
           sx={{
             flex: 1,
             minWidth: 0,
-            gap: 2,
+            gap: 1,
             width: '100%',
             height: '100%',
             minHeight: 0,
@@ -139,7 +139,11 @@ function RouteComponent() {
             }}
           >
             <SearchRounded
-              sx={{ fontSize: 18, color: designTokens.textFaint, flexShrink: 0 }}
+              sx={{
+                fontSize: 18,
+                color: designTokens.textFaint,
+                flexShrink: 0,
+              }}
             />
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <SearchBox
@@ -574,7 +578,9 @@ const MobileConfigureBar = ({
   onOpen: () => void;
 }) => {
   const summary = [
-    filterCount > 0 ? `${filterCount} filter${filterCount > 1 ? 's' : ''}` : null,
+    filterCount > 0
+      ? `${filterCount} filter${filterCount > 1 ? 's' : ''}`
+      : null,
     perPage ? `per_page ${perPage}` : null,
     'unsaved',
   ]
