@@ -93,17 +93,36 @@ function RouteComponent() {
   );
 
   return (
-    <Box sx={{ pb: mobile ? `${SCOPE_STRIP_HEIGHT + 8}px` : 0 }}>
+    <Box
+      sx={{
+        height: { xs: '100%', md: 'auto' },
+        display: { xs: 'flex', md: 'block' },
+        flexDirection: { xs: 'column', md: 'unset' },
+        minHeight: { xs: 0, md: 'unset' },
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
           gap: { xs: 2, md: 2.5 },
           alignItems: 'flex-start',
+          flex: { xs: 1, md: 'unset' },
+          minHeight: { xs: 0, md: 'unset' },
+          width: '100%',
         }}
       >
         {/* ── Main content (left) ── */}
-        <Stack sx={{ flex: 1, minWidth: 0, gap: 2, width: '100%' }}>
+        <Stack
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            gap: 2,
+            width: '100%',
+            height: { xs: '100%', md: 'auto' },
+            minHeight: { xs: 0, md: 'unset' },
+          }}
+        >
           {/* Search bar */}
           <Box
             sx={{
@@ -115,9 +134,7 @@ function RouteComponent() {
               display: 'flex',
               alignItems: 'center',
               gap: 1,
-              position: { xs: 'sticky', md: 'static' },
-              top: { xs: 60, md: 'auto' },
-              zIndex: { xs: 8, md: 'auto' },
+              flexShrink: 0,
             }}
           >
             <SearchRounded
@@ -162,6 +179,7 @@ function RouteComponent() {
               flexWrap: 'wrap',
               gap: 0.5,
               mt: -1,
+              flexShrink: 0,
             }}
           >
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
@@ -172,10 +190,29 @@ function RouteComponent() {
           </Stack>
 
           {/* ── Filter chips ── */}
-          <ActiveFilterChips />
+          <Box sx={{ flexShrink: 0 }}>
+            <ActiveFilterChips />
+          </Box>
 
-          <CtxSearchError />
-          <ContextHits />
+          <Box sx={{ flexShrink: 0 }}>
+            <CtxSearchError />
+          </Box>
+
+          {/* ── Results (scrollable on mobile) ── */}
+          <Box
+            sx={{
+              flex: { xs: 1, md: 'unset' },
+              minHeight: { xs: 0, md: 'unset' },
+              overflowY: { xs: 'auto', md: 'visible' },
+              overflowX: 'hidden',
+              mx: { xs: -2.5, md: 0 },
+              px: { xs: 2.5, md: 0 },
+              pb: mobile ? `${SCOPE_STRIP_HEIGHT + 80}px` : 0,
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
+            <ContextHits />
+          </Box>
 
           {/* ── Pagination ── */}
           <Stack
@@ -184,6 +221,7 @@ function RouteComponent() {
               justifyContent: 'space-between',
               alignItems: { xs: 'flex-end', md: 'center' },
               gap: 1.5,
+              flexShrink: 0,
             }}
           >
             <ResultsCount />

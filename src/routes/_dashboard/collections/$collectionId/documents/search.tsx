@@ -3,6 +3,7 @@ import { InstantSearch } from '@/components/InstantSearch';
 import {
   Badge,
   CollectionTabBar,
+  MOBILE_BOTTOM_NAV_HEIGHT,
   MobileCollectionScopeStrip,
   PageHeader,
   primaryButtonSx,
@@ -114,11 +115,24 @@ function SearchLayout() {
             ...initialSlotProps,
           }}
         >
-          <Stack sx={{ minWidth: 0 }}>
-            <Suspense fallback={<CollectionPageHeader collectionId={collectionId} numDocs={0} />}>
-              <CollectionPageHeaderConnected collectionId={collectionId} />
-            </Suspense>
-            <CollectionTabBar collectionId={collectionId} />
+          <Stack
+            sx={{
+              minWidth: 0,
+              height: {
+                xs: `calc(100dvh - ${MOBILE_BOTTOM_NAV_HEIGHT}px - env(safe-area-inset-bottom))`,
+                md: 'auto',
+              },
+              overflow: { xs: 'hidden', md: 'visible' },
+            }}
+          >
+            <Box sx={{ flexShrink: 0 }}>
+              <Suspense fallback={<CollectionPageHeader collectionId={collectionId} numDocs={0} />}>
+                <CollectionPageHeaderConnected collectionId={collectionId} />
+              </Suspense>
+            </Box>
+            <Box sx={{ flexShrink: 0 }}>
+              <CollectionTabBar collectionId={collectionId} />
+            </Box>
             <Box
               sx={{
                 flex: 1,
@@ -126,6 +140,9 @@ function SearchLayout() {
                 py: 2.5,
                 background: designTokens.surfaceTinted,
                 minHeight: 0,
+                display: { xs: 'flex', md: 'block' },
+                flexDirection: { xs: 'column', md: 'unset' },
+                overflow: { xs: 'hidden', md: 'visible' },
               }}
             >
               <Outlet />
