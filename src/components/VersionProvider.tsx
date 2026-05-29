@@ -1,19 +1,28 @@
 import { VersionContext } from '@/context/VersionContext';
 import { getTypesenseClient, typesenseStore } from '@/utils';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useStore } from 'zustand';
 
 export const VersionProvider = ({ children }: { children: ReactNode }) => {
   const credentials = useStore(typesenseStore, (s) => s.credentials);
   const clusterId = useStore(typesenseStore, (s) => s.currentCredsKey);
-  const creds = clusterId ? credentials[clusterId] : null;
-  const client = creds ? getTypesenseClient(creds) : null;
 
   const [versionInfo, setVersionInfo] = useState({
     major: 0,
     raw: '',
     is30Plus: true,
   });
+
+  const client = useMemo(() => {
+    const creds = clusterId ? credentials[clusterId] : null;
+    return creds ? getTypesenseClient(creds) : null;
+  }, [credentials, clusterId]);
 
   const updateVersion = useCallback((v: string) => {
     // parse data.version string (e.g. "30.0" → major: 30
@@ -41,7 +50,7 @@ export const VersionProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       cancelled = true;
     };
-  }, [clusterId, updateVersion, client]);
+  }, [updateVersion, client]);
 
   return (
     <VersionContext.Provider value={versionInfo}>

@@ -1,7 +1,6 @@
 import { ErrorFallback } from '@/components';
 import {
   Badge,
-  BigChart,
   primaryButtonSx,
   SectionCard,
   smallButtonSx,
@@ -19,7 +18,7 @@ import {
   LeakAddRounded,
   OpenInNewRounded,
 } from '@mui/icons-material';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
@@ -65,36 +64,39 @@ function HomeComponent() {
                 <MetricStrip />
               </Suspense>
             </ErrorBoundary>
-
-            <SectionCard
-              title='Search & write volume'
-              description='last 24 hours'
-              actions={<TimeRangeToggle />}
-            >
-              <Box sx={{ minHeight: 220 }}>
-                <BigChart />
-              </Box>
-              <Stack
-                direction='row'
-                sx={{
-                  gap: 2,
-                  mt: 1,
-                  fontSize: 11.5,
-                  color: designTokens.textMuted,
-                  flexWrap: 'wrap',
-                }}
+            {/* TODO: show top searches instead */}
+            {/* <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <SectionCard
+                title='Search & write volume'
+                description='last 24 hours'
+                actions={<TimeRangeToggle />}
               >
-                <LegendDot color={designTokens.accent}>Search</LegendDot>
-                <LegendDot color='#3aafe0'>Import</LegendDot>
-                <LegendDot color='#f6b500'>Write</LegendDot>
-                <LegendDot color={designTokens.textSubtle}>Delete</LegendDot>
-              </Stack>
-              <Alert severity='warning' sx={{ mt: 1.5 }}>
-                Illustrative chart — Typesense's API does not expose historical
-                time-series for QPS/latency. Hook up an external metrics store
-                (e.g. Prometheus + Grafana) to render real history.
-              </Alert>
-            </SectionCard>
+                <Box sx={{ minHeight: 220 }}>
+                  <BigChart />
+                </Box>
+                <Stack
+                  direction='row'
+                  sx={{
+                    gap: 2,
+                    mt: 1,
+                    fontSize: 11.5,
+                    color: designTokens.textMuted,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <LegendDot color={designTokens.accent}>Search</LegendDot>
+                  <LegendDot color='#3aafe0'>Import</LegendDot>
+                  <LegendDot color='#f6b500'>Write</LegendDot>
+                  <LegendDot color={designTokens.textSubtle}>Delete</LegendDot>
+                </Stack>
+                <Alert severity='warning' sx={{ mt: 1.5 }}>
+                  Illustrative chart — Typesense's API does not expose
+                  historical time-series for QPS/latency. Hook up an external
+                  metrics store (e.g. Prometheus + Grafana) to render real
+                  history.
+                </Alert>
+              </SectionCard>
+            </Box> */}
           </Stack>
 
           <Stack sx={{ gap: 1.75, minWidth: 0 }}>
