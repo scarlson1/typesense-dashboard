@@ -88,7 +88,7 @@ function RouteComponent() {
         </Suspense>
       }
       displayContent={
-        <DashboardDisplayOptions key={`display-opts-${collectionId}`} />
+        <DashboardDisplayOptions key={`display-opts-${collectionId}`} compact />
       }
     />
   );

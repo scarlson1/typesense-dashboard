@@ -20,6 +20,8 @@ export {
   dangerButtonSx,
 } from './buttonStyles';
 export { CollectionTabBar } from './CollectionTabBar';
+export { ChipMultiField } from './ChipMultiField';
+export type { ChipMultiFieldProps } from './ChipMultiField';
 export {
   MobileBottomNav,
   MOBILE_BOTTOM_NAV_HEIGHT,
