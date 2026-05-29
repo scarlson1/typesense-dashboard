@@ -1,8 +1,6 @@
 import { queryClient, typesenseStore } from '@/utils';
-import { createFileRoute, Navigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod/v4';
-import { useStore } from 'zustand';
 
 const authSearchSchema = z.object({
   redirect: z.string().optional(),
@@ -10,32 +8,18 @@ const authSearchSchema = z.object({
 });
 
 export const Route = createFileRoute('/logout')({
-  component: RouteComponent,
+  component: () => null,
   validateSearch: (search) => authSearchSchema.parse(search),
-});
+  beforeLoad: ({ search }) => {
+    queryClient.cancelQueries();
+    // @ts-expect-error logout returns State
+    const { currentCredsKey } = typesenseStore.getState().logout(search?.clusterId);
+    queryClient.clear();
 
-function RouteComponent() {
-  const search = Route.useSearch();
-  const navigate = Route.useNavigate();
-  const logout = useStore(typesenseStore, (state) => state.logout);
-
-  useEffect(() => {
-    try {
-      // TODO: add loading state and show loading indicator in list item
-      queryClient.cancelQueries();
-      // @ts-expect-error returns State
-      const { currentCredsKey } = logout(search?.clusterId);
-
-      if (!currentCredsKey) {
-        navigate({ to: '/auth', search: search });
-      }
-
-      // TODO: redirect to auth if no account ??
-      queryClient.clear();
-    } catch (err) {
-      console.log('LOGOUT ERROR: ', err);
+    if (!currentCredsKey) {
+      throw redirect({ to: '/auth', search });
     }
-  }, [search?.clusterId, logout, navigate, search]);
 
-  return <Navigate to={search.redirect || '/'} replace />;
-}
+    throw redirect({ to: search.redirect || '/' });
+  },
+});
