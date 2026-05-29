@@ -1,9 +1,14 @@
 import { VersionContext } from '@/context/VersionContext';
-import { useTypesenseClient } from '@/hooks';
+import { getTypesenseClient, typesenseStore } from '@/utils';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useStore } from 'zustand';
 
 export const VersionProvider = ({ children }: { children: ReactNode }) => {
-  const [client, clusterId] = useTypesenseClient();
+  const credentials = useStore(typesenseStore, (s) => s.credentials);
+  const clusterId = useStore(typesenseStore, (s) => s.currentCredsKey);
+  const creds = clusterId ? credentials[clusterId] : null;
+  const client = creds ? getTypesenseClient(creds) : null;
+
   const [versionInfo, setVersionInfo] = useState({
     major: 0,
     raw: '',
@@ -22,10 +27,11 @@ export const VersionProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    if (!client) return;
     let cancelled = false;
     client.debug
       .retrieve()
-      .then((d: { version: string; state: string; node_name: string }) => {
+      .then((d) => {
         if (!cancelled) updateVersion(d.version);
       })
       .catch(() => {

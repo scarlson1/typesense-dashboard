@@ -173,7 +173,8 @@ function ChipInput({
 
 export const SynonymsFormV30 = withForm({
   ...synonymsFormOptsV30,
-  render: ({ form }) => {
+  props: {} as { isEditing?: boolean; onCancel?: () => void },
+  render: ({ form, isEditing, onCancel }) => {
     return (
       <Grid container spacing={1.75}>
         <Grid size={{ xs: 12 }}>
@@ -250,9 +251,34 @@ export const SynonymsFormV30 = withForm({
           </form.AppField>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <form.AppForm>
-            <form.SubmitButton label='Add rule' fullWidth />
-          </form.AppForm>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <form.AppForm>
+              <form.SubmitButton label={isEditing ? 'Save changes' : 'Add rule'} fullWidth />
+            </form.AppForm>
+            {isEditing && onCancel && (
+              <Box
+                component='button'
+                type='button'
+                onClick={onCancel}
+                sx={{
+                  px: 1.5,
+                  py: '5px',
+                  fontSize: 12.5,
+                  fontWeight: 500,
+                  borderRadius: '6px',
+                  border: `1px solid ${designTokens.border}`,
+                  background: designTokens.surface,
+                  color: designTokens.textMuted,
+                  cursor: 'pointer',
+                  font: 'inherit',
+                  whiteSpace: 'nowrap',
+                  '&:hover': { borderColor: designTokens.borderStrong, color: designTokens.text },
+                }}
+              >
+                Cancel
+              </Box>
+            )}
+          </Box>
         </Grid>
       </Grid>
     );

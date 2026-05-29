@@ -88,7 +88,8 @@ export const CurationForm = withForm({
     }));
 
     useEffect(() => {
-      setExpanded(bools);
+      const { rule_match: _, ...expandedBools } = bools;
+      setExpanded(expandedBools);
     }, [
       bools.rule_query_bool,
       bools.rule_filter_bool,

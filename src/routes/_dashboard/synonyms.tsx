@@ -3,7 +3,10 @@ import {
   synonymsFormOptsV30,
   SynonymsFormV30,
 } from '@/components/SynonymsFormV30';
-import { SynonymsGridV30 } from '@/components/SynonymsGridV30';
+import {
+  SynonymsGridV30,
+  type SynonymRowForEdit,
+} from '@/components/SynonymsGridV30';
 import { collectionQueryKeys } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -12,6 +15,7 @@ import { DownloadRounded, OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import type { SynonymSetCreateSchema } from 'typesense';
 
 export const Route = createFileRoute('/_dashboard/synonyms')({
@@ -20,6 +24,8 @@ export const Route = createFileRoute('/_dashboard/synonyms')({
 });
 
 function RouteComponent() {
+  const [editingSynonym, setEditingSynonym] = useState<SynonymRowForEdit | null>(null);
+
   return (
     <Stack sx={{ minWidth: 0 }}>
       <PageHeader
@@ -63,22 +69,28 @@ function RouteComponent() {
         }}
       >
         <SectionCard noBodyPadding>
-          <Box sx={{ p: 2 }}>
-            <SynonymsGridV30 />
-          </Box>
+          <SynonymsGridV30 onEdit={(row) => setEditingSynonym(row)} />
         </SectionCard>
 
         <Box sx={{ minWidth: 0 }}>
-          <SectionCard title='Add synonym rule'>
-            <AddSynonym />
+          <SectionCard title={editingSynonym ? 'Edit synonym rule' : 'Add synonym rule'}>
+            <AddSynonym
+              editingSynonym={editingSynonym}
+              onCancel={() => setEditingSynonym(null)}
+            />
           </SectionCard>
         </Box>
       </Box>
-      {/* <MobileCollectionScopeStrip currentCollectionId={collectionId} /> */}
     </Stack>
   );
 }
-function AddSynonym() {
+
+interface AddSynonymProps {
+  editingSynonym?: SynonymRowForEdit | null;
+  onCancel?: () => void;
+}
+
+function AddSynonym({ editingSynonym, onCancel }: AddSynonymProps) {
   const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
 
@@ -110,7 +122,6 @@ function AddSynonym() {
   const form = useAppForm({
     ...synonymsFormOptsV30,
     onSubmit: async ({ value }) => {
-      // Each set holds one item; set name and item ID are both value.name
       const synonymSet: SynonymSetCreateSchema = {
         items: [
           {
@@ -133,11 +144,25 @@ function AddSynonym() {
       try {
         await mutation.mutateAsync({ synonymSetName: value.name, synonymSet });
         form.reset();
+        onCancel?.();
       } catch (_) {
         // toast handled in mutation
       }
     },
   });
+
+  useEffect(() => {
+    if (editingSynonym) {
+      form.setFieldValue('name', editingSynonym.setName);
+      form.setFieldValue('synonyms', editingSynonym.synonyms);
+      form.setFieldValue('root', editingSynonym.root);
+      form.setFieldValue('symbols_to_index', editingSynonym.symbols_to_index);
+      form.setFieldValue('locale', editingSynonym.locale);
+    } else {
+      form.reset();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingSynonym?.setName]);
 
   return (
     <Box
@@ -150,7 +175,7 @@ function AddSynonym() {
       noValidate
       sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
     >
-      <SynonymsFormV30 form={form} />
+      <SynonymsFormV30 form={form} isEditing={!!editingSynonym} onCancel={onCancel} />
     </Box>
   );
 }

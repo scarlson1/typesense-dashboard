@@ -1,6 +1,6 @@
+import { ClusterSelect } from '@/components/ClusterSelect';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
-import { typesenseStore } from '@/utils';
 import {
   CloseRounded,
   DarkModeRounded,
@@ -11,7 +11,7 @@ import {
   LightModeRounded,
   LogoutRounded,
   OpenInNewRounded,
-  PersonOutlineRounded,
+  PersonAddRounded,
   SettingsInputSvideoRounded,
   StarBorderRounded,
 } from '@mui/icons-material';
@@ -34,7 +34,6 @@ import {
   type LinkComponent,
 } from '@tanstack/react-router';
 import { forwardRef, useEffect, useRef, type ReactNode } from 'react';
-import { useStore } from 'zustand';
 
 interface MobileMoreSheetProps {
   open: boolean;
@@ -220,14 +219,6 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { is30Plus } = useTypesenseVersion();
-  const creds = useStore(typesenseStore, (s) => s.credentials);
-  const currKey = useStore(typesenseStore, (s) => s.currentCredsKey);
-  const current = currKey ? creds[currKey] : null;
-  const hostLabel = current
-    ? `${current.protocol}://${current.node}${
-        current.protocol === 'http' && current.port ? `:${current.port}` : ''
-      }`
-    : '—';
 
   const prevPath = useRef(location.pathname);
   useEffect(() => {
@@ -270,41 +261,23 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
           mt: 1,
         }}
       />
-      {/* User row */}
+      {/* Account switcher row */}
       <Stack
         direction='row'
-        sx={{ alignItems: 'center', gap: 1.25, px: 2, py: 1.5 }}
+        sx={{ alignItems: 'center', gap: 1, px: 2, py: 1.5 }}
       >
         <Box
           sx={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: designTokens.surfaceMuted,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: designTokens.textMuted,
+            flex: 1,
+            minWidth: 0,
+            '& .MuiInputBase-root': {
+              width: '100% !important',
+              background: designTokens.surfaceMuted,
+              borderRadius: '10px',
+            },
           }}
         >
-          <PersonOutlineRounded sx={{ fontSize: 20 }} />
-        </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography
-            sx={{ fontSize: 15, fontWeight: 600, color: designTokens.text }}
-          >
-            {current?.env ?? 'Connected'}
-          </Typography>
-          <Typography
-            noWrap
-            sx={{
-              fontSize: 12,
-              color: designTokens.textFaint,
-              fontFamily: designTokens.fontMono,
-            }}
-          >
-            {hostLabel}
-          </Typography>
+          <ClusterSelect />
         </Box>
         <IconButton onClick={onClose} size='small'>
           <CloseRounded sx={{ fontSize: 18 }} />
@@ -345,6 +318,11 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
             to='/server'
           />
         ) : null}
+        <SheetItem
+          icon={<PersonAddRounded />}
+          label='Sign into another account'
+          to='/auth'
+        />
       </Box>
 
       <Divider sx={{ borderColor: designTokens.border }} />

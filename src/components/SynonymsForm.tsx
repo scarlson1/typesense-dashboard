@@ -206,7 +206,8 @@ function ChipInput({
 
 export const SynonymsForm = withForm({
   ...synonymsFormOpts,
-  render: ({ form }) => {
+  props: {} as { isEditing?: boolean; onCancel?: () => void },
+  render: ({ form, isEditing, onCancel }) => {
     return (
       <Stack>
         <Typography sx={{ ...labelSx, mt: 0 }}>Type</Typography>
@@ -339,10 +340,33 @@ export const SynonymsForm = withForm({
           </Box>
         </Stack>
 
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
           <form.AppForm>
-            <form.SubmitButton label='Add rule' fullWidth />
+            <form.SubmitButton label={isEditing ? 'Save changes' : 'Add rule'} fullWidth />
           </form.AppForm>
+          {isEditing && onCancel && (
+            <Box
+              component='button'
+              type='button'
+              onClick={onCancel}
+              sx={{
+                px: 1.5,
+                py: '5px',
+                fontSize: 12.5,
+                fontWeight: 500,
+                borderRadius: '6px',
+                border: `1px solid ${designTokens.border}`,
+                background: designTokens.surface,
+                color: designTokens.textMuted,
+                cursor: 'pointer',
+                font: 'inherit',
+                whiteSpace: 'nowrap',
+                '&:hover': { borderColor: designTokens.borderStrong, color: designTokens.text },
+              }}
+            >
+              Cancel
+            </Box>
+          )}
         </Box>
       </Stack>
     );

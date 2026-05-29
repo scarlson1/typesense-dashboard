@@ -85,9 +85,8 @@ function TypesenseVersion() {
     <Stack spacing={0.5} direction='column' sx={{ alignItems: 'flex-end' }}>
       <Typography
         variant='overline'
-        color='textSecondary'
         fontSize='0.725rem'
-        sx={{ lineHeight: 1.2 }}
+        sx={{ lineHeight: 1.2, color: 'text.secondary' }}
       >
         Version
       </Typography>
