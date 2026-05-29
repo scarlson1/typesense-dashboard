@@ -117,7 +117,7 @@ function RouteComponent() {
         {/* Left: sets sidebar */}
         <SetsSidebar
           sets={sets}
-          selectedId={selectedId}
+          selectedId={selectedId ?? null}
           onSelect={setSelectedId}
         />
 

@@ -31,7 +31,7 @@ export const VersionProvider = ({ children }: { children: ReactNode }) => {
     let cancelled = false;
     client.debug
       .retrieve()
-      .then((d: { version: string; state: string; node_name: string }) => {
+      .then((d) => {
         if (!cancelled) updateVersion(d.version);
       })
       .catch(() => {
