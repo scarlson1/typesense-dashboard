@@ -1,4 +1,9 @@
-import { fieldInputSx, FieldRow, ghostButtonSx } from '@/components/redesign';
+import {
+  ChipMultiField,
+  fieldInputSx,
+  FieldRow,
+  ghostButtonSx,
+} from '@/components/redesign';
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
 import {
   useCollectionSchema,
@@ -125,19 +130,35 @@ export function DashboardDisplayOptions({
     [slotProps, setStoredDisplayOptions],
   );
 
-  const handleFieldsChange = useCallback(
-    (_: any, newVal: string[]) => {
+  const setDisplayFields = useCallback(
+    (newVal: string[]) => {
       updateSlotProps(
         {
-          hit: { displayFields: newVal || [] },
+          hit: { displayFields: newVal },
         },
         (_: object, srcValue: object) => {
           if (Array.isArray(srcValue)) return srcValue;
         },
       );
-      persistDisplay({ displayFields: newVal || [] });
+      persistDisplay({ displayFields: newVal });
     },
     [updateSlotProps, persistDisplay],
+  );
+
+  const displayFields = useMemo(
+    () => slotProps.hit?.displayFields || [],
+    [slotProps.hit?.displayFields],
+  );
+
+  const handleAddField = useCallback(
+    (field: string) => setDisplayFields([...displayFields, field]),
+    [displayFields, setDisplayFields],
+  );
+
+  const handleRemoveField = useCallback(
+    (index: number) =>
+      setDisplayFields(displayFields.filter((_, i) => i !== index)),
+    [displayFields, setDisplayFields],
   );
 
   const handleImageChange = useCallback(
@@ -207,61 +228,12 @@ export function DashboardDisplayOptions({
         description='Order of chips = order shown on the card.'
         compact={compact}
       >
-        <Autocomplete
-          multiple
-          id='display-fields'
-          size='small'
-          fullWidth
-          disableCloseOnSelect
+        <ChipMultiField
+          values={displayFields}
           options={fieldOptions}
-          value={slotProps.hit?.displayFields || []}
-          onChange={handleFieldsChange}
-          renderValue={(value, getTagProps) =>
-            value.map((option, index) => {
-              const { key, onDelete } = getTagProps({ index });
-              return (
-                <Box
-                  key={key}
-                  component='span'
-                  sx={{
-                    fontFamily: designTokens.fontMono,
-                    fontSize: 12,
-                    px: 0.875,
-                    py: '2px',
-                    background: designTokens.surfaceMuted,
-                    border: `1px solid ${designTokens.border}`,
-                    borderRadius: '4px',
-                    color: designTokens.text,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {option}
-                  <Box
-                    component='span'
-                    onClick={onDelete}
-                    sx={{
-                      color: designTokens.textFaint,
-                      cursor: 'pointer',
-                      fontSize: 11,
-                      lineHeight: 1,
-                      '&:hover': { color: designTokens.danger },
-                    }}
-                  >
-                    ×
-                  </Box>
-                </Box>
-              );
-            })
-          }
-          renderInput={(params) => (
-            <TextField {...params} placeholder='Add field…' sx={fieldInputSx} />
-          )}
-          slotProps={{
-            paper: { sx: autocompletePaperSx },
-          }}
+          onAdd={handleAddField}
+          onRemove={handleRemoveField}
+          placeholder='Add field…'
         />
       </FieldRow>
 
