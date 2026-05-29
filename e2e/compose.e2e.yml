@@ -1,0 +1,19 @@
+# Ephemeral Typesense instances for E2E (plain HTTP + CORS, in-memory data).
+# Usage: docker compose -f e2e/compose.e2e.yml up -d
+# Ports: v29 -> localhost:8108, v30 -> localhost:8109 (matches e2e/creds.ts).
+services:
+  typesense-v29:
+    image: typesense/typesense:29.0
+    command: '--data-dir=/data --api-key=xyz --api-port=8108 --enable-cors'
+    ports:
+      - '8108:8108'
+    tmpfs:
+      - /data
+
+  typesense-v30:
+    image: typesense/typesense:30.2
+    command: '--data-dir=/data --api-key=xyz --api-port=8108 --enable-cors'
+    ports:
+      - '8109:8108'
+    tmpfs:
+      - /data

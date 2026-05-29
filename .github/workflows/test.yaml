@@ -1,0 +1,88 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: Lint, typecheck & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm test:typecheck
+
+      - run: pnpm test:coverage
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+
+  e2e:
+    name: E2E (v29 + v30)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Start Typesense (v29 + v30)
+        run: docker compose -f e2e/compose.e2e.yml up -d
+
+      - name: Wait for Typesense to be healthy
+        run: |
+          for port in 8108 8109; do
+            echo "Waiting for Typesense on :$port ..."
+            for i in $(seq 1 30); do
+              if curl -sf "http://localhost:$port/health" -H 'x-typesense-api-key: xyz' >/dev/null; then
+                echo "  up"
+                break
+              fi
+              sleep 2
+              if [ "$i" -eq 30 ]; then echo "  timed out" && exit 1; fi
+            done
+          done
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        env:
+          CI: 'true'
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+
+      - name: Stop Typesense
+        if: always()
+        run: docker compose -f e2e/compose.e2e.yml down

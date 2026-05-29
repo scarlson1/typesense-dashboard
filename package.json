@@ -18,6 +18,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:typecheck": "tsc -p tsconfig.vitest.json --noEmit",
+    "test:e2e": "playwright test",
+    "e2e:up": "docker compose -f e2e/compose.e2e.yml up -d",
+    "e2e:down": "docker compose -f e2e/compose.e2e.yml down",
     "preview": "vite preview",
     "dev:docker": "docker run -dp 5173:5173 typesense-dashboard",
     "dev:compose": "docker compose up --watch --build",
@@ -66,6 +69,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@playwright/test": "^1.60.0",
     "@sentry/vite-plugin": "^3.6.0",
     "@tanstack/eslint-plugin-query": "^5.78.0",
     "@tanstack/router-plugin": "^1.121.21",
