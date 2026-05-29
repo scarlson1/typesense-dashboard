@@ -135,7 +135,7 @@ TODO -->
 
 <!-- old design -->
 
-![search parameters](docs/images/search_params.png)
+<!-- ![search parameters](docs/images/search_params.png)
 
 ![server status](docs/images/server_status.png)
 
@@ -153,7 +153,7 @@ TODO -->
 
 ![analytics rules](docs/images/analytics_rules.png)
 
-![search refinements](docs/images/search-dark.png)
+![search refinements](docs/images/search-dark.png) -->
 
 # Alternatives
 
