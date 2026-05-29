@@ -1,8 +1,4 @@
-import {
-  fieldInputSx,
-  FieldRow,
-  ghostButtonSx,
-} from '@/components/redesign';
+import { fieldInputSx, FieldRow, ghostButtonSx } from '@/components/redesign';
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
 import {
   useCollectionSchema,
@@ -27,8 +23,6 @@ import {
   type Theme,
 } from '@mui/material';
 import { useCallback, useEffect, useMemo } from 'react';
-
-// TODO: persist display preferences to local storage (per collection)
 
 const imgFitOptions: CSSProperties['backgroundSize'][] = [
   'auto',
@@ -75,7 +69,11 @@ const selectInputSx = {
   },
 };
 
-export function DashboardDisplayOptions({ compact = false }: { compact?: boolean }) {
+export function DashboardDisplayOptions({
+  compact = false,
+}: {
+  compact?: boolean;
+}) {
   const [_, slotProps, updateSlotProps] = useSearchSlots();
   const { data: collectionSchema } = useCollectionSchema();
   const [__, clusterId] = useTypesenseClient();
@@ -139,7 +137,7 @@ export function DashboardDisplayOptions({ compact = false }: { compact?: boolean
       );
       persistDisplay({ displayFields: newVal || [] });
     },
-    [persistDisplay],
+    [updateSlotProps, persistDisplay],
   );
 
   const handleImageChange = useCallback(
@@ -155,7 +153,7 @@ export function DashboardDisplayOptions({ compact = false }: { compact?: boolean
       updateSlotProps({ hit: { imgField } });
       persistDisplay({ imgField });
     },
-    [persistDisplay],
+    [updateSlotProps, persistDisplay],
   );
 
   const handleSizeChange = useCallback(
@@ -172,7 +170,7 @@ export function DashboardDisplayOptions({ compact = false }: { compact?: boolean
       });
       persistDisplay({ columns: columns || undefined });
     },
-    [updateSlotProps],
+    [updateSlotProps, persistDisplay],
   );
 
   const handleImgSizeChange = useCallback(
@@ -187,7 +185,7 @@ export function DashboardDisplayOptions({ compact = false }: { compact?: boolean
       });
       persistDisplay({ backgroundSize });
     },
-    [updateSlotProps],
+    [updateSlotProps, persistDisplay],
   );
 
   const handleResetGrid = useCallback(() => {
@@ -218,7 +216,7 @@ export function DashboardDisplayOptions({ compact = false }: { compact?: boolean
           options={fieldOptions}
           value={slotProps.hit?.displayFields || []}
           onChange={handleFieldsChange}
-          renderTags={(value, getTagProps) =>
+          renderValue={(value, getTagProps) =>
             value.map((option, index) => {
               const { key, onDelete } = getTagProps({ index });
               return (

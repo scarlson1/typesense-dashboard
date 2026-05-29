@@ -1,30 +1,30 @@
-import { collectionQueryKeys } from '@/constants';
-import { useTypesenseClient } from '@/hooks';
 import {
   fieldChipSx,
   fieldInputSx,
   FormField,
   primaryButtonSx,
 } from '@/components/redesign';
+import { collectionQueryKeys } from '@/constants';
+import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import {
-  collectionActions as zCollectionActions,
-  documentActions as zDocumentActions,
   aliasActions as zAliasActions,
-  synonymActions as zSynonymActions,
-  overrideActions as zOverrideActions,
-  stopwordsActions as zStopwordsActions,
-  keysActions as zKeysActions,
   analyticsActions as zAnalyticsActions,
-  analyticsRulesActions as zAnalyticsRulesActions,
   analyticsEventsActions as zAnalyticsEventsActions,
+  analyticsRulesActions as zAnalyticsRulesActions,
+  collectionActions as zCollectionActions,
+  configOpsActions as zConfigActions,
+  convoModelOpsActions as zConvoModelActions,
+  documentActions as zDocumentActions,
+  keysActions as zKeysActions,
   miscActions as zMiscActions,
+  naturalLangSearchActions as zNlSearchActions,
+  operationsActions as zOperationsActions,
+  overrideActions as zOverrideActions,
   presetActions as zPresetActions,
   streamingDictActions as zStemmingActions,
-  operationsActions as zOperationsActions,
-  convoModelOpsActions as zConvoModelActions,
-  naturalLangSearchActions as zNlSearchActions,
-  configOpsActions as zConfigActions,
+  stopwordsActions as zStopwordsActions,
+  synonymActions as zSynonymActions,
 } from '@/types';
 import {
   Autocomplete,
@@ -34,7 +34,7 @@ import {
   TextField,
   type Theme,
 } from '@mui/material';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -121,7 +121,9 @@ const NewApiKeyForm = ({
   };
 
   const canSubmit =
-    !submitting && (values.actions?.length ?? 0) > 0 && (values.collections?.length ?? 0) > 0;
+    !submitting &&
+    (values.actions?.length ?? 0) > 0 &&
+    (values.collections?.length ?? 0) > 0;
 
   return (
     <Stack spacing={2}>
@@ -213,7 +215,10 @@ const NewApiKeyForm = ({
             slotProps={{
               textField: {
                 sx: [
-                  fieldInputSx,
+                  // fieldInputSx,
+                  ...(Array.isArray(fieldInputSx)
+                    ? fieldInputSx
+                    : [fieldInputSx]),
                   {
                     '& .MuiOutlinedInput-root': {
                       py: 0,
@@ -251,7 +256,9 @@ const NewApiKeyForm = ({
         </LocalizationProvider>
       </FormField>
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 0.5 }}>
+      <Box
+        sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 0.5 }}
+      >
         <Button
           variant='contained'
           onClick={onSubmit}
