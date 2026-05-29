@@ -117,7 +117,7 @@ function RouteComponent() {
           sx={{
             flex: 1,
             minWidth: 0,
-            gap: 1,
+            gap: 0.75,
             width: '100%',
             height: '100%',
             minHeight: 0,
@@ -183,11 +183,11 @@ function RouteComponent() {
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: 0.5,
-              mt: -1,
+              mt: -0.5,
               flexShrink: 0,
             }}
           >
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+            <Box sx={{ display: { xs: 'block', md: 'none' }, ml: 1 }}>
               <CompactStatsLine />
             </Box>
             <Box sx={{ flex: 1 }} />
@@ -626,8 +626,8 @@ const MobileConfigureBar = ({
       sx={{
         position: 'fixed',
         bottom: bottomPos,
-        left: 12,
-        right: 12,
+        left: 14,
+        right: 14,
         zIndex: (theme) => theme.zIndex.appBar,
         backgroundColor: 'background.paper',
         border: `1px solid ${designTokens.border}`,

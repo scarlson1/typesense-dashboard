@@ -6,7 +6,7 @@ import {
   KeyRounded,
   MoreHorizRounded,
 } from '@mui/icons-material';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
   createLink,
   useMatchRoute,
@@ -15,7 +15,9 @@ import {
 import { forwardRef, useState, type ReactNode } from 'react';
 import { MobileMoreSheet } from './MobileMoreSheet';
 
-export const MOBILE_BOTTOM_NAV_HEIGHT = 60;
+// nav height (58) + bottom inset (14) + safe clearance (12) — used by
+// consumers as the base for bottom padding (env(safe-area-inset-bottom) added separately)
+export const MOBILE_BOTTOM_NAV_HEIGHT = 84;
 
 const RouterAnchor = forwardRef<
   HTMLAnchorElement,
@@ -57,45 +59,38 @@ const BottomNavItem = ({
   const isActive = active ?? matched;
 
   const content = (
-    <Stack
+    <Box
       sx={{
         flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 0.375,
-        py: 0.75,
+        gap: '2px',
+        mx: '2px',
+        my: '5px',
+        borderRadius: 999,
+        background: isActive ? designTokens.accentSoft : 'transparent',
+        color: isActive ? designTokens.accent : designTokens.textFaint,
+        transition: 'background 150ms, color 150ms',
         cursor: 'pointer',
         userSelect: 'none',
+        '& svg': { fontSize: 18 },
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 52,
-          height: 28,
-          borderRadius: '14px',
-          background: isActive ? designTokens.accentSoft : 'transparent',
-          color: isActive ? designTokens.accent : designTokens.textMuted,
-          transition: 'background 150ms, color 150ms',
-          '& svg': { fontSize: 22 },
-        }}
-      >
-        {icon}
-      </Box>
+      {icon}
       <Typography
         sx={{
-          fontSize: 10.5,
+          fontSize: 10,
           fontWeight: isActive ? 600 : 500,
           lineHeight: 1,
           letterSpacing: '-0.005em',
-          color: isActive ? designTokens.accent : designTokens.textMuted,
+          color: 'inherit',
         }}
       >
         {label}
       </Typography>
-    </Stack>
+    </Box>
   );
 
   if (!to) {
@@ -103,13 +98,7 @@ const BottomNavItem = ({
       <Box
         component='button'
         onClick={onClick}
-        sx={{
-          flex: 1,
-          background: 'transparent',
-          border: 0,
-          p: 0,
-          display: 'flex',
-        }}
+        sx={{ flex: 1, background: 'transparent', border: 0, p: 0, display: 'flex' }}
       >
         {content}
       </Box>
@@ -119,11 +108,7 @@ const BottomNavItem = ({
   return (
     <NavLink
       {...({ to } as unknown as React.ComponentProps<typeof NavLink>)}
-      style={{
-        flex: 1,
-        display: 'flex',
-        textDecoration: 'none',
-      }}
+      style={{ flex: 1, display: 'flex', textDecoration: 'none' }}
     >
       {content}
     </NavLink>
@@ -140,16 +125,16 @@ export function MobileBottomNav() {
         sx={{
           display: { xs: 'flex', md: 'none' },
           position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
+          left: '14px',
+          right: '14px',
+          bottom: 'calc(14px + env(safe-area-inset-bottom, 12px))',
           zIndex: (theme) => theme.zIndex.appBar + 1,
-          height: MOBILE_BOTTOM_NAV_HEIGHT,
+          height: 58,
           backgroundColor: 'background.paper',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          boxShadow: '0 -2px 16px rgba(0,0,0,0.08)',
-          pb: 'env(safe-area-inset-bottom)',
+          border: `1px solid ${designTokens.border}`,
+          borderRadius: '999px',
+          boxShadow: '0 12px 32px rgba(10,37,64,.18), 0 2px 6px rgba(10,37,64,.06)',
+          px: '4px',
           alignItems: 'stretch',
         }}
       >

@@ -167,7 +167,7 @@ function RouteComponent() {
             sx={{
               flexShrink: 0,
               px: 2,
-              py: 0.875,
+              py: 0.5, // 0.875,
               display: 'flex',
               alignItems: 'center',
               gap: 1,
@@ -440,7 +440,10 @@ function RouteComponent() {
           </IconButton>
         </Stack>
         <Box sx={{ flex: 1, overflowY: 'auto', px: 0.5 }}>
-          <ContextHits hitWrapperProps={{ size: 12 }} selectedHitId={selectedHitId} />
+          <ContextHits
+            hitWrapperProps={{ size: 12 }}
+            selectedHitId={selectedHitId}
+          />
         </Box>
         <Box
           sx={{
