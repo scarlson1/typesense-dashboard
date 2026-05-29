@@ -271,8 +271,9 @@ export function DashboardDisplayOptions({
         compact={compact}
       >
         <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.25}
+          // direction={{ xs: 'column', sm: 'row' }}
+          direction='column'
+          spacing={1}
           sx={{ alignItems: 'stretch' }}
         >
           <Autocomplete

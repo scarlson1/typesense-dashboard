@@ -12,13 +12,16 @@ import { useCallback } from 'react';
 export function DefaultCtxSearchPageSize(props: SelectProps<number>) {
   return (
     <FormControl sx={{ width: { xs: 100, sm: 120, md: 140 } }}>
-      <InputLabel id='per-page-select-label' sx={{ zIndex: 0 }}>
-        {props?.label ?? 'Hits Per Page'}
-      </InputLabel>
+      {props?.label ? (
+        <InputLabel id='per-page-select-label' sx={{ zIndex: 0 }}>
+          {props?.label ?? 'Hits Per Page'}
+        </InputLabel>
+      ) : undefined}
+
       <Select
         labelId='per-page-select-label'
         id='per-page-select'
-        label={props?.label ?? 'Hits Per Page'}
+        label={props?.label} // ?? 'Hits Per Page'
         size='small'
         {...props}
       />
@@ -34,7 +37,7 @@ export function CtxPageSize() {
     (event: SelectChangeEvent<number>) => {
       setPagination({ per_page: event.target.value });
     },
-    [setPagination]
+    [setPagination],
   );
 
   // TODO: menu option as slot ??

@@ -34,17 +34,19 @@ export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
       { label: 'Search', to: '/collections/$collectionId/documents/search' },
       { label: 'Documents', to: '/collections/$collectionId/documents/new' },
       { label: 'Schema', to: '/collections/$collectionId/config' },
-      {
-        label: 'Synonyms',
-        to: '/collections/$collectionId/synonyms',
-        hide: is30Plus,
-      },
-      {
-        label: 'Curation',
-        to: '/collections/$collectionId/curation',
-        hide: is30Plus,
-      },
-    ].filter((x) => !x.hide);
+      ...(is30Plus
+        ? [
+            {
+              label: 'Synonyms',
+              to: '/collections/$collectionId/synonyms',
+            },
+            {
+              label: 'Curation',
+              to: '/collections/$collectionId/curation',
+            },
+          ]
+        : []),
+    ]; // .filter((x) => !x.hide);
   }, [is30Plus]);
 
   return (

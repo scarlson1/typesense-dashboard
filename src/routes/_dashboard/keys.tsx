@@ -4,8 +4,6 @@ import {
   primaryButtonSx,
   smallButtonSx,
 } from '@/components/redesign';
-import { apiKeyQueryKeys } from '@/constants';
-import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import {
   AddRounded,
@@ -21,7 +19,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense, useState } from 'react';
 
@@ -33,32 +30,32 @@ export const Route = createFileRoute('/_dashboard/keys')({
   staticData: { crumb: 'API keys' },
 });
 
-function ApiKeyCountChip() {
-  const [client, clusterId] = useTypesenseClient();
-  const { data } = useQuery({
-    queryKey: apiKeyQueryKeys.all(clusterId),
-    queryFn: () => client.keys().retrieve(),
-  });
-  const count = data?.keys?.length ?? 0;
-  if (!data) return null;
-  return (
-    <Box
-      component='span'
-      sx={{
-        display: 'inline-block',
-        fontSize: 12.5,
-        color: designTokens.textMuted,
-        background: designTokens.surfaceMuted,
-        border: `1px solid ${designTokens.border}`,
-        borderRadius: '100px',
-        px: 1.25,
-        py: 0.375,
-      }}
-    >
-      {count} active
-    </Box>
-  );
-}
+// function ApiKeyCountChip() {
+//   const [client, clusterId] = useTypesenseClient();
+//   const { data } = useQuery({
+//     queryKey: apiKeyQueryKeys.all(clusterId),
+//     queryFn: () => client.keys().retrieve(),
+//   });
+//   const count = data?.keys?.length ?? 0;
+//   if (!data) return null;
+//   return (
+//     <Box
+//       component='span'
+//       sx={{
+//         display: 'inline-block',
+//         fontSize: 12.5,
+//         color: designTokens.textMuted,
+//         background: designTokens.surfaceMuted,
+//         border: `1px solid ${designTokens.border}`,
+//         borderRadius: '100px',
+//         px: 1.25,
+//         py: 0.375,
+//       }}
+//     >
+//       {count} active
+//     </Box>
+//   );
+// }
 
 function RouteComponent() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -77,7 +74,7 @@ function RouteComponent() {
               onClick={() => setDrawerOpen(true)}
               sx={{
                 ...primaryButtonSx,
-                display: { xs: 'inline-flex', lg: 'none' },
+                display: { xs: 'inline-flex', md: 'none' },
                 color: designTokens.onAccent,
               }}
             >
@@ -103,7 +100,7 @@ function RouteComponent() {
       />
 
       {/* Mobile count strip */}
-      <Box
+      {/* <Box
         sx={{
           display: { xs: 'block', lg: 'none' },
           px: 2.5,
@@ -113,7 +110,7 @@ function RouteComponent() {
         }}
       >
         <ApiKeyCountChip />
-      </Box>
+      </Box> */}
 
       <Box
         sx={{
@@ -157,7 +154,7 @@ function RouteComponent() {
           sx={{
             width: { lg: 340 },
             flexShrink: 0,
-            display: { xs: 'none', lg: 'block' },
+            display: { xs: 'none', md: 'block' },
             background: designTokens.surface,
             border: `1px solid ${designTokens.border}`,
             borderRadius: 1,
@@ -197,7 +194,7 @@ function RouteComponent() {
         anchor='bottom'
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sx={{ display: { xs: 'block', lg: 'none' } }}
+        sx={{ display: { xs: 'block', md: 'none' } }}
         slotProps={{
           paper: {
             sx: {

@@ -116,6 +116,9 @@ function SearchLayout() {
                 boxShadow: '0 1px 3px rgba(10,37,64,.12)',
               },
             },
+            pageSize: {
+              label: '',
+            },
             ...initialSlotProps,
           }}
         >
