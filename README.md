@@ -109,13 +109,31 @@ TODO -->
 
 ## Screenshots
 
+![search](docs/images/typesense-search-light.png)
+
+![geo search](docs/images/typesense-map-light.png)
+
+![geo search mobile](docs/images/map_mobile_dark.png)
+
+![schema](docs/images/typesense-schema-dark.png)
+
+![schema mobile](docs/images/schema_mobile_light.png)
+
+![api keys](docs/images/typesense-keys-light.png)
+
+![cluster stats](docs/images/typesense-cluster-dark.png)
+
+![add docs](docs/images/typesense-add-docs-light.png)
+
 ![API keys](docs/images/api_keys.png)
 
 ![search](docs/images/search.png)
 
 ![geo search](docs/images/geosearch-dark.png)
 
-<!-- ![geo search](docs/images/geosearch.png) -->
+![geo search mobile](docs/images/map_mobile_dark.png)
+
+<!-- old design -->
 
 ![search parameters](docs/images/search_params.png)
 

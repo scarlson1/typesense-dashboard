@@ -237,8 +237,11 @@ export function MobileCollectionScopeStrip({
             placeholder='Switch collection...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            autoFocus
-            sx={{ flex: 1, fontSize: 14 }}
+            sx={{
+              flex: 1,
+              // 16px keeps iOS Safari from auto-zooming on focus
+              '& .MuiInputBase-input': { fontSize: 16 },
+            }}
           />
           <Typography
             sx={{

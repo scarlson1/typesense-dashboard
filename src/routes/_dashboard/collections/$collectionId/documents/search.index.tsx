@@ -4,7 +4,6 @@ import {
   ContextHits,
   CtxPageSize,
   CtxPagination,
-  CtxRefinements,
   CtxSearchError,
   DashboardDisplayOptions,
   SearchBox,
@@ -17,11 +16,13 @@ import { designTokens } from '@/theme/themePrimitives';
 import {
   ClearRounded,
   CloseRounded,
+  FilterListRounded,
   KeyboardArrowUpRounded,
   SearchRounded,
   TuneRounded,
 } from '@mui/icons-material';
 import {
+  Badge,
   Box,
   Button,
   Chip,
@@ -169,9 +170,26 @@ function RouteComponent() {
             >
               <CompactStats />
             </Box>
-            {/* Refinements filter icon: mobile (xs/sm) only */}
-            <Box sx={{ display: { xs: 'contents', md: 'none' } }}>
-              <CtxRefinements />
+            {/* Refinements filter icon: mobile (xs/sm) only — opens config drawer */}
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
+              <IconButton
+                size='small'
+                aria-label='Open filters'
+                onClick={() => {
+                  setConfigTab(0);
+                  setConfigCollapsed(false);
+                  setDrawerOpen(true);
+                }}
+                sx={{ color: designTokens.textMuted }}
+              >
+                <Badge
+                  badgeContent={filterCount}
+                  color='primary'
+                  overlap='circular'
+                >
+                  <FilterListRounded fontSize='small' />
+                </Badge>
+              </IconButton>
             </Box>
           </Box>
 
@@ -229,18 +247,22 @@ function RouteComponent() {
               flexShrink: 0,
             }}
           >
-            <ResultsCount />
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <ResultsCount />
+            </Box>
             <Stack
               direction='row'
               spacing={2}
               sx={{
                 flex: '1 1 auto',
-                justifyContent: { xs: 'space-between', md: 'flex-end' },
+                justifyContent: { xs: 'flex-end', md: 'flex-end' },
                 alignItems: 'center',
                 width: { xs: '100%', md: 'auto' },
               }}
             >
-              <CtxPageSize />
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <CtxPageSize />
+              </Box>
               <CtxPagination />
             </Stack>
           </Stack>
