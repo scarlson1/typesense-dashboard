@@ -326,7 +326,7 @@ function RouteComponent() {
           sx={{
             position: 'fixed',
             alignItems: 'center',
-            bottom: MOBILE_BOTTOM_NAV_HEIGHT + 56,
+            bottom: `calc(${MOBILE_BOTTOM_NAV_HEIGHT + 56}px + env(safe-area-inset-bottom))`,
             right: 12,
             zIndex: (theme) => theme.zIndex.appBar + 50,
           }}

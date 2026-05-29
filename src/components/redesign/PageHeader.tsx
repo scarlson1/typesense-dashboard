@@ -1,6 +1,6 @@
+import { designTokens } from '@/theme/themePrimitives';
 import { Box, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { designTokens } from '@/theme/themePrimitives';
 
 interface PageHeaderProps {
   title: ReactNode;
@@ -48,7 +48,8 @@ export const PageHeader = ({
       <Stack
         direction='row'
         sx={{
-          alignItems: 'flex-start',
+          // alignItems: 'flex-start',
+          alignItems: 'center',
           gap: { xs: 1, sm: 1.75 },
           mb: 1.75,
         }}

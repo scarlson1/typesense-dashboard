@@ -15,11 +15,7 @@ import {
   useTypesenseClient,
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import {
-  AddRounded,
-  GridViewRounded,
-  MapRounded,
-} from '@mui/icons-material';
+import { AddRounded, GridViewRounded, MapRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -27,12 +23,13 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
 } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
-  Link as RouterLink,
   Outlet,
+  Link as RouterLink,
   useLocation,
   useMatchRoute,
   useNavigate,
@@ -50,6 +47,13 @@ export const Route = createFileRoute(
 function SearchLayout() {
   const { collectionId } = Route.useParams();
   const [client, clusterId] = useTypesenseClient();
+  const matchRoute = useMatchRoute();
+  const isMapRoute = Boolean(
+    matchRoute({
+      to: '/collections/$collectionId/documents/search/map',
+      params: { collectionId },
+    }),
+  );
 
   const { getStoredPreset, getStoredDisplayOptions } =
     useCollectionSearchPreset(clusterId, collectionId);
@@ -119,14 +123,23 @@ function SearchLayout() {
             sx={{
               minWidth: 0,
               height: {
-                xs: `calc(100dvh - ${MOBILE_BOTTOM_NAV_HEIGHT}px - env(safe-area-inset-bottom))`,
+                xs: isMapRoute
+                  ? '100dvh'
+                  : `calc(100dvh - ${MOBILE_BOTTOM_NAV_HEIGHT}px - env(safe-area-inset-bottom))`,
                 md: 'calc(100dvh - 48px)',
               },
               overflow: 'hidden',
             }}
           >
             <Box sx={{ flexShrink: 0 }}>
-              <Suspense fallback={<CollectionPageHeader collectionId={collectionId} numDocs={0} />}>
+              <Suspense
+                fallback={
+                  <CollectionPageHeader
+                    collectionId={collectionId}
+                    numDocs={0}
+                  />
+                }
+              >
                 <CollectionPageHeaderConnected collectionId={collectionId} />
               </Suspense>
             </Box>
@@ -192,19 +205,19 @@ function CollectionPageHeader({
   })
     ? 'Synonyms'
     : matchRoute({
-        to: '/collections/$collectionId/curation',
-        params: { collectionId },
-      })
-      ? 'Curation'
-      : matchRoute({
-          to: '/collections/$collectionId/config',
+          to: '/collections/$collectionId/curation',
           params: { collectionId },
         })
-        ? 'Schema'
-        : matchRoute({
-            to: '/collections/$collectionId/documents/new',
+      ? 'Curation'
+      : matchRoute({
+            to: '/collections/$collectionId/config',
             params: { collectionId },
           })
+        ? 'Schema'
+        : matchRoute({
+              to: '/collections/$collectionId/documents/new',
+              params: { collectionId },
+            })
           ? 'Documents'
           : 'Search';
 
@@ -246,10 +259,16 @@ function CollectionPageHeader({
             to='/collections/$collectionId/documents/new'
             params={{ collectionId }}
           >
-            <Box component='span' sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            <Box
+              component='span'
+              sx={{ display: { xs: 'none', sm: 'inline' } }}
+            >
               Add documents
             </Box>
-            <Box component='span' sx={{ display: { xs: 'inline', sm: 'none' } }}>
+            <Box
+              component='span'
+              sx={{ display: { xs: 'inline', sm: 'none' } }}
+            >
               Add
             </Box>
           </Button>
@@ -319,10 +338,32 @@ function ViewToggleButtons() {
       }}
     >
       <ToggleButton value='grid' aria-label='grid view'>
-        <GridViewRounded fontSize='inherit' sx={{ mr: 0.5 }} /> Grid
+        <GridViewRounded fontSize='inherit' sx={{ mr: 0.5 }} />{' '}
+        <Typography
+          component='span'
+          variant='body2'
+          sx={{
+            display: { xs: 'none', lg: 'block' },
+            fontSize: '0.675rem',
+            fontWeight: 600,
+          }}
+        >
+          Grid
+        </Typography>
       </ToggleButton>
       <ToggleButton value='map' aria-label='map view' disabled={!enableMap}>
-        <MapRounded fontSize='inherit' sx={{ mr: 0.5 }} /> Map
+        <MapRounded fontSize='inherit' sx={{ mr: 0.5 }} />
+        <Typography
+          component='span'
+          variant='body2'
+          sx={{
+            display: { xs: 'none', lg: 'block' },
+            fontSize: '0.675rem',
+            fontWeight: 600,
+          }}
+        >
+          Map
+        </Typography>
       </ToggleButton>
     </ToggleButtonGroup>
   );
