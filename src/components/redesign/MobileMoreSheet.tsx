@@ -2,6 +2,7 @@ import { ClusterSelect } from '@/components/ClusterSelect';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
 import {
+  AutoFixHighRounded,
   CloseRounded,
   DarkModeRounded,
   FrontHandRounded,
@@ -299,11 +300,13 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
           label='Stopwords'
           to='/stopwords'
         />
-        <SheetItem
-          icon={<FrontHandRounded />}
-          label='Curation'
-          to='/curation'
-        />
+        {is30Plus ? (
+          <SheetItem
+            icon={<AutoFixHighRounded />}
+            label='Curation'
+            to='/curation'
+          />
+        ) : null}
         {is30Plus ? (
           <SheetItem
             icon={<FrontHandRounded />}
@@ -311,16 +314,15 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
             to='/synonyms'
           />
         ) : null}
-        {is30Plus ? (
-          <SheetItem
-            icon={<SettingsInputSvideoRounded />}
-            label='Cluster config'
-            to='/server'
-          />
-        ) : null}
+        <SheetItem
+          icon={<SettingsInputSvideoRounded />}
+          label='Cluster config'
+          to='/server'
+        />
+
         <SheetItem
           icon={<PersonAddRounded />}
-          label='Sign into another account'
+          label='Sign into another cluster'
           to='/auth'
         />
       </Box>

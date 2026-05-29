@@ -2,6 +2,7 @@ export * from './diffArrayOfObjects';
 export * from './getObjectDiff';
 export * from './queryClient';
 export * from './typesenseStore';
+export * from './uiStore';
 
 export function splitIfString(val?: string | string[]) {
   if (!val) return [];
