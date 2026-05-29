@@ -34,30 +34,32 @@ const defaultTheme = createTheme();
 
 const customShadows: Shadows = [...defaultTheme.shadows];
 
+// Stripe-leaning brand palette — accent #0570de
 export const brand = {
-  50: 'hsl(210, 100%, 95%)',
-  100: 'hsl(210, 100%, 92%)',
-  200: 'hsl(210, 100%, 80%)',
-  300: 'hsl(210, 100%, 65%)',
-  400: 'hsl(210, 98%, 48%)',
-  500: 'hsl(210, 98%, 42%)',
-  600: 'hsl(210, 98%, 55%)',
-  700: 'hsl(210, 100%, 35%)',
-  800: 'hsl(210, 100%, 16%)',
-  900: 'hsl(210, 100%, 21%)',
+  50: 'hsl(213, 86%, 95%)',
+  100: 'hsl(213, 80%, 90%)',
+  200: 'hsl(212, 78%, 78%)',
+  300: 'hsl(211, 84%, 60%)',
+  400: 'hsl(210, 95%, 44%)',
+  500: 'hsl(212, 93%, 38%)',
+  600: 'hsl(212, 90%, 33%)',
+  700: 'hsl(212, 85%, 27%)',
+  800: 'hsl(213, 73%, 15%)',
+  900: 'hsl(213, 73%, 12%)',
 };
 
+// Hairline-border palette
 export const gray = {
-  50: 'hsl(220, 35%, 97%)',
-  100: 'hsl(220, 30%, 94%)',
-  200: 'hsl(220, 20%, 88%)',
-  300: 'hsl(220, 20%, 80%)',
-  400: 'hsl(220, 20%, 65%)',
-  500: 'hsl(220, 20%, 42%)',
-  600: 'hsl(220, 20%, 35%)',
-  700: 'hsl(220, 20%, 25%)',
-  800: 'hsl(220, 30%, 6%)',
-  900: 'hsl(220, 35%, 3%)',
+  50: 'hsl(210, 25%, 98%)',
+  100: 'hsl(210, 27%, 97%)',
+  200: 'hsl(218, 19%, 91%)',
+  300: 'hsl(214, 13%, 79%)',
+  400: 'hsl(212, 13%, 68%)',
+  500: 'hsl(210, 16%, 60%)',
+  600: 'hsl(212, 22%, 33%)',
+  700: 'hsl(212, 30%, 24%)',
+  800: 'hsl(213, 73%, 15%)',
+  900: 'hsl(213, 73%, 8%)',
 };
 
 export const green = {
@@ -192,11 +194,11 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
       divider: mode === 'dark' ? alpha(gray[700], 0.6) : alpha(gray[300], 0.4),
       background: {
-        default: 'hsl(0, 0%, 99%)',
-        paper: 'hsl(220, 35%, 97%)',
+        default: 'hsl(0, 0%, 100%)',
+        paper: 'hsl(0, 0%, 100%)',
         ...(mode === 'dark' && {
           default: gray[900],
-          paper: 'hsl(220, 30%, 7%)',
+          paper: 'hsl(213, 73%, 11%)',
         }),
       },
       text: {
@@ -207,7 +209,7 @@ export const getDesignTokens = (mode: PaletteMode) => {
         ...(mode === 'dark' && {
           primary: 'hsl(0, 0%, 100%)',
           secondary: gray[400],
-          tertiary: gray[600],
+          tertiary: gray[500],
         }),
       },
       action: {
@@ -220,19 +222,19 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
     },
     typography: {
-      // fontFamily: 'Inter, sans-serif', // from original demo theme
-      fontFamily: ['"IBM Plex Sans"', ...systemFont].join(','), // added
+      fontFamily: ['"Inter"', ...systemFont].join(','),
       fontFamilyCode: [
+        '"JetBrains Mono"',
+        '"SF Mono"',
         'Menlo',
         'Consolas',
         'Monaco',
-        '"Droid Sans Mono"',
         'monospace',
-      ].join(','), // added
-      fontFamilyTagline: ['"General Sans"', ...systemFont].join(','), // added
-      fontFamilySystem: systemFont.join(','), // added
-      fontWeightSemiBold: 600, // added
-      fontWeightExtraBold: 800, // added
+      ].join(','),
+      fontFamilyTagline: ['"Inter"', ...systemFont].join(','),
+      fontFamilySystem: systemFont.join(','),
+      fontWeightSemiBold: 600,
+      fontWeightExtraBold: 800,
       h1: {
         fontSize: defaultTheme.typography.pxToRem(48),
         fontWeight: 600,
@@ -281,7 +283,7 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 6,
     },
     shadows: customShadows,
   };
@@ -296,12 +298,14 @@ export const colorSchemes = {
         dark: brand[700],
         contrastText: brand[50],
       },
+      primaryChannel: '6 112 219',
       secondary: {
         light: gray[200],
         main: gray[400],
         dark: gray[700],
         contrastText: gray[50],
       },
+      secondaryChannel: '163 173 184',
       info: {
         light: brand[100],
         main: brand[300],
@@ -326,14 +330,17 @@ export const colorSchemes = {
       grey: {
         ...gray,
       },
-      divider: alpha(gray[300], 0.4),
+      divider: 'var(--ts-border)',
+      dividerChannel: '228 231 236',
       background: {
-        default: 'hsl(0, 0%, 99%)',
-        paper: 'hsl(220, 35%, 97%)',
+        default: 'var(--ts-bg)',
+        paper: 'var(--ts-surface)',
+        defaultChannel: '255 255 255',
+        paperChannel: '255 255 255',
       },
       text: {
-        primary: gray[800],
-        secondary: gray[600],
+        primary: 'var(--ts-text)',
+        secondary: 'var(--ts-textMuted)',
         warning: orange[400],
       },
       action: {
@@ -352,12 +359,14 @@ export const colorSchemes = {
         main: brand[400],
         dark: brand[700],
       },
+      primaryChannel: '6 112 219',
       secondary: {
         contrastText: gray[50],
         light: gray[300],
         main: gray[400],
         dark: gray[700],
       },
+      secondaryChannel: '163 173 184',
       info: {
         contrastText: brand[300],
         light: brand[500],
@@ -382,14 +391,17 @@ export const colorSchemes = {
       grey: {
         ...gray,
       },
-      divider: alpha(gray[700], 0.6),
+      divider: 'var(--ts-border)',
+      dividerChannel: '35 42 55',
       background: {
-        default: gray[900],
-        paper: 'hsl(220, 30%, 7%)',
+        default: 'var(--ts-bg)',
+        paper: 'var(--ts-surface)',
+        defaultChannel: '11 15 23',
+        paperChannel: '17 22 31',
       },
       text: {
-        primary: 'hsl(0, 0%, 100%)',
-        secondary: gray[400],
+        primary: 'var(--ts-text)',
+        secondary: 'var(--ts-textMuted)',
       },
       action: {
         hover: alpha(gray[600], 0.2),
@@ -452,13 +464,46 @@ export const typography = {
 };
 
 export const shape = {
-  borderRadius: 8,
+  borderRadius: 6,
 };
 
-// @ts-ignore
-const defaultShadows: Shadows = [
-  'none',
-  'var(--template-palette-baseShadow)',
-  ...defaultTheme.shadows.slice(2),
-];
+// Stripe-leaning design tokens shared across redesign primitives.
+// Mirrors `aT` in the source design files. Each color is a CSS-variable
+// reference so light/dark themes flip via the `data-mui-color-scheme`
+// attribute (palettes defined in src/index.css).
+export const designTokens = {
+  bg: 'var(--ts-bg)',
+  surface: 'var(--ts-surface)',
+  surfaceMuted: 'var(--ts-surfaceMuted)',
+  surfaceTinted: 'var(--ts-surfaceTinted)',
+  border: 'var(--ts-border)',
+  borderStrong: 'var(--ts-borderStrong)',
+  text: 'var(--ts-text)',
+  textMuted: 'var(--ts-textMuted)',
+  textFaint: 'var(--ts-textFaint)',
+  textSubtle: 'var(--ts-textSubtle)',
+  accent: 'var(--ts-accent)',
+  accentSoft: 'var(--ts-accentSoft)',
+  accentDeep: 'var(--ts-accentDeep)',
+  accentHover: 'var(--ts-accentHover)',
+  accentBorder: 'var(--ts-accentBorder)',
+  success: 'var(--ts-success)',
+  successSoft: 'var(--ts-successSoft)',
+  successBorder: 'var(--ts-successBorder)',
+  successDeep: 'var(--ts-successDeep)',
+  warning: 'var(--ts-warning)',
+  warningSoft: 'var(--ts-warningSoft)',
+  warningBorder: 'var(--ts-warningBorder)',
+  warningDeep: 'var(--ts-warningDeep)',
+  danger: 'var(--ts-danger)',
+  dangerSoft: 'var(--ts-dangerSoft)',
+  onAccent: 'var(--ts-onAccent)',
+  mark: 'var(--ts-mark)',
+  codeSurface: 'var(--ts-codeSurface)',
+  codeText: 'var(--ts-codeText)',
+  fontMono: '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
+};
+
+const defaultShadows: Shadows = [...defaultTheme.shadows];
+defaultShadows[1] = 'var(--template-palette-baseShadow)';
 export const shadows = defaultShadows;

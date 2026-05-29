@@ -12,7 +12,6 @@ import { tablePaginationClasses } from '@mui/material/TablePagination';
 import { gridClasses } from '@mui/x-data-grid';
 import type { DataGridComponents } from '@mui/x-data-grid/themeAugmentation';
 
-/* eslint-disable import/prefer-default-export */
 export const dataGridCustomizations: DataGridComponents<Theme> = {
   // DataGridProComponents<Theme> & DataGridProComponents<Theme> = {
   MuiDataGrid: {

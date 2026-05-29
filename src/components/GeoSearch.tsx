@@ -43,15 +43,16 @@ const INITIAL_VIEW_STATE: MapViewState = {
 
 interface GeoSearchProps {
   geoFieldName: string;
-  // layers?: LayersList | undefined;
-  // hoverInfo?: PickingInfo | null | undefined;
   renderTooltipContent?: (info: PickingInfo) => ReactNode;
+  onPinClick?: (id: string) => void;
+  showPopover?: boolean;
 }
 
 const GeoSearch = ({
   geoFieldName,
-  // hoverInfo,
   renderTooltipContent,
+  onPinClick,
+  showPopover,
 }: GeoSearchProps) => {
   const theme = useTheme();
   const { mode, systemMode } = useColorScheme();
@@ -145,6 +146,8 @@ const GeoSearch = ({
   const handleDeckClick = (info: PickingInfo) => {
     if (info.object) {
       setHoverInfo(info);
+      const id = (info.object as SearchResponseHit<any>).document?.id;
+      if (id != null) onPinClick?.(String(id));
     } else {
       setHoverInfo(null);
     }
@@ -166,11 +169,13 @@ const GeoSearch = ({
           mapboxAccessToken={MAPBOX_TOKEN}
         />
       </DeckGL>
-      <HoverInfo
-        pickingInfo={hoverInfo}
-        renderTooltipContent={renderTooltipContent}
-        onClose={handleCloseTooltip}
-      />
+      {showPopover ? (
+        <HoverInfo
+          pickingInfo={hoverInfo}
+          renderTooltipContent={renderTooltipContent}
+          onClose={handleCloseTooltip}
+        />
+      ) : null}
     </>
   );
 };

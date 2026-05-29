@@ -1,7 +1,6 @@
 import { alpha, type Components, type Theme } from '@mui/material/styles';
 import { gray } from '../themePrimitives';
 
-/* eslint-disable import/prefer-default-export */
 export const surfacesCustomizations: Components<Theme> = {
   MuiAccordion: {
     defaultProps: {
@@ -80,7 +79,7 @@ export const surfacesCustomizations: Components<Theme> = {
           border: `1px solid ${(theme.vars || theme).palette.divider}`,
           boxShadow: 'none',
           ...theme.applyStyles('dark', {
-            backgroundColor: gray[800],
+            backgroundColor: theme.vars.palette.background.paper, // gray[900],
           }),
           variants: [
             {

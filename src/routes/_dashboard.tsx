@@ -1,11 +1,21 @@
 import { ErrorFallback } from '@/components';
-import { AppNavbar } from '@/components/AppNavbar';
-import { Header } from '@/components/Header';
-import { SideMenu } from '@/components/SideMenu';
+import {
+  MOBILE_BOTTOM_NAV_HEIGHT,
+  MobileBottomNav,
+  SidebarBoundary,
+  TopBar,
+} from '@/components/redesign';
+import { VersionProvider } from '@/components/VersionProvider';
+import { designTokens } from '@/theme/themePrimitives';
 import { typesenseStore } from '@/utils';
-import { alpha, Box, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useMatches,
+} from '@tanstack/react-router';
 import { ErrorBoundary } from 'react-error-boundary';
 
 function isAuthenticated() {
@@ -30,50 +40,52 @@ export const Route = createFileRoute('/_dashboard')({
 });
 
 function RouteComponent() {
+  const matches = useMatches();
+  const crumbs = matches
+    .filter((m) => m.staticData.crumb)
+    .map((m) => ({ label: m.staticData.crumb as string }));
+
   return (
-    <Box sx={{ display: 'flex' }}>
-      <SideMenu />
-      <AppNavbar />
+    <VersionProvider>
       <Box
-        component='main'
-        sx={(theme) => ({
-          // TODO: use css var for AppNavbar height
-          // height: { xs: 'calc(100vh - 60px)', md: '100vh' },
-          flexGrow: 1,
-          backgroundColor: theme.vars
-            ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-            : alpha(theme.palette.background.default, 1),
-          overflow: 'auto',
-        })}
+        sx={{
+          display: 'flex',
+          minHeight: '100vh',
+          backgroundColor: 'background.default',
+        }}
       >
-        <Stack
-          spacing={2}
+        <SidebarBoundary />
+        <Box
+          component='main'
           sx={{
-            alignItems: 'center',
-            mx: 3,
-            pb: 5,
-            mt: { xs: 8, md: 0 },
+            flexGrow: 1,
+            minWidth: 0,
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            background: designTokens.surfaceTinted,
+            pb: {
+              xs: `calc(${MOBILE_BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom))`,
+              md: 0,
+            },
           }}
         >
-          <Header />
-          <Box
-            sx={{
-              width: '100%',
-              maxWidth: { sm: '100%', md: '1600px' },
-              pb: 5,
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            <TopBar crumbs={crumbs} />
+          </Box>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => {
+              captureException(err);
             }}
           >
-            <ErrorBoundary
-              FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => {
-                captureException(err);
-              }}
-            >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <Outlet />
-            </ErrorBoundary>
-          </Box>
-        </Stack>
+            </Box>
+          </ErrorBoundary>
+        </Box>
+        <MobileBottomNav />
       </Box>
-    </Box>
+    </VersionProvider>
   );
 }

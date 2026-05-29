@@ -116,6 +116,7 @@ export function CollectionsGrid() {
         getRowId={(row) => row.name}
         loading={isLoading || isFetching}
         pageSizeOptions={[5, 10, 20]}
+        sx={{ border: 0, borderRadius: 0 }}
         onCellDoubleClick={(params: GridCellParams<CollectionSchema>) => {
           navigate({
             from: '/collections/',

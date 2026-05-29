@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { MenuButton } from './MenuButton';
 import { MenuContent } from './MenuContent';
 // import { useNavigate } from '@tanstack/react-router';
@@ -33,6 +33,14 @@ export default function SideMenuMobile({
     displayName: 'John Doe',
     photoURL: '',
   };
+
+  const prevPathRef = useRef(location.pathname);
+  useEffect(() => {
+    if (location.pathname !== prevPathRef.current) {
+      prevPathRef.current = location.pathname;
+      if (open) toggleDrawer(false)();
+    }
+  }, [location.pathname, open, toggleDrawer]);
 
   const handleLogout = useCallback(async () => {
     navigate({

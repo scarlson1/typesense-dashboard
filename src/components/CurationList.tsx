@@ -4,23 +4,23 @@ import {
   overrideFormOpts,
 } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { ExpandMoreRounded } from '@mui/icons-material';
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  Typography,
-} from '@mui/material';
+  AutoFixHighRounded,
+  MoreHorizRounded,
+  SettingsRounded,
+} from '@mui/icons-material';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, useState, type SyntheticEvent } from 'react';
+import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import type { OverrideSchema } from 'typesense/lib/Typesense/Override';
 import type { OverrideCreateSchema } from 'typesense/lib/Typesense/Overrides';
 import { CurationForm } from './CurationForm';
 import { ErrorFallback } from './ErrorFallback';
+import { Badge, smallButtonSx } from './redesign';
 
 interface CurationListProps {
   collectionId: string;
@@ -31,142 +31,425 @@ export const CurationList = ({ collectionId }: CurationListProps) => {
   const { data: overrides } = useSuspenseQuery({
     queryKey: collectionQueryKeys.curation(clusterId, collectionId),
     queryFn: async () => {
-      let { overrides } = await client
+      const { overrides } = await client
         .collections(collectionId)
         .overrides()
         .retrieve();
       return overrides;
     },
   });
-  const [expanded, setExpanded] = useState<string | null>(null);
 
-  const handleAccordion =
-    (panel: string) => (_: SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : null);
-    };
+  const [editingId, setEditingId] = useState<string | null>('__new__');
+
+  const editingOverride =
+    editingId === '__new__'
+      ? null
+      : (overrides.find((o) => o.id === editingId) ?? null);
 
   return (
-    <>
-      {overrides.map((override) => (
-        <Accordion
-          expanded={expanded === `${override.id}`}
-          onChange={handleAccordion(`${override.id}`)}
-          key={override.id}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreRounded />}
-            aria-controls={`${override.id}-content`}
-            id={`${override.id}-header`}
-          >
-            <Typography variant='h6'>{override.id}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <ErrorBoundary
-              FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => {
-                captureException(err);
-              }}
-            >
-              <Suspense>
-                <CurationFormComponent
-                  collectionId={collectionId}
-                  submitButtonText='Update Override'
-                  defaultValues={{
-                    overrideId: override.id,
-                    rule_query_bool: Boolean(override.rule.query),
-                    rule_filter_bool: Boolean(override.rule.filter_by),
-                    rule_tags_bool: Boolean(override.rule.tags),
-                    rule: {
-                      query: override.rule.query || '',
-                      match: override.rule.match || 'exact',
-                      filter_by: override.rule.filter_by || '',
-                      tags: override.rule.tags
-                        ? override.rule.tags.join(', ')
-                        : '',
-                    },
-                    filter_by_bool: Boolean(override.filter_by),
-                    filter_by: override.filter_by || '',
-                    sort_by_bool: Boolean(override.sort_by),
-                    sort_by: override.sort_by,
-                    filter_curated_hits: Boolean(override.filter_curated_hits),
-                    replace_query_bool: Boolean(override.replace_query),
-                    replace_query: override.replace_query || '',
-                    remove_match_tokens: Boolean(
-                      override.remove_matched_tokens,
-                    ),
-                    custom_metadata_bool: Boolean(override.metadata),
-                    metadata: override.metadata
-                      ? JSON.stringify(override.metadata)
-                      : '',
-                    stop_processing: Boolean(override.stop_processing),
-                    effective_from_ts_bool: Boolean(override.effective_from_ts),
-                    effective_from_ts: override.effective_from_ts
-                      ? new Date(override.effective_from_ts * 1000)
-                      : new Date(),
-                    effective_to_ts_bool: Boolean(override.effective_to_ts),
-                    effective_to_ts: override.effective_to_ts
-                      ? new Date(override.effective_to_ts * 1000)
-                      : new Date(),
-                  }}
-                />
-                <Button
-                  // onClick={() => handleDeleteRule(r.name)}
-                  onClick={() => alert('TODO: delete override')}
-                  // loading={mutation.isPending && mutation.variables === r.name}
-                  // disabled={mutation.isPending}
-                  sx={{ my: 1 }}
-                >
-                  Delete
-                </Button>
-              </Suspense>
-            </ErrorBoundary>
-          </AccordionDetails>
-        </Accordion>
-      ))}
-
-      <Accordion
-        expanded={expanded === `new`}
-        onChange={handleAccordion(`new`)}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', lg: 'row' },
+        gap: 2,
+        alignItems: { lg: 'flex-start' },
+        width: '100%',
+      }}
+    >
+      {/* Left: override cards */}
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}
       >
-        <AccordionSummary
-          expandIcon={<ExpandMoreRounded />}
-          aria-controls={`new-content`}
-          id={`new-header`}
-        >
-          <Typography variant='h6'>Add New Override</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
+        {overrides.length === 0 ? (
+          <Box
+            sx={{
+              background: designTokens.surface,
+              border: `1px solid ${designTokens.border}`,
+              borderRadius: 1,
+              p: 3,
+              textAlign: 'center',
             }}
           >
-            <Suspense>
-              <CurationFormComponent
+            <Typography sx={{ fontSize: 13, color: designTokens.textMuted }}>
+              No curation rules yet. Create one using the panel on the right.
+            </Typography>
+          </Box>
+        ) : (
+          overrides.map((override) => (
+            <OverrideCard
+              key={override.id}
+              override={override}
+              isSelected={editingId === override.id}
+              onEdit={() => setEditingId(override.id)}
+            />
+          ))
+        )}
+      </Box>
+
+      {/* Right: form panel */}
+      <Box sx={{ width: { xs: '100%', lg: 320 }, flexShrink: 0 }}>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => captureException(err)}
+        >
+          <Suspense>
+            {editingId === '__new__' || !editingOverride ? (
+              <CurationFormCard
+                key='__new__'
                 collectionId={collectionId}
-                defaultValues={defaultOverrideValues}
-                submitButtonText='Add Override'
+                isNew
+                onSaved={(id) => setEditingId(id)}
               />
-            </Suspense>
-          </ErrorBoundary>
-        </AccordionDetails>
-      </Accordion>
-    </>
+            ) : (
+              <CurationFormCard
+                key={editingOverride.id}
+                collectionId={collectionId}
+                override={editingOverride}
+                onSaved={() => {}}
+                onCancel={() => setEditingId('__new__')}
+              />
+            )}
+          </Suspense>
+        </ErrorBoundary>
+      </Box>
+    </Box>
   );
 };
 
-interface CurationFormComponentProps {
-  collectionId: string;
-  defaultValues: any;
-  submitButtonText: string;
+interface OverrideCardProps {
+  override: OverrideSchema;
+  isSelected: boolean;
+  onEdit: () => void;
 }
 
-function CurationFormComponent({
+function OverrideCard({ override, isSelected, onEdit }: OverrideCardProps) {
+  const hasSchedule = override.effective_from_ts || override.effective_to_ts;
+  const now = Math.floor(Date.now() / 1000);
+  const isActive =
+    (!override.effective_from_ts || override.effective_from_ts <= now) &&
+    (!override.effective_to_ts || override.effective_to_ts >= now);
+
+  const matchText = override.rule.query
+    ? `${override.rule.match === 'contains' ? 'name:contains:' : ''}${override.rule.query}`
+    : override.rule.filter_by
+      ? override.rule.filter_by
+      : (override.rule.tags?.join(', ') ?? '—');
+
+  const scheduleText = (() => {
+    if (!hasSchedule) return 'always';
+    const from = override.effective_from_ts
+      ? new Date(override.effective_from_ts * 1000).toLocaleDateString(
+          undefined,
+          { month: 'short', day: 'numeric' },
+        )
+      : '';
+    const to = override.effective_to_ts
+      ? new Date(override.effective_to_ts * 1000).toLocaleDateString(
+          undefined,
+          { month: 'short', day: 'numeric' },
+        )
+      : '';
+    if (from && to) return `${from}–${to}`;
+    if (from) return `from ${from}`;
+    return `until ${to}`;
+  })();
+
+  return (
+    <Box
+      sx={{
+        background: designTokens.surface,
+        border: `1px solid ${isSelected ? designTokens.accentBorder : designTokens.border}`,
+        borderRadius: 1,
+        overflow: 'hidden',
+        transition: 'border-color 120ms ease',
+      }}
+    >
+      {/* Card header */}
+      <Stack
+        direction='row'
+        sx={{
+          px: 2,
+          py: 1.5,
+          alignItems: 'center',
+          gap: 1.25,
+          borderBottom: `1px solid ${designTokens.border}`,
+          background: designTokens.surfaceTinted,
+        }}
+      >
+        <AutoFixHighRounded sx={{ fontSize: 15, color: designTokens.accent }} />
+        <Typography
+          sx={{
+            fontFamily: designTokens.fontMono,
+            fontSize: 13,
+            fontWeight: 600,
+            color: designTokens.text,
+          }}
+        >
+          {override.id}
+        </Typography>
+        {isActive ? (
+          <Badge tone='success' size={10}>
+            ● active
+          </Badge>
+        ) : (
+          <Badge tone='neutral' size={10}>
+            paused
+          </Badge>
+        )}
+        <Box sx={{ flex: 1 }} />
+        <Button
+          size='small'
+          variant='outlined'
+          onClick={onEdit}
+          sx={{
+            ...smallButtonSx,
+            height: 28,
+            fontSize: 12,
+            px: 1.25,
+            minWidth: 'auto',
+          }}
+        >
+          Edit
+        </Button>
+        <IconButton
+          size='small'
+          sx={{
+            width: 26,
+            height: 26,
+            borderRadius: '5px',
+            color: designTokens.textFaint,
+          }}
+        >
+          <MoreHorizRounded sx={{ fontSize: 15 }} />
+        </IconButton>
+      </Stack>
+
+      {/* Card body: WHEN / THEN */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+          gap: 2.25,
+          px: 2.25,
+          py: 1.75,
+        }}
+      >
+        {/* WHEN */}
+        <Box>
+          <SectionLabel>When</SectionLabel>
+          <Box
+            sx={{
+              px: 1.25,
+              py: 1,
+              background: designTokens.surfaceMuted,
+              borderRadius: '5px',
+              fontFamily: designTokens.fontMono,
+              fontSize: 12,
+              color: designTokens.text,
+              mb: 1,
+              wordBreak: 'break-word',
+            }}
+          >
+            {matchText}
+          </Box>
+          <Stack
+            direction='row'
+            spacing={0.75}
+            sx={{
+              alignItems: 'center',
+              fontSize: 11.5,
+              color: designTokens.textMuted,
+            }}
+          >
+            <SettingsRounded
+              sx={{ fontSize: 12, color: designTokens.textFaint }}
+            />
+            <Typography sx={{ fontSize: 11.5, color: designTokens.textMuted }}>
+              {scheduleText}
+            </Typography>
+          </Stack>
+        </Box>
+
+        {/* THEN */}
+        <Box>
+          <SectionLabel>Then</SectionLabel>
+          {override.includes && override.includes.length > 0 && (
+            <Box sx={{ mb: 1 }}>
+              <Typography
+                sx={{ fontSize: 11, color: designTokens.textFaint, mb: 0.5 }}
+              >
+                Pin to top:
+              </Typography>
+              <Stack
+                direction='row'
+                spacing={0.625}
+                sx={{ flexWrap: 'wrap', gap: 0.625 }}
+              >
+                {override.includes.map((inc) => (
+                  <Box
+                    key={inc.id}
+                    component='span'
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 1,
+                      py: '3px',
+                      background: designTokens.successSoft,
+                      border: `1px solid ${designTokens.successBorder}`,
+                      color: designTokens.successDeep,
+                      borderRadius: '4px',
+                      fontFamily: designTokens.fontMono,
+                      fontSize: 11.5,
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                        width: 14,
+                        height: 14,
+                        borderRadius: 7,
+                        background: designTokens.successDeep,
+                        color: designTokens.onAccent,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 9,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {inc.position}
+                    </Box>
+                    {inc.id}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
+          {override.excludes && override.excludes.length > 0 && (
+            <Box>
+              <Typography
+                sx={{ fontSize: 11, color: designTokens.textFaint, mb: 0.5 }}
+              >
+                Hide:
+              </Typography>
+              <Stack
+                direction='row'
+                spacing={0.625}
+                sx={{ flexWrap: 'wrap', gap: 0.625 }}
+              >
+                {override.excludes.map((ex) => (
+                  <Box
+                    key={ex.id}
+                    component='span'
+                    sx={{
+                      px: 1,
+                      py: '3px',
+                      background: designTokens.dangerSoft,
+                      border: `1px solid color-mix(in srgb, ${designTokens.danger} 40%, transparent)`,
+                      color: designTokens.danger,
+                      borderRadius: '4px',
+                      fontFamily: designTokens.fontMono,
+                      fontSize: 11.5,
+                    }}
+                  >
+                    ↓ {ex.id}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
+          {(!override.includes || override.includes.length === 0) &&
+            (!override.excludes || override.excludes.length === 0) && (
+              <Box>
+                {override.filter_by && (
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: designTokens.textMuted,
+                      fontFamily: designTokens.fontMono,
+                    }}
+                  >
+                    filter: {override.filter_by}
+                  </Typography>
+                )}
+                {override.sort_by && (
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: designTokens.textMuted,
+                      fontFamily: designTokens.fontMono,
+                    }}
+                  >
+                    sort: {override.sort_by}
+                  </Typography>
+                )}
+                {override.replace_query && (
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: designTokens.textMuted,
+                      fontFamily: designTokens.fontMono,
+                    }}
+                  >
+                    replace: {override.replace_query}
+                  </Typography>
+                )}
+                {!override.filter_by &&
+                  !override.sort_by &&
+                  !override.replace_query && (
+                    <Typography
+                      sx={{ fontSize: 11.5, color: designTokens.textFaint }}
+                    >
+                      —
+                    </Typography>
+                  )}
+              </Box>
+            )}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Typography
+      sx={{
+        fontSize: 10.5,
+        fontWeight: 700,
+        color: designTokens.textFaint,
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+        mb: 1,
+      }}
+    >
+      {children}
+    </Typography>
+  );
+}
+
+interface CurationFormCardProps {
+  collectionId: string;
+  isNew?: boolean;
+  override?: OverrideSchema;
+  onSaved: (id: string) => void;
+  onCancel?: () => void;
+}
+
+function CurationFormCard({
   collectionId,
-  defaultValues,
-  submitButtonText,
-}: CurationFormComponentProps) {
+  isNew,
+  override,
+  onSaved,
+  onCancel,
+}: CurationFormCardProps) {
   const toast = useAsyncToast();
   const [client, clusterId] = useTypesenseClient();
 
@@ -190,7 +473,7 @@ function CurationFormComponent({
       toast.success(`curation saved [${data.id}]`, { id: 'save-curation' });
     },
     onError: (err, vars) => {
-      let msg = err.message || `error saving curation [${vars.overrideId}]`;
+      const msg = err.message || `error saving curation [${vars.overrideId}]`;
       toast.error(msg, { id: 'save-curation' });
     },
     onSettled: () => {
@@ -200,15 +483,49 @@ function CurationFormComponent({
     },
   });
 
+  const defaultValues = override
+    ? {
+        overrideId: override.id,
+        rule_query_bool: Boolean(override.rule.query),
+        rule_filter_bool: Boolean(override.rule.filter_by),
+        rule_tags_bool: Boolean(override.rule.tags),
+        rule: {
+          query: override.rule.query || '',
+          match: (override.rule.match as 'exact' | 'contains') || 'exact',
+          filter_by: override.rule.filter_by || '',
+          tags: override.rule.tags ? override.rule.tags.join(', ') : '',
+        },
+        filter_by_bool: Boolean(override.filter_by),
+        filter_by: override.filter_by || '',
+        sort_by_bool: Boolean(override.sort_by),
+        sort_by: override.sort_by || '',
+        filter_curated_hits: Boolean(override.filter_curated_hits),
+        replace_query_bool: Boolean(override.replace_query),
+        replace_query: override.replace_query || '',
+        remove_match_tokens: Boolean(override.remove_matched_tokens),
+        custom_metadata_bool: Boolean(override.metadata),
+        metadata: override.metadata ? JSON.stringify(override.metadata) : '',
+        stop_processing: Boolean(override.stop_processing),
+        effective_from_ts_bool: Boolean(override.effective_from_ts),
+        effective_from_ts: override.effective_from_ts
+          ? new Date(override.effective_from_ts * 1000)
+          : new Date(),
+        effective_to_ts_bool: Boolean(override.effective_to_ts),
+        effective_to_ts: override.effective_to_ts
+          ? new Date(override.effective_to_ts * 1000)
+          : new Date(),
+      }
+    : defaultOverrideValues;
+
   const form = useAppForm({
     ...overrideFormOpts,
     defaultValues,
     onSubmit: async ({ value }) => {
-      let overrideCreate: OverrideCreateSchema = {
+      const overrideCreate: OverrideCreateSchema = {
         rule: {
           query: value.rule_query_bool ? value.rule.query : undefined,
           match: value.rule_query_bool ? value.rule.match : undefined,
-          filter_by: value.rule_filter_bool ? value.rule.match : undefined,
+          filter_by: value.rule_filter_bool ? value.rule.filter_by : undefined,
           tags: value.rule.tags
             ? value.rule.tags.split(', ').map((t: string) => t.trim())
             : undefined,
@@ -219,10 +536,7 @@ function CurationFormComponent({
         replace_query: value.replace_query_bool
           ? value.replace_query
           : undefined,
-        // includes: [],
-        // excludes: [],
         filter_curated_hits: value.filter_curated_hits,
-        // TODO: date validation ?? does api throw if date is in the past ??
         effective_from_ts: value.effective_from_ts_bool
           ? value.effective_from_ts.getTime() / 1000
           : undefined,
@@ -236,13 +550,18 @@ function CurationFormComponent({
       };
 
       try {
-        await mutation.mutateAsync({
+        const result = await mutation.mutateAsync({
           collectionId,
           overrideId: value.overrideId,
           params: overrideCreate,
         });
-        form.reset();
-      } catch (err) {}
+        if (isNew) {
+          form.reset();
+          onSaved(result.id);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 
@@ -256,13 +575,72 @@ function CurationFormComponent({
       }}
       noValidate
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        gap: 2,
+        background: designTokens.surface,
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: 1,
+        p: 2,
       }}
     >
-      <CurationForm form={form} submitButtonText={submitButtonText} />
+      {/* Panel header */}
+      <Stack direction='row' spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
+        <Box
+          sx={{
+            width: 26,
+            height: 26,
+            borderRadius: 0.75,
+            background: designTokens.accentSoft,
+            color: designTokens.accent,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <AutoFixHighRounded sx={{ fontSize: 14 }} />
+        </Box>
+        <Typography
+          sx={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: designTokens.text,
+            letterSpacing: '-0.005em',
+          }}
+        >
+          {isNew ? 'New override' : `Edit: ${override?.id}`}
+        </Typography>
+      </Stack>
+      <Typography
+        sx={{
+          fontSize: 12,
+          color: designTokens.textMuted,
+          lineHeight: 1.5,
+          mb: 1.5,
+        }}
+      >
+        Pin, hide, or re-rank specific documents when a query matches a rule.
+      </Typography>
+
+      <CurationForm
+        form={form}
+        submitButtonText={isNew ? 'Save override' : 'Update'}
+      />
+
+      {!isNew && onCancel ? (
+        <Button
+          type='button'
+          variant='text'
+          size='small'
+          onClick={onCancel}
+          sx={{
+            mt: 1,
+            fontSize: 12,
+            color: designTokens.textMuted,
+            textTransform: 'none',
+          }}
+        >
+          Cancel editing
+        </Button>
+      ) : null}
     </Box>
   );
 }

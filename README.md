@@ -14,6 +14,10 @@ If the link is not prefilling login creds, use the following:
 - port: 443
 - api key: q0DAf2GWCdw0LPCzM72UytDVh719h4Tk
 
+## Supported Versions
+
+Intended to be compatible with `v29` and `v30`.
+
 ## Usage
 
 #### Prerequisites

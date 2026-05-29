@@ -7,11 +7,12 @@ import {
   Toolbar as MuiToolbar,
   Stack,
   styled,
-  tabsClasses,
+  // tabsClasses,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { ColorModeIconDropdown } from './ColorModeIconDropdown';
+// import { ColorModeIconDropdown } from './ColorModeIconDropdown';
+import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { MenuButton } from './MenuButton';
 import SideMenuMobile from './SideMenuMobile';
 
@@ -24,11 +25,17 @@ const Toolbar = styled(MuiToolbar)({
   justifyContent: 'center',
   gap: '12px',
   flexShrink: 0,
-  [`& ${tabsClasses.flexContainer}`]: {
+  // '& .MuiTabs-flexContainer'
+  ['& .MuiTabs-flexContainer']: {
     gap: '8px',
     p: '8px',
     pb: 0,
   },
+  // [`& ${tabsClasses.flexContainer}`]: {
+  //   gap: '8px',
+  //   p: '8px',
+  //   pb: 0,
+  // },
 });
 
 export function AppNavbar() {
@@ -75,7 +82,7 @@ export function AppNavbar() {
               Dashboard
             </Typography>
           </Stack>
-          <ColorModeIconDropdown />
+          <ThemeModeToggle />
           <MenuButton aria-label='menu' onClick={toggleDrawer(true)}>
             <MenuRounded />
           </MenuButton>

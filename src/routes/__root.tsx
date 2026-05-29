@@ -10,7 +10,6 @@ import {
 import { CssBaseline } from '@mui/material';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 // export interface RouterAppContext {
 //   // trpcQueryUtils: typeof trpcQueryUtils;
@@ -54,7 +53,7 @@ function RootComponent(props: { disableCustomTheme?: boolean }) {
         </DialogProvider>
         <Toaster />
       </AppTheme>
-      {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
+      {/* {import.meta.env.DEV ? <TanStackRouterDevtools /> : null} */}
       <ReactQueryDevtools position='bottom' buttonPosition='bottom-right' />
     </>
   );

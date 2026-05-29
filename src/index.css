@@ -1,68 +1,100 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* =====================================================================
+   Typesense design tokens. The `aT` palette from the redesign source is
+   exposed here as CSS custom properties so light and dark modes share
+   the same shape — only the values flip. Components read these via the
+   `designTokens` map in src/theme/themePrimitives.ts, which resolves
+   each key to `var(--ts-…)`. The attribute is managed by MUI's color
+   scheme system (see AppTheme.tsx, colorSchemeSelector).
+   ===================================================================== */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+:root,
+[data-mui-color-scheme='light'] {
+  color-scheme: light;
+  --ts-bg: #ffffff;
+  --ts-surface: #ffffff;
+  --ts-surfaceMuted: hsl(210, 36%, 97%);
+  --ts-surfaceTinted: hsl(210, 33%, 99%);
+  --ts-border: hsl(218, 19%, 91%);
+  --ts-borderStrong: hsl(214, 13%, 79%);
+  --ts-text: hsl(213, 73%, 15%);
+  --ts-textMuted: hsl(212, 22%, 33%);
+  --ts-textFaint: hsl(210, 16%, 60%);
+  --ts-textSubtle: hsl(212, 13%, 68%);
+  --ts-accent: hsl(210, 95%, 44%);
+  --ts-accentSoft: hsl(213, 86%, 95%);
+  --ts-accentDeep: hsl(212, 85%, 27%);
+  --ts-accentHover: hsl(211, 93%, 37%);
+  --ts-accentBorder: hsl(213, 78%, 84%);
+  --ts-success: hsl(149, 86%, 33%);
+  --ts-successSoft: hsl(140, 56%, 93%);
+  --ts-successBorder: hsl(140, 49%, 84%);
+  --ts-successDeep: hsl(152, 84%, 25%);
+  --ts-warning: hsl(38, 90%, 39%);
+  --ts-warningSoft: hsl(45, 92%, 88%);
+  --ts-warningBorder: hsl(45, 80%, 79%);
+  --ts-warningDeep: hsl(36, 92%, 28%);
+  --ts-danger: hsl(345, 60%, 53%);
+  --ts-dangerSoft: hsl(345, 60%, 96%);
+  --ts-onAccent: #ffffff;
+  --ts-mark: #fef3c7;
+  --ts-heroFrom: hsl(213, 73%, 15%);
+  --ts-heroMid: hsl(212, 85%, 27%);
+  --ts-heroTo: hsl(210, 95%, 44%);
+  --ts-codeSurface: hsl(213, 73%, 15%);
+  --ts-codeText: #e1e7ed;
+}
 
+[data-mui-color-scheme='dark'] {
+  color-scheme: dark;
+  --ts-bg: #0b0f17;
+  --ts-surface: #11161f;
+  /* --ts-surface: #0a2341; */
+  --ts-surfaceMuted: #161c27;
+  --ts-surfaceTinted: #0d1219;
+  --ts-border: #232a37;
+  --ts-borderStrong: #313a4a;
+  --ts-text: #e6ebf2;
+  --ts-textMuted: #a3aebd;
+  --ts-textFaint: #6f7a8a;
+  --ts-textSubtle: #4f5867;
+  --ts-accent: #4ba0f5;
+  --ts-accentSoft: #16263c;
+  --ts-accentDeep: #cfe1f7;
+  --ts-accentHover: #6cb1ff;
+  --ts-accentBorder: #2c4b6f;
+  --ts-success: #2bbf75;
+  --ts-successSoft: #122a1d;
+  --ts-successBorder: #1f3d2c;
+  --ts-successDeep: #6ed99e;
+  --ts-warning: #e3a64f;
+  --ts-warningSoft: #2a200c;
+  --ts-warningBorder: #4a3a14;
+  --ts-warningDeep: #e0b561;
+  --ts-danger: #ef4870;
+  --ts-dangerSoft: #3a1622;
+  --ts-onAccent: #08111d;
+  --ts-mark: #3a2f0f;
+  --ts-heroFrom: #06080d;
+  --ts-heroMid: #0b3f80;
+  --ts-heroTo: #1d4d8c;
+  --ts-codeSurface: #06080d;
+  --ts-codeText: #e1e7ed;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  background: var(--ts-bg);
+  color: var(--ts-text);
 }

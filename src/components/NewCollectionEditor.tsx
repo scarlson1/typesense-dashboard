@@ -29,7 +29,8 @@ const DEFAULT_INITIAL_VALUE: CollectionSchema = {
   enable_nested_fields: true,
 };
 
-interface NewCollectionEditorProps extends EditorProps {}
+// interface NewCollectionEditorProps extends EditorProps {}
+type NewCollectionEditorProps = EditorProps;
 
 const NewCollectionEditor = ({
   defaultValue = JSON.stringify(DEFAULT_INITIAL_VALUE),
@@ -51,7 +52,7 @@ const NewCollectionEditor = ({
       ...options,
       readOnly: mutation.isPending ? true : false,
     }),
-    [options, mutation.isPending]
+    [options, mutation.isPending],
   ); // merge nested objects ??
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -73,9 +74,9 @@ const NewCollectionEditor = ({
   };
 
   const handleSave = async () => {
-    let value = editorRef.current?.getValue();
+    const value = editorRef.current?.getValue();
     if (!value) return;
-    let parsed = JSON.parse(value);
+    const parsed = JSON.parse(value);
     // set read only ??
 
     if (markers.length) {

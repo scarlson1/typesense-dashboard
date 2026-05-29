@@ -1,11 +1,27 @@
 import { Editor, type EditorProps, type OnMount } from '@monaco-editor/react';
-import { useColorScheme, useTheme } from '@mui/material';
+import { useColorScheme } from '@mui/material';
 import Color from 'color';
 import * as monaco from 'monaco-editor';
 import { useCallback, useId, useRef } from 'react';
 
 const LIGHT_THEME = 'custom-theme-light';
 const DARK_THEME = 'custom-theme-dark';
+
+// Monaco's `editor.background` needs a literal hex; it can't consume a CSS
+// variable. Resolve the design palette via the computed style on <html> so
+// the editor surface matches whatever theme is active at mount time.
+function resolveSurfaceHex(fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue('--ts-surface')
+    .trim();
+  if (!raw) return fallback;
+  try {
+    return Color(raw).hex();
+  } catch {
+    return fallback;
+  }
+}
 
 export interface JsonEditorProps extends EditorProps {
   schema?: any;
@@ -59,7 +75,6 @@ function useInitMonaco({
   schema,
   editorId,
 }: JsonEditorProps & { editorId: string }) {
-  const theme = useTheme();
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
 
@@ -102,7 +117,7 @@ function useInitMonaco({
         rules: [],
         colors: {
           'editor.background':
-            slotProps?.background?.dark ?? Color('hsl(220, 30%, 7%)').hex(),
+            slotProps?.background?.dark ?? resolveSurfaceHex('#11161f'),
         },
       });
 
@@ -112,14 +127,13 @@ function useInitMonaco({
         rules: [],
         colors: {
           'editor.background':
-            slotProps?.background?.light ??
-            Color(theme.palette.background.paper).hex(),
+            slotProps?.background?.light ?? resolveSurfaceHex('#ffffff'),
         },
       });
 
       monaco.editor.setTheme(themeMode === 'dark' ? DARK_THEME : LIGHT_THEME);
     },
-    [schema, slotProps, onMount, theme, themeMode],
+    [schema, slotProps, onMount, themeMode],
   );
 
   return {

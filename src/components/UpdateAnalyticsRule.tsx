@@ -5,10 +5,12 @@ import {
   type AnalyticsRuleCreateValues,
 } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { queryClient } from '@/utils';
+import { upsertAnalyticsRule } from '@/utils/versionAdaptations';
 import { Box } from '@mui/material';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import type { AnalyticsRuleCreateSchema } from 'typesense/lib/Typesense/AnalyticsRule';
+import type { AnalyticsRuleCreateSchemaV1 } from 'typesense';
 import { AnalyticsRuleForm } from './AnalyticsRuleForm';
 
 interface UpdateAnalyticsRuleProps {
@@ -22,6 +24,7 @@ export function UpdateAnalyticsRule({
 }: UpdateAnalyticsRuleProps) {
   const toast = useAsyncToast();
   const [client, clusterId] = useTypesenseClient();
+  const { is30Plus } = useTypesenseVersion();
 
   const mutation = useMutation({
     mutationFn: ({
@@ -29,8 +32,8 @@ export function UpdateAnalyticsRule({
       schema,
     }: {
       name: string;
-      schema: AnalyticsRuleCreateSchema;
-    }) => client.analytics.rules().upsert(name, schema),
+      schema: AnalyticsRuleCreateSchemaV1;
+    }) => upsertAnalyticsRule(client, name, schema, is30Plus), //client.analytics.rules().upsert(name, schema),
     onMutate: (vars) => {
       toast.loading(`saving analytics rule`, {
         id: `rule-updated-${vars.name}`,
@@ -43,7 +46,7 @@ export function UpdateAnalyticsRule({
     },
     onError: (err, vars, ctx) => {
       console.log(err, vars, ctx);
-      let msg = err?.message || 'failed to save analytics rule';
+      const msg = err?.message || 'failed to save analytics rule';
       toast.error(msg, { id: `rule-updated-${vars.name}` });
     },
     onSettled: () => {
@@ -58,7 +61,7 @@ export function UpdateAnalyticsRule({
     defaultValues,
     onSubmit: async ({ value }) => {
       const { name, type, params } = value;
-      const schema: AnalyticsRuleCreateSchema = {
+      const schema: AnalyticsRuleCreateSchemaV1 = {
         type,
         params: {
           ...params,
@@ -73,7 +76,9 @@ export function UpdateAnalyticsRule({
         });
 
         form.reset();
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 
@@ -98,11 +103,11 @@ function AnalyticsRuleFormComponent({
   const { data: collectionNames } = useSuspenseQuery({
     queryKey: collectionQueryKeys.names(clusterId, { withAlias: true }),
     queryFn: async () => {
-      let collections = await client.collections().retrieve();
-      let aliasRes = await client.aliases().retrieve();
+      const collections = await client.collections().retrieve();
+      const aliasRes = await client.aliases().retrieve();
 
-      let collectionNames = collections.map((c) => c.name);
-      let aliasNames = aliasRes.aliases.map((a) => a.name);
+      const collectionNames = collections.map((c: { name: string }) => c.name);
+      const aliasNames = aliasRes.aliases.map((a: { name: string }) => a.name);
 
       return [...aliasNames, ...collectionNames];
     },

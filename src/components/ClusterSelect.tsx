@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
+  Box,
   Divider,
   IconButton,
   ListItemText,
@@ -134,7 +135,13 @@ export function ClusterSelect() {
         const cred = val ? credentials[val] : null;
 
         return (
-          <MenuItem disableGutters sx={{ maxWidth: '100%' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              maxWidth: '100%',
+            }}
+          >
             <ListItemAvatar sx={{ px: 1, mr: 0 }}>
               <Avatar alt={cred ? cred.env || cred.node : 'No Cluster'}>
                 {getEnvAvatar(cred?.env)}
@@ -160,7 +167,7 @@ export function ClusterSelect() {
                 },
               }}
             />
-          </MenuItem>
+          </Box>
         );
       }}
       inputProps={{ 'aria-label': 'Select cluster' }}

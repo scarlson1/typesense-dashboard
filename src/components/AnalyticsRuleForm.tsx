@@ -1,140 +1,296 @@
 import { analyticsFormOpts, analyticsRuleType } from '@/constants';
 import { withForm } from '@/hooks';
-import { FormHelperText, Grid } from '@mui/material';
+import { designTokens } from '@/theme/themePrimitives';
+import { primaryButtonSx } from '@/components/redesign';
+import { AddRounded } from '@mui/icons-material';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+  TextField as MuiTextField,
+  Typography,
+} from '@mui/material';
+
+const labelSx = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: designTokens.textFaint,
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.06em',
+  mb: 0.75,
+  mt: 1.5,
+};
+
+const compactInputSx = {
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: designTokens.surface,
+    fontSize: 12.5,
+    fontFamily: designTokens.fontMono,
+    minHeight: 32,
+    borderRadius: '6px',
+    '& fieldset': {
+      borderColor: designTokens.border,
+      transition: 'border-color 120ms ease',
+    },
+    '&:hover fieldset': { borderColor: designTokens.borderStrong },
+    '&.Mui-focused fieldset': {
+      borderColor: designTokens.accent,
+      borderWidth: 1,
+    },
+    '& input': {
+      fontSize: 12.5,
+      fontFamily: designTokens.fontMono,
+      padding: '6px 10px !important',
+    },
+    '& input::placeholder': {
+      color: designTokens.textMuted,
+      opacity: 1,
+    },
+  },
+};
+
+const RULE_TYPES = analyticsRuleType.options;
 
 export const AnalyticsRuleForm = withForm({
   ...analyticsFormOpts,
   props: {
     sourceOptions: [''],
     destinationOptions: [''],
-    submitButtonText: 'Submit',
+    submitButtonText: 'Add rule',
   },
   render: ({ form, sourceOptions, destinationOptions, submitButtonText }) => {
     return (
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <form.AppField name='name'>
-            {({ TextField }) => (
-              <TextField
-                id='name'
-                label='Name'
-                placeholder='suggested_searches'
-                required
-                fullWidth
-                variant='outlined'
-              />
-            )}
-          </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <form.AppField name='type'>
-            {({ Select }) => (
-              <Select
-                id='type'
-                label='Rule Type'
-                required
-                fullWidth
-                variant='outlined'
-                options={analyticsRuleType.options}
-              />
-            )}
-          </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <form.AppField name='params.source.collections'>
-            {({ Select, handleChange }) => (
-              <Select
-                id='params.source.collections'
-                label='Source Collection'
-                required
-                fullWidth
-                variant='outlined'
-                options={sourceOptions}
-                helperText={`Track searches sent to these collections`}
-                checkmark
+      <Box>
+        {/* Rule type grid */}
+        <Typography sx={labelSx}>Rule type</Typography>
+        <form.Field name='type'>
+          {({ state, handleChange }: any) => (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 0.75,
+                mb: 1.5,
+              }}
+            >
+              {RULE_TYPES.map((t) => {
+                const active = state.value === t;
+                return (
+                  <Box
+                    key={t}
+                    component='button'
+                    type='button'
+                    onClick={() => handleChange(t)}
+                    sx={{
+                      py: 1,
+                      px: 1.25,
+                      borderRadius: '5px',
+                      fontSize: 11.5,
+                      fontFamily: designTokens.fontMono,
+                      textAlign: 'left',
+                      border: `1px solid ${active ? designTokens.accentBorder : designTokens.border}`,
+                      background: active
+                        ? designTokens.accentSoft
+                        : designTokens.surface,
+                      color: active
+                        ? designTokens.accentDeep
+                        : designTokens.text,
+                      cursor: 'pointer',
+                      font: 'inherit',
+                      fontWeight: active ? 600 : 400,
+                      transition: 'all 120ms ease',
+                      '&:hover': {
+                        borderColor: active
+                          ? designTokens.accentBorder
+                          : designTokens.borderStrong,
+                      },
+                    }}
+                  >
+                    {t}
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
+        </form.Field>
+
+        {/* Name */}
+        <Typography sx={labelSx}>Name</Typography>
+        <form.AppField name='name'>
+          {({ state, handleChange, handleBlur }) => (
+            <MuiTextField
+              value={state.value}
+              onChange={(e) => handleChange(e.target.value)}
+              onBlur={handleBlur}
+              placeholder='suggested_searches'
+              fullWidth
+              size='small'
+              required
+              error={state.meta.isTouched && !state.meta.isValid}
+              sx={compactInputSx}
+            />
+          )}
+        </form.AppField>
+
+        {/* Source collection */}
+        <Typography sx={labelSx}>Source collection</Typography>
+        <form.Field name='params.source.collections'>
+          {({ state, handleChange, handleBlur }: any) => (
+            <Autocomplete
+              multiple
+              freeSolo
+              options={sourceOptions}
+              size='small'
+              value={state.value ?? []}
+              onChange={(_, newVal) => handleChange(newVal)}
+              renderInput={(params) => (
+                <MuiTextField
+                  {...params}
+                  onBlur={handleBlur}
+                  placeholder='select collections…'
+                  sx={compactInputSx}
+                />
+              )}
+              slotProps={{
+                paper: {
+                  sx: {
+                    border: `1px solid ${designTokens.border}`,
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 12.5,
+                  },
+                },
+              }}
+            />
+          )}
+        </form.Field>
+
+        {/* Destination collection */}
+        <Typography sx={labelSx}>Destination collection</Typography>
+        <form.Field name='params.destination.collection'>
+          {({ state, handleChange, handleBlur }: any) => (
+            <Autocomplete
+              freeSolo
+              options={destinationOptions}
+              size='small'
+              value={state.value ?? ''}
+              onChange={(_, newVal) =>
+                handleChange(typeof newVal === 'string' ? newVal : '')
+              }
+              onInputChange={(_, newVal, reason) => {
+                if (reason === 'input') handleChange(newVal);
+              }}
+              renderInput={(params) => (
+                <MuiTextField
+                  {...params}
+                  onBlur={handleBlur}
+                  placeholder='queries_suggestions'
+                  sx={compactInputSx}
+                />
+              )}
+              slotProps={{
+                paper: {
+                  sx: {
+                    border: `1px solid ${designTokens.border}`,
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 12.5,
+                  },
+                },
+              }}
+            />
+          )}
+        </form.Field>
+
+        {/* Limit */}
+        <Typography sx={labelSx}>Limit</Typography>
+        <form.AppField name='params.limit'>
+          {({ state, handleChange, handleBlur }) => (
+            <MuiTextField
+              value={state.value}
+              onChange={(e) => handleChange(e.target.value)}
+              onBlur={handleBlur}
+              placeholder='1000'
+              fullWidth
+              size='small'
+              sx={compactInputSx}
+            />
+          )}
+        </form.AppField>
+
+        {/* Checkboxes */}
+        <Stack direction='row' spacing={2} sx={{ mt: 1.5, mb: 1.75 }}>
+          <form.Field name='params.expand_query'>
+            {({ state, handleChange }: any) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size='small'
+                    checked={Boolean(state.value)}
+                    onChange={(_, c) => handleChange(c)}
+                    sx={{ p: 0.375 }}
+                  />
+                }
+                label='Expand partial queries'
                 slotProps={{
-                  select: {
-                    multiple: true,
-                    renderValue: (selected) =>
-                      (selected as string[]).join(', '),
+                  typography: {
+                    sx: {
+                      fontSize: 12,
+                      color: designTokens.textMuted,
+                    },
                   },
                 }}
-                onChange={(event) => {
-                  const {
-                    target: { value },
-                  } = event;
-                  let val =
-                    typeof value === 'string' ? value.split(',') : value;
-                  handleChange(val);
+              />
+            )}
+          </form.Field>
+          <form.Field name='params.enable_auto_aggregation'>
+            {({ state, handleChange }: any) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size='small'
+                    checked={Boolean(state.value)}
+                    onChange={(_, c) => handleChange(c)}
+                    sx={{ p: 0.375 }}
+                  />
+                }
+                label='Enable auto aggregation'
+                slotProps={{
+                  typography: {
+                    sx: {
+                      fontSize: 12,
+                      color: designTokens.textMuted,
+                    },
+                  },
                 }}
               />
             )}
-          </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <form.AppField name='params.destination.collection'>
-            {({ Select }) => (
-              <Select
-                id='params.destination.collection'
-                label='Destination Collection'
-                required
+          </form.Field>
+        </Stack>
+
+        {/* Submit */}
+        <form.AppForm>
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type='submit'
+                variant='contained'
                 fullWidth
-                variant='outlined'
-                options={destinationOptions}
-                helperText={`Collect search terms in this collection. Collection's schema needs to be set according to the docs`}
-              />
+                disableElevation
+                startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+                loading={isSubmitting}
+                disabled={!canSubmit}
+                sx={{ ...primaryButtonSx, height: 36 }}
+              >
+                {submitButtonText}
+              </Button>
             )}
-          </form.AppField>
-        </Grid>
-        {/* TODO:  USE NUMERIC INPUT MASK ?? */}
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <form.AppField name='params.limit'>
-            {({ TextField }) => (
-              <TextField
-                id='params.limit'
-                label='Limit'
-                fullWidth
-                variant='outlined'
-                placeholder='100'
-                helperText='Number of Search Terms to collect'
-              />
-            )}
-          </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 6, sm: 4 }}>
-          <form.AppField name='params.expand_query'>
-            {({ Checkbox }) => (
-              <>
-                <Checkbox
-                  label='Expand Partial Queries'
-                  value={`params.expand_query`}
-                />
-                <FormHelperText>
-                  If a searcher types in a partial query, should it be fully
-                  expanded automatically when logged
-                </FormHelperText>
-              </>
-            )}
-          </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 6, sm: 4 }}>
-          <form.AppField name='params.enable_auto_aggregation'>
-            {({ Checkbox }) => (
-              <>
-                <Checkbox
-                  label='Enable auto aggregation'
-                  value={`params.enable_auto_aggregation`}
-                />
-              </>
-            )}
-          </form.AppField>
-        </Grid>
-        <Grid size={{ xs: 12 }}>
-          <form.AppForm>
-            <form.SubmitButton label={submitButtonText} />
-          </form.AppForm>
-        </Grid>
-      </Grid>
+          </form.Subscribe>
+        </form.AppForm>
+      </Box>
     );
   },
 });

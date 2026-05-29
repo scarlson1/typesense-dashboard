@@ -1,3 +1,4 @@
+export * from './ConfigurePanel';
 export * from './ContextHits';
 export * from './DashboardDisplayOptions';
 export * from './Hit';

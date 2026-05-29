@@ -21,7 +21,7 @@ function CtxHits({ children }: { children?: ReactNode }) {
     ) : null;
   }
 
-  let message =
+  const message =
     slotProps?.noHitsFound?.message ||
     `No results for "${hits?.request_params?.q}"`;
 
@@ -38,7 +38,7 @@ function CtxHits({ children }: { children?: ReactNode }) {
   ) : null;
 }
 
-type CtxHitWrapperProps = Partial<GridProps>;
+type CtxHitWrapperProps = Partial<GridProps> & { [K in `data-${string}`]?: string };
 
 function CtxHitWrapper({ children, ...overrides }: CtxHitWrapperProps) {
   // { children?: ReactNode }
@@ -70,9 +70,10 @@ CtxHits.HitWrapper = CtxHitWrapper;
 type CtxHitProps = {
   children?: ReactNode;
   hitWrapperProps?: Partial<GridProps>;
+  selectedHitId?: string | null;
 };
 
-function CtxHit({ children, hitWrapperProps }: CtxHitProps) {
+function CtxHit({ children, hitWrapperProps, selectedHitId }: CtxHitProps) {
   const hits = useHits();
   const [slots, slotProps] = useSearchSlots();
 
@@ -82,12 +83,14 @@ function CtxHit({ children, hitWrapperProps }: CtxHitProps) {
         <CtxHitWrapper
           key={`hit-${hit.document.id}-${i}-wrapper`}
           {...hitWrapperProps}
+          data-hit-id={String(hit.document.id)}
         >
           <slots.hit
             {...slotProps?.hit}
             hit={hit}
             key={`hit-${hit.document.id}-${i}`}
             imgProps={slotProps?.hitImg || {}}
+            active={selectedHitId != null && String(hit.document.id) === selectedHitId}
           >
             {slots?.hitActions ? (
               <Suspense>
@@ -110,12 +113,13 @@ CtxHits.Hit = CtxHit;
 
 interface ContextHitsProps {
   hitWrapperProps?: CtxHitWrapperProps;
+  selectedHitId?: string | null;
 }
 
-export function ContextHits({ hitWrapperProps }: ContextHitsProps) {
+export function ContextHits({ hitWrapperProps, selectedHitId }: ContextHitsProps) {
   return (
     <CtxHits>
-      <CtxHits.Hit hitWrapperProps={hitWrapperProps} />
+      <CtxHits.Hit hitWrapperProps={hitWrapperProps} selectedHitId={selectedHitId} />
     </CtxHits>
   );
 }

@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_MAPBOX_TOKEN: string;
+  readonly VITE_APP_VERSION: string;
   // readonly VITE_APP_TITLE: string
   // more env variables...
 }

@@ -1,15 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast, type ToastOptions } from 'react-hot-toast';
 
 type CopiedValue = string | null;
 type CopyFn = (
   text: string | any,
   withToast?: boolean,
-  toastOptions?: ToastOptions
+  toastOptions?: ToastOptions,
 ) => Promise<boolean>; // Return success
 
-export const useCopyToClipboard = (): [CopiedValue, CopyFn] => {
+export const useCopyToClipboard = (
+  isCopiedTimer: number = 2000,
+): [CopiedValue, CopyFn, boolean] => {
   const [copiedText, setCopiedText] = useState<CopiedValue>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    if (!isCopied) return;
+    const timer = setTimeout(() => setIsCopied(false), isCopiedTimer);
+    return () => clearTimeout(timer);
+  }, [isCopied, isCopiedTimer]);
 
   const copy: CopyFn = async (text, withToast, toastOptions) => {
     if (!navigator?.clipboard) {
@@ -22,6 +31,7 @@ export const useCopyToClipboard = (): [CopiedValue, CopyFn] => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedText(text);
+      setIsCopied(true);
 
       if (!!withToast)
         toast.success('copied to clipboard', {
@@ -33,9 +43,10 @@ export const useCopyToClipboard = (): [CopiedValue, CopyFn] => {
     } catch (error) {
       console.warn('Copy failed', error);
       setCopiedText(null);
+      // if (!!withToast) toast.error() enable ??
       return false;
     }
   };
 
-  return [copiedText, copy];
+  return [copiedText, copy, isCopied];
 };

@@ -5,21 +5,29 @@ import {
 } from '@/constants';
 import { usePrevious, withForm } from '@/hooks';
 import { getArrayVal, splitIfString } from '@/utils';
-import { AddRounded, RemoveRounded } from '@mui/icons-material';
+import { smallButtonSx } from '@/components/redesign';
+import { designTokens } from '@/theme/themePrimitives';
+import {
+  AddRounded,
+  ExpandMoreRounded,
+  RemoveRounded,
+  StarBorderRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
-  Grid,
+  Chip,
   IconButton,
-  Link,
   Autocomplete as MuiAutocomplete,
   TextField as MuiTextField,
   Stack,
   Typography,
+  type SxProps,
   type Theme,
 } from '@mui/material';
+import { useStore } from '@tanstack/react-form';
 import { isEqual } from 'lodash-es';
-import { Fragment, useCallback, useEffect, useMemo } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   DocumentSchema,
   SearchParams,
@@ -28,6 +36,168 @@ import type { MultiSearchRequestsSchema } from 'typesense/lib/Typesense/MultiSea
 import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
 
 type SearchParamsFormFieldsProps = Parameters<typeof SearchParamsForm>[0];
+
+const MAX_CHIPS_VISIBLE = 3;
+
+const sectionLabelSx: SxProps<Theme> = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: designTokens.textFaint,
+  textTransform: 'uppercase',
+  letterSpacing: '0.07em',
+  mb: 0.75,
+};
+
+const sectionBoxSx: SxProps<Theme> = {
+  border: `1px solid ${designTokens.border}`,
+  borderRadius: '8px',
+  p: '8px',
+};
+
+const paramChipSx: SxProps<Theme> = {
+  height: 24,
+  fontSize: 12,
+  fontFamily: designTokens.fontMono,
+  background: designTokens.surfaceMuted,
+  border: `1px solid ${designTokens.border}`,
+  borderRadius: '5px',
+  color: designTokens.text,
+  '& .MuiChip-deleteIcon': {
+    fontSize: 13,
+    color: designTokens.textFaint,
+    '&:hover': { color: designTokens.text },
+  },
+};
+
+const addChipInputSx: SxProps<Theme> = {
+  '& .MuiOutlinedInput-root': {
+    fontSize: 12.5,
+    minHeight: 28,
+    py: 0,
+    px: '8px',
+    borderRadius: '5px',
+    fontFamily: designTokens.fontMono,
+    '& fieldset': {
+      borderColor: designTokens.border,
+      borderStyle: 'dashed',
+      transition: 'border-color 120ms ease',
+    },
+    '&:hover fieldset': { borderColor: designTokens.borderStrong },
+    '&.Mui-focused fieldset': {
+      borderColor: designTokens.accent,
+      borderStyle: 'solid',
+      borderWidth: '1px',
+    },
+    '& input': {
+      fontSize: 12.5,
+      padding: '0 4px !important',
+      fontFamily: designTokens.fontMono,
+      color: designTokens.textFaint,
+    },
+    '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
+    '& .MuiAutocomplete-endAdornment': { right: 4 },
+  },
+};
+
+const compactInputSx: SxProps<Theme> = {
+  '& .MuiOutlinedInput-root': {
+    fontSize: 12.5,
+    minHeight: 28,
+    py: 0,
+    px: '8px',
+    borderRadius: '5px',
+    fontFamily: designTokens.fontMono,
+    '& fieldset': {
+      borderColor: designTokens.border,
+      transition: 'border-color 120ms ease',
+    },
+    '&:hover fieldset': { borderColor: designTokens.borderStrong },
+    '&.Mui-focused fieldset': { borderColor: designTokens.accent, borderWidth: '1px' },
+    '& input': {
+      fontSize: 12.5,
+      padding: '0 4px !important',
+      fontFamily: designTokens.fontMono,
+    },
+    '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
+    '& .MuiAutocomplete-endAdornment': { right: 4 },
+  },
+};
+
+const paperSx = { border: (theme: Theme) => `1px solid ${theme.palette.divider}` };
+
+interface ChipMultiFieldProps {
+  values: string[];
+  options: string[];
+  onAdd: (val: string) => void;
+  onRemove: (index: number) => void;
+  placeholder?: string;
+}
+
+const ChipMultiField = ({
+  values,
+  options,
+  onAdd,
+  onRemove,
+  placeholder = 'Add field...',
+}: ChipMultiFieldProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const overflow = values.length - MAX_CHIPS_VISIBLE;
+  const visible = expanded || overflow <= 0 ? values : values.slice(0, MAX_CHIPS_VISIBLE);
+  const availableOptions = useMemo(
+    () => options.filter((o) => !values.includes(o)),
+    [options, values],
+  );
+
+  return (
+    <Box sx={sectionBoxSx}>
+      {values.length > 0 && (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: '6px' }}>
+          {visible.map((val, i) => (
+            <Chip
+              key={`${val}-${i}`}
+              label={val}
+              size='small'
+              onDelete={() => onRemove(i)}
+              sx={paramChipSx}
+            />
+          ))}
+          {!expanded && overflow > 0 && (
+            <Chip
+              label={`+${overflow}more`}
+              size='small'
+              onClick={() => setExpanded(true)}
+              sx={{
+                ...paramChipSx,
+                border: `1px dashed ${designTokens.border}`,
+                background: 'transparent',
+                color: designTokens.textMuted,
+                cursor: 'pointer',
+                '&:hover': { borderColor: designTokens.borderStrong, color: designTokens.text },
+              }}
+            />
+          )}
+        </Box>
+      )}
+      <MuiAutocomplete<string>
+        options={availableOptions}
+        value={null}
+        onChange={(_, newVal) => {
+          if (newVal) onAdd(newVal);
+        }}
+        blurOnSelect
+        clearOnBlur
+        renderInput={(params) => (
+          <MuiTextField {...params} placeholder={placeholder} sx={addChipInputSx} />
+        )}
+        slotProps={{ paper: { sx: paperSx } }}
+        popupIcon={
+          <ExpandMoreRounded sx={{ fontSize: 15, color: designTokens.textFaint }} />
+        }
+        sx={{ '& .MuiAutocomplete-popupIndicator': { mr: '-2px' } }}
+      />
+    </Box>
+  );
+};
 
 const SearchParamsFormFields = ({
   form,
@@ -39,8 +209,16 @@ const SearchParamsFormFields = ({
   submitButtonText,
 }: SearchParamsFormFieldsProps) => {
   const presetOptions = useMemo(() => presets.map((p) => p.name), [presets]);
+  const formValues = useStore(form.store, (state) => state.values);
 
-  // reset query by when options change or when collectionId changes ??
+  const hasUnsavedChanges = useMemo(() => {
+    const currentPresetName = formValues.preset;
+    if (!currentPresetName) return false;
+    const matched = presets.find((p) => p.name === currentPresetName);
+    if (!matched) return true;
+    return !isEqual(omitPreset(formValues), omitPreset(presetToFormValues(matched)));
+  }, [formValues, presets]);
+
   const prevQueryByOptions = usePrevious(queryByOptions);
   useEffect(() => {
     if (prevQueryByOptions && !isEqual(queryByOptions, prevQueryByOptions)) {
@@ -52,35 +230,24 @@ const SearchParamsFormFields = ({
     (newVal: string) => {
       const existingPreset = presets.find((p) => p.name === newVal);
       if (existingPreset) {
-        const { query_by, sort_by, facet_by, group_by, ...rest } = getParams(
-          existingPreset.value,
-        ); // filter_by,
-
-        form.setFieldValue('query_by', getArrayVal(splitIfString(query_by)));
-        form.setFieldValue('sort_by', getArrayVal(splitIfString(sort_by)));
-        form.setFieldValue(
-          'facet_by',
-          getArrayVal(splitIfString(facet_by)),
-          // uniqueArr([
-          //   ...getArrayVal(splitIfString(facet_by)),
-          //   ...getArrayVal(splitIfString(filter_by)),
-          // ])
-        );
-        form.setFieldValue('group_by', getArrayVal(splitIfString(group_by)));
-
-        let otherParams = [NEW_EMPTY_OTHER_PARAM];
-        const otherParamsEntries = Object.entries(rest);
-        if (otherParamsEntries.length) {
-          otherParams = otherParamsEntries.map(([k, v]) => ({
-            param: k,
-            value: typeof v === 'string' ? v : JSON.stringify(v),
-          }));
-        }
-        form.setFieldValue('other_params', otherParams);
+        const values = presetToFormValues(existingPreset);
+        form.setFieldValue('query_by', values.query_by);
+        form.setFieldValue('sort_by', values.sort_by);
+        form.setFieldValue('facet_by', values.facet_by);
+        form.setFieldValue('group_by', values.group_by);
+        form.setFieldValue('other_params', values.other_params);
       }
     },
     [presets],
   );
+
+  const prevPresetValue = usePrevious(formValues.preset);
+  useEffect(() => {
+    const preset = formValues.preset;
+    if (preset && preset !== prevPresetValue) {
+      handlePresetChange(preset);
+    }
+  }, [formValues.preset, prevPresetValue, handlePresetChange]);
 
   const handleClear = useCallback(() => {
     form.setFieldValue('preset', '');
@@ -91,360 +258,272 @@ const SearchParamsFormFields = ({
     form.setFieldValue('other_params', [NEW_EMPTY_OTHER_PARAM]);
   }, [form.setFieldValue, queryByOptions]);
 
-  // useEffect(() => {
-
-  //   return () => {
-
-  //   }
-  // }, [collectionId])
+  const queryByValues = useMemo(
+    () => (formValues.query_by as string[]).filter(Boolean),
+    [formValues.query_by],
+  );
+  const sortByValues = useMemo(
+    () => (formValues.sort_by as string[]).filter(Boolean),
+    [formValues.sort_by],
+  );
+  const facetByValues = useMemo(
+    () => (formValues.facet_by as string[]).filter(Boolean),
+    [formValues.facet_by],
+  );
+  const groupByValues = useMemo(
+    () => (formValues.group_by as string[]).filter(Boolean),
+    [formValues.group_by],
+  );
 
   return (
-    <Grid container columnSpacing={3} rowSpacing={3}>
-      <Grid
-        size={{ xs: 12, sm: 3 }}
-        sx={{
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          display: { xs: 'none', sm: 'flex' },
-        }}
-      >
-        <Typography sx={{ textAlign: 'right' }} component='div'>
-          <Link
-            href='https://typesense.org/docs/29.0/api/search.html#presets'
-            target='_blank'
-            rel='noopener noreferrer'
-            underline='hover'
-          >
-            Preset
-          </Link>
-        </Typography>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <form.AppField
-          name='preset'
-          listeners={{
-            onChange: ({ value }) => {
-              handlePresetChange(value);
-            },
+    <Box>
+      {/* Preset row */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 2.5, px: 0.25 }}>
+        <StarBorderRounded
+          sx={{
+            fontSize: 15,
+            color: hasUnsavedChanges ? designTokens.warning : designTokens.textFaint,
+            flexShrink: 0,
           }}
-        >
-          {({ Autocomplete }) => (
-            <Autocomplete
-              freeSolo
-              autoSelect
-              disablePortal
-              label='Preset'
-              options={presetOptions}
-              sx={{ maxWidth: 600 }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: (theme: Theme) =>
-                      `1px solid ${theme.palette.divider}`,
+        />
+        <MuiAutocomplete
+          freeSolo
+          autoSelect
+          options={presetOptions}
+          value={formValues.preset || ''}
+          onChange={(_, newVal) => {
+            form.setFieldValue('preset', (newVal as string) || '');
+          }}
+          sx={{ flex: 1, minWidth: 0 }}
+          renderInput={(params) => (
+            <MuiTextField
+              {...params}
+              placeholder='No preset'
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  py: 0,
+                  px: '4px',
+                  '& fieldset': { border: 'none' },
+                  '& input': {
+                    fontSize: 13,
+                    fontFamily: designTokens.fontMono,
+                    color: designTokens.text,
+                    padding: '2px 4px !important',
                   },
+                  '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
                 },
-              }}
-              textFieldProps={{
-                slotProps: {
-                  input: {
-                    type: 'search',
-                  },
-                },
-                helperText: 'press "esc" key to avoid selecting from menu',
               }}
             />
           )}
-        </form.AppField>
-      </Grid>
-      <Grid
-        size={{ xs: 12, sm: 3 }}
-        sx={{
-          display: { xs: 'none', sm: 'flex' },
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <Typography sx={{ textAlign: 'right' }} component='div'>
-          <Link
-            href='https://typesense.org/docs/29.0/api/search.html#query-parameters'
-            target='_blank'
-            rel='noopener noreferrer'
-            underline='hover'
+          slotProps={{ paper: { sx: paperSx } }}
+        />
+        {hasUnsavedChanges && (
+          <Typography
+            sx={{ fontSize: 12, fontWeight: 500, color: designTokens.warningDeep, flexShrink: 0 }}
           >
-            Query By
-          </Link>
-        </Typography>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <form.AppField name='query_by' mode='array'>
-          {({ Autocomplete }) => (
-            <Autocomplete
-              disablePortal
-              label='Query By'
-              multiple
-              limitTags={4}
-              options={queryByOptions}
-              sx={{ maxWidth: 600 }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: (theme: Theme) =>
-                      `1px solid ${theme.palette.divider}`,
-                  },
-                },
-                chip: { size: 'small' },
-              }}
-            />
-          )}
-        </form.AppField>
-      </Grid>
-      <Grid
-        size={{ xs: 12, sm: 3 }}
-        sx={{
-          display: { xs: 'none', sm: 'flex' },
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <Typography sx={{ textAlign: 'right' }} component='div'>
-          <Link
-            href='https://typesense.org/docs/29.0/api/search.html#ranking-and-sorting-parameters'
-            target='_blank'
-            rel='noopener noreferrer'
-            underline='hover'
-          >
-            Sort By
-          </Link>
-        </Typography>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <form.AppField name='sort_by' mode='array'>
-          {({ Autocomplete }) => (
-            <Autocomplete
-              disablePortal
-              label='Sort By'
-              multiple
-              limitTags={4}
-              options={sortByOptions}
-              sx={{ maxWidth: 600 }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: (theme: Theme) =>
-                      `1px solid ${theme.palette.divider}`,
-                  },
-                },
-                chip: { size: 'small' },
-              }}
-            />
-          )}
-        </form.AppField>
-      </Grid>
-      <Grid
-        size={{ xs: 12, sm: 3 }}
-        sx={{
-          display: { xs: 'none', sm: 'flex' },
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <Typography sx={{ textAlign: 'right' }} component='div'>
-          <Link
-            href='https://typesense.org/docs/29.0/api/search.html#faceting-parameters'
-            target='_blank'
-            rel='noopener noreferrer'
-            underline='hover'
-          >
-            Facet
-          </Link>{' '}
-          &{' '}
-          <Link
-            href='https://typesense.org/docs/29.0/api/search.html#filter-parameters'
-            target='_blank'
-            rel='noopener noreferrer'
-            underline='hover'
-          >
-            Filter By
-          </Link>
-        </Typography>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <form.AppField name='facet_by' mode='array'>
-          {({ Autocomplete }) => (
-            <Autocomplete
-              disablePortal
-              label='Facet & Filter By'
-              multiple
-              limitTags={4}
-              options={facetByOptions}
-              sx={{ maxWidth: 600 }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: (theme: Theme) =>
-                      `1px solid ${theme.palette.divider}`,
-                  },
-                },
-                chip: { size: 'small' },
-              }}
-            />
-          )}
-        </form.AppField>
-      </Grid>
-      <Grid
-        size={{ xs: 12, sm: 3 }}
-        sx={{
-          display: { xs: 'none', sm: 'flex' },
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <Typography sx={{ textAlign: 'right' }} component='div'>
-          <Link
-            href='https://typesense.org/docs/29.0/api/search.html#grouping-parameters'
-            target='_blank'
-            rel='noopener noreferrer'
-            underline='hover'
-          >
-            Group By
-          </Link>
-        </Typography>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <form.AppField name='group_by' mode='array'>
-          {({ Autocomplete }) => (
-            <Autocomplete
-              disablePortal
-              label='Group By'
-              multiple
-              limitTags={4}
-              options={groupByOptions}
-              sx={{ maxWidth: 600 }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: (theme: Theme) =>
-                      `1px solid ${theme.palette.divider}`,
-                  },
-                },
-                chip: { size: 'small' },
-              }}
-            />
-          )}
-        </form.AppField>
-      </Grid>
-      <Grid
-        size={{ xs: 12, sm: 3 }}
-        sx={{
-          display: { xs: 'none', sm: 'flex' },
-          justifyContent: 'flex-end',
-          alignItems: 'flex-start',
-        }}
-      >
-        <Typography sx={{ textAlign: 'right', mt: 1 }} component='div'>
-          Additional Parameters
-        </Typography>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <form.AppField name='other_params' mode='array'>
-          {({ state, pushValue, removeValue }) => (
-            <Stack direction='column' spacing={2}>
-              {state.value.map((_, i) => (
-                <Fragment key={`param-${i}`}>
-                  <Stack direction='row' spacing={2}>
-                    <form.Field name={`other_params[${i}].param`}>
-                      {({ state, handleChange, handleBlur }) => (
-                        <MuiAutocomplete
-                          disablePortal
-                          options={filteredParamKeys}
-                          sx={{ minWidth: 180, maxWidth: 300 }}
-                          value={state.value}
-                          onChange={(_, newVal: string | null) =>
-                            handleChange(newVal || '')
-                          }
-                          blurOnSelect
-                          autoHighlight
-                          renderInput={(params: object) => (
-                            <MuiTextField
-                              {...params}
-                              onBlur={handleBlur}
-                              label='Parameter Name'
-                            />
-                          )}
-                          slotProps={{
-                            paper: {
-                              sx: {
-                                border: (theme) =>
-                                  `1px solid ${theme.palette.divider}`,
-                              },
-                            },
-                            chip: { size: 'small' },
-                          }}
-                        />
-                      )}
-                    </form.Field>
+            unsaved
+          </Typography>
+        )}
+      </Box>
 
-                    <form.Field name={`other_params[${i}].value`}>
-                      {({ state, handleChange, handleBlur }) => (
-                        <MuiTextField
-                          id={`other_params[${i}].value`}
-                          label='Param Value'
-                          placeholder='e.g. 1,4,8'
-                          value={state.value}
-                          onChange={(e) => handleChange(e.target.value)}
-                          onBlur={handleBlur}
-                          fullWidth
-                          variant='outlined'
-                          sx={{ maxWidth: 300 }}
-                          error={state.meta.isTouched && !state.meta.isValid}
-                          color={state.meta.errors.length ? 'error' : 'primary'}
-                        />
-                      )}
-                    </form.Field>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                      }}
-                    >
+      <Stack direction='column' spacing={2}>
+        {/* QUERY BY */}
+        <Box>
+          <Typography sx={sectionLabelSx}>Query by</Typography>
+          <ChipMultiField
+            values={queryByValues}
+            options={queryByOptions}
+            onAdd={(val) => {
+              if (!queryByValues.includes(val))
+                form.setFieldValue('query_by', [...queryByValues, val]);
+            }}
+            onRemove={(i) =>
+              form.setFieldValue('query_by', queryByValues.filter((_, idx) => idx !== i))
+            }
+          />
+        </Box>
+
+        {/* SORT BY */}
+        <Box>
+          <Typography sx={sectionLabelSx}>Sort by</Typography>
+          <ChipMultiField
+            values={sortByValues}
+            options={sortByOptions}
+            onAdd={(val) => {
+              if (!sortByValues.includes(val))
+                form.setFieldValue('sort_by', [...sortByValues, val]);
+            }}
+            onRemove={(i) =>
+              form.setFieldValue('sort_by', sortByValues.filter((_, idx) => idx !== i))
+            }
+          />
+        </Box>
+
+        {/* FACET & FILTER BY */}
+        <Box>
+          <Typography sx={sectionLabelSx}>Facet & filter by</Typography>
+          <ChipMultiField
+            values={facetByValues}
+            options={facetByOptions}
+            onAdd={(val) => {
+              if (!facetByValues.includes(val))
+                form.setFieldValue('facet_by', [...facetByValues, val]);
+            }}
+            onRemove={(i) =>
+              form.setFieldValue('facet_by', facetByValues.filter((_, idx) => idx !== i))
+            }
+          />
+        </Box>
+
+        {/* GROUP BY */}
+        <Box>
+          <Typography sx={sectionLabelSx}>Group by</Typography>
+          <ChipMultiField
+            values={groupByValues}
+            options={groupByOptions}
+            onAdd={(val) => {
+              if (!groupByValues.includes(val))
+                form.setFieldValue('group_by', [...groupByValues, val]);
+            }}
+            onRemove={(i) =>
+              form.setFieldValue('group_by', groupByValues.filter((_, idx) => idx !== i))
+            }
+            placeholder='— none —'
+          />
+        </Box>
+
+        {/* ADDITIONAL */}
+        <Box>
+          <Typography sx={sectionLabelSx}>Additional</Typography>
+          <form.AppField name='other_params' mode='array'>
+            {({ state, pushValue, removeValue }) => (
+              <Stack direction='column' spacing={0.75}>
+                {state.value.map((_, i) => (
+                  <Fragment key={`param-${i}`}>
+                    <Stack direction='row' spacing={0.75} sx={{ alignItems: 'center' }}>
+                      <form.Field name={`other_params[${i}].param`}>
+                        {({ state: fState, handleChange, handleBlur }) => (
+                          <MuiAutocomplete
+                            options={filteredParamKeys}
+                            value={fState.value}
+                            onChange={(_, newVal: string | null) =>
+                              handleChange(newVal || '')
+                            }
+                            blurOnSelect
+                            autoHighlight
+                            renderInput={(params) => (
+                              <MuiTextField
+                                {...params}
+                                onBlur={handleBlur}
+                                placeholder='Parameter'
+                                sx={compactInputSx}
+                              />
+                            )}
+                            slotProps={{ paper: { sx: paperSx } }}
+                            popupIcon={
+                              <ExpandMoreRounded
+                                sx={{ fontSize: 15, color: designTokens.textFaint }}
+                              />
+                            }
+                            sx={{ flex: 1, minWidth: 0, '& .MuiAutocomplete-popupIndicator': { mr: '-2px' } }}
+                          />
+                        )}
+                      </form.Field>
+
+                      <form.Field name={`other_params[${i}].value`}>
+                        {({ state: fState, handleChange, handleBlur }) => (
+                          <MuiTextField
+                            placeholder='Value'
+                            value={fState.value}
+                            onChange={(e) => handleChange(e.target.value)}
+                            onBlur={handleBlur}
+                            size='small'
+                            sx={{ ...compactInputSx, width: 80 }}
+                          />
+                        )}
+                      </form.Field>
+
                       <IconButton
                         onClick={() => removeValue(i)}
                         size='small'
-                        color='error'
                         disabled={state.value.length <= 1 && i === 0}
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          border: `1px solid ${designTokens.border}`,
+                          borderRadius: '5px',
+                          color: designTokens.danger,
+                          '&:hover': {
+                            background: designTokens.dangerSoft,
+                            borderColor: designTokens.danger,
+                          },
+                          '&.Mui-disabled': { color: designTokens.textFaint, opacity: 0.5 },
+                        }}
                       >
-                        <RemoveRounded fontSize='inherit' />
+                        <RemoveRounded sx={{ fontSize: 12 }} />
                       </IconButton>
-                    </Box>
-                  </Stack>
-                </Fragment>
-              ))}
-              <Box>
-                <IconButton
-                  onClick={() => pushValue(NEW_EMPTY_OTHER_PARAM)}
-                  size='small'
-                  color='primary'
-                >
-                  <AddRounded fontSize='inherit' />
-                </IconButton>
-              </Box>
-            </Stack>
-          )}
-        </form.AppField>
-      </Grid>
-      <Grid
-        size={{ xs: 12 }}
-        sx={{ display: 'flex', justifyContent: 'center' }}
+                    </Stack>
+                  </Fragment>
+                ))}
+                <Box>
+                  <Button
+                    onClick={() => pushValue(NEW_EMPTY_OTHER_PARAM)}
+                    size='small'
+                    startIcon={<AddRounded sx={{ fontSize: 13 }} />}
+                    sx={{
+                      textTransform: 'none',
+                      fontSize: 12.5,
+                      fontWeight: 500,
+                      height: 28,
+                      borderRadius: '5px',
+                      border: `1px dashed ${designTokens.border}`,
+                      color: designTokens.textMuted,
+                      background: 'transparent',
+                      boxShadow: 'none',
+                      px: 1,
+                      '&:hover': {
+                        borderColor: designTokens.borderStrong,
+                        background: designTokens.surfaceMuted,
+                        color: designTokens.text,
+                      },
+                    }}
+                  >
+                    Add
+                  </Button>
+                </Box>
+              </Stack>
+            )}
+          </form.AppField>
+        </Box>
+      </Stack>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          mx: { xs: -2, sm: -2.75 },
+          mt: 3,
+          mb: -2.5,
+          px: { xs: 2, sm: 2.75 },
+          py: 1.5,
+          borderTop: `1px solid ${designTokens.border}`,
+          background: designTokens.surfaceTinted,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 1,
+        }}
       >
-        <Stack spacing={2} direction='row' sx={{ alignItems: 'center' }}>
-          <form.AppForm>
-            <form.SubmitButton label={submitButtonText} />
-          </form.AppForm>
-          <Button onClick={handleClear}>Clear</Button>
-        </Stack>
-      </Grid>
-    </Grid>
+        <Button onClick={handleClear} variant='outlined' sx={smallButtonSx}>
+          Clear
+        </Button>
+        <form.AppForm>
+          <form.SubmitButton
+            label={submitButtonText}
+            startIcon={<StarBorderRounded sx={{ fontSize: 14 }} />}
+          />
+        </form.AppForm>
+      </Box>
+    </Box>
   );
 };
 
@@ -456,7 +535,7 @@ export const SearchParamsForm = withForm({
     sortByOptions: [] as string[],
     facetByOptions: [] as string[],
     groupByOptions: [] as string[],
-    submitButtonText: 'Save as Preset',
+    submitButtonText: 'Save as preset',
   },
   render: (props) => <SearchParamsFormFields {...props} />,
 });
@@ -464,8 +543,32 @@ export const SearchParamsForm = withForm({
 function getParams<T extends DocumentSchema = DocumentSchema>(
   val: PresetSchema<T>['value'],
 ) {
-  // TODO: handle multi-index
   if ((val as MultiSearchRequestsSchema<T, string>).searches !== undefined)
     return (val as MultiSearchRequestsSchema<T, string>).searches[0];
   return val as SearchParams<T>;
+}
+
+function presetToFormValues(preset: PresetSchema<DocumentSchema>) {
+  const { query_by, sort_by, facet_by, group_by, ...rest } = getParams(preset.value);
+  let otherParams = [NEW_EMPTY_OTHER_PARAM];
+  const otherParamsEntries = Object.entries(rest);
+  if (otherParamsEntries.length) {
+    otherParams = otherParamsEntries.map(([k, v]) => ({
+      param: k,
+      value: typeof v === 'string' ? v : JSON.stringify(v),
+    }));
+  }
+  return {
+    preset: preset.name,
+    query_by: getArrayVal(splitIfString(query_by)),
+    sort_by: getArrayVal(splitIfString(sort_by)),
+    facet_by: getArrayVal(splitIfString(facet_by)),
+    group_by: getArrayVal(splitIfString(group_by)),
+    other_params: otherParams,
+  };
+}
+
+function omitPreset<T extends { preset?: unknown }>(values: T) {
+  const { preset: _preset, ...rest } = values;
+  return rest;
 }
