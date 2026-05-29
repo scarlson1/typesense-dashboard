@@ -16,6 +16,8 @@ import { DownloadRounded, OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
+import type { SynonymSchema } from 'typesense/lib/Typesense/Synonym';
 import type { SynonymCreateSchema } from 'typesense/lib/Typesense/Synonyms';
 
 export const Route = createFileRoute(
@@ -27,6 +29,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { collectionId } = Route.useParams();
+  const [editingSynonym, setEditingSynonym] = useState<SynonymSchema | null>(null);
 
   return (
     <Stack sx={{ minWidth: 0 }}>
@@ -73,14 +76,19 @@ function RouteComponent() {
         }}
       >
         <SectionCard noBodyPadding>
-          <Box sx={{ p: 2 }}>
-            <SynonymsGrid collectionId={collectionId} />
-          </Box>
+          <SynonymsGrid
+            collectionId={collectionId}
+            onEdit={(synonym) => setEditingSynonym(synonym)}
+          />
         </SectionCard>
 
         <Box sx={{ minWidth: 0 }}>
-          <SectionCard title='Add synonym rule'>
-            <AddSynonym collectionId={collectionId} />
+          <SectionCard title={editingSynonym ? 'Edit synonym rule' : 'Add synonym rule'}>
+            <AddSynonym
+              collectionId={collectionId}
+              editingSynonym={editingSynonym}
+              onCancel={() => setEditingSynonym(null)}
+            />
           </SectionCard>
         </Box>
       </Box>
@@ -91,9 +99,11 @@ function RouteComponent() {
 
 interface AddSynonymProps {
   collectionId: string;
+  editingSynonym?: SynonymSchema | null;
+  onCancel?: () => void;
 }
 
-function AddSynonym({ collectionId }: AddSynonymProps) {
+function AddSynonym({ collectionId, editingSynonym, onCancel }: AddSynonymProps) {
   const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
 
@@ -139,11 +149,29 @@ function AddSynonym({ collectionId }: AddSynonymProps) {
       try {
         await mutation.mutateAsync({ synonymId: value.synonymId.trim(), params });
         form.reset();
-      } catch (err) {
+        onCancel?.();
+      } catch (_err) {
         // swallow - toast handled in mutation
       }
     },
   });
+
+  useEffect(() => {
+    if (editingSynonym) {
+      form.setFieldValue('synonymId', editingSynonym.id ?? '');
+      form.setFieldValue('type', editingSynonym.root ? 'one-way' : 'multi-way');
+      form.setFieldValue('synonyms', editingSynonym.synonyms?.join(', ') ?? '');
+      form.setFieldValue('root', editingSynonym.root ?? '');
+      form.setFieldValue(
+        'symbols_to_index',
+        editingSynonym.symbols_to_index?.join(', ') ?? '',
+      );
+      form.setFieldValue('locale', editingSynonym.locale ?? '');
+    } else {
+      form.reset();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingSynonym?.id]);
 
   return (
     <Box
@@ -156,7 +184,7 @@ function AddSynonym({ collectionId }: AddSynonymProps) {
       noValidate
       sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
     >
-      <SynonymsForm form={form} />
+      <SynonymsForm form={form} isEditing={!!editingSynonym} onCancel={onCancel} />
     </Box>
   );
 }
