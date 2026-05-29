@@ -7,6 +7,7 @@ import { getCredsKey, getTypesenseClient, typesenseStore } from '@/utils';
 import {
   ArrowForwardRounded,
   DevicesRounded,
+  GitHub,
   KeyRounded,
   LogoutRounded,
   OpenInNewRounded,
@@ -238,7 +239,7 @@ function AuthComponent() {
             flexWrap: 'wrap',
           }}
         >
-          {/* <span>© 2026 Typesense Dashboard</span>
+          {/* <span>© 2026 Spencer</span>
           <span>·</span> */}
           <Link
             href='https://typesense.org/docs/'
@@ -246,9 +247,15 @@ function AuthComponent() {
             rel='noopener noreferrer'
             sx={{ color: 'inherit', textDecoration: 'none' }}
           >
-            Documentation
+            Documentation <OpenInNewRounded sx={{ fontSize: 'inherit' }} />
           </Link>
-          <Link
+          <Typography
+            variant='body2'
+            sx={{ color: 'inherit', fontSize: 'inherit' }}
+          >
+            · Not associated with Typesense
+          </Typography>
+          {/* <Link
             href='https://typesense.org/'
             target='_blank'
             rel='noopener noreferrer'
@@ -262,10 +269,23 @@ function AuthComponent() {
           >
             Open in Cloud
             <OpenInNewRounded sx={{ fontSize: 'inherit' }} />
-          </Link>
+          </Link> */}
           <Box component='span' sx={{ flex: 1 }} />
-          <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
-            v{import.meta.env.VITE_APP_VERSION}
+          {import.meta.env.VITE_APP_VERSION ? (
+            <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
+              v{import.meta.env.VITE_APP_VERSION}
+            </Box>
+          ) : null}
+          <Box>
+            <IconButton
+              href='https://github.com/scarlson1/typesense-dashboard'
+              target='_blank'
+              rel='noopener noreferrer'
+              aria-label='GitHub Repo'
+              size='small'
+            >
+              <GitHub fontSize='inherit' />
+            </IconButton>
           </Box>
         </Stack>
       </Stack>

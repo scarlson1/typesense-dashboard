@@ -32,5 +32,6 @@
     "inlineSources": true,
     "sourceRoot": "/"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/test", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }

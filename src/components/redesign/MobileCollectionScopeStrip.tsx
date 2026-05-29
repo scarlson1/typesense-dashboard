@@ -1,5 +1,6 @@
 import { collectionQueryKeys } from '@/constants';
 import { useTypesenseClient } from '@/hooks';
+import { uiStore } from '@/utils';
 import { designTokens } from '@/theme/themePrimitives';
 import {
   ArrowForwardRounded,
@@ -41,7 +42,8 @@ export function MobileCollectionScopeStrip({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = uiStore((s) => s.mobileCollectionScopeCollapsed);
+  const setCollapsed = uiStore((s) => s.setMobileCollectionScopeCollapsed);
 
   const { data: collections } = useQuery({
     queryKey: collectionQueryKeys.list(clusterId, {}),
@@ -235,8 +237,11 @@ export function MobileCollectionScopeStrip({
             placeholder='Switch collection...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            autoFocus
-            sx={{ flex: 1, fontSize: 14 }}
+            sx={{
+              flex: 1,
+              // 16px keeps iOS Safari from auto-zooming on focus
+              '& .MuiInputBase-input': { fontSize: 16 },
+            }}
           />
           <Typography
             sx={{
