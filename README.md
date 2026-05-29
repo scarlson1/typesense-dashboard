@@ -90,13 +90,13 @@ To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker 
 
 ![add docs](docs/images/typesense-add-docs-light.png)
 
-![API keys](docs/images/api_keys.png)
+<!-- ![API keys](docs/images/api_keys.png)
 
 ![search](docs/images/search.png)
 
 ![geo search](docs/images/geosearch-dark.png)
 
-![geo search mobile](docs/images/map_mobile_dark.png)
+![geo search mobile](docs/images/map_mobile_dark.png) -->
 
 # Alternatives
 
@@ -230,4 +230,5 @@ ssh-keygen -R 163.192.220.255
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
 - Delete documents by query
 - Export documents
+- Map zoom to bounds on load
 - theme matching toasts

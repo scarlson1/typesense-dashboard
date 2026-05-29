@@ -195,7 +195,7 @@ const ApiKeyGrid = () => {
               <TableCell sx={thSx}>Key</TableCell>
               <TableCell sx={thSx}>Actions</TableCell>
               <TableCell sx={thSx}>Collections</TableCell>
-              <TableCell sx={thSx}>Created</TableCell>
+              <TableCell sx={thSx}>Expires</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -348,7 +348,9 @@ function MobileKeyCard({ k, isFirst, onCopy }: MobileKeyCardProps) {
   const collapsible = hiddenActions > 0 || hiddenCollections > 0;
 
   const visibleActions =
-    expanded || !collapsible ? actions : actions.slice(0, COLLAPSED_ACTION_COUNT);
+    expanded || !collapsible
+      ? actions
+      : actions.slice(0, COLLAPSED_ACTION_COUNT);
 
   const collectionsLabel = isAllCollections
     ? 'all collections'
