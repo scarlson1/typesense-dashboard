@@ -29,7 +29,7 @@ Intended to be compatible with `v29` and `v30`.
 Use https://scarlson1.github.io/typesense-dashboard/ or clone the repository and run it locally. (If using github pages option, Typesense config must be configured with TLS or you'll get "ERR_NETWORK Network Error").
 
 - [Typesense Docs](https://typesense.org/docs/29.0/api/server-configuration.html#ssl-https)
-- Self-signed certificate references: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/) / [mkcert](https://github.com/FiloSottile/mkcert)
+<!-- - Self-signed certificate references: [video](https://www.youtube.com/watch?v=sR4_YISXNZE) / [article](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/) / [mkcert](https://github.com/FiloSottile/mkcert) -->
 
 If your typesense instance is running locally, use a service such as [ngrok](https://ngrok.com/) or [tailscale](https://tailscale.com/) to add TLS if connecting to [github pages](https://scarlson1.github.io/typesense-dashboard/). For example:
 
@@ -47,7 +47,7 @@ Use an admin key to authenticate. Cluster credentials are stored in session stor
 
 ### Docker
 
-Download the repo and run in Docker Desktop:
+Clone repo, build & run locally in Docker Desktop:
 
 ```bash
 $ git clone git@github.com:scarlson1/typesense-dashboard.git
@@ -55,7 +55,7 @@ $ docker build -t typesense-dashboard .
 $ docker run -d -p 8108:8108 typesense-dashboard
 ```
 
-From Docker Desktop:
+Pull image from Docker registry & run in Docker Desktop:
 
 ```bash
 $ docker pull spencercarlson/typesense-dashboard
@@ -68,44 +68,7 @@ From Github Registry:
 $ docker run -d -p 443:443 docker pull ghcr.io/scarlson1/typesense-dashboard:latest
 ```
 
-To enable geosearch, pass a mapbox key as an environment variable (i.e. docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token")
-
-<!-- To use the latest pre-built image:
-
-```bash
-docker pull spencercarlson/typesense-dashboard
-# or
-docker run -d -p 443:443 spencercarlson/typesense-dashboard
-```
-
-To use the latest pre-built docker image:
-```bash
-docker run -d -p 443:443 ghcr.io/scarlson1/typesense-dashboard:latest
-```
-```bash
-docker run -d -p 80:80 ghcr.io/scarlson1/typesense-dashboard:latest
-```
-
-If you have trouble connecting, trying ngrok.
-option 1) ngrok http https://localhost:443
-option 2) https://ngrok.com/docs/using-ngrok-with/docker/
--->
-
-<!-- ## Limitations/Issues
-
-TODO -->
-
-## TODO
-
-- Tests
-- [Filter operators](https://typesense.org/docs/guide/tips-for-filtering.html#available-operators)
-- [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
-- [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
-- [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
-- Delete documents by query
-- Export documents
-- Fix multi-cluster auth (currently overwriting existing)
-- save collection preset preferences in local storage
+To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token"`)
 
 ## Screenshots
 
@@ -113,11 +76,13 @@ TODO -->
 
 ![geo search](docs/images/typesense-map-light.png)
 
-![geo search mobile](docs/images/map_mobile_dark.png)
+<!-- ![geo search mobile](docs/images/map_mobile_dark.png) -->
+<img src="docs/images/map_mobile_dark.png" width="280" />
 
 ![schema](docs/images/typesense-schema-dark.png)
 
-![schema mobile](docs/images/schema_mobile_light.png)
+<!-- ![schema mobile](docs/images/schema_mobile_light.png) -->
+<img src="docs/images/schema_mobile_light.png" width="280" />
 
 ![api keys](docs/images/typesense-keys-light.png)
 
@@ -133,37 +98,15 @@ TODO -->
 
 ![geo search mobile](docs/images/map_mobile_dark.png)
 
-<!-- old design -->
-
-<!-- ![search parameters](docs/images/search_params.png)
-
-![server status](docs/images/server_status.png)
-
-![collections](docs/images/collections.png)
-
-![edit collection schema](docs/images/edit_collection.png)
-
-![add documents](docs/images/add_documents.png)
-
-![alias](docs/images/alias.png)
-
-![presets](docs/images/presets.png)
-
-![synonyms](docs/images/synonyms.png)
-
-![analytics rules](docs/images/analytics_rules.png)
-
-![search refinements](docs/images/search-dark.png) -->
-
 # Alternatives
 
 - [Typesense Cloud](https://cloud.typesense.org/) (paid)
 - bfritscher/typesense-dashboard [github](https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
 - amartya-dev/typesense-dashboard [github](https://github.com/amartya-dev/typesense-dashboard) (typescript)
 
-# Development
+## Development
 
-## Run locally
+### Run locally
 
 #### Install dependencies
 
@@ -177,9 +120,9 @@ pnpm install
 pnpm dev
 ```
 
-## Docker Compose
+### Docker Compose
 
-Update the volume paths in `compose.yml` or update `TYPESENSE_CERTS_DIR` and `TYPESENSE_DATA_PATH` environment variable in `.env.development`
+Update the volume paths in `compose.yml` or update `TYPESENSE_CERTS_DIR` and `TYPESENSE_DATA_PATH` environment variable in `.env.development`. These map to certificate directory (for TLS) and the typesense data directory where typesense will persist data, respectively.
 
 ```yml
 volumes:
@@ -278,6 +221,13 @@ terraform apply -var="attach_reserved_ip=true"
 ssh-keygen -R 163.192.220.255
 ```
 
-### TODOs
+## TODO
 
+- add tests to CI
+- [Filter operators](https://typesense.org/docs/guide/tips-for-filtering.html#available-operators)
+- [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
+- [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
+- [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
+- Delete documents by query
+- Export documents
 - theme matching toasts
