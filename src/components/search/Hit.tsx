@@ -53,6 +53,7 @@ export interface HitProps {
   displayFields?: string[];
   imgField?: string | null;
   imgProps?: CardMediaProps;
+  active?: boolean;
 }
 
 export function Hit({
@@ -61,6 +62,7 @@ export function Hit({
   displayFields,
   imgField,
   imgProps,
+  active,
 }: HitProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -82,8 +84,9 @@ export function Hit({
     <Card
       sx={{
         position: 'relative',
-        border: (theme) => `1px solid ${theme.vars.palette.divider}`,
-        // pb: 1.25,
+        border: (theme) =>
+          `1px solid ${active ? theme.vars.palette.primary.main : theme.vars.palette.divider}`,
+        transition: 'border-color 0.15s ease',
       }}
     >
       {Boolean(image) ? (

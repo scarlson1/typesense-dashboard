@@ -75,7 +75,7 @@ const selectInputSx = {
   },
 };
 
-export function DashboardDisplayOptions() {
+export function DashboardDisplayOptions({ compact = false }: { compact?: boolean }) {
   const [_, slotProps, updateSlotProps] = useSearchSlots();
   const { data: collectionSchema } = useCollectionSchema();
   const [__, clusterId] = useTypesenseClient();
@@ -207,6 +207,7 @@ export function DashboardDisplayOptions() {
       <FieldRow
         label='Display fields'
         description='Order of chips = order shown on the card.'
+        compact={compact}
       >
         <Autocomplete
           multiple
@@ -269,6 +270,7 @@ export function DashboardDisplayOptions() {
       <FieldRow
         label='Image field'
         description='The selected field is used to show an image in the results above.'
+        compact={compact}
       >
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
@@ -357,7 +359,7 @@ export function DashboardDisplayOptions() {
         </Stack>
       </FieldRow>
 
-      <FieldRow label='Columns in view' align='center'>
+      <FieldRow label='Columns in view' align='center' compact={compact}>
         <Stack direction='row' spacing={1.25} sx={{ alignItems: 'center' }}>
           <Box sx={{ width: 180 }}>
             <Select

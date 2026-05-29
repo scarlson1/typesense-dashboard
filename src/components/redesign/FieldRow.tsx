@@ -53,6 +53,7 @@ interface FieldRowProps {
   description?: ReactNode;
   children: ReactNode;
   align?: 'center' | 'flex-start';
+  compact?: boolean;
 }
 
 export function FieldRow({
@@ -60,18 +61,20 @@ export function FieldRow({
   description,
   children,
   align = 'flex-start',
+  compact = false,
 }: FieldRowProps) {
+  const stacked = compact;
   return (
     <Stack
-      direction={{ xs: 'column', sm: 'row' }}
-      spacing={{ xs: 1, sm: 3 }}
-      sx={{ alignItems: { xs: 'stretch', sm: align } }}
+      direction={stacked ? 'column' : { xs: 'column', sm: 'row' }}
+      spacing={stacked ? 0.75 : { xs: 1, sm: 3 }}
+      sx={{ alignItems: stacked ? 'stretch' : { xs: 'stretch', sm: align } }}
     >
       <Box
         sx={{
-          width: { xs: '100%', sm: FIELD_LABEL_COL_WIDTH },
+          width: stacked ? '100%' : { xs: '100%', sm: FIELD_LABEL_COL_WIDTH },
           flexShrink: 0,
-          pt: { xs: 0, sm: 0.875 },
+          pt: stacked ? 0 : { xs: 0, sm: 0.875 },
         }}
       >
         <Typography

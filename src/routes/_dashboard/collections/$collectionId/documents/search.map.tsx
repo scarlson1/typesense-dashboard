@@ -23,23 +23,20 @@ import {
   AlertTitle,
   Box,
   CircularProgress,
-  ClickAwayListener,
   Drawer,
   Fade,
   IconButton,
   Link,
   MenuItem,
   Paper,
-  Popper,
   Select,
   Stack,
   Typography,
   useMediaQuery,
-  type PopperProps,
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search/map',
@@ -92,6 +89,30 @@ function RouteComponent() {
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
+  const [selectedHitId, setSelectedHitId] = useState<string | null>(null);
+  const suppressNextDrawerClose = useRef(false);
+
+  const handlePinClick = useCallback(
+    (id: string) => {
+      setSelectedHitId(id);
+      if (mobile) {
+        suppressNextDrawerClose.current = true;
+        setResultsOpen(true);
+      }
+    },
+    [mobile],
+  );
+
+  useEffect(() => {
+    if (!selectedHitId) return;
+    const delay = mobile ? 350 : 0;
+    const timer = setTimeout(() => {
+      document
+        .querySelector(`[data-hit-id="${selectedHitId}"]`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [selectedHitId, mobile]);
 
   const hits = useHits();
   const hitCount = useMemo(() => hits?.found, [hits]);
@@ -191,11 +212,14 @@ function RouteComponent() {
                 borderRadius: { xs: 0, sm: 1 },
               }}
             >
-              <GeoSearch geoFieldName={geoFieldName} />
+              <GeoSearch
+                geoFieldName={geoFieldName}
+                onPinClick={handlePinClick}
+              />
             </Paper>
           ) : (
             <Typography sx={{ p: 3 }}>
-              Select a geography field to get started
+              Select a geography field to get started ⛭
             </Typography>
           )}
         </Box>
@@ -229,7 +253,7 @@ function RouteComponent() {
                   alignItems: 'center',
                   gap: 1,
                   position: 'sticky',
-                  top: 0,
+                  top: 8,
                   zIndex: 10,
                 }}
               >
@@ -256,14 +280,36 @@ function RouteComponent() {
                   />
                 </Box>
                 <MapCompactStats />
-                <DisplayOptionsButton
-                  setGeoFieldName={setGeoFieldName}
-                  geoFieldName={geoFieldName || ''}
-                  geoFieldOptions={geoFieldOptions}
-                />
+                {/* Settings gear — opens the side drawer */}
+                <IconButton
+                  size='small'
+                  onClick={() => setSettingsOpen(true)}
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '6px',
+                    color: settingsOpen
+                      ? designTokens.text
+                      : designTokens.textFaint,
+                    border: `1px solid ${settingsOpen ? designTokens.borderStrong : designTokens.border}`,
+                    background: settingsOpen
+                      ? designTokens.surfaceMuted
+                      : designTokens.surface,
+                    flexShrink: 0,
+                    '&:hover': {
+                      color: designTokens.text,
+                      borderColor: designTokens.borderStrong,
+                    },
+                  }}
+                >
+                  <SettingsRounded sx={{ fontSize: 14 }} />
+                </IconButton>
               </Box>
               <CtxSearchError />
-              <ContextHits hitWrapperProps={{ size: 12 }} />
+              <ContextHits
+                hitWrapperProps={{ size: 12 }}
+                selectedHitId={selectedHitId}
+              />
             </Stack>
             <Box sx={{ py: 1, mx: 'auto' }}>
               <CtxPagination />
@@ -286,11 +332,11 @@ function RouteComponent() {
           }}
         >
           {hitCount !== undefined && (
-            <Stack
+            <Box
               component='button'
-              direction='row'
               onClick={() => setResultsOpen(true)}
               sx={{
+                display: 'flex',
                 alignItems: 'center',
                 gap: 0.375,
                 fontSize: 12,
@@ -311,7 +357,7 @@ function RouteComponent() {
             >
               {hitCount.toLocaleString()} results
               <KeyboardArrowUpRounded sx={{ fontSize: 16, opacity: 0.8 }} />
-            </Stack>
+            </Box>
           )}
           <IconButton
             size='small'
@@ -330,11 +376,17 @@ function RouteComponent() {
         </Stack>
       )}
 
-      {/* ── Mobile: results drawer ── */}
+      {/* ── Mobile: results drawer (bottom sheet) ── */}
       <Drawer
         anchor='bottom'
         open={resultsOpen}
-        onClose={() => setResultsOpen(false)}
+        onClose={() => {
+          if (suppressNextDrawerClose.current) {
+            suppressNextDrawerClose.current = false;
+            return;
+          }
+          setResultsOpen(false);
+        }}
         slotProps={{
           paper: {
             sx: {
@@ -388,7 +440,7 @@ function RouteComponent() {
           </IconButton>
         </Stack>
         <Box sx={{ flex: 1, overflowY: 'auto', px: 0.5 }}>
-          <ContextHits hitWrapperProps={{ size: 12 }} />
+          <ContextHits hitWrapperProps={{ size: 12 }} selectedHitId={selectedHitId} />
         </Box>
         <Box
           sx={{
@@ -402,65 +454,57 @@ function RouteComponent() {
         </Box>
       </Drawer>
 
-      {/* ── Mobile: settings drawer ── */}
+      {/* ── Settings: side drawer (used by both mobile & desktop) ── */}
       <Drawer
-        anchor='bottom'
+        anchor='right'
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         slotProps={{
           paper: {
             sx: {
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              maxHeight: '88vh',
+              width: { xs: '85vw', sm: 320 },
               backgroundColor: 'background.paper',
               backgroundImage: 'none',
+              display: 'flex',
+              flexDirection: 'column',
             },
           },
         }}
       >
-        <Box
+        <Stack
+          direction='row'
           sx={{
-            width: 36,
-            height: 4,
-            borderRadius: 2,
-            background: designTokens.border,
-            mx: 'auto',
-            mt: 1,
-            mb: 0.5,
+            px: 2,
+            py: 1.5,
             flexShrink: 0,
-          }}
-        />
-        <Box
-          sx={{
-            overflow: 'auto',
-            px: 2.5,
-            pb: 'calc(env(safe-area-inset-bottom) + 24px)',
-            pt: 1,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: `1px solid ${designTokens.border}`,
           }}
         >
-          <Stack
-            direction='row'
+          <Typography
             sx={{
-              mb: 1.5,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              fontSize: 14,
+              fontWeight: 600,
+              color: designTokens.text,
+              letterSpacing: '-0.01em',
             }}
           >
-            <Typography
-              sx={{
-                fontSize: 16,
-                fontWeight: 600,
-                color: designTokens.text,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Map settings
-            </Typography>
-            <IconButton size='small' onClick={() => setSettingsOpen(false)}>
-              <CloseRounded sx={{ fontSize: 18 }} />
-            </IconButton>
-          </Stack>
+            Map settings
+          </Typography>
+          <IconButton size='small' onClick={() => setSettingsOpen(false)}>
+            <CloseRounded sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Stack>
+        <Box
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            px: 2,
+            py: 2,
+            pb: 'calc(env(safe-area-inset-bottom) + 16px)',
+          }}
+        >
           <MapSettingsContent
             geoFieldName={geoFieldName || ''}
             geoFieldOptions={geoFieldOptions}
@@ -484,7 +528,7 @@ function MapSettingsContent({
   onGeoFieldChange,
 }: MapSettingsContentProps) {
   return (
-    <Stack spacing={1.5}>
+    <Stack spacing={2}>
       <Box>
         <Typography sx={sectionLabelSx}>Map</Typography>
         <Box sx={sectionBoxSx}>
@@ -495,7 +539,7 @@ function MapSettingsContent({
                   fontSize: 12,
                   color: designTokens.textMuted,
                   flexShrink: 0,
-                  width: 72,
+                  width: 64,
                 }}
               >
                 Geo field
@@ -522,7 +566,7 @@ function MapSettingsContent({
                   fontSize: 12,
                   color: designTokens.textMuted,
                   flexShrink: 0,
-                  width: 72,
+                  width: 64,
                 }}
               >
                 Per page
@@ -536,7 +580,7 @@ function MapSettingsContent({
       <Box>
         <Typography sx={sectionLabelSx}>Display</Typography>
         <Box sx={sectionBoxSx}>
-          <DashboardDisplayOptions />
+          <DashboardDisplayOptions compact />
         </Box>
       </Box>
     </Stack>
@@ -572,84 +616,5 @@ function MapCompactStats() {
         <CircularProgress size={10} />
       </Fade>
     </Stack>
-  );
-}
-
-interface DisplayOptionsButtonProps extends Omit<
-  PopperProps,
-  'open' | 'anchorEl'
-> {
-  setGeoFieldName: (field: string) => void;
-  geoFieldName: string;
-  geoFieldOptions: string[];
-}
-
-function DisplayOptionsButton({
-  setGeoFieldName,
-  geoFieldName,
-  geoFieldOptions,
-  ...props
-}: DisplayOptionsButtonProps) {
-  const anchorRef = useRef<HTMLButtonElement>(null);
-  const [open, setOpen] = useState(false);
-
-  const handleClose = useCallback((e: Event | React.SyntheticEvent) => {
-    if (anchorRef.current?.contains(e.target as HTMLElement)) return;
-    setOpen(false);
-  }, []);
-
-  return (
-    <>
-      <IconButton
-        ref={anchorRef}
-        size='small'
-        onClick={() => setOpen((prev) => !prev)}
-        sx={{
-          width: 28,
-          height: 28,
-          borderRadius: '6px',
-          color: open ? designTokens.text : designTokens.textFaint,
-          border: `1px solid ${open ? designTokens.borderStrong : designTokens.border}`,
-          background: open ? designTokens.surfaceMuted : designTokens.surface,
-          flexShrink: 0,
-          '&:hover': {
-            color: designTokens.text,
-            borderColor: designTokens.borderStrong,
-          },
-        }}
-      >
-        <SettingsRounded sx={{ fontSize: 14 }} />
-      </IconButton>
-      <Popper
-        open={open}
-        anchorEl={anchorRef.current}
-        placement='bottom-end'
-        sx={{ zIndex: 2200 }}
-        {...props}
-      >
-        <ClickAwayListener onClickAway={handleClose} mouseEvent='onMouseUp'>
-          <Paper
-            sx={{
-              width: 380,
-              maxWidth: '90vw',
-              p: 2,
-              bgcolor: 'background.paper',
-              border: `1px solid ${designTokens.border}`,
-              maxHeight: '70vh',
-              overflowY: 'auto',
-              borderRadius: 1,
-              boxShadow:
-                '0 4px 12px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.06)',
-            }}
-          >
-            <MapSettingsContent
-              geoFieldName={geoFieldName}
-              geoFieldOptions={geoFieldOptions}
-              onGeoFieldChange={setGeoFieldName}
-            />
-          </Paper>
-        </ClickAwayListener>
-      </Popper>
-    </>
   );
 }

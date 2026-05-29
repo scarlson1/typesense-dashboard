@@ -405,7 +405,6 @@ const SearchParamsFormFields = ({
                         {({ state: fState, handleChange, handleBlur }) => (
                           <MuiAutocomplete
                             options={filteredParamKeys}
-                            sx={{ flex: 1, minWidth: 0 }}
                             value={fState.value}
                             onChange={(_, newVal: string | null) =>
                               handleChange(newVal || '')
@@ -426,7 +425,7 @@ const SearchParamsFormFields = ({
                                 sx={{ fontSize: 15, color: designTokens.textFaint }}
                               />
                             }
-                            sx={{ '& .MuiAutocomplete-popupIndicator': { mr: '-2px' } }}
+                            sx={{ flex: 1, minWidth: 0, '& .MuiAutocomplete-popupIndicator': { mr: '-2px' } }}
                           />
                         )}
                       </form.Field>
@@ -438,6 +437,7 @@ const SearchParamsFormFields = ({
                             value={fState.value}
                             onChange={(e) => handleChange(e.target.value)}
                             onBlur={handleBlur}
+                            size='small'
                             sx={{ ...compactInputSx, width: 80 }}
                           />
                         )}
