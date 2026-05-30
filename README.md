@@ -101,6 +101,8 @@ To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker 
 # Alternatives
 
 - [Typesense Cloud](https://cloud.typesense.org/) (paid)
+- [Typelens](https://typelens.copperline.io/)
+- [Typesense Desktop Client](https://www.typesense.app/)
 - bfritscher/typesense-dashboard [github](https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
 - amartya-dev/typesense-dashboard [github](https://github.com/amartya-dev/typesense-dashboard) (typescript)
 
