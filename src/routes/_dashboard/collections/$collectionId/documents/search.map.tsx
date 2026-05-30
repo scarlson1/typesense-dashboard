@@ -126,6 +126,18 @@ function RouteComponent() {
     return field?.type === 'geopoint';
   }, [schema, geoFieldName]);
 
+  if (!Boolean(import.meta.env.VITE_MAPBOX_TOKEN)) {
+    return (
+      <Box sx={{ maxWidth: 500, p: 2, mx: 'auto', my: 6 }}>
+        <Alert severity='warning' sx={{ borderRadius: 0 }}>
+          <AlertTitle>No API key configured</AlertTitle>
+          This cluster is connected without a Typesense API key. Add
+          VITE_MAPBOX_TOKEN to environment variables to enable geo search.
+        </Alert>
+      </Box>
+    );
+  }
+
   if (!isGeopoint)
     throw new Error(
       `only "geopoint" field type is supported in the current version`,

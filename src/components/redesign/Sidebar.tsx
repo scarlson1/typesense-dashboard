@@ -1,5 +1,6 @@
 import { ClusterSelect } from '@/components/ClusterSelect';
 import { ErrorFallback } from '@/components/ErrorFallback';
+import { Logo } from '@/components/Logo';
 import OptionsMenu from '@/components/OptionsMenu';
 import { collectionQueryKeys } from '@/constants';
 import { usePrevious, useTypesenseClient } from '@/hooks';
@@ -314,7 +315,8 @@ export function Sidebar() {
             letterSpacing: '-0.02em',
           }}
         >
-          T
+          {/* T */}
+          <Logo sx={{ fontSize: 16 }} />
         </Box>
         <Typography
           sx={{
