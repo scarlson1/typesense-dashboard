@@ -55,7 +55,7 @@ export const CtxSortBy = () => {
     return Array.isArray(params?.sort_by)
       ? params.sort_by
       : params.sort_by
-        ? (params?.sort_by).split(',')
+        ? params.sort_by.split(',')
         : [];
   }, [params?.sort_by]);
 

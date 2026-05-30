@@ -11,7 +11,7 @@ export function ServerHealth() {
     refetchInterval: 10000,
   });
 
-  // @ts-ignore
+  // @ts-expect-error resource_error is not in the typed health response
   const chipLabel = data.ok ? 'healthy' : (data.resource_error ?? 'Down');
 
   return (
