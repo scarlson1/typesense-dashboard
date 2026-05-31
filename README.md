@@ -48,6 +48,28 @@ ngrok/self-signed-cert setup. See [docs/railway-template.md](docs/railway-templa
 for the template definition. (Replace the button link with your published
 template URL.)
 
+### Desktop app (Electron)
+
+The dashboard also packages as a native desktop app. The big win over the
+browser build: the Electron renderer talks **directly to any Typesense node over
+plain HTTP** — no TLS, no `--enable-cors`, no `nip.io`/ngrok — because the main
+process injects permissive CORS headers for outbound requests (see
+[electron/main.ts](electron/main.ts)). `webSecurity` stays enabled.
+
+```bash
+pnpm electron:dev          # run in development (Vite HMR + Electron)
+pnpm electron:build        # build the three targets into out/
+pnpm electron:pack         # build + produce an installer for the current OS
+pnpm electron:pack:mac     # or :win / :linux for a specific target
+```
+
+Installers land in `release/`. Build-time env vars (`VITE_MAPBOX_TOKEN`,
+`VITE_APP_VERSION`) are baked in just like the web build. App icons are
+auto-detected from [build/](build/); code-signing/notarization need certs to
+avoid Gatekeeper/SmartScreen warnings on distribution. The
+[Build Electron installers](.github/workflows/electron-release.yaml) workflow
+produces artifacts for macOS/Windows/Linux on tag push or manual dispatch.
+
 ## Supported Versions
 
 Intended to be compatible with `v29` and `v30`.

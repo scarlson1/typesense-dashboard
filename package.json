@@ -3,11 +3,17 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "A dashboard to manage self hosted or local Typesense instances.",
+  "author": "Spencer Carlson",
   "homepage": "https://scarlson1.github.io/typesense-dashboard",
+  "main": "./out/main/index.js",
   "engines": {
-    "node": ">=18.12"
+    "node": ">=20.19"
   },
   "packageManager": "pnpm@10.18.3",
+  "pnpm": {
+    "onlyBuiltDependencies": ["electron", "esbuild"]
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && GENERATE_SOURCEMAP=false vite build",
@@ -22,6 +28,13 @@
     "e2e:up": "docker compose -f e2e/compose.e2e.yml up -d",
     "e2e:down": "docker compose -f e2e/compose.e2e.yml down",
     "preview": "vite preview",
+    "electron:dev": "electron-vite dev",
+    "electron:build": "electron-vite build",
+    "electron:preview": "electron-vite preview",
+    "electron:pack": "electron-vite build && electron-builder",
+    "electron:pack:mac": "electron-vite build && electron-builder --mac",
+    "electron:pack:win": "electron-vite build && electron-builder --win",
+    "electron:pack:linux": "electron-vite build && electron-builder --linux",
     "dev:docker": "docker run -dp 5173:5173 typesense-dashboard",
     "dev:compose": "docker compose up --watch --build",
     "dev:ngrok": "ngrok start typesense",
@@ -82,6 +95,9 @@
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
     "@vitest/coverage-v8": "^4.1.7",
+    "electron": "^42.3.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
