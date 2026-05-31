@@ -14,6 +14,40 @@ If the link is not prefilling login creds, use the following:
 - port: 443
 - api key: q0DAf2GWCdw0LPCzM72UytDVh719h4Tk
 
+## Deploy
+
+The dashboard is a 100% client-side static SPA (no backend) — you enter your
+Typesense host/key at runtime and the browser talks to Typesense directly. That
+makes it trivial to self-host.
+
+### Static hosting (dashboard only)
+
+Deploy to any static host. Routing is hash-based, so **no SPA-fallback redirect
+rules are needed**. Build with `pnpm build`, publish the `dist/` folder, and set
+`VITE_MAPBOX_TOKEN` (optional, enables geosearch) — and optionally
+`VITE_APP_VERSION` — as build-time env vars.
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/scarlson1/typesense-dashboard)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/scarlson1/typesense-dashboard)
+
+- **Cloudflare Pages / Vercel / Netlify** — free, auto-HTTPS, custom domains.
+  Vercel (`vercel.json`) and Netlify (`netlify.toml`) configs are included; on
+  Cloudflare Pages set the build command to `pnpm build` and the output
+  directory to `dist`.
+- Just like GitHub Pages, a static dashboard served over **HTTPS can only reach
+  Typesense over HTTPS** (mixed-content). If your Typesense is HTTP-only, use the
+  Railway option below, or add TLS (see [Web](#web)).
+
+### One-click on Railway (Typesense + dashboard)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy)
+
+Provisions a Typesense server (with auto-HTTPS) **and** the dashboard together,
+so the dashboard reaches Typesense over HTTPS with no mixed-content errors and no
+ngrok/self-signed-cert setup. See [docs/railway-template.md](docs/railway-template.md)
+for the template definition. (Replace the button link with your published
+template URL.)
+
 ## Supported Versions
 
 Intended to be compatible with `v29` and `v30`.

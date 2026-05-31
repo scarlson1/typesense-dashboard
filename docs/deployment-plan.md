@@ -8,8 +8,7 @@ host/port/protocol/API key at runtime on the `/#/auth` route, stored in session 
 browser talks directly to Typesense. Build output is static files in `dist/`.
 
 Today it only ships to **GitHub Pages** (`base: '/typesense-dashboard'` in `vite.config.ts:24`).
-Goal: make it as easy to self-host as Typelens (`https://typelens.copperline.io/`, "Deploy on
-Railway"). Two complementary deliverables:
+Goal: make it as easy to self-host. Two complementary deliverables:
 
 1. **Static hosting** — a trivial, free, server-less path for the dashboard alone.
 2. **Railway one-click** — a template that provisions **Typesense (auto-HTTPS) + dashboard**

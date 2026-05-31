@@ -11,17 +11,25 @@ export default defineConfig(({ mode }) => ({
       autoCodeSplitting: true,
     }),
     react(),
-    sentryVitePlugin({
-      org: process.env.SENTRY_ORG || 'spencer-carlson',
-      project: process.env.SENTRY_PROJECT || 'typesense-dashboard',
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-    }),
+    // Only upload source maps when an auth token is present so third-party /
+    // self-hosted builds (Vercel, Netlify, Docker, Railway) don't fail or warn.
+    ...(process.env.SENTRY_AUTH_TOKEN
+      ? [
+          sentryVitePlugin({
+            org: process.env.SENTRY_ORG || 'spencer-carlson',
+            project: process.env.SENTRY_PROJECT || 'typesense-dashboard',
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+          }),
+        ]
+      : []),
   ],
   server: {
     host: '0.0.0.0',
     port: 5173,
   },
-  base: '/typesense-dashboard',
+  // Root-relative by default (Cloudflare Pages / Vercel / Netlify / Docker / Railway).
+  // The GitHub Pages build sets VITE_BASE_PATH=/typesense-dashboard to keep its subpath.
+  base: process.env.VITE_BASE_PATH ?? '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),

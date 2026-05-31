@@ -33,9 +33,13 @@ Sentry.init({
 
 const hashHistory = createHashHistory();
 
+// Derive the router basepath from the Vite base so it stays in sync across hosts
+// (GitHub Pages -> '/typesense-dashboard', root-domain hosts -> '/').
+const basepath = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
+
 const router = createRouter({
   routeTree,
-  basepath: '/typesense-dashboard',
+  basepath,
   scrollRestoration: true,
   defaultPreload: 'intent',
   history: hashHistory,

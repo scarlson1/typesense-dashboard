@@ -1,0 +1,40 @@
+# Production image: build the static SPA, then serve it with nginx.
+# Separate from the dev `Dockerfile` (which runs `pnpm run dev`) so dev compose
+# is untouched. Used by Railway and any container host.
+
+# ---- Stage 1: build ----
+FROM node:22-alpine AS build
+
+# VITE_* vars are baked in at build time, so they must be present as build args.
+ARG VITE_BASE_PATH=/
+ARG VITE_MAPBOX_TOKEN
+ARG VITE_APP_VERSION
+ENV VITE_BASE_PATH=${VITE_BASE_PATH}
+ENV VITE_MAPBOX_TOKEN=${VITE_MAPBOX_TOKEN}
+ENV VITE_APP_VERSION=${VITE_APP_VERSION}
+
+RUN npm install -g pnpm@10.18.3
+
+# The production bundle is large; give Node enough heap to build it.
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+RUN pnpm build
+
+# ---- Stage 2: serve ----
+FROM nginx:alpine
+
+# Serve on $PORT (Railway injects it); default to 80 for plain `docker run`.
+ENV PORT=80
+# Only substitute PORT in the template so nginx's own $uri/$host are preserved.
+ENV NGINX_ENVSUBST_FILTER="^PORT$"
+
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Actual listen port is templated from $PORT; this is documentation only.
+EXPOSE 80
