@@ -16,9 +16,8 @@ If the link is not prefilling login creds, use the following:
 
 ## Deploy
 
-The dashboard is a 100% client-side static SPA (no backend) — you enter your
-Typesense host/key at runtime and the browser talks to Typesense directly. That
-makes it trivial to self-host.
+The dashboard is a 100% client-side static SPA (no backend) — enter
+Typesense host/key at runtime and the browser talks to Typesense directly.
 
 ### Static hosting (dashboard only)
 
@@ -156,7 +155,7 @@ To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker 
 
 # Alternatives
 
-- [Typesense Cloud](https://cloud.typesense.org/) (paid)
+- [Typesense Cloud](https://cloud.typesense.org/) (paid - official typesense commercial option)
 - [Typelens](https://typelens.copperline.io/)
 - [Typesense Desktop Client](https://www.typesense.app/)
 - bfritscher/typesense-dashboard [github](https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
@@ -278,6 +277,10 @@ terraform apply -var="attach_reserved_ip=true"
 # reset ssh
 ssh-keygen -R 163.192.220.255
 ```
+
+## Disclosure
+
+This is an independent project. It's not associated with [typesense.org](https://typesense.org/).
 
 ## TODO
 

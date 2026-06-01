@@ -69,5 +69,6 @@ export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
   sortBySelect: {
     multiple: true,
     size: 'small',
+    label: '',
   },
 };

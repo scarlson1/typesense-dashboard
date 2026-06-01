@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 coverage
+build
 
 # Electron build output (electron-vite) and installers (electron-builder)
 out
