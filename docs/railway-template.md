@@ -18,14 +18,21 @@ the "Deploy on Railway" button in the README points at it.
 - **Volume:** mount a persistent volume at `/data`
 - **Start command:**
   ```
-  --data-dir /data --api-key ${{TYPESENSE_API_KEY}} --api-port ${{PORT}} --enable-cors
+  /opt/typesense-server --data-dir /data --api-key ${{TYPESENSE_API_KEY}} --api-port ${{PORT}} --enable-cors
   ```
+  A custom start command **overrides the image's `ENTRYPOINT`** (`/opt/typesense-server`),
+  so the binary must be named explicitly — otherwise Railway tries to exec the
+  first flag and fails with `The executable '--data-dir' could not be found`.
   Railway terminates TLS at its edge, so Typesense itself serves plain HTTP on
   `$PORT` while the public domain is HTTPS.
 - **Variables:**
   - `TYPESENSE_API_KEY` — generate a strong default (e.g. Railway's
     `${{ secret(32) }}` template function) so each deploy gets a unique key.
-- **Networking:** enable a public domain (Railway auto-HTTPS, port 443).
+  - `PORT=8108` — so `--api-port ${{PORT}}` resolves deterministically and
+    matches the public-domain target port.
+- **Networking:** enable a public **HTTP** domain (Railway auto-HTTPS); set the
+  target port to `8108`. Public (not private) because the client-side dashboard
+  connects to Typesense directly from the browser.
 
 ## Service 2 — `dashboard`
 

@@ -44,13 +44,15 @@ be baked in at build time as a default for self-hosted builds.
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy)
 
+WIP: template not set up yet.
+
 Provisions a Typesense server (with auto-HTTPS) **and** the dashboard together,
 so the dashboard reaches Typesense over HTTPS with no mixed-content errors and no
 ngrok/self-signed-cert setup. See [docs/railway-template.md](docs/railway-template.md)
 for the template definition. (Replace the button link with your published
 template URL.)
 
-### Desktop app (Electron)
+### Desktop app (Electron WIP)
 
 The dashboard also packages as a native desktop app. The big win over the
 browser build: the Electron renderer talks **directly to any Typesense node over
