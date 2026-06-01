@@ -261,6 +261,8 @@ npx ts-node scripts/indexData.ts
 
 ### Troubleshooting
 
+Troubleshooting demo data vm.
+
 ```bash
 sudo systemctl status typesense-server
 
@@ -286,7 +288,7 @@ ssh-keygen -R 163.192.220.255
 
 ## Disclosure
 
-This is an independent project. It's not associated with [typesense.org](https://typesense.org/).
+This is an independent project. It's not associated with [typesense.org](https://typesense.org/) etc. etc.
 
 ## TODO
 
