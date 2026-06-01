@@ -1,0 +1,45 @@
+appId: org.typesense.dashboard
+productName: Typesense Dashboard
+
+directories:
+  output: release
+  # Icons (build/icon.icns, build/icon.ico, build/icon.png) are auto-detected
+  # here; without them electron-builder falls back to the default Electron icon.
+  buildResources: build
+
+# Everything the app needs at runtime lives in out/ (the renderer bundles its
+# own deps; the main process imports only electron + node builtins), so the
+# huge UI dependency tree is excluded from the installer.
+files:
+  - out/**/*
+  - package.json
+  - '!**/node_modules/**/*'
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.developer-tools
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+win:
+  target:
+    - nsis
+  artifactName: ${productName}-${version}-setup.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+linux:
+  target:
+    - AppImage
+  category: Development
+  artifactName: ${productName}-${version}.${ext}
+
+# Enables `electron-builder --publish` to upload installers + the update
+# manifest to GitHub Releases. In-app auto-update would additionally need the
+# electron-updater package wired into the main process.
+publish:
+  provider: github
+  owner: scarlson1
+  repo: typesense-dashboard

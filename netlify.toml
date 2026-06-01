@@ -1,0 +1,12 @@
+# Netlify deploy config for the (root-relative) static dashboard.
+# Routing is hash-based, so no SPA fallback/redirect rules are required.
+# Set VITE_MAPBOX_TOKEN (and optionally VITE_APP_VERSION) in the Netlify UI to
+# enable geosearch — VITE_* vars are baked in at build time.
+
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NPM_FLAGS = "--version"
+  PNPM_FLAGS = "--frozen-lockfile"

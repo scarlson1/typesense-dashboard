@@ -1,6 +1,7 @@
 import GeoSearch from '@/components/GeoSearch';
 import { MOBILE_BOTTOM_NAV_HEIGHT } from '@/components/redesign';
 import {
+  ConfigurePanel,
   ContextHits,
   CtxPageSize,
   CtxPagination,
@@ -8,9 +9,13 @@ import {
   DashboardDisplayOptions,
   SearchBox,
 } from '@/components/search';
+import { CtxFacetOptions } from '@/components/search/FacetOptions';
+import { CtxSortBy } from '@/components/search/SortBy';
+import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
 import { useDefaultIndexParams, useHits, useSchema, useSearch } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseFieldType } from '@/types';
+import { getMapboxToken, mapboxStore } from '@/utils';
 import {
   CloseRounded,
   KeyboardArrowUpRounded,
@@ -22,6 +27,7 @@ import {
   Alert,
   AlertTitle,
   Box,
+  Button,
   CircularProgress,
   Drawer,
   Fade,
@@ -31,12 +37,20 @@ import {
   Paper,
   Select,
   Stack,
+  TextField,
   Typography,
   useMediaQuery,
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export const Route = createFileRoute(
   '/_dashboard/collections/$collectionId/documents/search/map',
@@ -83,11 +97,13 @@ const rowSelectSx = {
 
 function RouteComponent() {
   const mobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
+  const mapboxToken = getMapboxToken(mapboxStore((s) => s.mapboxToken));
   const { geoFieldOptions } = useDefaultIndexParams();
   const [geoFieldName, setGeoFieldName] = useState<string | null>(
     () => geoFieldOptions[0] || null,
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState(0);
   const [resultsOpen, setResultsOpen] = useState(false);
   const [selectedHitId, setSelectedHitId] = useState<string | null>(null);
   const suppressNextDrawerClose = useRef(false);
@@ -117,6 +133,15 @@ function RouteComponent() {
   const hits = useHits();
   const hitCount = useMemo(() => hits?.found, [hits]);
 
+  const { params } = useSearch();
+  const filterCount = useMemo(() => {
+    if (!params?.filter_by) return 0;
+    return params.filter_by
+      .split('&&')
+      .map((f) => f.trim())
+      .filter(Boolean).length;
+  }, [params?.filter_by]);
+
   const { collectionId } = Route.useParams();
   const schema = useSchema(collectionId);
 
@@ -126,16 +151,8 @@ function RouteComponent() {
     return field?.type === 'geopoint';
   }, [schema, geoFieldName]);
 
-  if (!Boolean(import.meta.env.VITE_MAPBOX_TOKEN)) {
-    return (
-      <Box sx={{ maxWidth: 500, p: 2, mx: 'auto', my: 6 }}>
-        <Alert severity='warning' sx={{ borderRadius: 0 }}>
-          <AlertTitle>No API key configured</AlertTitle>
-          This cluster is connected without a Typesense API key. Add
-          VITE_MAPBOX_TOKEN to environment variables to enable geo search.
-        </Alert>
-      </Box>
-    );
+  if (!mapboxToken) {
+    return <MapboxTokenGate />;
   }
 
   if (!isGeopoint)
@@ -515,15 +532,17 @@ function RouteComponent() {
           sx={{
             flex: 1,
             overflowY: 'auto',
-            px: 2,
-            py: 2,
             pb: 'calc(env(safe-area-inset-bottom) + 16px)',
           }}
         >
           <MapSettingsContent
+            collectionId={collectionId}
             geoFieldName={geoFieldName || ''}
             geoFieldOptions={geoFieldOptions}
             onGeoFieldChange={setGeoFieldName}
+            filterCount={filterCount}
+            tab={settingsTab}
+            onTabChange={setSettingsTab}
           />
         </Box>
       </Drawer>
@@ -532,19 +551,28 @@ function RouteComponent() {
 }
 
 interface MapSettingsContentProps {
+  collectionId: string;
   geoFieldName: string;
   geoFieldOptions: string[];
   onGeoFieldChange: (v: string) => void;
+  filterCount: number;
+  tab: number;
+  onTabChange: (tab: number) => void;
 }
 
 function MapSettingsContent({
+  collectionId,
   geoFieldName,
   geoFieldOptions,
   onGeoFieldChange,
+  filterCount,
+  tab,
+  onTabChange,
 }: MapSettingsContentProps) {
   return (
-    <Stack spacing={2}>
-      <Box>
+    <Stack>
+      {/* Map-specific settings — always visible above the tabs */}
+      <Box sx={{ px: 2, pt: 2, pb: 1.5 }}>
         <Typography sx={sectionLabelSx}>Map</Typography>
         <Box sx={sectionBoxSx}>
           <Stack spacing={0.75}>
@@ -592,15 +620,59 @@ function MapSettingsContent({
         </Box>
       </Box>
 
-      <Box>
-        <Typography sx={sectionLabelSx}>Display</Typography>
-        <Box sx={sectionBoxSx}>
-          <DashboardDisplayOptions compact />
-        </Box>
-      </Box>
+      {/* Tabbed config — mirrors the search grid view */}
+      <ConfigurePanel
+        tab={tab}
+        onTabChange={onTabChange}
+        filterCount={filterCount}
+        refineContent={<MapRefineTabContent />}
+        paramsContent={
+          <Suspense
+            fallback={
+              <Box sx={{ height: 200, background: designTokens.surfaceMuted }} />
+            }
+          >
+            <UpdateSearchParameters
+              key={`update-search-${collectionId}`}
+              collectionId={collectionId}
+            />
+          </Suspense>
+        }
+        displayContent={
+          <DashboardDisplayOptions
+            key={`display-opts-${collectionId}`}
+            compact
+          />
+        }
+      />
     </Stack>
   );
 }
+
+// ── Refine tab content — sort + facet refinements ──
+
+const MapRefineTabContent = () => (
+  <Stack spacing={2.5}>
+    <Box>
+      <Typography
+        sx={{
+          fontSize: 11.5,
+          fontWeight: 600,
+          color: designTokens.textFaint,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          mb: 1,
+        }}
+      >
+        Sort by
+      </Typography>
+      <Box sx={{ '& .MuiFormControl-root': { width: '100%' } }}>
+        <CtxSortBy />
+      </Box>
+    </Box>
+    <CtxFacetOptions />
+  </Stack>
+);
 
 function MapCompactStats() {
   const { data, isLoading, isFetching } = useSearch();
@@ -631,5 +703,53 @@ function MapCompactStats() {
         <CircularProgress size={10} />
       </Fade>
     </Stack>
+  );
+}
+
+function MapboxTokenGate() {
+  const setMapboxToken = mapboxStore((s) => s.setMapboxToken);
+  const [value, setValue] = useState('');
+
+  const handleSave = () => {
+    const trimmed = value.trim();
+    if (trimmed) setMapboxToken(trimmed);
+  };
+
+  return (
+    <Box sx={{ maxWidth: 500, p: 2, mx: 'auto', my: 6 }}>
+      <Alert severity='info' sx={{ borderRadius: 0 }}>
+        <AlertTitle>Mapbox token required</AlertTitle>
+        Geo search renders maps with Mapbox. Paste a Mapbox access token to
+        enable it — the token is stored locally in this browser only.{' '}
+        <Link
+          href='https://account.mapbox.com/access-tokens/'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          Get a token
+          <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+        </Link>
+      </Alert>
+      <Stack direction='row' spacing={1} sx={{ mt: 2 }}>
+        <TextField
+          fullWidth
+          size='small'
+          label='Mapbox access token'
+          placeholder='pk.…'
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave();
+          }}
+        />
+        <Button
+          variant='contained'
+          onClick={handleSave}
+          disabled={!value.trim()}
+        >
+          Save
+        </Button>
+      </Stack>
+    </Box>
   );
 }

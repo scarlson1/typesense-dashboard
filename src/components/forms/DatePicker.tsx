@@ -23,7 +23,7 @@ export default function DatePicker({ label, ...props }: DatePickerProps) {
         defaultValue={state.value}
         // onChange={(newVal) => handleChange(newVal)}
         onChange={(newVal) => handleChange(newVal as Date)}
-        // @ts-ignore
+        // @ts-expect-error onBlur is not part of the MuiDatePicker props type
         onBlur={() => {
           handleBlur();
         }}

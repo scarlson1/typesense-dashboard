@@ -14,9 +14,66 @@ If the link is not prefilling login creds, use the following:
 - port: 443
 - api key: q0DAf2GWCdw0LPCzM72UytDVh719h4Tk
 
+## Deploy
+
+The dashboard is a 100% client-side static SPA (no backend) — enter
+Typesense host/key at runtime and the browser talks to Typesense directly.
+
+### Static hosting (dashboard only)
+
+Deploy to any static host. Routing is hash-based, so **no SPA-fallback redirect
+rules are needed**. Build with `pnpm build`, publish the `dist/` folder, and
+optionally set `VITE_APP_VERSION` as a build-time env var. Geosearch is enabled
+by entering a Mapbox token in the app (see below); `VITE_MAPBOX_TOKEN` can also
+be baked in at build time as a default for self-hosted builds.
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/scarlson1/typesense-dashboard)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/scarlson1/typesense-dashboard)
+
+- **Cloudflare Pages / Vercel / Netlify** — free, auto-HTTPS, custom domains.
+  Vercel (`vercel.json`) and Netlify (`netlify.toml`) configs are included; on
+  Cloudflare Pages set the build command to `pnpm build` and the output
+  directory to `dist`.
+- Just like GitHub Pages, a static dashboard served over **HTTPS can only reach
+  Typesense over HTTPS** (mixed-content). If your Typesense is HTTP-only, use the
+  Railway option below, or add TLS (see [Web](#web)).
+
+### One-click on Railway (Typesense + dashboard)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy)
+
+Provisions a Typesense server (with auto-HTTPS) **and** the dashboard together,
+so the dashboard reaches Typesense over HTTPS with no mixed-content errors and no
+ngrok/self-signed-cert setup. See [docs/railway-template.md](docs/railway-template.md)
+for the template definition. (Replace the button link with your published
+template URL.)
+
+### Desktop app (Electron)
+
+The dashboard also packages as a native desktop app. The big win over the
+browser build: the Electron renderer talks **directly to any Typesense node over
+plain HTTP** — no TLS, no `--enable-cors`, no `nip.io`/ngrok — because the main
+process injects permissive CORS headers for outbound requests (see
+[electron/main.ts](electron/main.ts)). `webSecurity` stays enabled.
+
+```bash
+pnpm electron:dev          # run in development (Vite HMR + Electron)
+pnpm electron:build        # build the three targets into out/
+pnpm electron:pack         # build + produce an installer for the current OS
+pnpm electron:pack:mac     # or :win / :linux for a specific target
+```
+
+Installers land in `release/`. `VITE_APP_VERSION` is baked in at build time
+just like the web build; geosearch is enabled per-user by entering a Mapbox
+token in-app (released installers ship without a baked token). App icons are
+auto-detected from [build/](build/); code-signing/notarization need certs to
+avoid Gatekeeper/SmartScreen warnings on distribution. The
+[Build Electron installers](.github/workflows/electron-release.yaml) workflow
+produces artifacts for macOS/Windows/Linux on tag push or manual dispatch.
+
 ## Supported Versions
 
-Intended to be compatible with `v29` and `v30`.
+Intended to be compatible with Typesense `v29` and `v30`.
 
 ## Usage
 
@@ -68,7 +125,11 @@ From Github Registry:
 $ docker run -d -p 443:443 docker pull ghcr.io/scarlson1/typesense-dashboard:latest
 ```
 
-To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token"`)
+To enable geosearch, open the **Map** view in the dashboard and paste a
+[Mapbox access token](https://account.mapbox.com/access-tokens/). The token is
+stored locally in your browser only. (Operators building their own image can
+instead bake a default token in at build time with
+`--build-arg VITE_MAPBOX_TOKEN="your_mapbox_token"`.)
 
 ## Screenshots
 
@@ -100,7 +161,7 @@ To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker 
 
 # Alternatives
 
-- [Typesense Cloud](https://cloud.typesense.org/) (paid)
+- [Typesense Cloud](https://cloud.typesense.org/) (paid - official typesense commercial option)
 - [Typelens](https://typelens.copperline.io/)
 - [Typesense Desktop Client](https://www.typesense.app/)
 - bfritscher/typesense-dashboard [github](https://github.com/bfritscher/typesense-dashboard/tree/main) (vue)
@@ -200,6 +261,8 @@ npx ts-node scripts/indexData.ts
 
 ### Troubleshooting
 
+Troubleshooting demo data vm.
+
 ```bash
 sudo systemctl status typesense-server
 
@@ -222,6 +285,10 @@ terraform apply -var="attach_reserved_ip=true"
 # reset ssh
 ssh-keygen -R 163.192.220.255
 ```
+
+## Disclosure
+
+This is an independent project. It's not associated with [typesense.org](https://typesense.org/) etc. etc.
 
 ## TODO
 

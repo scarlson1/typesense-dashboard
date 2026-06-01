@@ -46,6 +46,7 @@ jobs:
             - name: Build
               run: pnpm build
               env:
+                  VITE_BASE_PATH: /typesense-dashboard
                   VITE_APP_VERSION: ${{ steps.vars.outputs.tag }}
                   VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN}}
                   # VITE_APP_VERSION: ${{ github.event.release.tag_name }}

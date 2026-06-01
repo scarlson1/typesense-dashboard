@@ -1,5 +1,6 @@
 export * from './diffArrayOfObjects';
 export * from './getObjectDiff';
+export * from './mapboxStore';
 export * from './queryClient';
 export * from './typesenseStore';
 export * from './uiStore';

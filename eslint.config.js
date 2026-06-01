@@ -41,4 +41,12 @@ export default tseslint.config(
       'no-extra-boolean-cast': 'off',
     },
   },
+  {
+    // Playwright fixtures expose a `use` callback that the react-hooks plugin
+    // mistakes for the React `use` hook.
+    files: ['e2e/**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 );

@@ -5,6 +5,7 @@ import {
   useSearchSlots,
   useTypesenseClient,
 } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import { formatDollar, uniqueArr } from '@/utils';
 import {
   Box,
@@ -291,7 +292,18 @@ export const CtxFacetOptions = () => {
       <CtxFacetContainer>
         {mergedFacets?.map((facetCount) => (
           <CtxFacetContainer key={facetCount.field_name}>
-            <Typography variant='overline'>{facetCount.field_name}</Typography>
+            <Typography
+              sx={{
+                fontSize: 11.5,
+                fontWeight: 600,
+                color: designTokens.textFaint,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                mb: 1,
+              }}
+            >
+              {facetCount.field_name}
+            </Typography>
             {facetCount.isNumeric ? (
               <NumericFacetOption
                 value={facetCount.numericValueRange}
@@ -365,6 +377,11 @@ function ValueLabelComponent(
       open={open}
       onClose={handleClose}
       onOpen={handleOpen}
+      slotProps={{
+        popper: {
+          modifiers: [{ name: 'offset', options: { offset: [0, -10] } }],
+        },
+      }}
     >
       {children}
     </Tooltip>
@@ -388,15 +405,17 @@ function NumericFacetOption(props: NumericFacetOptionProps) {
   };
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box sx={{ px: 2, pt: 3 }}>
       <Slider
         valueLabelDisplay='on'
         slots={{
           valueLabel: ValueLabelComponent,
         }}
+        size='small'
         {...props}
         onChange={handleChange}
         value={value}
+
         // getAriaValueText={valuetext}
       />
     </Box>

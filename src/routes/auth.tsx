@@ -273,7 +273,7 @@ function AuthComponent() {
           <Box component='span' sx={{ flex: 1 }} />
           {import.meta.env.VITE_APP_VERSION ? (
             <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
-              v{import.meta.env.VITE_APP_VERSION}
+              {import.meta.env.VITE_APP_VERSION}
             </Box>
           ) : null}
           <Box>
