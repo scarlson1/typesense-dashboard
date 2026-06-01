@@ -51,7 +51,7 @@ export default function OptionsMenu() {
       toast.info(`TODO: implement ${id}`, { id });
       handleClose();
     },
-    [toast, handleClose]
+    [toast, handleClose],
   );
 
   return (
@@ -83,9 +83,9 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={() => handleToast('profile')}>Profile</MenuItem>
-        <MenuItem onClick={() => handleToast('account')}>My account</MenuItem>
-        <Divider />
+        {/* <MenuItem onClick={() => handleToast('profile')}>Profile</MenuItem> */}
+        {/* <MenuItem onClick={() => handleToast('account')}>My account</MenuItem> */}
+        {/* <Divider /> */}
         <MenuItem
           onClick={() => {
             handleClose();
