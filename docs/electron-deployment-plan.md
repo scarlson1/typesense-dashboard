@@ -103,7 +103,7 @@ Recommendation: **option 1**. It removes the documented TLS headache while keepi
   `VITE_MAPBOX_TOKEN` acts only as a fallback default. Without either, the Map view prompts for a
   token instead of rendering.
 - **Code-signing**: macOS notarization + Windows signing need certs/secrets — required to avoid
-  Gatekeeper/SmartScreen warnings on distribution.
+  Gatekeeper/SmartScreen warnings on distribution. See [Code signing](#code-signing) below.
 
 ## Verification
 
@@ -114,3 +114,83 @@ Recommendation: **option 1**. It removes the documented TLS headache while keepi
   assets load from `file://`, geosearch works (with token), and Typesense connection succeeds.
 - Verify the existing web (GitHub Pages / static) build still works unchanged — Electron config is
   additive and must not alter `vite.config.ts` web output.
+
+## Releases
+
+The [Build Electron installers](../.github/workflows/electron-release.yaml) workflow runs on a
+`v*.*.*` tag push (or manual dispatch). On a tag push it calls
+`electron-builder --publish always`, which uploads the per-OS installers and the `latest*.yml`
+update manifests to a **draft** GitHub Release. Cutting a release:
+
+1. Bump `version` in `package.json` (electron-builder derives the release tag/version from it).
+2. Commit, then push a matching tag: `git tag v1.2.3 && git push origin v1.2.3`.
+3. Wait for the three matrix jobs (macOS/Windows/Linux) to finish, then open the draft Release on
+   GitHub, confirm all installers attached, and click **Publish**.
+4. The README links to `/releases/latest`, so publishing makes the downloads live automatically.
+
+Manual `workflow_dispatch` runs skip publishing and only upload artifacts to the workflow run
+(useful for test builds).
+
+## Code signing
+
+Unsigned builds work but trip OS protections: macOS Gatekeeper blocks the `.dmg` ("can't be opened
+because Apple cannot check it for malicious software") and Windows SmartScreen flags the `.exe`
+("Windows protected your PC"). Signing + notarization removes both. electron-builder reads signing
+config from environment variables, so this is all done via GitHub Actions secrets — no `yml`
+changes needed beyond exposing the secrets in the `Build & package` step's `env:`.
+
+### macOS (Developer ID + notarization)
+
+Requires a paid Apple Developer account ($99/yr).
+
+1. In the Apple Developer portal create a **Developer ID Application** certificate. Export it from
+   Keychain Access as a `.p12` with a password, then base64-encode it:
+   `base64 -i cert.p12 | pbcopy`.
+2. Create an **app-specific password** (appleid.apple.com → Sign-In and Security) for notarization,
+   and note your **Team ID** (Membership page).
+3. Add repo secrets:
+   - `CSC_LINK` — base64 of the `.p12`
+   - `CSC_KEY_PASSWORD` — the `.p12` export password
+   - `APPLE_ID` — your Apple ID email
+   - `APPLE_APP_SPECIFIC_PASSWORD` — the app-specific password
+   - `APPLE_TEAM_ID` — your Team ID
+4. Expose them in the macOS leg of the `env:` block. electron-builder auto-notarizes when
+   `APPLE_ID`/`APPLE_APP_SPECIFIC_PASSWORD`/`APPLE_TEAM_ID` are present (it staples the ticket).
+   For hardened-runtime entitlements add a `build/entitlements.mac.plist` and reference it under
+   `mac.entitlements` in `electron-builder.yml`.
+
+### Windows (Authenticode)
+
+Options, cheapest-first:
+
+- **Azure Trusted Signing** (cloud, ~ $10/mo, no SmartScreen reputation wait) — recommended if
+  available in your region. Configure via the `azureSignOptions` block in `electron-builder.yml`.
+- **OV / EV code-signing certificate** from a CA (DigiCert, Sectigo, …). An EV cert builds
+  SmartScreen reputation immediately; OV certs accumulate it over time/installs.
+
+For a file-based cert: base64-encode the `.pfx` and add secrets `WIN_CSC_LINK` (base64 `.pfx`) and
+`WIN_CSC_KEY_PASSWORD`, then map them to `CSC_LINK`/`CSC_KEY_PASSWORD` in the Windows leg of `env:`.
+
+### Linux
+
+`.AppImage` needs no code signing. Optionally publish a detached GPG signature / checksum so users
+can verify integrity.
+
+### CI wiring sketch
+
+```yaml
+      - name: Build & package
+        run: pnpm electron:build && pnpm exec electron-builder --publish ${{ startsWith(github.ref, 'refs/tags/') && 'always' || 'never' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_APP_VERSION: ${{ steps.vars.outputs.tag }}
+          # macOS only — ignored on other runners
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+```
+
+(Use `if: runner.os == 'macOS'` / `'Windows'` guarded steps, or separate env blocks, so each OS
+only sees its own cert. Once signed, drop the "not yet code-signed" note from the README.)
