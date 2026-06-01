@@ -123,7 +123,11 @@ export const SearchSlotsProvider =
 
     const slotProps = useMemo(
       () =>
+        // Merge into a fresh object — never the shared SEARCH_DEFAULT_SLOT_PROPS
+        // constant, since lodash mergeWith mutates its first argument. Mutating
+        // it would leak one collection's display options into the next.
         mergeWith(
+          {},
           SEARCH_DEFAULT_SLOT_PROPS,
           slotPropsState,
           (_: object, srcValue: object) => {
@@ -135,7 +139,8 @@ export const SearchSlotsProvider =
 
     const updateSlotProps = useCallback(
       (updates: Partial<SearchSlotProps>, mergeFn: Function = () => {}) => {
-        setSlotPropsState((prev) => ({ ...mergeWith(prev, updates, mergeFn) }));
+        // Merge into a fresh object so the current state isn't mutated in place.
+        setSlotPropsState((prev) => mergeWith({}, prev, updates, mergeFn));
       },
       [],
     );
