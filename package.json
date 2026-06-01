@@ -1,7 +1,7 @@
 {
   "name": "typesense-dashboard",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "A dashboard to manage self hosted or local Typesense instances.",
   "author": "Spencer Carlson",

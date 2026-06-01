@@ -19,6 +19,8 @@ If the link is not prefilling login creds, use the following:
 The dashboard is a 100% client-side static SPA (no backend) — enter
 Typesense host/key at runtime and the browser talks to Typesense directly.
 
+Below are quick deployment options if you'd like to host the app instead of using the Github pages link above.
+
 ### Static hosting (dashboard only)
 
 Deploy to any static host. Routing is hash-based, so **no SPA-fallback redirect
@@ -55,6 +57,15 @@ browser build: the Electron renderer talks **directly to any Typesense node over
 plain HTTP** — no TLS, no `--enable-cors`, no `nip.io`/ngrok — because the main
 process injects permissive CORS headers for outbound requests (see
 [electron/main.ts](electron/main.ts)). `webSecurity` stays enabled.
+
+**Download:** grab the installer for your OS from the
+[latest release](https://github.com/scarlson1/typesense-dashboard/releases/latest)
+— `.dmg` (macOS), `.exe` (Windows), or `.AppImage` (Linux). Builds are not yet
+code-signed, so macOS shows a Gatekeeper prompt (right-click → Open, or
+System Settings → Privacy & Security → Open Anyway) and Windows shows a
+SmartScreen warning (More info → Run anyway).
+
+**Build from source:**
 
 ```bash
 pnpm electron:dev          # run in development (Vite HMR + Electron)
