@@ -32,7 +32,10 @@ the "Deploy on Railway" button in the README points at it.
 - **Source:** this repo (`Dockerfile.prod` via `railway.json`).
 - **Build args / variables:**
   - `VITE_BASE_PATH=/` (root-relative; this is also the default).
-  - `VITE_MAPBOX_TOKEN` — optional, enables geosearch (baked at build time).
+  - `VITE_MAPBOX_TOKEN` — optional. Geosearch is normally enabled per-user by
+    entering a Mapbox token in-app (stored in the browser), so the template can
+    leave this unset. Setting it bakes a default token into the build for every
+    visitor of that instance — only do this with a token you intend to share.
 - **Networking:** enable a public domain (Railway auto-HTTPS). nginx listens on
   `$PORT`, which Railway injects.
 

@@ -22,9 +22,10 @@ Typesense host/key at runtime and the browser talks to Typesense directly.
 ### Static hosting (dashboard only)
 
 Deploy to any static host. Routing is hash-based, so **no SPA-fallback redirect
-rules are needed**. Build with `pnpm build`, publish the `dist/` folder, and set
-`VITE_MAPBOX_TOKEN` (optional, enables geosearch) — and optionally
-`VITE_APP_VERSION` — as build-time env vars.
+rules are needed**. Build with `pnpm build`, publish the `dist/` folder, and
+optionally set `VITE_APP_VERSION` as a build-time env var. Geosearch is enabled
+by entering a Mapbox token in the app (see below); `VITE_MAPBOX_TOKEN` can also
+be baked in at build time as a default for self-hosted builds.
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/scarlson1/typesense-dashboard)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/scarlson1/typesense-dashboard)
@@ -62,8 +63,9 @@ pnpm electron:pack         # build + produce an installer for the current OS
 pnpm electron:pack:mac     # or :win / :linux for a specific target
 ```
 
-Installers land in `release/`. Build-time env vars (`VITE_MAPBOX_TOKEN`,
-`VITE_APP_VERSION`) are baked in just like the web build. App icons are
+Installers land in `release/`. `VITE_APP_VERSION` is baked in at build time
+just like the web build; geosearch is enabled per-user by entering a Mapbox
+token in-app (released installers ship without a baked token). App icons are
 auto-detected from [build/](build/); code-signing/notarization need certs to
 avoid Gatekeeper/SmartScreen warnings on distribution. The
 [Build Electron installers](.github/workflows/electron-release.yaml) workflow
@@ -71,7 +73,7 @@ produces artifacts for macOS/Windows/Linux on tag push or manual dispatch.
 
 ## Supported Versions
 
-Intended to be compatible with `v29` and `v30`.
+Intended to be compatible with Typesense `v29` and `v30`.
 
 ## Usage
 
@@ -123,7 +125,11 @@ From Github Registry:
 $ docker run -d -p 443:443 docker pull ghcr.io/scarlson1/typesense-dashboard:latest
 ```
 
-To enable geosearch, pass a mapbox key as an environment variable (i.e. `docker run [...] -e VITE_MAPBOX_TOKEN="your_mapbox_token"`)
+To enable geosearch, open the **Map** view in the dashboard and paste a
+[Mapbox access token](https://account.mapbox.com/access-tokens/). The token is
+stored locally in your browser only. (Operators building their own image can
+instead bake a default token in at build time with
+`--build-arg VITE_MAPBOX_TOKEN="your_mapbox_token"`.)
 
 ## Screenshots
 

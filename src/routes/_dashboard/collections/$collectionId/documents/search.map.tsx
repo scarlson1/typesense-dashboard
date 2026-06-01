@@ -15,6 +15,7 @@ import { UpdateSearchParameters } from '@/components/UpdateSearchParameters';
 import { useDefaultIndexParams, useHits, useSchema, useSearch } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseFieldType } from '@/types';
+import { getMapboxToken, mapboxStore } from '@/utils';
 import {
   CloseRounded,
   KeyboardArrowUpRounded,
@@ -26,6 +27,7 @@ import {
   Alert,
   AlertTitle,
   Box,
+  Button,
   CircularProgress,
   Drawer,
   Fade,
@@ -35,6 +37,7 @@ import {
   Paper,
   Select,
   Stack,
+  TextField,
   Typography,
   useMediaQuery,
   type SelectChangeEvent,
@@ -94,6 +97,7 @@ const rowSelectSx = {
 
 function RouteComponent() {
   const mobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
+  const mapboxToken = getMapboxToken(mapboxStore((s) => s.mapboxToken));
   const { geoFieldOptions } = useDefaultIndexParams();
   const [geoFieldName, setGeoFieldName] = useState<string | null>(
     () => geoFieldOptions[0] || null,
@@ -147,16 +151,8 @@ function RouteComponent() {
     return field?.type === 'geopoint';
   }, [schema, geoFieldName]);
 
-  if (!Boolean(import.meta.env.VITE_MAPBOX_TOKEN)) {
-    return (
-      <Box sx={{ maxWidth: 500, p: 2, mx: 'auto', my: 6 }}>
-        <Alert severity='warning' sx={{ borderRadius: 0 }}>
-          <AlertTitle>No API key configured</AlertTitle>
-          This cluster is connected without a Typesense API key. Add
-          VITE_MAPBOX_TOKEN to environment variables to enable geo search.
-        </Alert>
-      </Box>
-    );
+  if (!mapboxToken) {
+    return <MapboxTokenGate />;
   }
 
   if (!isGeopoint)
@@ -707,5 +703,53 @@ function MapCompactStats() {
         <CircularProgress size={10} />
       </Fade>
     </Stack>
+  );
+}
+
+function MapboxTokenGate() {
+  const setMapboxToken = mapboxStore((s) => s.setMapboxToken);
+  const [value, setValue] = useState('');
+
+  const handleSave = () => {
+    const trimmed = value.trim();
+    if (trimmed) setMapboxToken(trimmed);
+  };
+
+  return (
+    <Box sx={{ maxWidth: 500, p: 2, mx: 'auto', my: 6 }}>
+      <Alert severity='info' sx={{ borderRadius: 0 }}>
+        <AlertTitle>Mapbox token required</AlertTitle>
+        Geo search renders maps with Mapbox. Paste a Mapbox access token to
+        enable it — the token is stored locally in this browser only.{' '}
+        <Link
+          href='https://account.mapbox.com/access-tokens/'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          Get a token
+          <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+        </Link>
+      </Alert>
+      <Stack direction='row' spacing={1} sx={{ mt: 2 }}>
+        <TextField
+          fullWidth
+          size='small'
+          label='Mapbox access token'
+          placeholder='pk.…'
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave();
+          }}
+        />
+        <Button
+          variant='contained'
+          onClick={handleSave}
+          disabled={!value.trim()}
+        >
+          Save
+        </Button>
+      </Stack>
+    </Box>
   );
 }

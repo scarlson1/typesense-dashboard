@@ -78,8 +78,9 @@ Recommendation: **option 1**. It removes the documented TLS headache while keepi
    - `electron:pack` → `electron-vite build && electron-builder` (use `--mac`/`--win`/`--linux`)
 5. **`electron-builder.yml`**: `appId`, `productName`, targets (dmg/nsis/AppImage), `files`
    (built `out/`), icons under `build/`. Configure `publish` (e.g. GitHub Releases) for auto-update.
-6. **Env vars**: `VITE_MAPBOX_TOKEN` (geosearch) and `VITE_APP_VERSION` are baked at renderer build
-   time — pass them in the build script / CI.
+6. **Env vars**: `VITE_APP_VERSION` is baked at renderer build time — pass it in the build script /
+   CI. Geosearch is enabled per-user via an in-app Mapbox token (stored locally); released
+   installers ship without a baked `VITE_MAPBOX_TOKEN` so they don't leak the maintainer's key.
 7. **CI** (optional): a `release` workflow running `electron-builder` on macOS + Windows + Linux
    runners, uploading artifacts to GitHub Releases. Code-signing certs/notarization via secrets.
 
@@ -98,7 +99,9 @@ Recommendation: **option 1**. It removes the documented TLS headache while keepi
 - **`base: './'`**: required so `file://` finds assets; `import.meta.env.BASE_URL` then resolves and
   `src/main.tsx:38` keeps the router basepath correct.
 - **Sentry plugin** runs during renderer build; harmless without `SENTRY_AUTH_TOKEN` (skips upload).
-- **Mapbox token** is build-time; missing token silently degrades geosearch.
+- **Mapbox token**: entered in-app and stored in `localStorage`; an optional build-time
+  `VITE_MAPBOX_TOKEN` acts only as a fallback default. Without either, the Map view prompts for a
+  token instead of rendering.
 - **Code-signing**: macOS notarization + Windows signing need certs/secrets — required to avoid
   Gatekeeper/SmartScreen warnings on distribution.
 

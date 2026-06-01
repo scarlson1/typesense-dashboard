@@ -1,4 +1,5 @@
 import { useDebounce, useHits, useSearchParams, useSearchSlots } from '@/hooks';
+import { getMapboxToken, mapboxStore } from '@/utils';
 import {
   WebMercatorViewport,
   type MapViewState,
@@ -30,7 +31,6 @@ import type { SearchResponseHit } from 'typesense/lib/Typesense/Documents';
 
 // typesense geo adaptation: https://github.com/typesense/typesense-instantsearch-adapter/blob/e70765dffa4e28d22be443a234971f8858c001c3/src/SearchRequestAdapter.js#L320
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 const MAP_LIGHT_STYLE = 'mapbox://styles/mapbox/light-v11';
 const MAP_DARK_STYLE = 'mapbox://styles/s-carlson/cmdp028fi00b201qp3n382bo0'; // 'mapbox://styles/mapbox/dark-v11';
 // https://deck.gl/docs/api-reference/core/deck#initialviewstate
@@ -55,6 +55,7 @@ const GeoSearch = ({
   showPopover,
 }: GeoSearchProps) => {
   const theme = useTheme();
+  const mapboxToken = getMapboxToken(mapboxStore((s) => s.mapboxToken));
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
   const hits = useHits();
@@ -166,7 +167,7 @@ const GeoSearch = ({
       >
         <Map
           mapStyle={themeMode === 'dark' ? MAP_DARK_STYLE : MAP_LIGHT_STYLE}
-          mapboxAccessToken={MAPBOX_TOKEN}
+          mapboxAccessToken={mapboxToken}
         />
       </DeckGL>
       {showPopover ? (
