@@ -119,7 +119,7 @@ const lightDesign: DesignTokens = {
 // share the brand and respond to the theme toggle.
 export const theme = createTheme({
   cssVariables: { colorSchemeSelector: 'data-theme' },
-  defaultColorScheme: 'dark',
+  // defaultColorScheme: 'dark',
   colorSchemes: {
     dark: {
       palette: {

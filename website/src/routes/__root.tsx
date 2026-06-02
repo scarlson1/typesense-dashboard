@@ -27,9 +27,7 @@ const RootDocument = ({ children }: { children: ReactNode }) => (
       <HeadContent />
     </head>
     <body>
-      {/* Sets data-theme from the persisted mode before first paint (no flash).
-          Must match ThemeProvider's defaultMode + the theme's colorSchemeSelector. */}
-      <InitColorSchemeScript attribute='data-theme' defaultMode='dark' />
+      <InitColorSchemeScript attribute='data-theme' defaultMode='system' />
       <Providers>{children}</Providers>
       {import.meta.env.DEV && (
         <TanStackDevtools
