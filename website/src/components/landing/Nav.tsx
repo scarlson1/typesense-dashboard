@@ -58,7 +58,7 @@ export const Nav = () => {
             target='_blank'
             rel='noopener'
             startIcon={<GitHub fontSize='inherit' />}
-            sx={{ borderColor: (theme) => theme.palette.design.borderStrong }}
+            sx={{ borderColor: (theme) => theme.palette.design.border }}
           >
             {/* <GithubIcon /> */}
             GitHub
