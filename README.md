@@ -52,7 +52,9 @@ ngrok/self-signed-cert setup. See [docs/railway-template.md](docs/railway-templa
 for the template definition. (Replace the button link with your published
 template URL.)
 
-### Desktop app (Electron WIP)
+### Desktop app (Electron)
+
+**WIP: need to implement code signing**
 
 The dashboard also packages as a native desktop app. The big win over the
 browser build: the Electron renderer talks **directly to any Typesense node over
