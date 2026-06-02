@@ -149,6 +149,8 @@ export const Gallery = () => {
                 key={`${item.src}-${i}`}
                 cols={item.cols}
                 rows={item.rows}
+                className={`gcard reveal${item.delay ? ` ${item.delay}` : ''}${hidden ? ' hidden' : ''}`}
+                data-cat={item.cat}
                 sx={{
                   display: hidden ? 'hidden' : 'block',
                   border: '1px solid var(--mui-palette-design-border)',
