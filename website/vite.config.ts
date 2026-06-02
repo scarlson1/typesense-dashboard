@@ -1,15 +1,20 @@
-import { defineConfig } from 'vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import viteReact from '@vitejs/plugin-react';
+import { nitro } from 'nitro/vite';
+import { defineConfig } from 'vite';
 
 const config = defineConfig({
   resolve: {
     tsconfigPaths: true,
     dedupe: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
   },
-  // MUI/Emotion must be bundled for SSR so styles render server-side.
-  ssr: { noExternal: ['@mui/*', '@emotion/*'] },
-  plugins: [tanstackStart(), viteReact()],
-})
+  // Bundle all app deps into the SSR build so the serverless function is
+  // self-contained. The Vercel/Nitro function ships only the bundled chunks
+  // (no node_modules), so anything left external fails at runtime with
+  // "Cannot find module" (e.g. react). This also keeps MUI/Emotion styles
+  // rendering server-side.
+  ssr: { noExternal: true },
+  plugins: [tanstackStart(), nitro(), viteReact()],
+});
 
-export default config
+export default config;

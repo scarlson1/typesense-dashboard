@@ -37,6 +37,7 @@ release
 *.sw?
 
 .tanstack
+.claude
 
 .env.sentry-build-plugin
 .env
