@@ -41,17 +41,10 @@ export const OpenSource = () => {
             <div className='media-cap'>
               <i /> Dashboard › Config · Schema
             </div>
-            {/* {mode === 'light' ? (
-              <img
-                src='/assets/shots/schema-light.png'
-                alt='Schema editor showing field types and indexing flags'
-              />
-            ) : ( */}
             <img
               src='/assets/shots/schema-dark.png'
               alt='Schema editor showing field types and indexing flags'
             />
-            {/* )} */}
           </div>
         </div>
       </div>
