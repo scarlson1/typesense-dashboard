@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme } from '@mui/material/styles';
 
 // The marketing page styles itself with the design tokens in styles.css.
 // This MUI theme exists so any MUI components added later share the brand.
@@ -12,5 +12,5 @@ export const theme = createTheme({
   typography: {
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
   },
-  shape: { borderRadius: 9 },
-})
+  shape: { borderRadius: 8 },
+});

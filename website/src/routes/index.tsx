@@ -1,27 +1,30 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
-import { Features } from '#/components/landing/Features'
-import { Footer } from '#/components/landing/Footer'
-import { GeoHighlight, SearchHighlight } from '#/components/landing/Highlights'
-import { Gallery } from '#/components/landing/Gallery'
-import { GetStarted } from '#/components/landing/GetStarted'
-import { Hero } from '#/components/landing/Hero'
-import { Nav } from '#/components/landing/Nav'
-import { OpenSource } from '#/components/landing/OpenSource'
-import { TrustStrip } from '#/components/landing/TrustStrip'
-import { useReveal } from '#/hooks'
+import { Features } from '#/components/landing/Features';
+import { Footer } from '#/components/landing/Footer';
+import { Gallery } from '#/components/landing/Gallery';
+import { GetStarted } from '#/components/landing/GetStarted';
+import { Hero } from '#/components/landing/Hero';
+import { GeoHighlight, SearchHighlight } from '#/components/landing/Highlights';
+import { Nav } from '#/components/landing/Nav';
+import { OpenSource } from '#/components/landing/OpenSource';
+import { TrustStrip } from '#/components/landing/TrustStrip';
+import { useReveal } from '#/hooks/useReveal';
+import { Box } from '@mui/material';
 
-export const Route = createFileRoute('/')({ component: Home })
+export const Route = createFileRoute('/')({ component: Home });
 
 function Home() {
-  useReveal()
+  useReveal();
 
   return (
     <>
       <Nav />
-      <main id="top">
+      <main id='top'>
         <Hero />
-        <TrustStrip />
+        <Box sx={{ mt: { xs: 4, sm: 5, md: 6, lg: 8 } }}>
+          <TrustStrip />
+        </Box>
         <Features />
         <SearchHighlight />
         <GeoHighlight />
@@ -31,5 +34,5 @@ function Home() {
       </main>
       <Footer />
     </>
-  )
+  );
 }
