@@ -1,6 +1,7 @@
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { ThemeProvider } from '@mui/material';
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
@@ -12,12 +13,11 @@ import appCss from '../styles.css?url';
 
 const emotionCache = createCache({ key: 'css' });
 
-// Apply the persisted theme before first paint to avoid a light/dark flash.
-const noFlashTheme = `;(function(){try{var t=localStorage.getItem("ts-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;
-
 const Providers = ({ children }: { children: ReactNode }) => (
   <CacheProvider value={emotionCache}>
-    <ThemeProvider theme={theme}>{children}</ThemeProvider>
+    <ThemeProvider theme={theme} defaultMode='dark'>
+      {children}
+    </ThemeProvider>
   </CacheProvider>
 );
 
@@ -25,9 +25,11 @@ const RootDocument = ({ children }: { children: ReactNode }) => (
   <html lang='en' data-theme='dark'>
     <head>
       <HeadContent />
-      <script dangerouslySetInnerHTML={{ __html: noFlashTheme }} />
     </head>
     <body>
+      {/* Sets data-theme from the persisted mode before first paint (no flash).
+          Must match ThemeProvider's defaultMode + the theme's colorSchemeSelector. */}
+      <InitColorSchemeScript attribute='data-theme' defaultMode='dark' />
       <Providers>{children}</Providers>
       {import.meta.env.DEV && (
         <TanStackDevtools

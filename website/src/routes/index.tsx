@@ -22,7 +22,9 @@ function Home() {
       <Nav />
       <main id='top'>
         <Hero />
-        <Box sx={{ mt: { xs: 4, sm: 5, md: 6, lg: 8 } }}>
+        <Box
+        // sx={{ mt: { xs: 4, sm: 5, md: 6, lg: 8 } }}
+        >
           <TrustStrip />
         </Box>
         <Features />

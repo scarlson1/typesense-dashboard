@@ -9,7 +9,7 @@ import {
 } from '#/components/icons';
 import { DEMO_URL, REPO_URL } from '#/components/landing/links';
 import { Logo } from '#/components/Logo';
-import { Box, Stack } from '@mui/material';
+import { Box, Container, Stack } from '@mui/material';
 
 // TODO: stack row on large screens
 // TODO: scale down second section (currently only looks descent on MD + screens)
@@ -80,7 +80,8 @@ export const Hero = () => {
   useHeroCountUp(shotRef);
 
   return (
-    <Box className='hero' sx={{ position: 'relative' }}>
+    //   <Box className='hero' sx={{ position: 'relative' }}>
+    <Container className='hero' maxWidth='xl' sx={{ position: 'relative' }}>
       <Stack
         direction={{ xs: 'column', xl: 'row' }}
         spacing={{ xs: 6, xl: 8 }}
@@ -99,9 +100,9 @@ export const Hero = () => {
           // className='wrap hero-inner'
           sx={{
             textAlign: { xs: 'center', xl: 'left' },
-            maxWidth: { xs: 820 },
+            // maxWidth: { xs: 820 },
             mx: { xs: 'auto', xl: 0 },
-            flex: { xl: '0 1 460px' },
+            flex: { xl: '0 1 600px' },
             // Override the design's hero-scoped centering for the xl row
             // layout (these selectors out-specify a flat sx rule).
             '& .lead': {
@@ -113,9 +114,7 @@ export const Hero = () => {
             },
           }}
         >
-          <span className='eyebrow reveal'>
-            Open source · Self-hosted · MIT
-          </span>
+          <span className='eyebrow reveal'>Open source · Self-hosted</span>
           <h1 className='reveal d1'>
             The dashboard your <span className='grad'>Typesense cluster</span>{' '}
             deserves
@@ -564,7 +563,7 @@ export const Hero = () => {
           </div>
         </Box>
       </Stack>
-    </Box>
+    </Container>
   );
 };
 
