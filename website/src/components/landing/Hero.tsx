@@ -158,7 +158,18 @@ export const Hero = () => {
           </div>
         </Box>
 
-        <Box sx={{ width: '100%', minWidth: 0, flex: { xl: '1 1 0' } }}>
+        <Box
+          sx={{
+            width: '100%',
+            minWidth: 0,
+            flex: { xl: '1 1 0' },
+            // In the xl row layout the column can be narrower than the mock's
+            // natural width. Keep the dashboard at full size so its grids don't
+            // squish/wrap; the shot-frame (overflow: hidden) clips whatever
+            // doesn't fit. When the column is wider than this, nothing clips.
+            '& .ts-app': { minWidth: { xl: 960 } },
+          }}
+        >
           <div className='shot-frame reveal d2' id='heroShot' ref={shotRef}>
             <div className='win-bar'>
               <div className='win-dots'>

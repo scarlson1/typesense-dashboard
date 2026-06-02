@@ -62,14 +62,14 @@ const shots: Shot[] = [
     rows: 1,
   },
   {
-    // size: 'half',
-    cat: 'light',
-    title: 'Add documents',
-    tag: 'Light',
-    src: '/assets/shots/add-docs-light.png',
+    // size: 'tall',
+    cat: 'mobile',
+    title: 'Schema',
+    tag: 'Mobile',
+    src: '/assets/shots/schema-mobile-light.png',
     delay: 'd1',
     cols: 1,
-    rows: 1,
+    rows: 2,
   },
   {
     // size: 'wide',
@@ -81,14 +81,14 @@ const shots: Shot[] = [
     rows: 1,
   },
   {
-    // size: 'tall',
-    cat: 'mobile',
-    title: 'Schema',
-    tag: 'Mobile',
-    src: '/assets/shots/schema-mobile-light.png',
+    // size: 'half',
+    cat: 'light',
+    title: 'Add documents',
+    tag: 'Light',
+    src: '/assets/shots/add-docs-light.png',
     delay: 'd1',
     cols: 1,
-    rows: 2,
+    rows: 1,
   },
   {
     // size: 'half',
@@ -136,8 +136,9 @@ export const Gallery = () => {
           ))}
         </div>
         <ImageList
-          variant='masonry'
-          // variant='quilted'
+          // variant='masonry'
+          variant='quilted'
+          rowHeight={isMobile ? 200 : 340}
           cols={isMobile ? 2 : 3}
           gap={16}
         >
