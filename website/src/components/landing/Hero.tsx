@@ -9,7 +9,7 @@ import {
 } from '#/components/icons';
 import { DEMO_URL, REPO_URL } from '#/components/landing/links';
 import { Logo } from '#/components/Logo';
-import { Box, Container, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 // TODO: stack row on large screens
 // TODO: scale down second section (currently only looks descent on MD + screens)
@@ -81,7 +81,7 @@ export const Hero = () => {
 
   return (
     //   <Box className='hero' sx={{ position: 'relative' }}>
-    <Container className='hero' maxWidth='xl' sx={{ position: 'relative' }}>
+    <Box className='hero' sx={{ position: 'relative', mx: 'auto' }}>
       <Stack
         direction={{ xs: 'column', xl: 'row' }}
         spacing={{ xs: 6, xl: 8 }}
@@ -90,7 +90,8 @@ export const Hero = () => {
           // maxWidth: 'var(--maxw)',
           mx: 'auto',
           px: '28px',
-          alignItems: { xl: 'center' },
+          justifyContent: 'center',
+          alignItems: 'center', // { xl: 'center' },
           // The Stack owns the gap between copy + dashboard, so drop the
           // shot-frame's own top margin to avoid doubling it up.
           '& .shot-frame': { mt: 0 },
@@ -116,8 +117,8 @@ export const Hero = () => {
         >
           <span className='eyebrow reveal'>Open source · Self-hosted</span>
           <h1 className='reveal d1'>
-            The dashboard your <span className='grad'>Typesense cluster</span>{' '}
-            deserves
+            Manage your <span className='grad'>Typesense cluster</span> without
+            touching the terminal
           </h1>
           <p className='lead reveal d2'>
             A fast, polished UI to manage self-hosted and local Typesense
@@ -144,7 +145,7 @@ export const Hero = () => {
               View on GitHub
             </a>
           </div>
-          <div className='hero-meta reveal d4'>
+          <Box className='hero-meta reveal d4' sx={{ pb: 2 }}>
             <span>
               <CheckIcon strokeWidth={2.5} /> Compatible with Typesense v29 &
               v30
@@ -155,13 +156,14 @@ export const Hero = () => {
             <span>
               <CheckIcon strokeWidth={2.5} /> Deploy in one command
             </span>
-          </div>
+          </Box>
         </Box>
 
         <Box
           sx={{
             width: '100%',
             minWidth: 0,
+            maxWidth: 1000,
             flex: { xl: '1 1 0' },
             // In the xl row layout the column can be narrower than the mock's
             // natural width. Keep the dashboard at full size so its grids don't
@@ -366,7 +368,7 @@ export const Hero = () => {
                 <div className='ts-head'>
                   <div>
                     <div className='ts-eyebrow'>
-                      NODE-1 · localhost:443 · v29.0
+                      NODE-1 · localhost:443 · v30.2
                     </div>
                     <h3>Cluster overview</h3>
                     <p>
@@ -574,7 +576,7 @@ export const Hero = () => {
           </div>
         </Box>
       </Stack>
-    </Container>
+    </Box>
   );
 };
 

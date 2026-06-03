@@ -1,3 +1,4 @@
+import '@mui/material/IconButton';
 import { createTheme } from '@mui/material/styles';
 
 // Design color tokens mirrored from styles.css (:root = dark,
@@ -44,6 +45,18 @@ declare module '@mui/material/styles' {
   }
   interface PaletteOptions {
     design?: DesignTokens;
+  }
+}
+
+// declare module '@mui/material/IconButton' {
+//   interface IconButtonPropsVariantOverrides {
+//     square?: true;
+//   }
+// }
+declare module '@mui/material/IconButton' {
+  interface IconButtonOwnProps {
+    /** Custom variant applied via theme overrides */
+    variant?: 'square';
   }
 }
 
@@ -119,7 +132,7 @@ const lightDesign: DesignTokens = {
 // share the brand and respond to the theme toggle.
 export const theme = createTheme({
   cssVariables: { colorSchemeSelector: 'data-theme' },
-  defaultColorScheme: 'dark',
+  // defaultColorScheme: 'dark',
   colorSchemes: {
     dark: {
       palette: {
@@ -148,19 +161,29 @@ export const theme = createTheme({
           textTransform: 'none',
           fontWeight: 'bolder',
         },
-        // contained: {
-        //   boxShadow: 'none',
-        //   '&:hover': {
-        //     boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.15)',
-        //   },
-        // },
-        // outlined: {
-        //   borderWidth: '2px',
-        //   '&:hover': {
-        //     borderWidth: '2px',
-        //   },
-        // },
       },
+    },
+    MuiIconButton: {
+      defaultProps: {
+        disableRipple: true, // 1. Sets it as default for EVERY IconButton
+      },
+      variants: [
+        {
+          props: { variant: 'square' },
+          style: ({ theme }) => ({
+            color: theme.vars.palette.design.textMuted,
+            border: `1px solid`,
+            borderColor: theme.vars.palette.design.border,
+            borderRadius: theme.shape.borderRadius,
+            padding: theme.spacing(1),
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              color: theme.vars.palette.text.primary,
+              borderColor: theme.vars.palette.design.borderStrong,
+            },
+          }),
+        },
+      ],
     },
   },
 });

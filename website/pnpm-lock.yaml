@@ -27,26 +27,26 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(@emotion/react@11.14.0(@types/react@19.2.16)(react@19.2.7))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.16)(react@19.2.7))(@types/react@19.2.16)(react@19.2.7))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-devtools':
-        specifier: latest
+        specifier: ^0.10.5
         version: 0.10.5(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(csstype@3.2.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.13)
       '@tanstack/react-router':
-        specifier: latest
+        specifier: ^1.170.10
         version: 1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-router-devtools':
-        specifier: latest
+        specifier: ^1.167.0
         version: 1.167.0(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@tanstack/router-core@1.171.8)(csstype@3.2.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-router-ssr-query':
-        specifier: latest
+        specifier: ^1.167.1
         version: 1.167.1(@tanstack/query-core@5.100.14)(@tanstack/react-query@5.100.14(react@19.2.7))(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@tanstack/router-core@1.171.8)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-start':
-        specifier: latest
+        specifier: ^1.168.18
         version: 1.168.18(crossws@0.4.5(srvx@0.11.16))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@22.19.19)(jiti@2.7.0))
       '@tanstack/router-plugin':
         specifier: ^1.132.0
         version: 1.168.13(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@8.0.16(@types/node@22.19.19)(jiti@2.7.0))
       nitro:
-        specifier: npm:nitro-nightly@latest
-        version: nitro-nightly@3.0.1-20260602-161340-ab30554d(chokidar@5.0.0)(jiti@2.7.0)(lru-cache@11.5.1)(vite@8.0.16(@types/node@22.19.19)(jiti@2.7.0))
+        specifier: 3.0.260522-beta
+        version: 3.0.260522-beta(chokidar@5.0.0)(jiti@2.7.0)(lru-cache@11.5.1)(vite@8.0.16(@types/node@22.19.19)(jiti@2.7.0))
       react:
         specifier: ^19.2.0
         version: 19.2.7
@@ -1327,8 +1327,8 @@ packages:
   nf3@0.3.17:
     resolution: {integrity: sha512-N9zEWySuJFw+gR0lhS5863YsvNeudOdqRyFvNb+jMXbeTJOdrjDqkCpDginIZfUm0LzT1t1nCRiDeqQm/8kirQ==}
 
-  nitro-nightly@3.0.1-20260602-161340-ab30554d:
-    resolution: {integrity: sha512-SclO7mj6bVrKyRrj5Yq4zMyJ5DPJEId+4iYGne5on/sm2Nt8BtAuPLDZrfLDff0abHYUaG1YHcatgl6mXdWnoQ==}
+  nitro@3.0.260522-beta:
+    resolution: {integrity: sha512-L/z2eOWgkiQHc65kv+SEMgau505afSRF7NJlbooaaZEZscFrNSD7rXZzeVubQlgIzPbhOG8o73bk9soIiGTHRA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -3064,7 +3064,7 @@ snapshots:
 
   nf3@0.3.17: {}
 
-  nitro-nightly@3.0.1-20260602-161340-ab30554d(chokidar@5.0.0)(jiti@2.7.0)(lru-cache@11.5.1)(vite@8.0.16(@types/node@22.19.19)(jiti@2.7.0)):
+  nitro@3.0.260522-beta(chokidar@5.0.0)(jiti@2.7.0)(lru-cache@11.5.1)(vite@8.0.16(@types/node@22.19.19)(jiti@2.7.0)):
     dependencies:
       consola: 3.4.2
       crossws: 0.4.5(srvx@0.11.16)

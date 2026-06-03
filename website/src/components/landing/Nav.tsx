@@ -4,7 +4,7 @@ import { Logo } from '#/components/Logo';
 import { ThemeModeToggle } from '#/components/ThemeModeToggle';
 import { useScrolled } from '#/hooks/useScrolled';
 import { GitHub } from '@mui/icons-material';
-import { Box, Button, Container } from '@mui/material';
+import { Box, Button, Container, IconButton, Stack } from '@mui/material';
 
 export const Nav = () => {
   const scrolled = useScrolled();
@@ -18,37 +18,131 @@ export const Nav = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          height: 56,
+          height: { xs: 48, sm: 56 },
           // paddingInline: 28,
         }}
       >
-        <a className='brand' href='#top'>
-          <span className='logo'>
-            <Logo />
-          </span>
-          <span>
-            Typesense Dashboard <small>· OSS</small>
-          </span>
-        </a>
-        <nav className='nav-links'>
-          <a href='#features'>Features</a>
-          <a href='#search'>Search</a>
-          <a href='#gallery'>Screenshots</a>
-          {/* <a href='#open-source'>Open source</a> */}
-          <a href='#start'>Get started</a>
-        </nav>
-        <div className='nav-actions'>
-          {/* <button
-            className='theme-toggle'
-            onClick={toggle}
-            aria-label='Toggle color theme'
+        <Stack
+          component='a'
+          direction='row'
+          spacing={{ xs: 0.5, sm: 1 }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '11px',
+            fontWeight: 700,
+            fontSize: 16,
+            letterSpacing: '-0.01em',
+          }}
+          href='#top'
+        >
+          <Box
+            component='span'
+            sx={{
+              width: { xs: 24, sm: 30 },
+              height: { xs: 24, sm: 30 },
+              borderRadius: 1,
+              flex: 'none',
+              background:
+                'linear-gradient(160deg, var(--mui-palette-design-accentHover), var(--mui-palette-design-accent))',
+              display: 'grid',
+              placeItems: 'center',
+              color: '#FFF',
+              fontWeight: 700,
+              fontSize: 16,
+              letterSpacing: '-0.01em',
+              '& svg': {
+                width: '62%',
+                height: '62%',
+              },
+            }}
           >
-            <SunIcon />
-            <MoonIcon />
-          </button> */}
-          <Box>
-            <ThemeModeToggle />
+            <Logo />
           </Box>
+          <span>
+            Typesense Dashboard{' '}
+            <Box
+              component='small'
+              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+            >
+              · OSS
+            </Box>
+          </span>
+        </Stack>
+        {/* <Box
+          component='a'
+          // className='brand'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '11px',
+            fontWeight: 700,
+            fontSize: 16,
+            letterSpacing: '-0.01em',
+          }}
+          href='#top'
+        >
+          <Box
+            component='span'
+            // className='logo'
+            sx={{
+              width: { xs: 24, sm: 30 },
+              height: { xs: 24, sm: 30 },
+              borderRadius: 1,
+              flex: 'none',
+              background:
+                'linear-gradient(160deg, var(--mui-palette-design-accentHover), var(--mui-palette-design-accent))', 
+              display: 'grid',
+              placeItems: 'center',
+              color: '#FFF',
+              fontWeight: 700,
+              fontSize: 16,
+              letterSpacing: '-0.01em',
+              '& svg': {
+                width: '62%',
+                height: '62%',
+              },
+            }}
+          >
+            <Logo />
+          </Box>
+          <span>
+            Typesense Dashboard{' '}
+            <Box
+              component='small'
+              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+            >
+              · OSS
+            </Box>
+          </span>
+        </Box> */}
+        <Stack
+          direction='row'
+          spacing={1}
+          sx={{ ml: 'auto', display: { xs: 'none', lg: 'flex' } }}
+        >
+          <Button href='#features' color='inherit' size='small'>
+            Features
+          </Button>
+          <Button href='#search' color='inherit' size='small'>
+            Search
+          </Button>
+          <Button href='#gallery' color='inherit' size='small'>
+            Screenshots
+          </Button>
+          <Button href='#start' color='inherit' size='small'>
+            Get started
+          </Button>
+        </Stack>
+
+        <Stack
+          direction='row'
+          spacing={1}
+          sx={{
+            alignItems: 'center',
+            ml: 'auto',
+          }}
+        >
           <Button
             // className='btn btn-ghost btn-sm'
             size='small'
@@ -58,11 +152,34 @@ export const Nav = () => {
             target='_blank'
             rel='noopener'
             startIcon={<GitHub fontSize='inherit' />}
-            sx={{ borderColor: (theme) => theme.palette.design.border }}
+            sx={{
+              borderColor: (theme) => theme.palette.design.border,
+              display: { xs: 'none', sm: 'inline-flex' },
+            }}
           >
             {/* <GithubIcon /> */}
             GitHub
           </Button>
+          <IconButton
+            href={REPO_URL}
+            target='_blank'
+            rel='noopener'
+            aria-label='Github'
+            size='small'
+            disableRipple
+            variant='square'
+            sx={{
+              display: {
+                xs: 'inline-flex',
+                sm: 'none',
+                md: 'none',
+                lg: 'none',
+                xl: 'none',
+              },
+            }}
+          >
+            <GitHub fontSize='inherit' />
+          </IconButton>
           <Button
             // className='btn btn-primary btn-sm'
             variant='contained'
@@ -70,10 +187,15 @@ export const Nav = () => {
             href={DEMO_URL}
             target='_blank'
             rel='noopener'
+            sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
           >
             Live demo
           </Button>
-        </div>
+
+          <Box>
+            <ThemeModeToggle />
+          </Box>
+        </Stack>
       </Container>
     </header>
   );
