@@ -1,5 +1,6 @@
 import { AuthForm } from '@/components/AuthForm';
 import { Logo } from '@/components/Logo';
+import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { authSchema } from '@/constants/authForm';
 import { useAppForm, useAsyncToast } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -150,6 +151,9 @@ function AuthComponent() {
             }}
           >
             Dashboard
+          </Box>
+          <Box sx={{ ml: 'auto' }}>
+            <ThemeModeToggle />
           </Box>
         </Stack>
 
