@@ -44,7 +44,7 @@ function Home() {
       <Box
         aria-hidden
         sx={{
-          height: { xs: 'calc(76px + env(safe-area-inset-bottom, 0px))', md: 0 },
+          height: { xs: 'calc(92px + env(safe-area-inset-bottom, 0px))', md: 0 },
         }}
       />
     </>

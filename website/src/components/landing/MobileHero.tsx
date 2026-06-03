@@ -72,41 +72,41 @@ const Stat = ({ k, value, sub }: StatProps) => (
 );
 
 // --- quick-action icons (mirrored from the desktop hero's cluster card) ---
-const qaStroke = {
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-};
-const PlusIcon = () => (
-  <svg {...qaStroke}>
-    <line x1='12' y1='5' x2='12' y2='19' />
-    <line x1='5' y1='12' x2='19' y2='12' />
-  </svg>
-);
-const KeyIcon = () => (
-  <svg {...qaStroke}>
-    <circle cx='7.5' cy='15.5' r='4.5' />
-    <path d='m10.7 12.3 8.3-8.3M16 5l3 3' />
-  </svg>
-);
-const BackupIcon = () => (
-  <svg {...qaStroke}>
-    <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
-    <polyline points='7 10 12 15 17 10' />
-    <line x1='12' y1='15' x2='12' y2='3' />
-  </svg>
-);
-const AliasIcon = () => (
-  <svg {...qaStroke}>
-    <polyline points='17 1 21 5 17 9' />
-    <path d='M3 11V9a4 4 0 0 1 4-4h14' />
-    <polyline points='7 23 3 19 7 15' />
-    <path d='M21 13v2a4 4 0 0 1-4 4H3' />
-  </svg>
-);
+// const qaStroke = {
+//   viewBox: '0 0 24 24',
+//   fill: 'none',
+//   stroke: 'currentColor',
+//   strokeWidth: 2,
+//   strokeLinecap: 'round' as const,
+//   strokeLinejoin: 'round' as const,
+// };
+// const PlusIcon = () => (
+//   <svg {...qaStroke}>
+//     <line x1='12' y1='5' x2='12' y2='19' />
+//     <line x1='5' y1='12' x2='19' y2='12' />
+//   </svg>
+// );
+// const KeyIcon = () => (
+//   <svg {...qaStroke}>
+//     <circle cx='7.5' cy='15.5' r='4.5' />
+//     <path d='m10.7 12.3 8.3-8.3M16 5l3 3' />
+//   </svg>
+// );
+// const BackupIcon = () => (
+//   <svg {...qaStroke}>
+//     <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
+//     <polyline points='7 10 12 15 17 10' />
+//     <line x1='12' y1='15' x2='12' y2='3' />
+//   </svg>
+// );
+// const AliasIcon = () => (
+//   <svg {...qaStroke}>
+//     <polyline points='17 1 21 5 17 9' />
+//     <path d='M3 11V9a4 4 0 0 1 4-4h14' />
+//     <polyline points='7 23 3 19 7 15' />
+//     <path d='M21 13v2a4 4 0 0 1-4 4H3' />
+//   </svg>
+// );
 
 const TOP_SEARCHES: Array<{ rk: number; q: string; w: string; ct: string }> = [
   { rk: 1, q: 'vanderbilt', w: '100%', ct: '1,284' },
@@ -695,22 +695,24 @@ export const MobileHero = () => {
         </Box>
       </Box>
 
-      {/* ---------- sticky bottom CTA (pinned to the viewport on mobile) ---------- */}
+      {/* ---------- floating bottom CTA (pinned to the viewport on mobile) ---------- */}
       <Stack
         direction='row'
         sx={(theme) => ({
           alignItems: 'center',
           position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
+          left: 14,
+          right: 14,
+          bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
           zIndex: theme.zIndex.appBar,
           gap: '10px',
-          padding: '13px 18px calc(13px + env(safe-area-inset-bottom, 0px))',
-          background: `color-mix(in srgb, ${theme.vars.palette.design.bg} 88%, transparent)`,
-          backdropFilter: 'blur(14px) saturate(1.2)',
-          borderTop: `1px solid ${theme.vars.palette.design.border}`,
+          padding: '10px',
+          borderRadius: '16px',
+          background: `color-mix(in srgb, ${theme.vars.palette.design.surface} 80%, transparent)`,
+          backdropFilter: 'blur(16px) saturate(1.2)',
+          border: `1px solid ${theme.vars.palette.design.border}`,
+          boxShadow:
+            '0 18px 40px -12px rgba(0,0,0,0.55), 0 2px 8px -2px rgba(0,0,0,0.4)',
         })}
       >
         <Button
