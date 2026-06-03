@@ -476,9 +476,15 @@ function AuthComponent() {
                 direction='row'
                 sx={{ alignItems: 'center', gap: 1 }}
               >
-                <Check sx={{ fontSize: 16, color: '#4ade80' }} />
+                <Check sx={{ fontSize: 14, color: '#4ade80' }} />
                 <Typography
-                  sx={{ fontSize: 13.5, color: 'rgba(255,255,255,0.72)' }}
+                  sx={{
+                    fontSize: 11.5,
+                    color: 'rgba(255,255,255,0.72)',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
                   {label}
                 </Typography>
