@@ -117,8 +117,8 @@ export const Hero = () => {
         >
           <span className='eyebrow reveal'>Open source · Self-hosted</span>
           <h1 className='reveal d1'>
-            The dashboard your <span className='grad'>Typesense cluster</span>{' '}
-            deserves
+            Manage your <span className='grad'>Typesense cluster</span> without
+            touching the terminal
           </h1>
           <p className='lead reveal d2'>
             A fast, polished UI to manage self-hosted and local Typesense
@@ -145,7 +145,7 @@ export const Hero = () => {
               View on GitHub
             </a>
           </div>
-          <div className='hero-meta reveal d4'>
+          <Box className='hero-meta reveal d4' sx={{ pb: 2 }}>
             <span>
               <CheckIcon strokeWidth={2.5} /> Compatible with Typesense v29 &
               v30
@@ -156,7 +156,7 @@ export const Hero = () => {
             <span>
               <CheckIcon strokeWidth={2.5} /> Deploy in one command
             </span>
-          </div>
+          </Box>
         </Box>
 
         <Box
@@ -368,7 +368,7 @@ export const Hero = () => {
                 <div className='ts-head'>
                   <div>
                     <div className='ts-eyebrow'>
-                      NODE-1 · localhost:443 · v29.0
+                      NODE-1 · localhost:443 · v30.2
                     </div>
                     <h3>Cluster overview</h3>
                     <p>
