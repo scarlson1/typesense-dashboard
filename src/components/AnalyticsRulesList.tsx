@@ -48,17 +48,13 @@ export function AnalyticsRulesList() {
 
         return res.rules as AnalyticsRuleSchemaV1[];
       } else {
-        return await client.analytics.rules().retrieve(); // as AnalyticsRuleSchema[]
+        // The SDK types retrieve() as AnalyticsRuleSchema[], but Typesense 28+
+        // actually returns { rules: [...] }. Normalize to an array.
+        const res = (await client.analytics.rules().retrieve()) as unknown as
+          | AnalyticsRuleSchema[]
+          | { rules: AnalyticsRuleSchema[] };
+        return Array.isArray(res) ? res : (res?.rules ?? []);
       }
-
-      // const res = (await client.analytics.rules().retrieve()) as
-      //   | { rules: AnalyticsRuleSchema[] }
-      //   | { rules: AnalyticsRuleSchemaV1[] };
-
-      // const rules = Array.isArray(res)
-      //   ? (res as AnalyticsRuleSchema[])
-      //   : (res as { rules: AnalyticsRuleSchemaV1[] }).rules;
-      // return rules;
     },
   });
   const toast = useAsyncToast();

@@ -111,7 +111,12 @@ function AnalyticsInsight() {
 
         return res.rules as AnalyticsRuleSchemaV1[];
       } else {
-        return await client.analytics.rules().retrieve();
+        // The SDK types retrieve() as AnalyticsRuleSchema[], but Typesense 28+
+        // actually returns { rules: [...] }. Normalize to an array.
+        const res = (await client.analytics.rules().retrieve()) as unknown as
+          | AnalyticsRuleSchema[]
+          | { rules: AnalyticsRuleSchema[] };
+        return Array.isArray(res) ? res : (res?.rules ?? []);
       }
     },
   });
