@@ -476,8 +476,9 @@ export const MobileHero = () => {
             fontWeight: 800,
             marginTop: '16px',
           }}
+          // className='reveal d1'
         >
-          The dashboard your{' '}
+          Manage your{' '}
           <Box
             component='span'
             sx={(theme) => ({
@@ -489,7 +490,7 @@ export const MobileHero = () => {
           >
             Typesense cluster
           </Box>{' '}
-          deserves
+          without touching the terminal
         </Typography>
 
         <Typography

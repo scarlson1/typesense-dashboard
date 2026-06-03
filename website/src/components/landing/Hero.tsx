@@ -175,9 +175,9 @@ export const Hero = () => {
           <div className='shot-frame reveal d2' id='heroShot' ref={shotRef}>
             <div className='win-bar'>
               <div className='win-dots'>
-                <i />
-                <i />
-                <i />
+                <i className='close' />
+                <i className='minimize' />
+                <i className='fullscreen' />
               </div>
               <div className='win-url'>
                 <svg
