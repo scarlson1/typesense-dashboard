@@ -63,7 +63,11 @@ export const Nav = () => {
             Typesense Dashboard{' '}
             <Box
               component='small'
-              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                fontWeight: 400,
+                color: (theme) => theme.vars.palette.design.textFaint,
+              }}
             >
               · OSS
             </Box>
@@ -73,7 +77,14 @@ export const Nav = () => {
         <Stack
           direction='row'
           spacing={1}
-          sx={{ ml: 'auto', display: { xs: 'none', lg: 'flex' } }}
+          sx={{
+            ml: 'auto',
+            display: { xs: 'none', lg: 'flex' },
+            color: (theme) => theme.vars.palette.design.textMuted,
+            '&:hover': {
+              color: (theme) => theme.vars.palette.text.primary,
+            },
+          }}
         >
           <Button href='#features' color='inherit' size='small'>
             Features
