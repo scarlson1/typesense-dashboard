@@ -549,7 +549,9 @@ export const MobileHero = () => {
           border: `1px solid ${theme.vars.palette.design.border}`,
           borderBottom: 0,
           background: theme.vars.palette.design.surface,
-          boxShadow: '0 30px 70px -30px rgba(0,0,0,0.7)',
+          // Match the desktop .shot-frame shadow (--shadow-float): a softer,
+          // theme-aware float instead of the heavy black drop shadow.
+          boxShadow: 'var(--shadow-float)',
           overflow: 'hidden',
         })}
       >
@@ -709,7 +711,8 @@ export const MobileHero = () => {
           gap: '10px',
           padding: '10px',
           borderRadius: '16px',
-          background: `color-mix(in srgb, ${theme.vars.palette.design.surface} 80%, transparent)`,
+          // background: `color-mix(in srgb, ${theme.vars.palette.design.surface} 80%, transparent)`,
+          background: `color-mix(in srgb, var(--mui-palette-design-surface) 80%, transparent)`,
           backdropFilter: 'blur(16px) saturate(1.2)',
           border: `1px solid ${theme.vars.palette.design.border}`,
           boxShadow:
@@ -722,9 +725,10 @@ export const MobileHero = () => {
           target='_blank'
           rel='noopener'
           startIcon={<PlayIcon width={18} height={18} />}
+          // size='small'
           sx={(theme) => ({
             flex: 1,
-            height: 48,
+            // height: 48,
             borderRadius: 'var(--radius-sm)',
             fontSize: 15,
             color: theme.vars.palette.design.onAccent,
@@ -738,7 +742,10 @@ export const MobileHero = () => {
           target='_blank'
           rel='noopener'
           aria-label='GitHub'
-          sx={{ width: 48, height: 48, borderRadius: 'var(--radius-sm)' }}
+          sx={{
+            // width: 48, height: 48,
+            borderRadius: 'var(--radius-sm)',
+          }}
         >
           <GithubIcon width={20} height={20} />
         </IconButton>

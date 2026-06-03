@@ -161,6 +161,15 @@ export const theme = createTheme({
           textTransform: 'none',
           fontWeight: 'bolder',
         },
+        outlined: ({ theme }) => ({
+          borderColor: theme.vars.palette.design.border,
+          ...theme.applyStyles('dark', {
+            borderColor: theme.vars.palette.design.borderStrong,
+          }),
+          '&:hover': {
+            borderColor: theme.vars.palette.design.accentBorder,
+          },
+        }),
       },
     },
     MuiIconButton: {

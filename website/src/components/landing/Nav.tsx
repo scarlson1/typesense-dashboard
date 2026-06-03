@@ -63,63 +63,28 @@ export const Nav = () => {
             Typesense Dashboard{' '}
             <Box
               component='small'
-              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                fontWeight: 400,
+                color: (theme) => theme.vars.palette.design.textFaint,
+              }}
             >
               · OSS
             </Box>
           </span>
         </Stack>
-        {/* <Box
-          component='a'
-          // className='brand'
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '11px',
-            fontWeight: 700,
-            fontSize: 16,
-            letterSpacing: '-0.01em',
-          }}
-          href='#top'
-        >
-          <Box
-            component='span'
-            // className='logo'
-            sx={{
-              width: { xs: 24, sm: 30 },
-              height: { xs: 24, sm: 30 },
-              borderRadius: 1,
-              flex: 'none',
-              background:
-                'linear-gradient(160deg, var(--mui-palette-design-accentHover), var(--mui-palette-design-accent))', 
-              display: 'grid',
-              placeItems: 'center',
-              color: '#FFF',
-              fontWeight: 700,
-              fontSize: 16,
-              letterSpacing: '-0.01em',
-              '& svg': {
-                width: '62%',
-                height: '62%',
-              },
-            }}
-          >
-            <Logo />
-          </Box>
-          <span>
-            Typesense Dashboard{' '}
-            <Box
-              component='small'
-              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
-            >
-              · OSS
-            </Box>
-          </span>
-        </Box> */}
+
         <Stack
           direction='row'
           spacing={1}
-          sx={{ ml: 'auto', display: { xs: 'none', lg: 'flex' } }}
+          sx={{
+            ml: 'auto',
+            display: { xs: 'none', lg: 'flex' },
+            color: (theme) => theme.vars.palette.design.textMuted,
+            '&:hover': {
+              color: (theme) => theme.vars.palette.text.primary,
+            },
+          }}
         >
           <Button href='#features' color='inherit' size='small'>
             Features
@@ -154,7 +119,7 @@ export const Nav = () => {
             startIcon={<GitHub fontSize='inherit' />}
             sx={{
               borderColor: (theme) => theme.palette.design.border,
-              display: { xs: 'none', sm: 'inline-flex' },
+              display: { xs: 'none', md: 'inline-flex' },
             }}
           >
             {/* <GithubIcon /> */}
@@ -187,7 +152,7 @@ export const Nav = () => {
             href={DEMO_URL}
             target='_blank'
             rel='noopener'
-            sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
           >
             Live demo
           </Button>
