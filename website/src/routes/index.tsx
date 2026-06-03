@@ -27,9 +27,11 @@ function Home() {
         <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <Hero />
         </Box>
-        <Box
-        // sx={{ mt: { xs: 4, sm: 5, md: 6, lg: 8 } }}
-        >
+        {/* Sits above the mobile hero's wireframe (zIndex 2) so its opaque
+            background covers the wireframe's downward drop shadow instead of
+            letting it bleed into this strip — the peek then reads as diving
+            cleanly under the section, matching the desktop hero. */}
+        <Box sx={{ position: 'relative', zIndex: 3 }}>
           <TrustStrip />
         </Box>
         <Features />

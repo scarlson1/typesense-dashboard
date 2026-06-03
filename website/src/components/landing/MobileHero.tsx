@@ -549,7 +549,9 @@ export const MobileHero = () => {
           border: `1px solid ${theme.vars.palette.design.border}`,
           borderBottom: 0,
           background: theme.vars.palette.design.surface,
-          boxShadow: '0 30px 70px -30px rgba(0,0,0,0.7)',
+          // Match the desktop .shot-frame shadow (--shadow-float): a softer,
+          // theme-aware float instead of the heavy black drop shadow.
+          boxShadow: 'var(--shadow-float)',
           overflow: 'hidden',
         })}
       >
