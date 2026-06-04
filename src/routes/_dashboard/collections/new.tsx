@@ -1,5 +1,6 @@
 import { NewCollectionForm } from '@/components/NewCollectionForm';
-import { Box, Skeleton, Tab, Tabs, Typography } from '@mui/material';
+import { PageHeader } from '@/components/redesign';
+import { Box, Container, Skeleton, Stack, Tab, Tabs } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   lazy,
@@ -10,7 +11,7 @@ import {
 } from 'react';
 
 const NewCollectionEditor = lazy(
-  () => import('@/components/NewCollectionEditor')
+  () => import('@/components/NewCollectionEditor'),
 );
 
 export const Route = createFileRoute('/_dashboard/collections/new')({
@@ -28,8 +29,27 @@ function NewCollection() {
   }, []);
 
   return (
-    <Box>
-      <Typography variant='h3'>New Collection</Typography>
+    <Stack sx={{ minWidth: 0 }}>
+      <PageHeader
+        title='New Collection'
+        // badges={<Badge tone='neutral'>{collectionId}</Badge>}
+        // actions={
+        //   <Button
+        //     component='a'
+        //     href='https://typesense.org/docs/29.0/api/curation.html'
+        //     target='_blank'
+        //     rel='noopener noreferrer'
+        //     variant='outlined'
+        //     size='small'
+        //     startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+        //     sx={smallButtonSx}
+        //   >
+        //     Docs
+        //   </Button>
+        // }
+      />
+      {/* <CollectionTabBar collectionId={collectionId} /> */}
+
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={value}
@@ -40,16 +60,18 @@ function NewCollection() {
           <Tab label='JSON' value='editor' />
         </Tabs>
       </Box>
-      <Box role='tabpanel' hidden={value !== 'form'} sx={{ pt: 3 }}>
-        {value === 'form' && <NewCollectionForm />}
-      </Box>
-      <Box role='tabpanel' hidden={value !== 'editor'} sx={{ pt: 3 }}>
-        {value === 'editor' && (
-          <Suspense fallback={<Skeleton variant='rounded' height={'60vh'} />}>
-            <NewCollectionEditor />
-          </Suspense>
-        )}
-      </Box>
-    </Box>
+      <Container maxWidth='xl'>
+        <Box role='tabpanel' hidden={value !== 'form'} sx={{ pt: 3 }}>
+          {value === 'form' && <NewCollectionForm />}
+        </Box>
+        <Box role='tabpanel' hidden={value !== 'editor'} sx={{ pt: 3 }}>
+          {value === 'editor' && (
+            <Suspense fallback={<Skeleton variant='rounded' height={'60vh'} />}>
+              <NewCollectionEditor />
+            </Suspense>
+          )}
+        </Box>
+      </Container>
+    </Stack>
   );
 }

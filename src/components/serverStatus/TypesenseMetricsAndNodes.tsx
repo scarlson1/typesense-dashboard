@@ -1,7 +1,8 @@
 import { ErrorFallback } from '@/components/ErrorFallback';
+import { Badge, SectionCard } from '@/components/redesign';
 import { useTypesenseClient } from '@/hooks';
 import { formatBytes, removeStartEndMatches } from '@/utils';
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isObject, round } from 'lodash-es';
@@ -10,22 +11,16 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 export function TypesenseMetricsAndNodes() {
   return (
-    <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
-      <Stack
-        spacing={1}
-        direction='row'
-        sx={{ justifyContent: 'space-between', alignItems: 'center' }}
-      >
-        <Typography variant='h6' gutterBottom>
-          Typesense
-        </Typography>
+    <SectionCard
+      title='Typesense Metrics'
+      actions={
         <ErrorBoundary fallback={null}>
           <Suspense>
             <TypesenseVersion />
           </Suspense>
         </ErrorBoundary>
-      </Stack>
-
+      }
+    >
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={2}
@@ -69,31 +64,22 @@ export function TypesenseMetricsAndNodes() {
           </ErrorBoundary>
         </Box>
       </Stack>
-    </Paper>
+    </SectionCard>
   );
 }
 
 function TypesenseVersion() {
   const [client, clientId] = useTypesenseClient();
+  // /debug is admin only -> handle fallback
   const { data } = useSuspenseQuery({
     queryKey: [clientId, 'debug'],
     queryFn: () => client.debug.retrieve(),
     staleTime: 1000 * 300,
   });
 
-  return (
-    <Stack spacing={0.5} direction='column' sx={{ alignItems: 'flex-end' }}>
-      <Typography
-        variant='overline'
-        sx={{ lineHeight: 1.2, color: 'text.secondary', fontSize: '0.725rem' }}
-      >
-        Version
-      </Typography>
-      <Typography variant='subtitle2' sx={{ lineHeight: 1.2 }}>
-        {data?.version ?? '--'}
-      </Typography>
-    </Stack>
-  );
+  if (!data?.version) return null;
+
+  return <Badge tone='neutral'>v{data?.version}</Badge>;
 }
 
 function TypesenseMetrics() {

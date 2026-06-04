@@ -15,7 +15,7 @@ export const NewCollectionForm = () => {
     onSubmit: async ({ value }) => {
       // TODO: fix zod type (FieldType)
       const { fields, ...rest } = value;
-      let collection: CollectionCreateSchema = {
+      const collection: CollectionCreateSchema = {
         ...rest,
         fields: fields as CollectionFieldSchema[],
       };
@@ -33,12 +33,7 @@ export const NewCollectionForm = () => {
           form.handleSubmit();
         }}
         noValidate
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          gap: 2,
-        }}
+        sx={{ width: '100%' }}
       >
         <CollectionForm form={form} />
       </Box>

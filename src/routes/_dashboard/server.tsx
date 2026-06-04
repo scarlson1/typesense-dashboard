@@ -1,7 +1,6 @@
 import { ErrorFallback } from '@/components';
 import {
   Badge,
-  BigChart,
   PageHeader,
   primaryButtonSx,
   SectionCard,
@@ -9,6 +8,7 @@ import {
   StatCard,
 } from '@/components/redesign';
 import {
+  ServerHealth,
   ServerMetrics,
   ServerOps,
   TypesenseMetricsAndNodes,
@@ -17,7 +17,7 @@ import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { formatBytes } from '@/utils';
 import { DownloadRounded, SettingsRounded } from '@mui/icons-material';
-import { Alert, Box, Button, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -56,7 +56,23 @@ function RouteComponent() {
           </Suspense>
         </ErrorBoundary>
 
-        <Box
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          sx={{ mt: 1.75 }}
+        >
+          <ServerMetrics />
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense fallback={null}>
+              <TypesenseMetricsAndNodes />
+            </Suspense>
+          </ErrorBoundary>
+        </Stack>
+
+        {/* <Box
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', lg: '1.6fr 1fr' },
@@ -102,7 +118,7 @@ function RouteComponent() {
               </Suspense>
             </ErrorBoundary>
           </Stack>
-        </Box>
+        </Box> */}
 
         <Box sx={{ mt: 1.75 }}>
           <SectionCard title='Operations'>
@@ -152,7 +168,11 @@ function ServerHeader({
       eyebrow={`NODE-1 · ${host}${port ? `:${port}` : ''}`}
       badges={
         <>
-          <Badge tone='success'>● Healthy</Badge>
+          <ErrorBoundary fallback={null}>
+            <Suspense fallback={null}>
+              <ServerHealth />
+            </Suspense>
+          </ErrorBoundary>
           {version ? <Badge tone='neutral'>v{version}</Badge> : null}
         </>
       }

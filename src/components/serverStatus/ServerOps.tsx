@@ -2,15 +2,7 @@ import { ErrorFallback } from '@/components';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { queryClient } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Grid,
-  Link,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Grid, Link, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
@@ -18,75 +10,73 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 export function ServerOps() {
   return (
-    <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
-      <Stack direction='column' spacing={2}>
-        <Typography variant='h6'>Server Operations</Typography>
-        <Box>
-          <Typography variant='subtitle1' gutterBottom>
-            Cache
-          </Typography>
-          <Typography variant='body2' sx={{ pb: 2 }}>
-            Responses of search requests that are sent with use_cache parameter
-            are cached in a LRU cache{' '}
-            <Link
-              href='https://typesense.org/docs/29.0/api/cluster-operations.html#clear-cache'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
-            </Link>
-          </Typography>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
+    // <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
+    <Stack direction='column' spacing={2}>
+      <Box>
+        <Typography variant='subtitle1' gutterBottom>
+          Cache
+        </Typography>
+        <Typography variant='body2' sx={{ pb: 2 }}>
+          Responses of search requests that are sent with use_cache parameter
+          are cached in a LRU cache{' '}
+          <Link
+            href='https://typesense.org/docs/29.0/api/cluster-operations.html#clear-cache'
+            target='_blank'
+            rel='noopener noreferrer'
           >
-            <ClearCache />
-          </ErrorBoundary>
-        </Box>
-        <Box>
-          <Typography variant='subtitle1' gutterBottom>
-            Compact DB
-          </Typography>
-          <Typography variant='body2' sx={{ pb: 2 }}>
-            Typesense uses RocksDB to store your documents on the disk.
-            Compacting could reduce the size of the database and decrease read
-            latency.{' '}
-            <Link
-              href='https://typesense.org/docs/29.0/api/cluster-operations.html#compacting-the-on-disk-database'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
-            </Link>
-          </Typography>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
+            Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+          </Link>
+        </Typography>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => {
+            captureException(err);
+          }}
+        >
+          <ClearCache />
+        </ErrorBoundary>
+      </Box>
+      <Box>
+        <Typography variant='subtitle1' gutterBottom>
+          Compact DB
+        </Typography>
+        <Typography variant='body2' sx={{ pb: 2 }}>
+          Typesense uses RocksDB to store your documents on the disk. Compacting
+          could reduce the size of the database and decrease read latency.{' '}
+          <Link
+            href='https://typesense.org/docs/29.0/api/cluster-operations.html#compacting-the-on-disk-database'
+            target='_blank'
+            rel='noopener noreferrer'
           >
-            <CompactDatabase />
-          </ErrorBoundary>
-        </Box>
-        <Box>
-          <Typography variant='subtitle1' gutterBottom>
-            Schema Updates in Progress
-          </Typography>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
-          >
-            <Suspense>
-              <SchemaUpdatesInProgress />
-            </Suspense>
-          </ErrorBoundary>
-        </Box>
-      </Stack>
-    </Paper>
+            Docs <OpenInNewRounded fontSize='inherit' sx={{ ml: 0.25 }} />
+          </Link>
+        </Typography>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => {
+            captureException(err);
+          }}
+        >
+          <CompactDatabase />
+        </ErrorBoundary>
+      </Box>
+      <Box>
+        <Typography variant='subtitle1' gutterBottom>
+          Schema Updates in Progress
+        </Typography>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={(err: unknown) => {
+            captureException(err);
+          }}
+        >
+          <Suspense>
+            <SchemaUpdatesInProgress />
+          </Suspense>
+        </ErrorBoundary>
+      </Box>
+    </Stack>
+    // </Paper>
   );
 }
 
