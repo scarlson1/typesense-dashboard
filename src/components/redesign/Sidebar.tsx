@@ -334,6 +334,13 @@ export function Sidebar() {
         sx={{
           mb: 1.75,
           '& .MuiInputBase-root': {
+            width: '100%',
+            // The global MuiInputBase override scales inputs by 0.875 (a 16px
+            // font / iOS-zoom hack), which paints every input 12.5% narrower
+            // than its box. Opt out here and size the font directly so the
+            // cluster select actually fills the sidebar.
+            transform: 'none',
+            fontSize: '0.875rem',
             background: designTokens.surfaceMuted,
             borderRadius: '7px',
           },
