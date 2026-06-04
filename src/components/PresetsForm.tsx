@@ -480,7 +480,22 @@ function ParameterRow({
       spacing={1.25}
       sx={{ alignItems: 'center', width: '100%' }}
     >
-      <Box sx={{ flex: `0 0 ${PARAM_LABEL_COL}px`, minWidth: 0 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 0.75, sm: 1.25 }}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          alignItems: { xs: 'stretch', sm: 'center' },
+        }}
+      >
+      <Box
+        sx={{
+          flex: { xs: '0 0 auto', sm: `0 0 ${PARAM_LABEL_COL}px` },
+          width: { xs: '100%', sm: 'auto' },
+          minWidth: 0,
+        }}
+      >
         <form.Field name={nameField}>
           {({ state, handleChange, handleBlur }: any) => {
             const nameVal = state.value ?? '';
@@ -536,7 +551,7 @@ function ParameterRow({
         </form.Field>
       </Box>
 
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ flex: 1, width: { xs: '100%', sm: 'auto' }, minWidth: 0 }}>
         <form.Field name={valueField}>
           {({ state, handleChange }: { state: { value: string }; handleChange: (val: string) => void }) => (
             <ChipInput
@@ -546,6 +561,7 @@ function ParameterRow({
           )}
         </form.Field>
       </Box>
+      </Stack>
 
       <IconButton
         onClick={onRemove}

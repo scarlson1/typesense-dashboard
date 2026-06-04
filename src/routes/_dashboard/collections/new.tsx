@@ -1,6 +1,15 @@
 import { NewCollectionForm } from '@/components/NewCollectionForm';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Box, Skeleton, Tab, Typography } from '@mui/material';
+import { PageHeader, smallButtonSx } from '@/components/redesign';
+import { OpenInNewRounded } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Container,
+  Skeleton,
+  Stack,
+  Tab,
+  Tabs,
+} from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   lazy,
@@ -11,7 +20,7 @@ import {
 } from 'react';
 
 const NewCollectionEditor = lazy(
-  () => import('@/components/NewCollectionEditor')
+  () => import('@/components/NewCollectionEditor'),
 );
 
 export const Route = createFileRoute('/_dashboard/collections/new')({
@@ -29,24 +38,48 @@ function NewCollection() {
   }, []);
 
   return (
-    <Box>
-      <Typography variant='h3'>New Collection</Typography>
-      <TabContext value={value}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label='lab API tabs example'>
-            <Tab label='Form' value='form' />
-            <Tab label='JSON' value='editor' />
-          </TabList>
+    <Stack sx={{ minWidth: 0 }}>
+      <PageHeader
+        title='New Collection'
+        // badges={<Badge tone='neutral'>{collectionId}</Badge>}
+        actions={
+          <Button
+            component='a'
+            href='https://typesense.org/docs/32.2/api/curation.html'
+            target='_blank'
+            rel='noopener noreferrer'
+            variant='outlined'
+            size='small'
+            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+            sx={smallButtonSx}
+          >
+            Schema Docs
+          </Button>
+        }
+      />
+
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label='new collection input mode'
+        >
+          <Tab label='Form' value='form' />
+          <Tab label='JSON' value='editor' />
+        </Tabs>
+      </Box>
+      <Container maxWidth='xl'>
+        <Box role='tabpanel' hidden={value !== 'form'} sx={{ pt: 3 }}>
+          {value === 'form' && <NewCollectionForm />}
         </Box>
-        <TabPanel value='form'>
-          <NewCollectionForm />
-        </TabPanel>
-        <TabPanel value='editor'>
-          <Suspense fallback={<Skeleton variant='rounded' height={'60vh'} />}>
-            <NewCollectionEditor />
-          </Suspense>
-        </TabPanel>
-      </TabContext>
-    </Box>
+        <Box role='tabpanel' hidden={value !== 'editor'} sx={{ pt: 3 }}>
+          {value === 'editor' && (
+            <Suspense fallback={<Skeleton variant='rounded' height={'60vh'} />}>
+              <NewCollectionEditor />
+            </Suspense>
+          )}
+        </Box>
+      </Container>
+    </Stack>
   );
 }

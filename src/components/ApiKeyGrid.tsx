@@ -3,11 +3,7 @@ import { apiKeyQueryKeys } from '@/constants';
 import { useAsyncToast, useDialog, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import {
-  ContentCopyOutlined,
-  DeleteOutlineRounded,
-  ExpandMoreRounded,
-} from '@mui/icons-material';
+import { DeleteOutlineRounded, ExpandMoreRounded } from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -42,15 +38,15 @@ const actionChipSx = {
   whiteSpace: 'nowrap' as const,
 };
 
-const copyButtonSx = {
-  width: 22,
-  height: 22,
-  border: `1px solid ${designTokens.border}`,
-  borderRadius: '4px',
-  background: designTokens.surface,
-  color: designTokens.textFaint,
-  '&:hover': { borderColor: designTokens.borderStrong },
-};
+// const copyButtonSx = {
+//   width: 22,
+//   height: 22,
+//   border: `1px solid ${designTokens.border}`,
+//   borderRadius: '4px',
+//   background: designTokens.surface,
+//   color: designTokens.textFaint,
+//   '&:hover': { borderColor: designTokens.borderStrong },
+// };
 
 const thSx = {
   textAlign: 'left' as const,
@@ -311,7 +307,7 @@ function DesktopKeyRow({
               •••••••••••••••
             </Box>
           </Typography>
-          <Tooltip title='Copy prefix'>
+          {/* <Tooltip title='Copy prefix'>
             <IconButton
               size='small'
               onClick={() => onCopy(k.value_prefix || '')}
@@ -319,7 +315,7 @@ function DesktopKeyRow({
             >
               <ContentCopyOutlined sx={{ fontSize: 11 }} />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
         </Stack>
       </TableCell>
 
@@ -360,7 +356,9 @@ function DesktopKeyRow({
               '&:hover': { color: designTokens.text },
             }}
           >
-            <Typography sx={{ fontSize: 12, fontWeight: 600, color: 'inherit' }}>
+            <Typography
+              sx={{ fontSize: 12, fontWeight: 600, color: 'inherit' }}
+            >
               {expanded ? 'Show less' : 'Show all'}
             </Typography>
             <ExpandMoreRounded
@@ -389,7 +387,9 @@ function DesktopKeyRow({
           ) : allCollections.length ? (
             <>
               {visibleCollections.join(', ')}
-              {!expanded && hiddenCollections > 0 ? ` +${hiddenCollections}` : ''}
+              {!expanded && hiddenCollections > 0
+                ? ` +${hiddenCollections}`
+                : ''}
             </>
           ) : (
             '—'
@@ -489,7 +489,7 @@ function MobileKeyCard({ k, isFirst, onCopy }: MobileKeyCardProps) {
             •••••••••••
           </Box>
         </Typography>
-        <Tooltip title='Copy prefix'>
+        {/* <Tooltip title='Copy prefix'>
           <IconButton
             size='small'
             onClick={() => onCopy(k.value_prefix || '')}
@@ -497,7 +497,7 @@ function MobileKeyCard({ k, isFirst, onCopy }: MobileKeyCardProps) {
           >
             <ContentCopyOutlined sx={{ fontSize: 11 }} />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
       </Stack>
 
       {/* Actions + collection scope */}

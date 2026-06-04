@@ -23,12 +23,17 @@ import type {
 
 interface SchemaFieldEditDialogProps {
   field: CollectionFieldSchema | null;
+  /** When true, opens the dialog in create mode (with an editable name field). */
+  creating?: boolean;
   onClose: () => void;
   onSave: (updated: CollectionFieldSchema) => void;
+  /** Called instead of onSave when in create mode. */
+  onCreate?: (created: CollectionFieldSchema) => void;
   saving?: boolean;
 }
 
 interface EditState {
+  name: string;
   type: FieldType;
   index: boolean;
   facet: boolean;
@@ -37,13 +42,14 @@ interface EditState {
   optional: boolean;
 }
 
-const buildInitialState = (field: CollectionFieldSchema): EditState => ({
-  type: field.type as FieldType,
-  index: field.index ?? true,
-  facet: field.facet ?? false,
-  sort: field.sort ?? false,
-  range_index: field.range_index ?? false,
-  optional: field.optional ?? false,
+const buildInitialState = (field: CollectionFieldSchema | null): EditState => ({
+  name: field?.name ?? '',
+  type: (field?.type as FieldType) ?? 'string',
+  index: field?.index ?? true,
+  facet: field?.facet ?? false,
+  sort: field?.sort ?? false,
+  range_index: field?.range_index ?? false,
+  optional: field?.optional ?? false,
 });
 
 const TOGGLES: { key: keyof Omit<EditState, 'type'>; label: string; help: string }[] = [
@@ -56,34 +62,46 @@ const TOGGLES: { key: keyof Omit<EditState, 'type'>; label: string; help: string
 
 export const SchemaFieldEditDialog = ({
   field,
+  creating,
   onClose,
   onSave,
+  onCreate,
   saving,
 }: SchemaFieldEditDialogProps) => {
+  const isCreate = Boolean(creating) && !field;
+  const open = Boolean(field) || Boolean(creating);
+
   const [state, setState] = useState<EditState | null>(
-    field ? buildInitialState(field) : null,
+    open ? buildInitialState(field) : null,
   );
 
   useEffect(() => {
-    setState(field ? buildInitialState(field) : null);
-  }, [field]);
+    setState(open ? buildInitialState(field) : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [field, creating]);
 
   const handleSave = () => {
-    if (!field || !state) return;
-    onSave({
-      name: field.name,
+    if (!state) return;
+    const payload: CollectionFieldSchema = {
+      name: state.name.trim(),
       type: state.type,
       index: state.index,
       facet: state.facet,
       sort: state.sort,
       range_index: state.range_index,
       optional: state.optional,
-    });
+    };
+    if (isCreate) {
+      if (!payload.name) return;
+      onCreate?.(payload);
+    } else {
+      onSave(payload);
+    }
   };
 
   return (
     <Dialog
-      open={Boolean(field)}
+      open={open}
       onClose={saving ? undefined : onClose}
       maxWidth='xs'
       fullWidth
@@ -105,7 +123,7 @@ export const SchemaFieldEditDialog = ({
           py: 1.75,
         }}
       >
-        Edit field
+        {isCreate ? 'Add field' : 'Edit field'}
         {field ? (
           <Box
             component='span'
@@ -125,6 +143,32 @@ export const SchemaFieldEditDialog = ({
       <DialogContent sx={{ py: 2.25, px: 2.75 }}>
         {state ? (
           <Stack sx={{ gap: 2 }}>
+            {isCreate ? (
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: designTokens.text,
+                    mb: 0.75,
+                  }}
+                >
+                  Name
+                </Typography>
+                <TextField
+                  fullWidth
+                  autoFocus
+                  size='small'
+                  placeholder='field_name'
+                  value={state.name}
+                  onChange={(e) =>
+                    setState({ ...state, name: e.target.value })
+                  }
+                  sx={fieldInputSx}
+                />
+              </Box>
+            ) : null}
+
             <Box>
               <Typography
                 sx={{
@@ -152,16 +196,18 @@ export const SchemaFieldEditDialog = ({
                   </MenuItem>
                 ))}
               </TextField>
-              <Typography
-                sx={{
-                  fontSize: 11.5,
-                  color: designTokens.textMuted,
-                  mt: 0.5,
-                }}
-              >
-                Changing type drops &amp; re-adds this field, triggering a
-                re-index.
-              </Typography>
+              {!isCreate ? (
+                <Typography
+                  sx={{
+                    fontSize: 11.5,
+                    color: designTokens.textMuted,
+                    mt: 0.5,
+                  }}
+                >
+                  Changing type drops &amp; re-adds this field, triggering a
+                  re-index.
+                </Typography>
+              ) : null}
             </Box>
 
             <Stack sx={{ gap: 0.5 }}>
@@ -234,10 +280,11 @@ export const SchemaFieldEditDialog = ({
           size='small'
           onClick={handleSave}
           loading={saving}
+          disabled={isCreate && !state?.name.trim()}
           startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
           sx={primaryButtonSx}
         >
-          Save changes
+          {isCreate ? 'Add field' : 'Save changes'}
         </Button>
       </DialogActions>
     </Dialog>

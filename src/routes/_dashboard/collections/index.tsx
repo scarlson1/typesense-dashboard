@@ -1,5 +1,5 @@
 import { ErrorFallback } from '@/components';
-import { CollectionsGrid } from '@/components/CollectionsGrid';
+import { CollectionsTable } from '@/components/CollectionsTable';
 import { collectionQueryKeys } from '@/constants';
 import {
   Badge,
@@ -84,7 +84,9 @@ function CollectionsComponent() {
                 FallbackComponent={ErrorFallback}
                 onError={(err: unknown) => captureException(err)}
               >
-                <CollectionsGrid />
+                <Suspense fallback={<CollectionsTableFallback />}>
+                  <CollectionsTable />
+                </Suspense>
               </ErrorBoundary>
             </Box>
           </>
@@ -156,6 +158,24 @@ function StatStripFallback() {
             border: `1px solid ${designTokens.border}`,
             borderRadius: 1,
             height: 92,
+          }}
+        />
+      ))}
+    </Box>
+  );
+}
+
+function CollectionsTableFallback() {
+  return (
+    <Box sx={{ p: 1.75 }}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <Box
+          key={i}
+          sx={{
+            height: 24,
+            my: 1.5,
+            borderRadius: 0.5,
+            background: designTokens.surfaceMuted,
           }}
         />
       ))}

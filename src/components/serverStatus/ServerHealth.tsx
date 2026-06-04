@@ -1,5 +1,5 @@
+import { Badge } from '@/components/redesign';
 import { useTypesenseClient } from '@/hooks';
-import { Chip } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 export function ServerHealth() {
@@ -12,13 +12,15 @@ export function ServerHealth() {
   });
 
   // @ts-expect-error resource_error is not in the typed health response
-  const chipLabel = data.ok ? 'healthy' : (data.resource_error ?? 'Down');
+  const chipLabel = data.ok ? 'Healthy' : (data.resource_error ?? 'Down');
 
-  return (
-    <Chip
-      label={chipLabel}
-      color={data.ok ? 'success' : 'warning'}
-      size='small'
-    />
-  );
+  return <Badge tone={data.ok ? 'success' : 'danger'}>● {chipLabel}</Badge>;
+
+  // return (
+  //   <Chip
+  //     label={chipLabel}
+  //     color={data.ok ? 'success' : 'warning'}
+  //     size='small'
+  //   />
+  // );
 }

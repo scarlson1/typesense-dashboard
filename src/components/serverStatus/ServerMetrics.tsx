@@ -1,10 +1,12 @@
 import { CircularProgressWithLabel } from '@/components/CircularProgressWithLabel';
 import { LinearProgressWithLabel } from '@/components/LinearProgressWithLabel';
+import { SectionCard } from '@/components/redesign';
 import { useTypesenseClient } from '@/hooks';
 import { formatBytes, removeStartEndMatches } from '@/utils';
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { ServerHealth } from './ServerHealth';
 
 export function ServerMetrics() {
@@ -19,35 +21,33 @@ export function ServerMetrics() {
   const cpuPcts = useMemo(() => {
     // use index when mapping or keep the cpu number from key ??
     return Object.entries(data).filter(([key, _]: string[]) =>
-      key.startsWith('system_cpu')
+      key.startsWith('system_cpu'),
     );
   }, [data]);
 
   const megabytesPct = Math.round(
     (Number(data.system_memory_used_bytes) /
       Number(data.system_memory_total_bytes)) *
-      100
+      100,
   );
 
   const megabytesPctDisk = Math.round(
     (Number(data.system_disk_used_bytes) /
       Number(data.system_disk_total_bytes)) *
-      100
+      100,
   );
 
   return (
-    <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
-      <Stack
-        direction='row'
-        spacing={2}
-        // sx={{ justifyContent: 'space-between' }}
-      >
-        <Typography variant='h6' gutterBottom>
-          Server Metrics
-        </Typography>
-        <ServerHealth />
-      </Stack>
-
+    <SectionCard
+      title='Server Metrics'
+      actions={
+        <ErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <ServerHealth />
+          </Suspense>
+        </ErrorBoundary>
+      }
+    >
       <Stack
         direction='row'
         spacing={{ xs: 1, sm: 1.5, md: 2 }}
@@ -65,7 +65,7 @@ export function ServerMetrics() {
             <Typography variant='body2' color='text.secondary'>
               {removeStartEndMatches(
                 removeStartEndMatches(id, 'system_'),
-                '_active_percentage'
+                '_active_percentage',
               )}
             </Typography>
             <CircularProgressWithLabel value={Number(val)} size={48} />
@@ -99,6 +99,6 @@ export function ServerMetrics() {
         </Typography>
         <Typography>{`Received: ${formatBytes(Number(data.system_network_received_bytes))}; Sent: ${formatBytes(Number(data.system_network_sent_bytes))}`}</Typography>
       </Box>
-    </Paper>
+    </SectionCard>
   );
 }

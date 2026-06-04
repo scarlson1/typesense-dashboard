@@ -165,7 +165,10 @@ function HomeHeader({ fallback }: { fallback?: boolean } = {}) {
             variant='outlined'
             size='small'
             startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
-            sx={smallButtonSx}
+            sx={{
+              ...smallButtonSx,
+              display: { xs: 'none', sm: 'inline-flex' },
+            }}
           >
             Docs
           </Button>

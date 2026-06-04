@@ -1,23 +1,20 @@
 import { ErrorFallback } from '@/components';
 import {
   Badge,
-  BigChart,
   PageHeader,
-  primaryButtonSx,
   SectionCard,
-  smallButtonSx,
   StatCard,
 } from '@/components/redesign';
 import {
-  ServerMetrics,
+  MemoryBreakdown,
+  MemoryUtilization,
+  ServerHealth,
   ServerOps,
-  TypesenseMetricsAndNodes,
 } from '@/components/serverStatus';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { formatBytes } from '@/utils';
-import { DownloadRounded, SettingsRounded } from '@mui/icons-material';
-import { Alert, Box, Button, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -59,50 +56,60 @@ function RouteComponent() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', lg: '1.6fr 1fr' },
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
             gap: 1.75,
             mt: 1.75,
           }}
         >
-          <SectionCard
-            title='Requests per second'
-            description='Search · Import · Delete · Write — last 24 hours'
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
           >
-            <BigChart />
-            <Stack
-              direction='row'
-              sx={{
-                gap: 2,
-                mt: 1,
-                fontSize: 11.5,
-                color: designTokens.textMuted,
-                flexWrap: 'wrap',
-              }}
+            <Suspense
+              fallback={
+                <Skeleton
+                  variant='rounded'
+                  height={150}
+                  sx={{ background: designTokens.surfaceMuted }}
+                />
+              }
             >
-              <Legend color={designTokens.accent}>Search</Legend>
-              <Legend color='#3aafe0'>Import</Legend>
-              <Legend color='#f6b500'>Write</Legend>
-              <Legend color={designTokens.textSubtle}>Delete</Legend>
-            </Stack>
-            <Alert severity='warning' sx={{ mt: 1.5 }}>
-              Illustrative chart — Typesense's API does not expose historical
-              time-series for QPS/latency. Hook up an external metrics store
-              (e.g. Prometheus + Grafana) to render real history.
-            </Alert>
-          </SectionCard>
-
-          <Stack sx={{ gap: 1.75, minWidth: 0 }}>
-            <ServerMetrics />
-            <ErrorBoundary
-              FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              <MemoryUtilization />
+            </Suspense>
+          </ErrorBoundary>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense
+              fallback={
+                <Skeleton
+                  variant='rounded'
+                  height={150}
+                  sx={{ background: designTokens.surfaceMuted }}
+                />
+              }
             >
-              <Suspense fallback={null}>
-                <TypesenseMetricsAndNodes />
-              </Suspense>
-            </ErrorBoundary>
-          </Stack>
+              <MemoryBreakdown />
+            </Suspense>
+          </ErrorBoundary>
         </Box>
+
+        {/* <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          sx={{ mt: 1.75 }}
+        >
+          <ServerMetrics />
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense fallback={null}>
+              <TypesenseMetricsAndNodes />
+            </Suspense>
+          </ErrorBoundary>
+        </Stack> */}
 
         <Box sx={{ mt: 1.75 }}>
           <SectionCard title='Operations'>
@@ -152,30 +159,34 @@ function ServerHeader({
       eyebrow={`NODE-1 · ${host}${port ? `:${port}` : ''}`}
       badges={
         <>
-          <Badge tone='success'>● Healthy</Badge>
+          <ErrorBoundary fallback={null}>
+            <Suspense fallback={null}>
+              <ServerHealth />
+            </Suspense>
+          </ErrorBoundary>
           {version ? <Badge tone='neutral'>v{version}</Badge> : null}
         </>
       }
-      actions={
-        <>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<DownloadRounded sx={{ fontSize: 13 }} />}
-            sx={smallButtonSx}
-          >
-            Snapshot
-          </Button>
-          <Button
-            variant='contained'
-            size='small'
-            startIcon={<SettingsRounded sx={{ fontSize: 13 }} />}
-            sx={primaryButtonSx}
-          >
-            Configuration
-          </Button>
-        </>
-      }
+      // actions={
+      //   <>
+      //     <Button
+      //       variant='outlined'
+      //       size='small'
+      //       startIcon={<DownloadRounded sx={{ fontSize: 13 }} />}
+      //       sx={smallButtonSx}
+      //     >
+      //       Snapshot
+      //     </Button>
+      //     <Button
+      //       variant='contained'
+      //       size='small'
+      //       startIcon={<SettingsRounded sx={{ fontSize: 13 }} />}
+      //       sx={primaryButtonSx}
+      //     >
+      //       Configuration
+      //     </Button>
+      //   </>
+      // }
     />
   );
 }

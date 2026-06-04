@@ -220,7 +220,7 @@ function AliasCountChip() {
     <Box
       component='span'
       sx={{
-        display: 'inline-block',
+        display: { xs: 'none', sm: 'inline-block' },
         fontSize: 12.5,
         color: designTokens.textMuted,
         background: designTokens.surfaceMuted,
