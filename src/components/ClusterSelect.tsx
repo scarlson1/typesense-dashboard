@@ -174,7 +174,8 @@ export function ClusterSelect() {
       fullWidth
       sx={{
         maxHeight: 56,
-        width: 215,
+        maxWidth: 300,
+        width: '100%',
         '&.MuiList-root': {
           p: '8px',
         },
