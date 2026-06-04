@@ -2,9 +2,7 @@ import { ErrorFallback } from '@/components';
 import {
   Badge,
   PageHeader,
-  primaryButtonSx,
   SectionCard,
-  smallButtonSx,
   StatCard,
 } from '@/components/redesign';
 import {
@@ -16,8 +14,7 @@ import {
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { formatBytes } from '@/utils';
-import { DownloadRounded, SettingsRounded } from '@mui/icons-material';
-import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -170,26 +167,26 @@ function ServerHeader({
           {version ? <Badge tone='neutral'>v{version}</Badge> : null}
         </>
       }
-      actions={
-        <>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<DownloadRounded sx={{ fontSize: 13 }} />}
-            sx={smallButtonSx}
-          >
-            Snapshot
-          </Button>
-          <Button
-            variant='contained'
-            size='small'
-            startIcon={<SettingsRounded sx={{ fontSize: 13 }} />}
-            sx={primaryButtonSx}
-          >
-            Configuration
-          </Button>
-        </>
-      }
+      // actions={
+      //   <>
+      //     <Button
+      //       variant='outlined'
+      //       size='small'
+      //       startIcon={<DownloadRounded sx={{ fontSize: 13 }} />}
+      //       sx={smallButtonSx}
+      //     >
+      //       Snapshot
+      //     </Button>
+      //     <Button
+      //       variant='contained'
+      //       size='small'
+      //       startIcon={<SettingsRounded sx={{ fontSize: 13 }} />}
+      //       sx={primaryButtonSx}
+      //     >
+      //       Configuration
+      //     </Button>
+      //   </>
+      // }
     />
   );
 }
