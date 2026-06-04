@@ -31,24 +31,6 @@ export function SearchBox({ disabled, helperText, ...props }: SearchBoxProps) {
       error={!queryByValid}
       autoComplete='false'
       {...props}
-      slotProps={{
-        ...(props?.slotProps || {}),
-        input: {
-          ...(props?.slotProps?.input || {}),
-          disableUnderline: true,
-          sx: {
-            fontSize: '16px', // set base to prevent auto iOS zoom
-            transform: 'scale(0.9)', // adjust appearance
-            transformOrigin: 'left center', // adjust layout so position stays correct
-            '& .MuiInputBase-input': {
-              padding: 0, // drop the 4/5 asymmetric padding
-              height: '1.4375em',
-              lineHeight: '1.4375em', // single-line text centers within its own line box
-            },
-          },
-        },
-      }}
-      sx={{}}
     />
   );
 }

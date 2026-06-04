@@ -1,5 +1,6 @@
 import { ErrorFallback } from '@/components';
 import { MobileCollectionScopeStrip } from '@/components/redesign';
+import { SchemaCardView } from '@/components/SchemaCardView';
 import { SchemaFieldEditDialog } from '@/components/SchemaFieldEditDialog';
 import { SchemaTableView } from '@/components/SchemaTableView';
 import {
@@ -24,6 +25,7 @@ import { designTokens } from '@/theme/themePrimitives';
 import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import type { EditorProps, OnMount } from '@monaco-editor/react';
 import {
+  AddRounded,
   CheckRounded,
   ContentCopyRounded,
   LockOutlineRounded,
@@ -82,6 +84,7 @@ function CollectionSettings() {
   const [view, setView] = useState<SchemaView>('table');
   const [editingField, setEditingField] =
     useState<CollectionFieldSchema | null>(null);
+  const [addingField, setAddingField] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const dialog = useDialog();
@@ -95,7 +98,10 @@ function CollectionSettings() {
   });
 
   const fieldEditMutation = useUpdateCollection({
-    onSuccess: () => setEditingField(null),
+    onSuccess: () => {
+      setEditingField(null);
+      setAddingField(false);
+    },
   });
 
   const handleSaveField = useCallback(
@@ -105,6 +111,16 @@ function CollectionSettings() {
         updates: {
           fields: [{ name: updated.name, drop: true }, updated],
         },
+      });
+    },
+    [collectionId, fieldEditMutation],
+  );
+
+  const handleCreateField = useCallback(
+    (created: CollectionFieldSchema) => {
+      fieldEditMutation.mutate({
+        colName: collectionId,
+        updates: { fields: [created] },
       });
     },
     [collectionId, fieldEditMutation],
@@ -191,17 +207,39 @@ function CollectionSettings() {
           </>
         }
         actions={
-          <Button
-            variant='contained'
-            size='small'
-            startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
-            sx={primaryButtonSx}
-            onClick={() => handleUpdateSchema()}
-            loading={mutation.isPending}
-            disabled={Boolean(markers.length)}
-          >
-            Save schema
-          </Button>
+          <>
+            {view === 'table' ? (
+              <Button
+                variant='contained'
+                size='small'
+                startIcon={<AddRounded sx={{ fontSize: 16 }} />}
+                sx={{
+                  ...primaryButtonSx,
+                  display: { xs: 'inline-flex', md: 'none' },
+                }}
+                onClick={() => setAddingField(true)}
+              >
+                Field
+              </Button>
+            ) : null}
+            <Button
+              variant='contained'
+              size='small'
+              startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
+              sx={{
+                ...primaryButtonSx,
+                display: {
+                  xs: view === 'json' ? 'inline-flex' : 'none',
+                  md: 'inline-flex',
+                },
+              }}
+              onClick={() => handleUpdateSchema()}
+              loading={mutation.isPending}
+              disabled={Boolean(markers.length)}
+            >
+              Save schema
+            </Button>
+          </>
         }
       />
       <CollectionTabBar collectionId={collectionId} />
@@ -245,18 +283,33 @@ function CollectionSettings() {
               </Suspense>
             </Box>
             {view === 'table' ? (
-              <SchemaTableView
-                fields={data.fields ?? []}
-                onEditField={setEditingField}
-              />
+              <>
+                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                  <SchemaTableView
+                    fields={data.fields ?? []}
+                    onEditField={setEditingField}
+                  />
+                </Box>
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                  <SchemaCardView
+                    fields={data.fields ?? []}
+                    onEditField={setEditingField}
+                  />
+                </Box>
+              </>
             ) : null}
           </SectionCard>
         </Box>
 
         <SchemaFieldEditDialog
           field={editingField}
-          onClose={() => setEditingField(null)}
+          creating={addingField}
+          onClose={() => {
+            setEditingField(null);
+            setAddingField(false);
+          }}
           onSave={handleSaveField}
+          onCreate={handleCreateField}
           saving={fieldEditMutation.isPending}
         />
 
