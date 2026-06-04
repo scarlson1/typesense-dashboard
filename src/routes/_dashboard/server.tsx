@@ -8,10 +8,10 @@ import {
   StatCard,
 } from '@/components/redesign';
 import {
+  MemoryBreakdown,
+  MemoryUtilization,
   ServerHealth,
-  ServerMetrics,
   ServerOps,
-  TypesenseMetricsAndNodes,
 } from '@/components/serverStatus';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -56,7 +56,49 @@ function RouteComponent() {
           </Suspense>
         </ErrorBoundary>
 
-        <Stack
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 1.75,
+            mt: 1.75,
+          }}
+        >
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense
+              fallback={
+                <Skeleton
+                  variant='rounded'
+                  height={150}
+                  sx={{ background: designTokens.surfaceMuted }}
+                />
+              }
+            >
+              <MemoryUtilization />
+            </Suspense>
+          </ErrorBoundary>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense
+              fallback={
+                <Skeleton
+                  variant='rounded'
+                  height={150}
+                  sx={{ background: designTokens.surfaceMuted }}
+                />
+              }
+            >
+              <MemoryBreakdown />
+            </Suspense>
+          </ErrorBoundary>
+        </Box>
+
+        {/* <Stack
           direction={{ xs: 'column', md: 'row' }}
           spacing={2}
           sx={{ mt: 1.75 }}
@@ -70,55 +112,7 @@ function RouteComponent() {
               <TypesenseMetricsAndNodes />
             </Suspense>
           </ErrorBoundary>
-        </Stack>
-
-        {/* <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', lg: '1.6fr 1fr' },
-            gap: 1.75,
-            mt: 1.75,
-          }}
-        >
-          <SectionCard
-            title='Requests per second'
-            description='Search · Import · Delete · Write — last 24 hours'
-          >
-            <BigChart />
-            <Stack
-              direction='row'
-              sx={{
-                gap: 2,
-                mt: 1,
-                fontSize: 11.5,
-                color: designTokens.textMuted,
-                flexWrap: 'wrap',
-              }}
-            >
-              <Legend color={designTokens.accent}>Search</Legend>
-              <Legend color='#3aafe0'>Import</Legend>
-              <Legend color='#f6b500'>Write</Legend>
-              <Legend color={designTokens.textSubtle}>Delete</Legend>
-            </Stack>
-            <Alert severity='warning' sx={{ mt: 1.5 }}>
-              Illustrative chart — Typesense's API does not expose historical
-              time-series for QPS/latency. Hook up an external metrics store
-              (e.g. Prometheus + Grafana) to render real history.
-            </Alert>
-          </SectionCard>
-
-          <Stack sx={{ gap: 1.75, minWidth: 0 }}>
-            <ServerMetrics />
-            <ErrorBoundary
-              FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
-            >
-              <Suspense fallback={null}>
-                <TypesenseMetricsAndNodes />
-              </Suspense>
-            </ErrorBoundary>
-          </Stack>
-        </Box> */}
+        </Stack> */}
 
         <Box sx={{ mt: 1.75 }}>
           <SectionCard title='Operations'>

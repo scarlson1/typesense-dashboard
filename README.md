@@ -316,3 +316,4 @@ This is an independent project. It's not associated with [typesense.org](https:/
 - Export documents
 - Map zoom to bounds on load
 - theme matching toasts
+- use version from context for docs links ??

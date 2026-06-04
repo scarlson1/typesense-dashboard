@@ -1,6 +1,15 @@
 import { NewCollectionForm } from '@/components/NewCollectionForm';
-import { PageHeader } from '@/components/redesign';
-import { Box, Container, Skeleton, Stack, Tab, Tabs } from '@mui/material';
+import { PageHeader, smallButtonSx } from '@/components/redesign';
+import { OpenInNewRounded } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Container,
+  Skeleton,
+  Stack,
+  Tab,
+  Tabs,
+} from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   lazy,
@@ -33,22 +42,21 @@ function NewCollection() {
       <PageHeader
         title='New Collection'
         // badges={<Badge tone='neutral'>{collectionId}</Badge>}
-        // actions={
-        //   <Button
-        //     component='a'
-        //     href='https://typesense.org/docs/29.0/api/curation.html'
-        //     target='_blank'
-        //     rel='noopener noreferrer'
-        //     variant='outlined'
-        //     size='small'
-        //     startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
-        //     sx={smallButtonSx}
-        //   >
-        //     Docs
-        //   </Button>
-        // }
+        actions={
+          <Button
+            component='a'
+            href='https://typesense.org/docs/32.2/api/curation.html'
+            target='_blank'
+            rel='noopener noreferrer'
+            variant='outlined'
+            size='small'
+            startIcon={<OpenInNewRounded sx={{ fontSize: 13 }} />}
+            sx={smallButtonSx}
+          >
+            Schema Docs
+          </Button>
+        }
       />
-      {/* <CollectionTabBar collectionId={collectionId} /> */}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
