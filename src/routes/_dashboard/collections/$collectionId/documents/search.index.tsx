@@ -171,7 +171,9 @@ function RouteComponent() {
               <CompactStats />
             </Box>
             {/* Refinements filter icon: mobile (xs/sm) only — opens config drawer */}
-            <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
+            <Box
+              sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}
+            >
               <IconButton
                 size='small'
                 aria-label='Open filters'
@@ -653,10 +655,11 @@ const MobileConfigureBar = ({
         zIndex: (theme) => theme.zIndex.appBar,
         backgroundColor: 'background.paper',
         border: `1px solid ${designTokens.border}`,
-        borderRadius: '12px',
+        // borderRadius: '12px',
+        borderRadius: '40px',
         boxShadow: '0 4px 16px rgba(10,37,64,.1)',
-        px: 1.75,
-        py: 1,
+        px: 1.5,
+        py: 0.75,
         alignItems: 'center',
         gap: 1,
         cursor: 'pointer',
@@ -679,7 +682,12 @@ const MobileConfigureBar = ({
       </IconButton>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
-          sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text }}
+          sx={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: designTokens.text,
+            lineHeight: 1.2,
+          }}
         >
           Configure
         </Typography>
@@ -687,7 +695,7 @@ const MobileConfigureBar = ({
           <Typography
             noWrap
             sx={{
-              fontSize: 11.5,
+              fontSize: 9,
               color: designTokens.textFaint,
               fontFamily: designTokens.fontMono,
             }}
@@ -703,9 +711,9 @@ const MobileConfigureBar = ({
             alignItems: 'center',
             justifyContent: 'center',
             minWidth: 22,
-            height: 22,
+            height: 18,
             borderRadius: '11px',
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 600,
             px: 0.5,
             backgroundColor: designTokens.accent,
@@ -722,15 +730,15 @@ const MobileConfigureBar = ({
         }}
         size='small'
         sx={{
-          width: 36,
-          height: 36,
+          width: 28,
+          height: 28,
           borderRadius: '50%',
           backgroundColor: designTokens.text,
           color: designTokens.surface,
           '&:hover': { backgroundColor: designTokens.text, opacity: 0.9 },
         }}
       >
-        <KeyboardArrowUpRounded sx={{ fontSize: 20 }} />
+        <KeyboardArrowUpRounded sx={{ fontSize: 18 }} />
       </IconButton>
     </Stack>
   );
