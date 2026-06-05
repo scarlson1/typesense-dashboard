@@ -190,21 +190,11 @@ export function ClusterSelect() {
         sx: { maxWidth: 300 },
       }}
     >
-      {/* <MenuItem value=''>
-        <ListItemAvatar>
-          <Avatar alt='No Cluster'>
-            <DevicesRounded sx={{ fontSize: '1rem' }} />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary='No selection' secondary='choose a cluster' />
-      </MenuItem> */}
-
       {prodCreds.length ? (
         <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
       ) : null}
       {prodCreds.length
         ? prodCreds.map((i) => (
-            // <RenderOption option={i} />
             <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
               <ListItemAvatar>
                 <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
@@ -255,7 +245,6 @@ export function ClusterSelect() {
       ) : null}
       {stagingCreds.length
         ? stagingCreds.map((i) => (
-            // <RenderOption option={i} />
             <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
               <ListItemAvatar>
                 <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
@@ -306,7 +295,6 @@ export function ClusterSelect() {
       ) : null}
       {devCreds.length
         ? devCreds.map((i) => (
-            // <RenderOption option={i} />
             <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
               <ListItemAvatar>
                 <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
@@ -357,7 +345,6 @@ export function ClusterSelect() {
       ) : null}
       {testingCreds.length
         ? testingCreds.map((i) => (
-            // <RenderOption option={i} />
             <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
               <ListItemAvatar>
                 <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
@@ -406,7 +393,6 @@ export function ClusterSelect() {
       {ciCreds.length ? <ListSubheader sx={{ pt: 0 }}>CI</ListSubheader> : null}
       {ciCreds.length
         ? ciCreds.map((i) => (
-            // <RenderOption option={i} />
             <MenuItem value={getCredsKey(i)} key={getCredsKey(i)}>
               <ListItemAvatar>
                 <Avatar alt={`${i.protocol}:${i.node}:${i.port}`}>
@@ -464,19 +450,3 @@ export function ClusterSelect() {
     </Select>
   );
 }
-
-// function RenderOption({ option }: { option: TypesenseCreds }) {
-//   return (
-//     <MenuItem value={getCredsKey(option)}>
-//       <ListItemAvatar>
-//         <Avatar alt={`${option.protocol}:${option.node}:${option.port}`}>
-//           <DevicesRounded sx={{ fontSize: '1rem' }} />
-//         </Avatar>
-//       </ListItemAvatar>
-//       <ListItemText
-//         primary={option.name ?? option.env ?? 'no name'}
-//         secondary={`${option.protocol}:${option.node}:${option.port}`}
-//       />
-//     </MenuItem>
-//   );
-// }

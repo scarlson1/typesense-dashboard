@@ -341,6 +341,8 @@ export const colorSchemes = {
       text: {
         primary: 'var(--ts-text)',
         secondary: 'var(--ts-textMuted)',
+        primaryChannel: '10 35 66',
+        secondaryChannel: '66 83 103',
         warning: orange[400],
       },
       action: {
@@ -402,6 +404,8 @@ export const colorSchemes = {
       text: {
         primary: 'var(--ts-text)',
         secondary: 'var(--ts-textMuted)',
+        primaryChannel: '230 235 242',
+        secondaryChannel: '163 174 189',
       },
       action: {
         hover: alpha(gray[600], 0.2),
