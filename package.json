@@ -12,7 +12,10 @@
   },
   "packageManager": "pnpm@10.18.3",
   "pnpm": {
-    "onlyBuiltDependencies": ["electron", "esbuild"]
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild"
+    ]
   },
   "scripts": {
     "dev": "vite",
@@ -43,6 +46,7 @@
     "analyze:bundle": "pnpm dlx vite-bundle-visualizer"
   },
   "dependencies": {
+    "@base-ui/react": "^1.5.0",
     "@deck.gl/core": "^9.2.11",
     "@deck.gl/layers": "^9.2.11",
     "@deck.gl/react": "^9.2.11",

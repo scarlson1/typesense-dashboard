@@ -1,7 +1,7 @@
+import { primaryButtonSx } from '@/components/redesign';
 import { analyticsFormOpts, analyticsRuleType } from '@/constants';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { primaryButtonSx } from '@/components/redesign';
 import { AddRounded } from '@mui/icons-material';
 import {
   Autocomplete,
@@ -9,8 +9,8 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  Stack,
   TextField as MuiTextField,
+  Stack,
   Typography,
 } from '@mui/material';
 
@@ -45,10 +45,10 @@ const compactInputSx = {
       fontFamily: designTokens.fontMono,
       padding: '6px 10px !important',
     },
-    '& input::placeholder': {
-      color: designTokens.textMuted,
-      opacity: 1,
-    },
+    // '& input::placeholder': {
+    //   color: designTokens.textMuted,
+    //   opacity: 1,
+    // },
   },
 };
 
@@ -151,6 +151,7 @@ export const AnalyticsRuleForm = withForm({
                   {...params}
                   onBlur={handleBlur}
                   placeholder='select collections…'
+                  required
                   sx={compactInputSx}
                 />
               )}
@@ -218,6 +219,34 @@ export const AnalyticsRuleForm = withForm({
             />
           )}
         </form.AppField>
+
+        {/* Event type */}
+        {/* v30 implementation - one rule per event (instead of array of event types in v29) */}
+        {/* <Stack direction='row' spacing={{ xs: 1, sm: 1.5, md: 2 }}>
+          <Box>
+
+            <Typography sx={labelSx}>Event Type</Typography>
+            <form.AppField name='event_type'>
+              {({ state, handleChange, handleBlur }) => (
+                <MuiTextField
+                  value={state.value}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  fullWidth
+                  size='small'
+                  sx={compactInputSx}
+                  select
+                >
+                  {analyticsEventType.options.map((o) => (
+                    <MenuItem key={o} value={o}>
+                      {o}
+                    </MenuItem>
+                  ))}
+                </MuiTextField>
+              )}
+            </form.AppField>
+          </Box>
+        </Stack> */}
 
         {/* Checkboxes */}
         <Stack direction='row' spacing={2} sx={{ mt: 1.5, mb: 1.75 }}>

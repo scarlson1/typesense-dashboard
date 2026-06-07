@@ -23,7 +23,7 @@ export const toAnalyticsRulePayloads = ({
     name: collections.length === 1 ? name : `${name}_${collection}`,
     type: schema.type,
     collection,
-    event_type: 'search',
+    event_type: 'search', // schema.event_type ||
     rule_tag: name,
     params: {
       destination_collection: destinationCollection,
