@@ -1,6 +1,12 @@
-import { Box, Stack, Typography, type SxProps, type Theme } from '@mui/material';
-import type { ReactNode } from 'react';
 import { designTokens } from '@/theme/themePrimitives';
+import {
+  Box,
+  Stack,
+  Typography,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
+import type { ReactNode } from 'react';
 
 export const FIELD_LABEL_COL_WIDTH = 184;
 
@@ -25,10 +31,6 @@ export const fieldInputSx: SxProps<Theme> = {
       fontSize: 13,
       padding: '4px 4px !important',
       fontFamily: designTokens.fontMono,
-    },
-    '& input::placeholder': {
-      color: designTokens.textFaint,
-      opacity: 1,
     },
   },
 };
