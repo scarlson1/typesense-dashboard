@@ -7,13 +7,13 @@ import {
   analyticsQueryKeys,
   analyticsRuleCreateSchemaV30,
   analyticsRuleUiConfigV30,
+  analyticsRuleV1SubmitSchema,
   collectionQueryKeys,
 } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { upsertAnalyticsRule } from '@/utils/versionAdaptations';
 import { DeleteOutlineRounded } from '@mui/icons-material';
 import {
   Box,
@@ -348,7 +348,11 @@ function NewRulePanelV29() {
     }: {
       name: string;
       schema: AnalyticsRuleCreateSchemaV1;
-    }) => upsertAnalyticsRule(client, name, schema, is30Plus), // client.analytics.rules().upsert(name, schema),
+    }) =>
+      client.analyticsV1
+        .rules()
+        .upsert(name, schema as AnalyticsRuleCreateSchemaV1),
+    // upsertAnalyticsRule(client, name, schema, is30Plus),
     onMutate: (vars) => {
       toast.loading(`saving analytics rule`, {
         id: `rule-updated-${vars.name}`,
@@ -375,19 +379,45 @@ function NewRulePanelV29() {
     defaultValues: analyticsFormDefaultValues,
     onSubmit: async ({ value }) => {
       const { name, type, params } = value;
-      const schema: AnalyticsRuleCreateSchemaV1 = {
+      const candidate = {
         type,
         params: {
           ...params,
           limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
         },
       };
+
+      const result = analyticsRuleV1SubmitSchema.safeParse(candidate);
+      if (!result.success) {
+        toast.error(
+          result.error.issues[0]?.message ?? 'invalid analytics rule',
+        );
+        return;
+      }
+
       try {
-        await mutation.mutateAsync({ name, schema });
+        await mutation.mutateAsync({
+          name,
+          schema: result.data as AnalyticsRuleCreateSchemaV1,
+        });
         form.reset();
       } catch (err) {
         console.log(err);
       }
+      // const { name, type, params } = value;
+      // const schema: AnalyticsRuleCreateSchemaV1 = {
+      //   type,
+      //   params: {
+      //     ...params,
+      //     limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
+      //   },
+      // };
+      // try {
+      //   await mutation.mutateAsync({ name, schema });
+      //   form.reset();
+      // } catch (err) {
+      //   console.log(err);
+      // }
     },
   });
 

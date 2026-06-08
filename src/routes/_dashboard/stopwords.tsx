@@ -33,7 +33,7 @@ export const Route = createFileRoute('/_dashboard/stopwords')({
 
 function RouteComponent() {
   const [client, clusterId] = useTypesenseClient();
-  const { data: stopwordSets, isLoading } = useQuery({
+  const { data: stopwordSets } = useQuery({
     queryKey: [clusterId, 'stopwords'],
     queryFn: async () => {
       const res = await client.stopwords().retrieve();

@@ -336,14 +336,10 @@ export const AnalyticsRuleFormV30 = withForm({
               <form.AppField name='params.limit'>
                 {({ state, handleChange, handleBlur }) => (
                   <NumberSpinner
-                    // label=""
-
                     onValueChange={(val) => {
-                      // console.log('onValueChange: ', val, rest);
                       handleChange(val ?? 1);
                     }}
                     onBlur={handleBlur}
-                    // onValueCommitted
                     min={1}
                     max={10000}
                     step={100}
@@ -351,22 +347,9 @@ export const AnalyticsRuleFormV30 = withForm({
                     size='small'
                     error={!state.meta.isValid}
                   />
-                  // <MuiTextField
-                  //   value={state.value}
-                  //   onChange={(e) => handleChange(e.target.value)}
-                  //   onBlur={handleBlur}
-                  //   placeholder='1000'
-                  //   fullWidth
-                  //   size='small'
-                  //   sx={compactInputSx}
-                  //   // disabled={ruleType === 'counter' || ruleType === 'log'}
-                  // />
                 )}
               </form.AppField>
             </Box>
-            {/*      );
-             }}
-           /> */}
 
             {/* <form.Subscribe
             selector={(state) => state.values.type}

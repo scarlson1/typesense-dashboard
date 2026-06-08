@@ -35,20 +35,23 @@ export const analyticsRuleCreateValues = z.object({
     enable_auto_aggregation: z.boolean(),
     source: z.object({
       collections: z.array(z.string()),
-      // events: z.array(
-      //   z.object({
-      //     type: z.string(),
-      //     weight: z.number(),
-      //     name: z.string(),
-      //   })
-      // ), // .optional(),
+      // counter events — optional so existing callers/defaults stay valid
+      events: z
+        .array(
+          z.object({
+            type: z.string(),
+            weight: z.number(),
+            name: z.string(),
+          }),
+        )
+        .optional(),
     }),
-    expand_query: z.boolean(), // .optional(),
+    expand_query: z.boolean(),
     destination: z.object({
       collection: z.string(),
-      // counter_field: z.string(), // .optional()
+      counter_field: z.string().optional(),
     }),
-    limit: z.string(), // z.number().int(), // .optional()
+    limit: z.number().int(), // z.number().int(), // .optional()
   }),
 });
 export type AnalyticsRuleCreateValues = z.infer<
@@ -62,15 +65,15 @@ export const analyticsFormDefaultValues = {
   params: {
     source: {
       collections: [],
-      // events: [],
+      events: [],
     },
     expand_query: false,
     enable_auto_aggregation: true,
     destination: {
       collection: '',
-      // counter_field: '',
+      counter_field: '',
     },
-    limit: '', // as unknown as number,
+    limit: 1000,
   },
 } as AnalyticsRuleCreateValues;
 
@@ -80,6 +83,76 @@ export const analyticsFormOpts = formOptions({
     onChange: analyticsRuleCreateValues,
   },
 });
+
+// ----- v1 (pre-v30) per-type submit schema — authoritative for the wire ----- //
+
+const counterEventV1 = z.object({
+  type: z.enum(['click', 'conversion', 'visit']),
+  weight: z.number(),
+  name: z.string().min(1),
+});
+
+const popularQueriesV1 = z.object({
+  type: z.literal('popular_queries'),
+  params: z.object({
+    source: z.object({ collections: z.array(z.string()).min(1) }),
+    destination: z.object({ collection: z.string().min(1) }),
+    limit: z.number().int().optional(),
+    expand_query: z.boolean().optional(),
+    enable_auto_aggregation: z.boolean().optional(),
+    meta_fields: z.array(z.string()).optional(),
+  }),
+});
+
+const nohitsQueriesV1 = z.object({
+  type: z.literal('nohits_queries'),
+  params: z.object({
+    source: z.object({ collections: z.array(z.string()).min(1) }),
+    destination: z.object({ collection: z.string().min(1) }),
+    limit: z.number().int().optional(),
+    meta_fields: z.array(z.string()).optional(),
+  }),
+});
+
+const counterV1 = z.object({
+  type: z.literal('counter'),
+  params: z.object({
+    source: z.object({
+      collections: z.array(z.string()).min(1),
+      events: z.array(counterEventV1).min(1), // counter REQUIRES events
+    }),
+    destination: z.object({
+      collection: z.string().min(1),
+      counter_field: z.string().min(1), // and a counter_field
+    }),
+  }),
+});
+
+// 'log' intentionally excluded — undocumented in the v28/v29 API.
+export const analyticsRuleV1SubmitSchema = z.discriminatedUnion('type', [
+  popularQueriesV1,
+  nohitsQueriesV1,
+  counterV1,
+]);
+export type AnalyticsRuleV1Submit = z.infer<typeof analyticsRuleV1SubmitSchema>;
+
+// Presentation only: rule types v29 supports + which fields each one shows.
+export const analyticsV1RuleTypes = [
+  'popular_queries',
+  'nohits_queries',
+  'counter',
+] as const;
+
+export const analyticsRuleV1UiConfig = {
+  popular_queries: {
+    showFields: ['limit', 'expand_query', 'enable_auto_aggregation'],
+  },
+  nohits_queries: { showFields: ['limit'] },
+  counter: { showFields: ['events', 'counter_field'] },
+} satisfies Record<
+  (typeof analyticsV1RuleTypes)[number],
+  { showFields: readonly string[] }
+>;
 
 // ----- V30 ------ //
 

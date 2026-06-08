@@ -58,7 +58,6 @@ const addChipInputSx: SxProps<Theme> = {
       fontFamily: designTokens.fontMono,
       color: designTokens.textFaint,
     },
-
     '& .MuiAutocomplete-endAdornment': { right: 4 },
   },
 };
