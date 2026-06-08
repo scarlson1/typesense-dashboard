@@ -89,12 +89,16 @@ export function AnalyticsRulesList() {
 
   const { data: rules } = useSuspenseQuery({
     // TODO: type rules depending on version
-    queryKey: analyticsQueryKeys.rules(clusterId),
+    // is30Plus is part of the key so a post-switch version correction
+    // refetches under the right API branch instead of keeping a stale result.
+    queryKey: [...analyticsQueryKeys.rules(clusterId), is30Plus],
     queryFn: async () => {
       if (!is30Plus) {
         const res = await client.analyticsV1.rules().retrieve();
 
-        return res.rules as AnalyticsRuleSchemaV1[];
+        // Guard: useSuspenseQuery throws if the queryFn returns undefined,
+        // which happens when analytics is disabled and `rules` is absent.
+        return (res?.rules ?? []) as AnalyticsRuleSchemaV1[];
       } else {
         // The SDK types retrieve() as AnalyticsRuleSchema[], but Typesense 28+
         // actually returns { rules: [...] }. Normalize to an array.

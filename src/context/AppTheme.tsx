@@ -39,6 +39,17 @@ export function AppTheme(props: AppThemeProps) {
           // ...feedbackCustomizations,
           // ...navigationCustomizations,
           // ...surfacesCustomizations,
+          MuiMenu: {
+            styleOverrides: {
+              // In dark mode MUI paints a translucent-white elevation
+              // overlay (backgroundImage) over the Paper, which lightens the
+              // --ts-surface menu background into grey. Drop it so menus keep
+              // the true surface color. No-op in light mode.
+              paper: {
+                backgroundImage: 'none',
+              },
+            },
+          },
           ...(themeComponents || {}),
         },
       }),
