@@ -58,7 +58,10 @@ const NewCollectionEditor = ({
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    setTimeout(() => {
+    // Cancel the deferred work if the editor is disposed first, otherwise it
+    // touches torn-down Monaco services and throws "InstantiationService has
+    // been disposed" (e.g. StrictMode remount or the dialog closing quickly).
+    const formatTimer = setTimeout(() => {
       editor.getAction('editor.action.formatDocument')?.run();
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
@@ -71,6 +74,7 @@ const NewCollectionEditor = ({
         ],
       });
     }, 50);
+    editor.onDidDispose(() => clearTimeout(formatTimer));
   };
 
   const handleSave = async () => {

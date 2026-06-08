@@ -72,6 +72,12 @@ const NewApiKeyEditor = ({ onSuccess }: NewApiKeyEditorProps) => {
 
   const handleEditorDidMount: OnMount = (ed) => {
     editorRef.current = ed;
+    // Null the ref on dispose so deferred callbacks (e.g. the post-success
+    // formatDocument below) short-circuit instead of calling into torn-down
+    // Monaco services and throwing "InstantiationService has been disposed".
+    ed.onDidDispose(() => {
+      editorRef.current = null;
+    });
   };
 
   const handleSwitchTab = useCallback(

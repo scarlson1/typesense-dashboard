@@ -100,9 +100,15 @@ function useInitMonaco({
 
   const handleEditorDidMount: OnMount = useCallback(
     (editor, monaco) => {
-      setTimeout(() => {
+      // applySchema is deferred; if the editor is disposed within this window
+      // (React StrictMode's dev mount/unmount/remount, or the dialog closing /
+      // route changing before it fires) the callback would touch torn-down
+      // Monaco services and throw "InstantiationService has been disposed".
+      // Cancel it when the editor disposes.
+      const schemaTimer = setTimeout(() => {
         applySchema(editor, monaco);
       }, 100);
+      editor.onDidDispose(() => clearTimeout(schemaTimer));
 
       // Re-apply schema when this editor gets focus
       editor.onDidFocusEditorText(() => {

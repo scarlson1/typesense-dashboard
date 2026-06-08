@@ -317,3 +317,14 @@ This is an independent project. It's not associated with [typesense.org](https:/
 - Map zoom to bounds on load
 - theme matching toasts
 - use version from context for docs links ??
+
+- **Vector / semantic search** — no UI to define embedding fields or issue `vector_query`/
+  semantic search, despite v30 making this a flagship capability.
+- **Natural Language Search (`nl_search`) + NL search models** — key-actions exist
+  (`typesenseApiKeyActions.ts`) but no routes/components to manage NL models or run NL queries.
+- **Conversational Search / RAG + conversation models** — same: actions defined, no UI.
+- **Document edit/view + partial update + update-by-query** —
+  `documents/$documentId.tsx` is a "TODO: view not set up yet" stub; `useUpdateDocument.ts` exists
+  but isn't wired into the UI; no PATCH-by-filter.
+- **Federated multi-search** — no cross-collection multi-search UI.
+- **Analytics data viewing** — rules can be configured, but aggregated query data / events
