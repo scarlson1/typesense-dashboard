@@ -1,3 +1,4 @@
+import { designTokens } from '@/theme/themePrimitives';
 import type { Components, Theme } from '@mui/material/styles';
 
 export const inputCustomizations: Components<Theme> = {
@@ -29,7 +30,21 @@ export const inputCustomizations: Components<Theme> = {
           fontSize: '16px',
         },
         WebkitFontSmoothing: 'antialiased',
+        fontFamily: designTokens.fontMono,
         // WillChange: 'transform',
+        // '& .MuiInputBase-root': {
+        //   fontFamily: '"YourCustomFont", sans-serif',
+        //   fontSize: '16px',
+        //   fontWeight: 500,
+        // },
+        // '& .MuiInputLabel-root': {
+        //   fontFamily: '"YourCustomFont", sans-serif',
+        //   fontSize: '14px',
+        // },
+        // '& .MuiFormHelperText-root': {
+        //   fontFamily: '"YourCustomFont", sans-serif',
+        //   fontSize: '12px',
+        // }
       },
       input: ({ theme }) => ({
         '&::placeholder': {
@@ -38,4 +53,87 @@ export const inputCustomizations: Components<Theme> = {
       }),
     },
   },
+  MuiOutlinedInput: {
+    styleOverrides: {
+      root: {
+        // ({ theme }) => ({
+        // minHeight: 28,
+        // padding: '0 8px',
+        // borderRadius: theme.shape.borderRadius,
+        fontFamily: designTokens.fontMono,
+        '& fieldset': {
+          borderColor: 'var(--ts-borderStrong)', // theme.vars.palette. // designTokens.borderStrong
+          transition: 'border-color 120ms ease',
+        },
+        '&:hover fieldset': {
+          borderColor: designTokens.accent,
+          borderWidth: '1px',
+        },
+        '& .MuiAutocomplete-endAdornment': {
+          right: 4,
+        },
+      }, // ),
+      input: {
+        // padding: '0 4px !important',
+        fontFamily: designTokens.fontMono,
+        '&::placeholder': {
+          color: designTokens.textFaint,
+          opacity: 1,
+        },
+      },
+    },
+  },
+  MuiAutocomplete: {
+    styleOverrides: {
+      root: {
+        // ({ theme }) => ({
+        // Targets the options list
+
+        '& .MuiOutlinedInput-root': {
+          // borderRadius: theme.shape.borderRadius,
+          fontFamily: designTokens.fontMono,
+          // padding: '0 8px',
+          // minHeight: 28,
+          fontSize: '0.875rem',
+          '@media (pointer: coarse)': {
+            fontSize: '16px',
+          },
+          WebkitFontSmoothing: 'antialiased',
+          // '& .MuiAutocomplete-input': { padding: '0 4px' },
+          '& fieldset': {
+            borderColor: 'var(--ts-borderStrong)',
+            transition: 'border-color 120ms ease',
+          },
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--ts-borderStrong)',
+          },
+          '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--ts-accent)',
+          },
+          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline':
+            {
+              borderColor: 'var(--ts-accent)',
+            },
+          '& .MuiAutocomplete-endAdornment': { right: 4 },
+        },
+      }, // ),
+      listbox: {
+        fontFamily: designTokens.fontMono,
+      },
+      // Targets the input text
+      input: {
+        fontFamily: designTokens.fontMono,
+      },
+    },
+  },
+  // MuiInputLabel: {
+  //   styleOverrides: {
+  //     root: {
+  //       color: 'var(--palette-text-faint)',
+  //       '&.Mui-focused': {
+  //         color: 'var(--mui-palette-primary-main)',
+  //       },
+  //     },
+  //   },
+  // },
 };

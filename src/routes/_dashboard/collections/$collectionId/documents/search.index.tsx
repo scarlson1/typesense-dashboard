@@ -154,7 +154,6 @@ function RouteComponent() {
                 sx={{
                   my: 0,
                   '& .MuiInput-root': {
-                    fontSize: 14,
                     '&:before, &:after': { display: 'none' },
                   },
                   '& .MuiFormHelperText-root': { display: 'none' },
