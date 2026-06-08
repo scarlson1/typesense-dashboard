@@ -1,10 +1,6 @@
-import {
-  ChipMultiField,
-  fieldInputSx,
-  FieldRow,
-  ghostButtonSx,
-} from '@/components/redesign';
+import { ChipMultiField, FieldRow, ghostButtonSx } from '@/components/redesign';
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
+import { fieldInputSx } from '@/constants/redesignSx';
 import {
   useCollectionSchema,
   useCollectionSearchPreset,

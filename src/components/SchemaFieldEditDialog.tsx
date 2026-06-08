@@ -1,4 +1,5 @@
-import { fieldInputSx, primaryButtonSx, smallButtonSx } from '@/components/redesign';
+import { primaryButtonSx, smallButtonSx } from '@/components/redesign';
+import { fieldInputSx } from '@/constants/redesignSx';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseFieldType } from '@/types';
 import { CheckRounded } from '@mui/icons-material';
@@ -52,11 +53,23 @@ const buildInitialState = (field: CollectionFieldSchema | null): EditState => ({
   optional: field?.optional ?? false,
 });
 
-const TOGGLES: { key: keyof Omit<EditState, 'type'>; label: string; help: string }[] = [
-  { key: 'index', label: 'Index', help: 'Include this field in the search index' },
+const TOGGLES: {
+  key: keyof Omit<EditState, 'type'>;
+  label: string;
+  help: string;
+}[] = [
+  {
+    key: 'index',
+    label: 'Index',
+    help: 'Include this field in the search index',
+  },
   { key: 'facet', label: 'Facet', help: 'Enable faceting on this field' },
   { key: 'sort', label: 'Sort', help: 'Allow sorting results by this field' },
-  { key: 'range_index', label: 'Range', help: 'Enable range queries (numeric fields)' },
+  {
+    key: 'range_index',
+    label: 'Range',
+    help: 'Enable range queries (numeric fields)',
+  },
   { key: 'optional', label: 'Optional', help: 'Documents may omit this field' },
 ];
 
@@ -161,9 +174,7 @@ export const SchemaFieldEditDialog = ({
                   size='small'
                   placeholder='field_name'
                   value={state.name}
-                  onChange={(e) =>
-                    setState({ ...state, name: e.target.value })
-                  }
+                  onChange={(e) => setState({ ...state, name: e.target.value })}
                   sx={fieldInputSx}
                 />
               </Box>
@@ -246,7 +257,7 @@ export const SchemaFieldEditDialog = ({
                   </Box>
                   <Switch
                     size='small'
-                    checked={state[t.key]}
+                    checked={Boolean(state[t.key])}
                     onChange={(_, checked) =>
                       setState({ ...state, [t.key]: checked })
                     }

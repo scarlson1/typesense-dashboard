@@ -9,12 +9,7 @@ export {
 export { ChipMultiField } from './ChipMultiField';
 export type { ChipMultiFieldProps } from './ChipMultiField';
 export { CollectionTabBar } from './CollectionTabBar';
-export {
-  FIELD_LABEL_COL_WIDTH,
-  fieldChipSx,
-  fieldInputSx,
-  FieldRow,
-} from './FieldRow';
+export { FIELD_LABEL_COL_WIDTH, FieldRow } from './FieldRow';
 export { FormField } from './FormField';
 export { MOBILE_BOTTOM_NAV_HEIGHT, MobileBottomNav } from './MobileBottomNav';
 export { MobileCollectionScopeStrip } from './MobileCollectionScopeStrip';

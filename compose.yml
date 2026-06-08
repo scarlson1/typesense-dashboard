@@ -60,7 +60,7 @@ services:
       - TYPESENSE_ENABLE_SEARCH_ANALYTICS=true
       - SSL_CERTIFICATE=/etc/ssl/certs/localhost+1.pem
       - SSL_CERTIFICATE_KEY=/etc/ssl/certs/localhost+1-key.pem
-    command: '--data-dir=/data --api-key=xyz --enable-cors --api-port=444 --ssl-certificate=/etc/ssl/certs/localhost+1.pem --ssl-certificate-key=/etc/ssl/certs/localhost+1-key.pem --enable-search-analytics=true --analytics-flush-interval=36000'
+    command: '--data-dir=/data --api-key=xyz --enable-cors --api-port=444 --ssl-certificate=/etc/ssl/certs/localhost+1.pem --ssl-certificate-key=/etc/ssl/certs/localhost+1-key.pem --enable-search-analytics=true --analytics-flush-interval=300'
 
   # optionally run ngrok image for https (if connecting to github pages etc.)
   # ngrok:

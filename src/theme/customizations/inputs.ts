@@ -31,6 +31,11 @@ export const inputCustomizations: Components<Theme> = {
         WebkitFontSmoothing: 'antialiased',
         // WillChange: 'transform',
       },
+      input: ({ theme }) => ({
+        '&::placeholder': {
+          color: theme.vars.palette.text.faint,
+        },
+      }),
     },
   },
 };

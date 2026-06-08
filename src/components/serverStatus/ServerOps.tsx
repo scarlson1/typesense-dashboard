@@ -10,10 +10,19 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 export function ServerOps() {
   return (
-    // <Paper sx={{ my: 2, p: { xs: 2, sm: 3, md: 4 } }}>
     <Stack direction='column' spacing={2}>
       <Box>
-        <Typography variant='subtitle1' gutterBottom>
+        <Typography
+          variant='subtitle1'
+          sx={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'text.faint',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+          gutterBottom
+        >
           Cache
         </Typography>
         <Typography variant='body2' sx={{ pb: 2 }}>
@@ -37,7 +46,17 @@ export function ServerOps() {
         </ErrorBoundary>
       </Box>
       <Box>
-        <Typography variant='subtitle1' gutterBottom>
+        <Typography
+          variant='subtitle1'
+          sx={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'text.faint',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+          gutterBottom
+        >
           Compact DB
         </Typography>
         <Typography variant='body2' sx={{ pb: 2 }}>
@@ -76,7 +95,6 @@ export function ServerOps() {
         </ErrorBoundary>
       </Box>
     </Stack>
-    // </Paper>
   );
 }
 

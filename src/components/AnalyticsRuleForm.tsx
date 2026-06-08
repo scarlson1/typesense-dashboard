@@ -1,18 +1,29 @@
-import { analyticsFormOpts, analyticsRuleType } from '@/constants';
-import { withForm } from '@/hooks';
-import { designTokens } from '@/theme/themePrimitives';
+import { NumberSpinner } from '@/components/forms/NumberSpinner';
 import { primaryButtonSx } from '@/components/redesign';
-import { AddRounded } from '@mui/icons-material';
+import {
+  analyticsFormOpts,
+  analyticsRuleV1UiConfig,
+  analyticsV1RuleTypes,
+  collectionQueryKeys,
+} from '@/constants';
+import { useTypesenseClient, withForm } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
+import { AddRounded, CloseRounded } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   FormControlLabel,
-  Stack,
+  IconButton,
+  MenuItem,
   TextField as MuiTextField,
+  Stack,
   Typography,
 } from '@mui/material';
+import { useStore } from '@tanstack/react-form';
+import { useQuery } from '@tanstack/react-query';
 
 const labelSx = {
   fontSize: 10.5,
@@ -45,14 +56,10 @@ const compactInputSx = {
       fontFamily: designTokens.fontMono,
       padding: '6px 10px !important',
     },
-    '& input::placeholder': {
-      color: designTokens.textMuted,
-      opacity: 1,
-    },
   },
 };
 
-const RULE_TYPES = analyticsRuleType.options;
+const COUNTER_EVENT_TYPES = ['click', 'conversion', 'visit'] as const;
 
 export const AnalyticsRuleForm = withForm({
   ...analyticsFormOpts,
@@ -61,7 +68,43 @@ export const AnalyticsRuleForm = withForm({
     destinationOptions: [''],
     submitButtonText: 'Add rule',
   },
-  render: ({ form, sourceOptions, destinationOptions, submitButtonText }) => {
+  render: function AnalyticsRuleFormV29({
+    form,
+    sourceOptions,
+    destinationOptions,
+    submitButtonText,
+  }) {
+    const [client, clusterId] = useTypesenseClient();
+
+    const destinationCollection = useStore(
+      form.store,
+      (s) => s.values.params.destination.collection,
+    );
+
+    const {
+      data: colSchema,
+      isPending,
+      isEnabled,
+      isError,
+      error,
+    } = useQuery({
+      queryKey: collectionQueryKeys.schema(clusterId, destinationCollection),
+      queryFn: () =>
+        client.collections(destinationCollection as string).retrieve(),
+      enabled: Boolean(destinationCollection),
+    });
+    const counterFieldNames = colSchema?.fields
+      .filter((f) => ['int32', 'int64', 'float'].includes(f.type))
+      .map((f) => f.name);
+
+    const ruleType = useStore(form.store, (state) => state.values.type);
+    const uiConfig =
+      analyticsRuleV1UiConfig[
+        ruleType as 'popular_queries' | 'nohits_queries' | 'counter'
+      ];
+    const showFields = uiConfig?.showFields ?? [];
+    const isCounter = ruleType === 'counter';
+
     return (
       <Box>
         {/* Rule type grid */}
@@ -76,7 +119,7 @@ export const AnalyticsRuleForm = withForm({
                 mb: 1.5,
               }}
             >
-              {RULE_TYPES.map((t) => {
+              {analyticsV1RuleTypes.map((t) => {
                 const active = state.value === t;
                 return (
                   <Box
@@ -151,6 +194,7 @@ export const AnalyticsRuleForm = withForm({
                   {...params}
                   onBlur={handleBlur}
                   placeholder='select collections…'
+                  required
                   sx={compactInputSx}
                 />
               )}
@@ -203,71 +247,216 @@ export const AnalyticsRuleForm = withForm({
           )}
         </form.Field>
 
-        {/* Limit */}
-        <Typography sx={labelSx}>Limit</Typography>
-        <form.AppField name='params.limit'>
-          {({ state, handleChange, handleBlur }) => (
-            <MuiTextField
-              value={state.value}
-              onChange={(e) => handleChange(e.target.value)}
-              onBlur={handleBlur}
-              placeholder='1000'
-              fullWidth
-              size='small'
-              sx={compactInputSx}
-            />
-          )}
-        </form.AppField>
+        {/* Limit — query-aggregation types only */}
+        {showFields.includes('limit') && (
+          <>
+            <Typography sx={labelSx}>Limit</Typography>
+            <form.AppField name='params.limit'>
+              {({ state, handleChange, handleBlur }) => (
+                <NumberSpinner
+                  onValueChange={(val) => {
+                    handleChange(val ?? 1);
+                  }}
+                  onBlur={handleBlur}
+                  min={1}
+                  max={10000}
+                  step={100}
+                  value={state.value}
+                  size='small'
+                  error={!state.meta.isValid}
+                />
+              )}
+            </form.AppField>
+          </>
+        )}
 
-        {/* Checkboxes */}
-        <Stack direction='row' spacing={2} sx={{ mt: 1.5, mb: 1.75 }}>
-          <form.Field name='params.expand_query'>
-            {({ state, handleChange }: any) => (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    size='small'
-                    checked={Boolean(state.value)}
-                    onChange={(_, c) => handleChange(c)}
-                    sx={{ p: 0.375 }}
-                  />
-                }
-                label='Expand partial queries'
-                slotProps={{
-                  typography: {
-                    sx: {
-                      fontSize: 12,
-                      color: designTokens.textMuted,
+        {/* Counter-only: counter_field */}
+        {isCounter && (
+          <>
+            <Typography sx={labelSx}>Counter field</Typography>
+            <form.AppField name='params.destination.counter_field'>
+              {({ state, handleChange, handleBlur }) => (
+                <MuiTextField
+                  value={state.value ?? ''}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onBlur={handleBlur}
+                  placeholder='popularity'
+                  fullWidth
+                  size='small'
+                  required
+                  sx={compactInputSx}
+                  select
+                  helperText={
+                    isError
+                      ? (error?.message ?? 'failed to load schema')
+                      : !isPending && !counterFieldNames?.length
+                        ? 'int32 field required'
+                        : 'int32 destination field to increment'
+                  }
+                  slotProps={{
+                    input: {
+                      endAdornment:
+                        isPending && isEnabled ? (
+                          <CircularProgress size={16} />
+                        ) : undefined,
                     },
-                  },
-                }}
-              />
-            )}
-          </form.Field>
-          <form.Field name='params.enable_auto_aggregation'>
-            {({ state, handleChange }: any) => (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    size='small'
-                    checked={Boolean(state.value)}
-                    onChange={(_, c) => handleChange(c)}
-                    sx={{ p: 0.375 }}
-                  />
-                }
-                label='Enable auto aggregation'
-                slotProps={{
-                  typography: {
-                    sx: {
-                      fontSize: 12,
-                      color: designTokens.textMuted,
+                    formHelperText: {
+                      sx: {
+                        fontSize: '0.65rem',
+                        lineHeight: 1.3,
+                      },
                     },
-                  },
-                }}
-              />
+                  }}
+                >
+                  <MenuItem value=''>--</MenuItem>
+                  {counterFieldNames?.map((o) => (
+                    <MenuItem value={o} key={o}>
+                      {o}
+                    </MenuItem>
+                  ))}
+                </MuiTextField>
+              )}
+            </form.AppField>
+
+            {/* Counter-only: source.events[] array editor */}
+            <Typography sx={labelSx}>Events</Typography>
+
+            <form.Field name='params.source.events' mode='array'>
+              {(field: any) => (
+                <Stack spacing={1}>
+                  {(field.state.value ?? []).map((_: unknown, i: number) => (
+                    <Stack
+                      key={i}
+                      direction='row'
+                      spacing={1}
+                      useFlexGap
+                      sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                    >
+                      <form.AppField name={`params.source.events[${i}].type`}>
+                        {({ state, handleChange }) => (
+                          <MuiTextField
+                            select
+                            size='small'
+                            value={state.value ?? 'click'}
+                            onChange={(e) => handleChange(e.target.value)}
+                            sx={{ ...compactInputSx, minWidth: 100 }}
+                          >
+                            {COUNTER_EVENT_TYPES.map((o) => (
+                              <MenuItem key={o} value={o}>
+                                {o}
+                              </MenuItem>
+                            ))}
+                          </MuiTextField>
+                        )}
+                      </form.AppField>
+
+                      <form.AppField name={`params.source.events[${i}].name`}>
+                        {({ state, handleChange, handleBlur }) => (
+                          <MuiTextField
+                            value={state.value ?? ''}
+                            onChange={(e) => handleChange(e.target.value)}
+                            onBlur={handleBlur}
+                            placeholder='event_name'
+                            size='small'
+                            fullWidth
+                            sx={compactInputSx}
+                          />
+                        )}
+                      </form.AppField>
+
+                      <form.AppField name={`params.source.events[${i}].weight`}>
+                        {({ state, handleChange }) => (
+                          <NumberSpinner
+                            label='Weight'
+                            min={0}
+                            value={state.value ?? 1}
+                            size='small'
+                            onValueChange={(val) => handleChange(val ?? 1)}
+                            labelProps={{
+                              sx: labelSx,
+                            }}
+                          />
+                        )}
+                      </form.AppField>
+
+                      <IconButton
+                        size='small'
+                        aria-label='remove event'
+                        onClick={() => field.removeValue(i)}
+                        color='error'
+                      >
+                        <CloseRounded sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Stack>
+                  ))}
+
+                  <Button
+                    type='button'
+                    size='small'
+                    startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+                    onClick={() =>
+                      field.pushValue({ type: 'click', weight: 1, name: '' })
+                    }
+                    sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+                  >
+                    add event
+                  </Button>
+                </Stack>
+              )}
+            </form.Field>
+          </>
+        )}
+
+        {/* Checkboxes — query-aggregation types only */}
+        {(showFields.includes('expand_query') ||
+          showFields.includes('enable_auto_aggregation')) && (
+          <Stack direction='row' spacing={2} sx={{ mt: 1.5, mb: 1.75 }}>
+            {showFields.includes('expand_query') && (
+              <form.Field name='params.expand_query'>
+                {({ state, handleChange }: any) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size='small'
+                        checked={Boolean(state.value)}
+                        onChange={(_, c) => handleChange(c)}
+                        sx={{ p: 0.375 }}
+                      />
+                    }
+                    label='Expand partial queries'
+                    slotProps={{
+                      typography: {
+                        sx: { fontSize: 12, color: designTokens.textMuted },
+                      },
+                    }}
+                  />
+                )}
+              </form.Field>
             )}
-          </form.Field>
-        </Stack>
+            {showFields.includes('enable_auto_aggregation') && (
+              <form.Field name='params.enable_auto_aggregation'>
+                {({ state, handleChange }: any) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size='small'
+                        checked={Boolean(state.value)}
+                        onChange={(_, c) => handleChange(c)}
+                        sx={{ p: 0.375 }}
+                      />
+                    }
+                    label='Enable auto aggregation'
+                    slotProps={{
+                      typography: {
+                        sx: { fontSize: 12, color: designTokens.textMuted },
+                      },
+                    }}
+                  />
+                )}
+              </form.Field>
+            )}
+          </Stack>
+        )}
 
         {/* Submit */}
         <form.AppForm>
@@ -283,7 +472,7 @@ export const AnalyticsRuleForm = withForm({
                 startIcon={<AddRounded sx={{ fontSize: 14 }} />}
                 loading={isSubmitting}
                 disabled={!canSubmit}
-                sx={{ ...primaryButtonSx, height: 36 }}
+                sx={{ ...primaryButtonSx, height: 36, mt: 2 }}
               >
                 {submitButtonText}
               </Button>

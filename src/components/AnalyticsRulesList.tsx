@@ -1,14 +1,19 @@
+import { AnalyticsRuleFormV30 } from '@/components/AnalyticsRuleFormV30';
 import {
   analyticsFormDefaultValues,
+  analyticsFormDefaultValuesV30,
   analyticsFormOpts,
+  analyticsFormOptsV30,
   analyticsQueryKeys,
+  analyticsRuleCreateSchemaV30,
+  analyticsRuleUiConfigV30,
+  analyticsRuleV1SubmitSchema,
   collectionQueryKeys,
 } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { upsertAnalyticsRule } from '@/utils/versionAdaptations';
 import { DeleteOutlineRounded } from '@mui/icons-material';
 import {
   Box,
@@ -26,7 +31,10 @@ import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import type { AnalyticsRuleSchema } from 'typesense/lib/Typesense/AnalyticsRule';
+import type {
+  AnalyticsRuleCreateSchema,
+  AnalyticsRuleSchema,
+} from 'typesense/lib/Typesense/AnalyticsRule';
 import type {
   AnalyticsRuleCreateSchemaV1,
   AnalyticsRuleSchemaV1,
@@ -34,6 +42,46 @@ import type {
 import { AnalyticsRuleForm } from './AnalyticsRuleForm';
 import { ErrorFallback } from './ErrorFallback';
 import { Badge } from './redesign';
+
+//V29
+// export interface AnalyticsRuleCreateSchemaV1 {
+//   type: "popular_queries" | "nohits_queries" | "counter" | "log";
+//   params: {
+//       enable_auto_aggregation?: boolean;
+//       source: {
+//           collections: string[];
+//           events?: {
+//               type: string;
+//               weight?: number;
+//               name: string;
+//           }[];
+//       };
+//       expand_query?: boolean;
+//       destination?: {
+//           collection: string;
+//           counter_field?: string;
+//       };
+//       limit?: number;
+//   };
+// }
+
+// V30
+// export interface AnalyticsRuleCreateSchema {
+//   name: string;
+//   type: string; // ["popular_queries", "nohits_queries", "counter", "log"]
+//   collection: string;
+//   event_type: string; // search, click, conversion, and visit
+//   rule_tag?: string;
+//   params?: {
+//       destination_collection?: string;
+//       limit?: number;
+//       capture_search_requests?: boolean;
+//       meta_fields?: string[];
+//       expand_query?: boolean;
+//       counter_field?: string;
+//       weight?: number;
+//   };
+// }
 
 export function AnalyticsRulesList() {
   const [client, clusterId] = useTypesenseClient();
@@ -269,9 +317,16 @@ export function AnalyticsRulesList() {
 }
 
 function NewRulePanel() {
+  const { is30Plus } = useTypesenseVersion();
+
+  if (is30Plus) return <NewRulePanelV30 />;
+
+  return <NewRulePanelV29 />;
+}
+
+function NewRulePanelV29() {
   const toast = useAsyncToast();
   const [client, clusterId] = useTypesenseClient();
-  const { is30Plus } = useTypesenseVersion();
 
   const { data: collectionNames } = useSuspenseQuery({
     queryKey: collectionQueryKeys.names(clusterId, { withAlias: true }),
@@ -292,7 +347,11 @@ function NewRulePanel() {
     }: {
       name: string;
       schema: AnalyticsRuleCreateSchemaV1;
-    }) => upsertAnalyticsRule(client, name, schema, is30Plus), // client.analytics.rules().upsert(name, schema),
+    }) =>
+      client.analyticsV1
+        .rules()
+        .upsert(name, schema as AnalyticsRuleCreateSchemaV1),
+    // upsertAnalyticsRule(client, name, schema, is30Plus),
     onMutate: (vars) => {
       toast.loading(`saving analytics rule`, {
         id: `rule-updated-${vars.name}`,
@@ -318,16 +377,175 @@ function NewRulePanel() {
     ...analyticsFormOpts,
     defaultValues: analyticsFormDefaultValues,
     onSubmit: async ({ value }) => {
-      const { name, type, params } = value;
-      const schema: AnalyticsRuleCreateSchemaV1 = {
-        type,
-        params: {
-          ...params,
-          limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
-        },
-      };
+      // const { name, type, params } = value;
+      // const candidate = {
+      //   type,
+      //   params: {
+      //     ...params,
+      //     limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
+      //   },
+      // };
+
+      // const result = analyticsRuleV1SubmitSchema.safeParse(candidate);
+      // if (!result.success) {
+      //   toast.error(
+      //     result.error.issues[0]?.message ?? 'invalid analytics rule',
+      //   );
+      //   return;
+      // }
+      const schema = analyticsRuleV1SubmitSchema.parse(
+        value,
+      ) as AnalyticsRuleCreateSchemaV1;
+
       try {
-        await mutation.mutateAsync({ name, schema });
+        await mutation.mutateAsync({
+          name: value.name,
+          schema, // : result.data as AnalyticsRuleCreateSchemaV1,
+        });
+        form.reset();
+      } catch (err) {
+        console.log(err);
+      }
+      // const { name, type, params } = value;
+      // const schema: AnalyticsRuleCreateSchemaV1 = {
+      //   type,
+      //   params: {
+      //     ...params,
+      //     limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
+      //   },
+      // };
+      // try {
+      //   await mutation.mutateAsync({ name, schema });
+      //   form.reset();
+      // } catch (err) {
+      //   console.log(err);
+      // }
+    },
+  });
+
+  return (
+    <Box
+      component='form'
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+      noValidate
+      sx={{
+        background: designTokens.surface,
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: 1,
+        p: 2,
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: 13.5,
+          fontWeight: 600,
+          color: designTokens.text,
+          mb: 0.5,
+          letterSpacing: '-0.005em',
+        }}
+      >
+        New analytics rule
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: 12,
+          color: designTokens.textMuted,
+          lineHeight: 1.5,
+          mb: 1.5,
+        }}
+      >
+        Capture searches into a separate Typesense collection for analysis &amp;
+        autocomplete.
+      </Typography>
+
+      <AnalyticsRuleForm
+        form={form}
+        sourceOptions={collectionNames}
+        destinationOptions={collectionNames}
+        submitButtonText='Add rule'
+      />
+    </Box>
+  );
+}
+
+function NewRulePanelV30() {
+  const toast = useAsyncToast();
+  const [client, clusterId] = useTypesenseClient();
+
+  // TODO: if providing alias, how does that affect the schema query for meta_fields ??
+
+  const { data: collectionNames } = useSuspenseQuery({
+    queryKey: collectionQueryKeys.names(clusterId, { withAlias: true }),
+    queryFn: async () => {
+      const collections = await client.collections().retrieve();
+      const aliasRes = await client.aliases().retrieve();
+      return [
+        ...aliasRes.aliases.map((a: { name: string }) => a.name),
+        ...collections.map((c: { name: string }) => c.name),
+      ];
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: ({
+      name,
+      schema,
+    }: {
+      name: string;
+      schema: AnalyticsRuleCreateSchema;
+    }) => client.analytics.rules().upsert(name, schema),
+    onMutate: (vars) => {
+      toast.loading(`saving analytics rule`, {
+        id: `rule-updated-${vars.name}`,
+      });
+    },
+    onSuccess: (_, vars) => {
+      toast.success(`analytics rule saved`, {
+        id: `rule-updated-${vars.name}`,
+      });
+    },
+    onError: (err, vars) => {
+      const msg = err?.message || 'failed to save analytics rule';
+      toast.error(msg, { id: `rule-updated-${vars.name}` });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: analyticsQueryKeys.rules(clusterId),
+      });
+    },
+  });
+
+  const form = useAppForm({
+    ...analyticsFormOptsV30,
+    defaultValues: analyticsFormDefaultValuesV30,
+    onSubmit: async ({ value }) => {
+      console.log('VALUE: ', value);
+
+      const cfg = analyticsRuleUiConfigV30[value.type];
+
+      // Force the implied event_type for query-aggregation types before validating.
+      const normalized = {
+        ...value,
+        event_type: cfg.eventTypeFixed ? cfg.eventTypes[0] : value.event_type,
+      };
+
+      const result = analyticsRuleCreateSchemaV30.safeParse(normalized);
+      if (!result.success) {
+        toast.error(
+          result.error.issues[0]?.message ?? 'invalid analytics rule',
+        );
+        return;
+      }
+
+      try {
+        await mutation.mutateAsync({
+          name: value.name,
+          schema: result.data, // as AnalyticsRuleCreateSchema,
+        });
         form.reset();
       } catch (err) {
         console.log(err);
@@ -374,7 +592,7 @@ function NewRulePanel() {
         autocomplete.
       </Typography>
 
-      <AnalyticsRuleForm
+      <AnalyticsRuleFormV30
         form={form}
         sourceOptions={collectionNames}
         destinationOptions={collectionNames}

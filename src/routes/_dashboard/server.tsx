@@ -6,6 +6,7 @@ import {
   StatCard,
 } from '@/components/redesign';
 import {
+  CpuUtilization,
   MemoryBreakdown,
   MemoryUtilization,
   ServerHealth,
@@ -20,6 +21,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import type { StatsResponse } from 'typesense';
 
 export const Route = createFileRoute('/_dashboard/server')({
   component: RouteComponent,
@@ -61,38 +63,62 @@ function RouteComponent() {
             mt: 1.75,
           }}
         >
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
-          >
-            <Suspense
-              fallback={
-                <Skeleton
-                  variant='rounded'
-                  height={150}
-                  sx={{ background: designTokens.surfaceMuted }}
-                />
-              }
+          <Stack direction='column' spacing={1.75}>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: unknown) => captureException(err)}
             >
-              <MemoryUtilization />
-            </Suspense>
-          </ErrorBoundary>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
-          >
-            <Suspense
-              fallback={
-                <Skeleton
-                  variant='rounded'
-                  height={150}
-                  sx={{ background: designTokens.surfaceMuted }}
-                />
-              }
+              <Suspense
+                fallback={
+                  <Skeleton
+                    variant='rounded'
+                    height={150}
+                    sx={{ background: designTokens.surfaceMuted }}
+                  />
+                }
+              >
+                <MemoryUtilization />
+              </Suspense>
+            </ErrorBoundary>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: unknown) => captureException(err)}
             >
-              <MemoryBreakdown />
-            </Suspense>
-          </ErrorBoundary>
+              <Suspense
+                fallback={
+                  <Skeleton
+                    variant='rounded'
+                    height={150}
+                    sx={{ background: designTokens.surfaceMuted }}
+                  />
+                }
+              >
+                <CpuUtilization />
+              </Suspense>
+            </ErrorBoundary>
+          </Stack>
+
+          <Stack direction='column' spacing={1.75}>
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onError={(err: unknown) => captureException(err)}
+            >
+              <Suspense
+                fallback={
+                  <Skeleton
+                    variant='rounded'
+                    height={150}
+                    sx={{ background: designTokens.surfaceMuted }}
+                  />
+                }
+              >
+                <MemoryBreakdown />
+              </Suspense>
+            </ErrorBoundary>
+            <SectionCard title='Operations'>
+              <ServerOps />
+            </SectionCard>
+          </Stack>
         </Box>
 
         {/* <Stack
@@ -110,12 +136,6 @@ function RouteComponent() {
             </Suspense>
           </ErrorBoundary>
         </Stack> */}
-
-        <Box sx={{ mt: 1.75 }}>
-          <SectionCard title='Operations'>
-            <ServerOps />
-          </SectionCard>
-        </Box>
       </Box>
     </Stack>
   );
@@ -232,6 +252,9 @@ function TopStrip() {
     .latency_ms;
   const latency =
     Number(latencyMs?.['search'] ?? latencyMs?.['total'] ?? 0) || 0;
+  const cacheHitRatio = (stats as StatsResponse & { cache_hit_ratio: number })
+    ?.cache_hit_ratio;
+
   const memUsed = Number(metrics.system_memory_used_bytes ?? 0);
   const memTotal = Number(metrics.system_memory_total_bytes ?? 0);
   const memPct = memTotal ? memUsed / memTotal : 0;
@@ -243,7 +266,11 @@ function TopStrip() {
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+        gridTemplateColumns: {
+          xs: 'repeat(2, 1fr)',
+          md: 'repeat(4, 1fr)',
+          lg: 'repeat(5, 1fr)',
+        },
         gap: 1.25,
       }}
     >
@@ -251,16 +278,29 @@ function TopStrip() {
         label='Search QPS'
         value={qps.toFixed(1)}
         sub='requests/sec'
-        delta='+8.4%'
+        // delta='+8.4%' // TODO: track to compute delta ??
         deltaPositive
       />
       <StatCard
         label='p95 latency'
-        value={latency ? latency.toFixed(1) : '—'}
+        value={typeof latency === 'number' ? latency.toFixed(1) : '—'}
         unit=' ms'
-        sub='last 5 min'
-        delta='-1.2 ms'
-        deltaPositive
+        sub='last ~10 sec.'
+        // delta='-1.2 ms'
+        deltaPositive={Boolean(latency) && latency < 50}
+      />
+      <StatCard
+        label='Cache Hit Ratio'
+        value={
+          typeof latency === 'number'
+            ? `${Math.round(cacheHitRatio * 1000) / 10}`
+            : '—'
+        }
+        unit=' %'
+        sub='last ~10 sec.'
+        // delta='-1.2 ms'
+        deltaPositive={Boolean(cacheHitRatio) && cacheHitRatio > 0.2}
+        sx={{ display: { xs: 'none', lg: 'block' } }}
       />
       <StatCard
         label='Memory'

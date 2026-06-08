@@ -1,12 +1,12 @@
 import {
   Badge,
+  dangerButtonSx,
   PageHeader,
   primaryButtonSx,
   smallButtonSx,
-  dangerButtonSx,
 } from '@/components/redesign';
-import { designTokens } from '@/theme/themePrimitives';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
 import {
   AddRounded,
@@ -17,14 +17,13 @@ import {
 import {
   Box,
   Button,
-  Stack,
   TextField as MuiTextField,
+  Stack,
   Typography,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import type { StopwordSchema } from 'typesense/lib/Typesense/Stopword';
 import type { StopwordCreateSchema } from 'typesense/lib/Typesense/Stopwords';
 
 export const Route = createFileRoute('/_dashboard/stopwords')({
@@ -34,7 +33,7 @@ export const Route = createFileRoute('/_dashboard/stopwords')({
 
 function RouteComponent() {
   const [client, clusterId] = useTypesenseClient();
-  const { data: stopwordSets, isLoading } = useQuery({
+  const { data: stopwordSets } = useQuery({
     queryKey: [clusterId, 'stopwords'],
     queryFn: async () => {
       const res = await client.stopwords().retrieve();
@@ -47,7 +46,7 @@ function RouteComponent() {
       (stopwordSets ?? []).map((s) => {
         const words = Array.isArray(s.stopwords)
           ? s.stopwords
-          : s.stopwords?.stopwords ?? [];
+          : (s.stopwords?.stopwords ?? []);
         return {
           id: s.id,
           locale: s.locale ?? '',
@@ -63,7 +62,9 @@ function RouteComponent() {
     [sets],
   );
 
-  const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined);
+  const [selectedId, setSelectedId] = useState<string | null | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (selectedId === undefined && sets.length > 0) {
@@ -74,7 +75,9 @@ function RouteComponent() {
     }
   }, [sets, selectedId]);
 
-  const selectedSet = selectedId ? (sets.find((s) => s.id === selectedId) ?? null) : null;
+  const selectedSet = selectedId
+    ? (sets.find((s) => s.id === selectedId) ?? null)
+    : null;
 
   const badgeText =
     sets.length > 0
@@ -124,10 +127,7 @@ function RouteComponent() {
         {/* Right: editor */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {selectedSet ? (
-            <StopwordEditor
-              key={selectedSet.id}
-              set={selectedSet}
-            />
+            <StopwordEditor key={selectedSet.id} set={selectedSet} />
           ) : (
             <NewSetPanel onCreated={(id) => setSelectedId(id)} />
           )}
@@ -260,9 +260,7 @@ function SetsSidebar({
             borderRadius: '7px',
             border: `1px dashed ${selectedId === null ? designTokens.accent : designTokens.borderStrong}`,
             background:
-              selectedId === null
-                ? designTokens.accentSoft
-                : 'transparent',
+              selectedId === null ? designTokens.accentSoft : 'transparent',
             color:
               selectedId === null
                 ? designTokens.accentDeep
@@ -441,9 +439,7 @@ function StopwordEditor({ set }: { set: StopwordSetDescriptor }) {
             background: designTokens.surface,
           }}
         >
-          <SearchRounded
-            sx={{ fontSize: 14, color: designTokens.textFaint }}
-          />
+          <SearchRounded sx={{ fontSize: 14, color: designTokens.textFaint }} />
           <Box
             component='input'
             value={filter}
@@ -459,7 +455,6 @@ function StopwordEditor({ set }: { set: StopwordSetDescriptor }) {
               fontFamily: 'inherit',
               background: 'transparent',
               color: designTokens.text,
-              '&::placeholder': { color: designTokens.textFaint },
             }}
           />
         </Box>
@@ -489,9 +484,7 @@ function StopwordEditor({ set }: { set: StopwordSetDescriptor }) {
             mb: 1.75,
           }}
         >
-          <AddRounded
-            sx={{ fontSize: 14, color: designTokens.textFaint }}
-          />
+          <AddRounded sx={{ fontSize: 14, color: designTokens.textFaint }} />
           <Box
             component='input'
             value={addInput}
@@ -513,7 +506,6 @@ function StopwordEditor({ set }: { set: StopwordSetDescriptor }) {
               fontFamily: 'inherit',
               background: 'transparent',
               color: designTokens.text,
-              '&::placeholder': { color: designTokens.textFaint },
             }}
           />
           <Button
@@ -570,9 +562,7 @@ function StopwordEditor({ set }: { set: StopwordSetDescriptor }) {
             </Box>
           ))}
           {filteredWords.length === 0 && (
-            <Typography
-              sx={{ fontSize: 12.5, color: designTokens.textFaint }}
-            >
+            <Typography sx={{ fontSize: 12.5, color: designTokens.textFaint }}>
               {filter ? 'No matching words.' : 'No words yet. Add some above.'}
             </Typography>
           )}
@@ -836,7 +826,9 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
           onChange={handleWordInputChange}
           onKeyDown={handleWordKeyDown}
           onBlur={flushDraft}
-          placeholder={words.length === 0 ? 'type words, press space or comma…' : ''}
+          placeholder={
+            words.length === 0 ? 'type words, press space or comma…' : ''
+          }
           sx={{
             flex: 1,
             minWidth: 120,
@@ -847,7 +839,6 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
             background: 'transparent',
             color: designTokens.text,
             py: '2px',
-            '&::placeholder': { color: designTokens.textFaint, opacity: 1 },
           }}
         />
       </Box>

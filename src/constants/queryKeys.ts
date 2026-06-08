@@ -6,11 +6,11 @@ import type {
 
 export const collectionQueryKeys = {
   all: (clusterId: string) => [clusterId, 'collections'] as const,
-  list: (clusterId: string, filters: any) =>
-    [...collectionQueryKeys.all(clusterId), filters] as const, // [string, any],
+  list: (clusterId: string, filters?: Record<string, unknown>) =>
+    [...collectionQueryKeys.all(clusterId), filters] as const, // [string, unknown],
   collection: (clusterId: string, collectionId: string) =>
     [...collectionQueryKeys.all(clusterId), collectionId] as const,
-  names: (clusterId: string, options?: any) =>
+  names: (clusterId: string, options?: Record<string, unknown>) =>
     [...collectionQueryKeys.all(clusterId), 'names', options] as const,
   schemas: (clusterId: string) =>
     [...collectionQueryKeys.all(clusterId), 'schemas'] as const,

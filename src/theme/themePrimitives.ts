@@ -28,6 +28,16 @@ declare module '@mui/material/styles' {
   interface Palette {
     baseShadow: string;
   }
+
+  interface TypeText {
+    // tertiary: string;
+    faint: string;
+    subtle: string;
+    faintChannel: string;
+    subtleChannel: string;
+    warning: string;
+    warningChannel: string;
+  }
 }
 
 const defaultTheme = createTheme();
@@ -114,6 +124,7 @@ const systemFont = [
   '"Segoe UI Symbol"',
 ];
 
+// DELETE ?? pre-redesign ??
 export const getDesignTokens = (mode: PaletteMode) => {
   customShadows[1] =
     mode === 'dark'
@@ -341,9 +352,14 @@ export const colorSchemes = {
       text: {
         primary: 'var(--ts-text)',
         secondary: 'var(--ts-textMuted)',
+        faint: 'var(--ts-textFaint)',
+        subtle: 'var(--ts-textSubtle)',
         primaryChannel: '10 35 66',
         secondaryChannel: '66 83 103',
+        faintChannel: '143 163 184',
+        subtleChannel: '167 180 197',
         warning: orange[400],
+        warningChannel: '196 146 10',
       },
       action: {
         hover: alpha(gray[200], 0.2),
@@ -404,8 +420,14 @@ export const colorSchemes = {
       text: {
         primary: 'var(--ts-text)',
         secondary: 'var(--ts-textMuted)',
+        faint: 'var(--ts-textFaint)',
+        subtle: 'var(--ts-textSubtle)',
         primaryChannel: '230 235 242',
         secondaryChannel: '163 174 189',
+        faintChannel: '111, 122, 138',
+        subtleChannel: '79, 88, 103',
+        warning: orange[400],
+        warningChannel: '196 146 10',
       },
       action: {
         hover: alpha(gray[600], 0.2),

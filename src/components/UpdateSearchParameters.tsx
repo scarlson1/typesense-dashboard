@@ -49,7 +49,7 @@ export function UpdateSearchParameters({
     facetByOptions,
     groupByOptions,
   } = useDefaultIndexParams();
-  const { getStoredPreset, setStoredPreset } = useCollectionSearchPreset(
+  const { getStoredPreset } = useCollectionSearchPreset(
     clusterId,
     collectionId,
   );
@@ -152,33 +152,9 @@ export function UpdateSearchParameters({
 
   const prevCollectionId = usePrevious(collectionId);
 
-  // Auto-default to first preset if nothing stored and no preset active (desired behavior ??)
-  useEffect(() => {
-    if (collectionId !== prevCollectionId) return;
-    if (presets?.length && !preset && !getStoredPreset()) {
-      const firstPreset = presets[0].name;
-      setPreset(firstPreset);
-      setStoredPreset(firstPreset);
-    }
-  }, [presets, collectionId, prevCollectionId]); // only run when presets load
-
-  // Sync preset selection to localStorage
-  useEffect(() => {
-    if (collectionId !== prevCollectionId) return;
-    if (formPresetValue !== prevFormPresetValue) {
-      const existingPreset = presets.find((p) => p.name === formPresetValue);
-      if (existingPreset?.name) {
-        setPreset(existingPreset.name);
-        setStoredPreset(existingPreset.name);
-      }
-    }
-  }, [
-    presets,
-    formPresetValue,
-    prevFormPresetValue,
-    collectionId,
-    prevCollectionId,
-  ]);
+  // Note: persisting the active preset to localStorage now lives in the
+  // always-mounted <PresetPersistence /> (rendered in the search layout) so it
+  // is synced regardless of which configure tab / mobile drawer is open.
 
   // clear form if collection preset preference not set
   useEffect(() => {

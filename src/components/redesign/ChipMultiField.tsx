@@ -58,7 +58,6 @@ const addChipInputSx: SxProps<Theme> = {
       fontFamily: designTokens.fontMono,
       color: designTokens.textFaint,
     },
-    '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
     '& .MuiAutocomplete-endAdornment': { right: 4 },
   },
 };
@@ -133,11 +132,17 @@ export const ChipMultiField = ({
         blurOnSelect
         clearOnBlur
         renderInput={(params) => (
-          <MuiTextField {...params} placeholder={placeholder} sx={addChipInputSx} />
+          <MuiTextField
+            {...params}
+            placeholder={placeholder}
+            sx={addChipInputSx}
+          />
         )}
         slotProps={{ paper: { sx: paperSx } }}
         popupIcon={
-          <ExpandMoreRounded sx={{ fontSize: 15, color: designTokens.textFaint }} />
+          <ExpandMoreRounded
+            sx={{ fontSize: 15, color: designTokens.textFaint }}
+          />
         }
         sx={{ '& .MuiAutocomplete-popupIndicator': { mr: '-2px' } }}
       />
