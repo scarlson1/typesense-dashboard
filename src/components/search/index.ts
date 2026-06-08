@@ -7,6 +7,8 @@ export * from './LoadingHits';
 export * from './PresetPersistence';
 export * from './Refinements';
 export * from './SearchBox';
+export * from './SearchModes';
+export * from './SearchModesBar';
 export * from './SearchError';
 export * from './SearchPageSize';
 export * from './SearchPagination';

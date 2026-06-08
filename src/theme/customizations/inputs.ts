@@ -72,6 +72,17 @@ export const inputCustomizations: Components<Theme> = {
         '& .MuiAutocomplete-endAdornment': {
           right: 4,
         },
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--ts-borderStrong)',
+          transition: 'border-color 120ms ease',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--ts-accent)',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--ts-accent)',
+          borderWidth: '1px', // MUI defaults to 2px on focus
+        },
       }, // ),
       input: {
         // padding: '0 4px !important',
