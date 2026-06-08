@@ -33,6 +33,7 @@ import type {
 } from 'typesense/lib/Typesense/Documents';
 import type { MultiSearchRequestsSchema } from 'typesense/lib/Typesense/MultiSearch';
 import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
+import { dividerPaperSx as paperSx } from '@/constants/redesignSx';
 
 type SearchParamsFormFieldsProps = Parameters<typeof SearchParamsForm>[0];
 
@@ -69,7 +70,6 @@ const compactInputSx: SxProps<Theme> = {
   },
 };
 
-const paperSx = { border: (theme: Theme) => `1px solid ${theme.palette.divider}` };
 
 const SearchParamsFormFields = ({
   form,

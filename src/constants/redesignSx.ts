@@ -26,6 +26,49 @@ export const fieldInputSx: SxProps<Theme> = {
   },
 };
 
+// Compact monospace field used by the redesign forms (analytics, curation,
+// synonyms, stopwords). Previously copy-pasted into each form file.
+export const compactMonoInputSx: SxProps<Theme> = {
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: designTokens.surface,
+    fontSize: 12.5,
+    fontFamily: designTokens.fontMono,
+    minHeight: 32,
+    borderRadius: '6px',
+    '& fieldset': {
+      borderColor: designTokens.border,
+      transition: 'border-color 120ms ease',
+    },
+    '&:hover fieldset': { borderColor: designTokens.borderStrong },
+    '&.Mui-focused fieldset': {
+      borderColor: designTokens.accent,
+      borderWidth: 1,
+    },
+    '& input': {
+      fontSize: 12.5,
+      fontFamily: designTokens.fontMono,
+      padding: '6px 10px !important',
+    },
+    '& input::placeholder': { color: designTokens.textMuted, opacity: 1 },
+  },
+};
+
+// Uppercase section label used above redesign form fields.
+export const sectionLabelSx: SxProps<Theme> = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: designTokens.textFaint,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  mb: 0.75,
+  mt: 1.5,
+};
+
+// Hairline border for popover/autocomplete Paper surfaces.
+export const dividerPaperSx: SxProps<Theme> = {
+  border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+};
+
 export const fieldChipSx: SxProps<Theme> = {
   height: 22,
   fontSize: 12,

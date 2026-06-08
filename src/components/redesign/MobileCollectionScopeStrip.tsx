@@ -98,7 +98,7 @@ export function MobileCollectionScopeStrip({
               height: 44,
               backgroundColor: 'background.paper',
               border: `1px solid ${designTokens.border}`,
-              boxShadow: '0 6px 20px rgba(10,37,64,.08)',
+              boxShadow: designTokens.shadowScope,
               color: designTokens.textMuted,
               '&:hover': { borderColor: designTokens.borderStrong },
             }}
@@ -119,7 +119,7 @@ export function MobileCollectionScopeStrip({
               backgroundColor: 'background.paper',
               border: `1px solid ${designTokens.border}`,
               borderRadius: '999px',
-              boxShadow: '0 6px 20px rgba(10,37,64,.08)',
+              boxShadow: designTokens.shadowScope,
               cursor: 'pointer',
               '&:hover': { borderColor: designTokens.borderStrong },
             }}

@@ -195,7 +195,7 @@ const ThemeToggle = () => {
               backgroundColor: 'background.paper',
               color: designTokens.text,
               fontWeight: 600,
-              boxShadow: '0 1px 2px rgba(0,0,0,.06)',
+              boxShadow: designTokens.shadowSheet,
             },
             '&:hover': { backgroundColor: 'transparent' },
             '&.Mui-selected:hover': { backgroundColor: 'background.paper' },

@@ -42,6 +42,8 @@
   --ts-heroTo: hsl(210, 95%, 44%);
   --ts-codeSurface: hsl(213, 73%, 15%);
   --ts-codeText: #e1e7ed;
+  --ts-codeTextMuted: #8c9fb3;
+  --ts-codeBorder: #2a3a55;
 }
 
 [data-mui-color-scheme='dark'] {
@@ -79,6 +81,8 @@
   --ts-heroTo: #1d4d8c;
   --ts-codeSurface: #06080d;
   --ts-codeText: #e1e7ed;
+  --ts-codeTextMuted: #8c9fb3;
+  --ts-codeBorder: #2a3a55;
 }
 
 html,

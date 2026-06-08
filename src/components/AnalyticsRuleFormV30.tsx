@@ -8,6 +8,10 @@ import {
   eventTypesByRuleType,
   type AnalyticsEventType,
 } from '@/constants';
+import {
+  compactMonoInputSx as compactInputSx,
+  sectionLabelSx as labelSx,
+} from '@/constants/redesignSx';
 import { useTypesenseClient, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { AddRounded } from '@mui/icons-material';
@@ -25,44 +29,6 @@ import {
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { useQuery } from '@tanstack/react-query';
-
-const labelSx = {
-  fontSize: 10.5,
-  fontWeight: 700,
-  color: designTokens.textFaint,
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.06em',
-  mb: 0.75,
-  mt: 1.5,
-};
-
-const compactInputSx = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: designTokens.surface,
-    fontSize: 12.5,
-    fontFamily: designTokens.fontMono,
-    minHeight: 32,
-    borderRadius: '6px',
-    '& fieldset': {
-      borderColor: designTokens.border,
-      transition: 'border-color 120ms ease',
-    },
-    '&:hover fieldset': { borderColor: designTokens.borderStrong },
-    '&.Mui-focused fieldset': {
-      borderColor: designTokens.accent,
-      borderWidth: 1,
-    },
-    '& input': {
-      fontSize: 12.5,
-      fontFamily: designTokens.fontMono,
-      padding: '6px 10px !important',
-    },
-    // '& input::placeholder': {
-    //   color: designTokens.textMuted,
-    //   opacity: 1,
-    // },
-  },
-};
 
 const RULE_TYPES = analyticsRuleType.options;
 

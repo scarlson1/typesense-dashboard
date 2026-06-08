@@ -10,8 +10,7 @@ export const smallButtonSx: SxProps<Theme> = {
   borderColor: designTokens.border,
   color: designTokens.text,
   backgroundColor: 'background.paper',
-  boxShadow:
-    '0 1px 1px rgba(50,50,90,.04), 0 1px 1px rgba(50,50,90,.05)',
+  boxShadow: designTokens.shadowButton,
   '&:hover': {
     borderColor: designTokens.borderStrong,
     background: designTokens.surfaceMuted,
@@ -25,8 +24,7 @@ export const primaryButtonSx: SxProps<Theme> = {
   height: 32,
   borderRadius: '6px',
   background: designTokens.accent,
-  boxShadow:
-    '0 1px 1px rgba(50,50,90,.06), 0 1px 2px rgba(50,50,90,.08), inset 0 -1px 0 rgba(0,0,0,.12)',
+  boxShadow: designTokens.shadowButtonPrimary,
   '&:hover': { background: designTokens.accentHover },
 };
 

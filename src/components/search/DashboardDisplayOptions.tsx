@@ -1,6 +1,6 @@
 import { ChipMultiField, FieldRow, ghostButtonSx } from '@/components/redesign';
 import { SEARCH_DEFAULT_SLOT_PROPS } from '@/constants';
-import { fieldInputSx } from '@/constants/redesignSx';
+import { dividerPaperSx as autocompletePaperSx, fieldInputSx } from '@/constants/redesignSx';
 import {
   useCollectionSchema,
   useCollectionSearchPreset,
@@ -21,7 +21,6 @@ import {
   TextField,
   type CSSProperties,
   type SelectChangeEvent,
-  type Theme,
 } from '@mui/material';
 import { useCallback, useEffect, useMemo } from 'react';
 
@@ -40,10 +39,6 @@ interface ImgOption {
   inputValue?: string;
 }
 const filter = createFilterOptions<ImgOption>();
-
-const autocompletePaperSx = {
-  border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
-};
 
 const selectInputSx = {
   ...fieldInputSx,

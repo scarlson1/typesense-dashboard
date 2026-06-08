@@ -302,10 +302,10 @@ export function UpdatePreset<T extends DocumentSchema = DocumentSchema>({
         <Box
           sx={{
             mt: 1.5,
-            background: '#0a2540',
+            background: designTokens.codeSurface,
             borderRadius: 1,
             p: 2,
-            color: '#e1e7ed',
+            color: designTokens.codeText,
           }}
         >
           <Stack
@@ -320,7 +320,7 @@ export function UpdatePreset<T extends DocumentSchema = DocumentSchema>({
               sx={{
                 fontSize: 11.5,
                 fontWeight: 600,
-                color: '#8c9fb3',
+                color: designTokens.codeTextMuted,
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
               }}
@@ -337,12 +337,12 @@ export function UpdatePreset<T extends DocumentSchema = DocumentSchema>({
               }}
               sx={{
                 background: 'transparent',
-                border: `1px solid #2a3a55`,
+                border: `1px solid ${designTokens.codeBorder}`,
                 borderRadius: '5px',
                 px: 1,
                 py: '3px',
                 fontSize: 11,
-                color: '#e1e7ed',
+                color: designTokens.codeText,
                 '&:hover': { background: 'rgba(255,255,255,0.05)' },
               }}
             >

@@ -307,7 +307,7 @@ function CollectionRowActions({
               border: `1px solid ${designTokens.border}`,
               borderRadius: 1,
               minWidth: 160,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+              boxShadow: designTokens.shadowCardHover,
             },
           },
         }}
