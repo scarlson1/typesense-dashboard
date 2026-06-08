@@ -61,7 +61,7 @@ function AuthComponent() {
       port: search.port ?? '',
       protocol: search.protocol ?? '',
       apiKey: search.apiKey ?? '',
-      env: search.env ?? '',
+      env: search.env ?? 'development',
     },
     validators: { onChange: authSchema },
     onSubmit: async ({ value: { node, port, protocol, apiKey, env } }) => {

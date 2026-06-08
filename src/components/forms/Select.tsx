@@ -21,6 +21,7 @@ export function Select({
   id,
   helperText,
   checkmark,
+  slotProps,
   ...props
 }: TextFieldProps) {
   // Use the context returned from `createFormHookContexts`
@@ -45,14 +46,17 @@ export function Select({
           ? errors.map((e) => e?.message).join(', ')
           : helperText
       }
+      id={id}
       // delete render value ?? used default ??
       slotProps={{
+        ...slotProps,
         select: {
           renderValue: (selected) => {
             if (typeof selected === 'string') return selected;
             if (Array.isArray(selected)) return selected.join(', ');
             return JSON.stringify(selected);
           },
+          ...slotProps?.select,
         },
       }}
       {...props}
