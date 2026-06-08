@@ -4,8 +4,9 @@ import {
   analyticsFormOpts,
   analyticsRuleV1UiConfig,
   analyticsV1RuleTypes,
+  collectionQueryKeys,
 } from '@/constants';
-import { withForm } from '@/hooks';
+import { useTypesenseClient, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { AddRounded, CloseRounded } from '@mui/icons-material';
 import {
@@ -13,6 +14,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   FormControlLabel,
   IconButton,
   MenuItem,
@@ -21,6 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
+import { useQuery } from '@tanstack/react-query';
 
 const labelSx = {
   fontSize: 10.5,
@@ -71,6 +74,29 @@ export const AnalyticsRuleForm = withForm({
     destinationOptions,
     submitButtonText,
   }) {
+    const [client, clusterId] = useTypesenseClient();
+
+    const destinationCollection = useStore(
+      form.store,
+      (s) => s.values.params.destination.collection,
+    );
+
+    const {
+      data: colSchema,
+      isPending,
+      isEnabled,
+      isError,
+      error,
+    } = useQuery({
+      queryKey: collectionQueryKeys.schema(clusterId, destinationCollection),
+      queryFn: () =>
+        client.collections(destinationCollection as string).retrieve(),
+      enabled: Boolean(destinationCollection),
+    });
+    const counterFieldNames = colSchema?.fields
+      .filter((f) => ['int32', 'int64', 'float'].includes(f.type))
+      .map((f) => f.name);
+
     const ruleType = useStore(form.store, (state) => state.values.type);
     const uiConfig =
       analyticsRuleV1UiConfig[
@@ -221,22 +247,6 @@ export const AnalyticsRuleForm = withForm({
           )}
         </form.Field>
 
-        {/* Limit */}
-        {/* <Typography sx={labelSx}>Limit</Typography>
-        <form.AppField name='params.limit'>
-          {({ state, handleChange, handleBlur }) => (
-            <MuiTextField
-              value={state.value}
-              onChange={(e) => handleChange(e.target.value)}
-              onBlur={handleBlur}
-              placeholder='1000'
-              fullWidth
-              size='small'
-              sx={compactInputSx}
-            />
-          )}
-        </form.AppField> */}
-
         {/* Limit — query-aggregation types only */}
         {showFields.includes('limit') && (
           <>
@@ -255,15 +265,6 @@ export const AnalyticsRuleForm = withForm({
                   size='small'
                   error={!state.meta.isValid}
                 />
-                // <MuiTextField
-                //   value={state.value}
-                //   onChange={(e) => handleChange(e.target.value)}
-                //   onBlur={handleBlur}
-                //   placeholder='1000'
-                //   fullWidth
-                //   size='small'
-                //   sx={compactInputSx}
-                // />
               )}
             </form.AppField>
           </>
@@ -284,7 +285,36 @@ export const AnalyticsRuleForm = withForm({
                   size='small'
                   required
                   sx={compactInputSx}
-                />
+                  select
+                  helperText={
+                    isError
+                      ? (error?.message ?? 'failed to load schema')
+                      : !isPending && !counterFieldNames?.length
+                        ? 'int32 field required'
+                        : 'int32 destination field to increment'
+                  }
+                  slotProps={{
+                    input: {
+                      endAdornment:
+                        isPending && isEnabled ? (
+                          <CircularProgress size={16} />
+                        ) : undefined,
+                    },
+                    formHelperText: {
+                      sx: {
+                        fontSize: '0.65rem',
+                        lineHeight: 1.3,
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value=''>--</MenuItem>
+                  {counterFieldNames?.map((o) => (
+                    <MenuItem value={o} key={o}>
+                      {o}
+                    </MenuItem>
+                  ))}
+                </MuiTextField>
               )}
             </form.AppField>
 
@@ -299,7 +329,8 @@ export const AnalyticsRuleForm = withForm({
                       key={i}
                       direction='row'
                       spacing={1}
-                      sx={{ alignItems: 'center' }}
+                      useFlexGap
+                      sx={{ alignItems: 'center', flexWrap: 'wrap' }}
                     >
                       <form.AppField name={`params.source.events[${i}].type`}>
                         {({ state, handleChange }) => (
@@ -308,7 +339,7 @@ export const AnalyticsRuleForm = withForm({
                             size='small'
                             value={state.value ?? 'click'}
                             onChange={(e) => handleChange(e.target.value)}
-                            sx={{ ...compactInputSx, minWidth: 120 }}
+                            sx={{ ...compactInputSx, minWidth: 100 }}
                           >
                             {COUNTER_EVENT_TYPES.map((o) => (
                               <MenuItem key={o} value={o}>
@@ -336,10 +367,14 @@ export const AnalyticsRuleForm = withForm({
                       <form.AppField name={`params.source.events[${i}].weight`}>
                         {({ state, handleChange }) => (
                           <NumberSpinner
+                            label='Weight'
                             min={0}
                             value={state.value ?? 1}
                             size='small'
                             onValueChange={(val) => handleChange(val ?? 1)}
+                            labelProps={{
+                              sx: labelSx,
+                            }}
                           />
                         )}
                       </form.AppField>
@@ -348,6 +383,7 @@ export const AnalyticsRuleForm = withForm({
                         size='small'
                         aria-label='remove event'
                         onClick={() => field.removeValue(i)}
+                        color='error'
                       >
                         <CloseRounded sx={{ fontSize: 16 }} />
                       </IconButton>
@@ -436,7 +472,7 @@ export const AnalyticsRuleForm = withForm({
                 startIcon={<AddRounded sx={{ fontSize: 14 }} />}
                 loading={isSubmitting}
                 disabled={!canSubmit}
-                sx={{ ...primaryButtonSx, height: 36 }}
+                sx={{ ...primaryButtonSx, height: 36, mt: 2 }}
               >
                 {submitButtonText}
               </Button>

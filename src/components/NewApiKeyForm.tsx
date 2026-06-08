@@ -1,10 +1,6 @@
-import {
-  fieldChipSx,
-  fieldInputSx,
-  FormField,
-  primaryButtonSx,
-} from '@/components/redesign';
+import { FormField, primaryButtonSx } from '@/components/redesign';
 import { collectionQueryKeys } from '@/constants';
+import { fieldChipSx, fieldInputSx } from '@/constants/redesignSx';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import {

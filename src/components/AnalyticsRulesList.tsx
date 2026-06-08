@@ -43,6 +43,46 @@ import { AnalyticsRuleForm } from './AnalyticsRuleForm';
 import { ErrorFallback } from './ErrorFallback';
 import { Badge } from './redesign';
 
+//V29
+// export interface AnalyticsRuleCreateSchemaV1 {
+//   type: "popular_queries" | "nohits_queries" | "counter" | "log";
+//   params: {
+//       enable_auto_aggregation?: boolean;
+//       source: {
+//           collections: string[];
+//           events?: {
+//               type: string;
+//               weight?: number;
+//               name: string;
+//           }[];
+//       };
+//       expand_query?: boolean;
+//       destination?: {
+//           collection: string;
+//           counter_field?: string;
+//       };
+//       limit?: number;
+//   };
+// }
+
+// V30
+// export interface AnalyticsRuleCreateSchema {
+//   name: string;
+//   type: string; // ["popular_queries", "nohits_queries", "counter", "log"]
+//   collection: string;
+//   event_type: string; // search, click, conversion, and visit
+//   rule_tag?: string;
+//   params?: {
+//       destination_collection?: string;
+//       limit?: number;
+//       capture_search_requests?: boolean;
+//       meta_fields?: string[];
+//       expand_query?: boolean;
+//       counter_field?: string;
+//       weight?: number;
+//   };
+// }
+
 export function AnalyticsRulesList() {
   const [client, clusterId] = useTypesenseClient();
   const { is30Plus } = useTypesenseVersion();
@@ -276,46 +316,6 @@ export function AnalyticsRulesList() {
   );
 }
 
-//V29
-// export interface AnalyticsRuleCreateSchemaV1 {
-//   type: "popular_queries" | "nohits_queries" | "counter" | "log";
-//   params: {
-//       enable_auto_aggregation?: boolean;
-//       source: {
-//           collections: string[];
-//           events?: {
-//               type: string;
-//               weight?: number;
-//               name: string;
-//           }[];
-//       };
-//       expand_query?: boolean;
-//       destination?: {
-//           collection: string;
-//           counter_field?: string;
-//       };
-//       limit?: number;
-//   };
-// }
-
-// V30
-// export interface AnalyticsRuleCreateSchema {
-//   name: string;
-//   type: string; // ["popular_queries", "nohits_queries", "counter", "log"]
-//   collection: string;
-//   event_type: string; // search, click, conversion, and visit
-//   rule_tag?: string;
-//   params?: {
-//       destination_collection?: string;
-//       limit?: number;
-//       capture_search_requests?: boolean;
-//       meta_fields?: string[];
-//       expand_query?: boolean;
-//       counter_field?: string;
-//       weight?: number;
-//   };
-// }
-
 function NewRulePanel() {
   const { is30Plus } = useTypesenseVersion();
 
@@ -327,7 +327,6 @@ function NewRulePanel() {
 function NewRulePanelV29() {
   const toast = useAsyncToast();
   const [client, clusterId] = useTypesenseClient();
-  const { is30Plus } = useTypesenseVersion();
 
   const { data: collectionNames } = useSuspenseQuery({
     queryKey: collectionQueryKeys.names(clusterId, { withAlias: true }),
@@ -378,27 +377,30 @@ function NewRulePanelV29() {
     ...analyticsFormOpts,
     defaultValues: analyticsFormDefaultValues,
     onSubmit: async ({ value }) => {
-      const { name, type, params } = value;
-      const candidate = {
-        type,
-        params: {
-          ...params,
-          limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
-        },
-      };
+      // const { name, type, params } = value;
+      // const candidate = {
+      //   type,
+      //   params: {
+      //     ...params,
+      //     limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
+      //   },
+      // };
 
-      const result = analyticsRuleV1SubmitSchema.safeParse(candidate);
-      if (!result.success) {
-        toast.error(
-          result.error.issues[0]?.message ?? 'invalid analytics rule',
-        );
-        return;
-      }
+      // const result = analyticsRuleV1SubmitSchema.safeParse(candidate);
+      // if (!result.success) {
+      //   toast.error(
+      //     result.error.issues[0]?.message ?? 'invalid analytics rule',
+      //   );
+      //   return;
+      // }
+      const schema = analyticsRuleV1SubmitSchema.parse(
+        value,
+      ) as AnalyticsRuleCreateSchemaV1;
 
       try {
         await mutation.mutateAsync({
-          name,
-          schema: result.data as AnalyticsRuleCreateSchemaV1,
+          name: value.name,
+          schema, // : result.data as AnalyticsRuleCreateSchemaV1,
         });
         form.reset();
       } catch (err) {

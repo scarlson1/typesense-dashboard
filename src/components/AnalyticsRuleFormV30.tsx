@@ -80,6 +80,12 @@ export const AnalyticsRuleFormV30 = withForm({
     submitButtonText,
   }) {
     const [client, clusterId] = useTypesenseClient();
+
+    const destinationCollection = useStore(
+      form.store,
+      (s) => s.values.params.destination_collection,
+    );
+
     const {
       data: colSchema,
       isPending,
@@ -87,26 +93,20 @@ export const AnalyticsRuleFormV30 = withForm({
       isError,
       error,
     } = useQuery({
-      queryKey: collectionQueryKeys.schema(
-        clusterId,
-        form.getFieldValue('collection'),
-      ),
+      queryKey: collectionQueryKeys.schema(clusterId, destinationCollection),
       queryFn: () =>
-        client
-          .collections(form.getFieldValue('collection') as string)
-          .retrieve(),
-      enabled: Boolean(form.getFieldValue('collection')),
+        client.collections(destinationCollection as string).retrieve(),
+      enabled: Boolean(destinationCollection),
     });
+    const counterFieldNames = colSchema?.fields
+      .filter((f) => ['int32', 'int64', 'float'].includes(f.type))
+      .map((f) => f.name);
 
     const ruleType = useStore(form.store, (state) => state.values.type);
 
     // const hideExtraFields = ruleType === 'counter' || ruleType === 'log';
 
     const isCounterOrLogs = ruleType === 'counter' || ruleType === 'log';
-
-    const counterFieldNames = colSchema?.fields
-      .filter((f) => f.type === 'int32')
-      .map((f) => f.name);
 
     return (
       <Box>
@@ -454,7 +454,7 @@ export const AnalyticsRuleFormV30 = withForm({
                         ? (error?.message ?? 'failed to load schema')
                         : !isPending && !counterFieldNames?.length
                           ? 'int32 field required'
-                          : undefined
+                          : 'int32 destination field to increment'
                     }
                     slotProps={{
                       input: {
@@ -462,6 +462,12 @@ export const AnalyticsRuleFormV30 = withForm({
                           isPending && isEnabled ? (
                             <CircularProgress size={16} />
                           ) : undefined,
+                      },
+                      formHelperText: {
+                        sx: {
+                          fontSize: '0.65rem',
+                          lineHeight: 1.3,
+                        },
                       },
                     }}
                   >

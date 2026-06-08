@@ -5,23 +5,27 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
+import FormLabel, { type FormLabelProps } from '@mui/material/FormLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { useId } from 'react';
 
 // https://base-ui.com/react/components/number-field#api-reference
+
+interface NumberSpinnerProps extends BaseNumberField.Root.Props {
+  label?: React.ReactNode;
+  size?: 'small' | 'medium';
+  error?: boolean;
+  labelProps?: FormLabelProps; // TODO: slotProps ??
+}
 
 export function NumberSpinner({
   id: idProp,
   label,
   error,
   size = 'medium',
+  labelProps,
   ...other
-}: BaseNumberField.Root.Props & {
-  label?: React.ReactNode;
-  size?: 'small' | 'medium';
-  error?: boolean;
-}) {
+}: NumberSpinnerProps) {
   let id = useId();
   if (idProp) {
     id = idProp;
@@ -63,6 +67,7 @@ export function NumberSpinner({
         {Boolean(label) && (
           <FormLabel
             htmlFor={id}
+            {...labelProps}
             sx={{
               display: 'inline-block',
               cursor: 'ew-resize',
@@ -71,6 +76,7 @@ export function NumberSpinner({
               fontWeight: 500,
               lineHeight: 1.5,
               mb: 0.5,
+              ...(labelProps?.sx || {}),
             }}
           >
             {label}

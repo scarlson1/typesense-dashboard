@@ -28,7 +28,7 @@ export const eventTypesByRuleType: Record<
 };
 
 export const analyticsRuleCreateValues = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   type: analyticsRuleType,
   // event_type: analyticsEventType.or(z.string()),
   params: z.object({
@@ -76,13 +76,6 @@ export const analyticsFormDefaultValues = {
     limit: 1000,
   },
 } as AnalyticsRuleCreateValues;
-
-export const analyticsFormOpts = formOptions({
-  defaultValues: analyticsFormDefaultValues,
-  validators: {
-    onChange: analyticsRuleCreateValues,
-  },
-});
 
 // ----- v1 (pre-v30) per-type submit schema — authoritative for the wire ----- //
 
@@ -135,6 +128,75 @@ export const analyticsRuleV1SubmitSchema = z.discriminatedUnion('type', [
   counterV1,
 ]);
 export type AnalyticsRuleV1Submit = z.infer<typeof analyticsRuleV1SubmitSchema>;
+
+export const analyticsRuleV1FormValidator = analyticsRuleCreateValues.check(
+  (ctx) => {
+    const { type, params } = ctx.value;
+
+    if (!params.source.collections?.length) {
+      ctx.issues.push({
+        code: 'custom',
+        path: ['params', 'source', 'collections'],
+        message: 'select at least one source collection',
+        input: params.source.collections,
+      });
+    }
+    if (!params.destination.collection) {
+      ctx.issues.push({
+        code: 'custom',
+        path: ['params', 'destination', 'collection'],
+        message: 'destination collection is required',
+        input: params.destination.collection,
+      });
+    }
+
+    if (type === 'counter') {
+      if (!params.destination.counter_field) {
+        ctx.issues.push({
+          code: 'custom',
+          path: ['params', 'destination', 'counter_field'],
+          message: 'counter_field is required',
+          input: params.destination.counter_field,
+        });
+      }
+      if (!params.source.events?.length) {
+        ctx.issues.push({
+          code: 'custom',
+          path: ['params', 'source', 'events'],
+          message: 'add at least one event',
+          input: params.source.events,
+        });
+      } else {
+        params.source.events.forEach((e, i) => {
+          if (!e.name) {
+            ctx.issues.push({
+              code: 'custom',
+              path: ['params', 'source', 'events', i, 'name'],
+              message: 'event name is required',
+              input: e.name,
+            });
+          }
+          if (!['click', 'conversion', 'visit'].includes(e.type)) {
+            ctx.issues.push({
+              code: 'custom',
+              path: ['params', 'source', 'events', i, 'type'],
+              message: 'invalid event type',
+              input: e.type,
+            });
+          }
+        });
+      }
+    }
+  },
+);
+
+export const analyticsFormOpts = formOptions({
+  defaultValues: analyticsFormDefaultValues,
+  validators: {
+    onChange: analyticsRuleCreateValues, // permissive: no red errors mid-typing
+    onSubmit: analyticsRuleV1FormValidator, // strict per-type: blocks bad submits
+  },
+});
 
 // Presentation only: rule types v29 supports + which fields each one shows.
 export const analyticsV1RuleTypes = [
