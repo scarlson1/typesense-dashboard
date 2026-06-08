@@ -1,3 +1,4 @@
+export * from './CpuUtilization';
 export * from './MemoryBreakdown';
 export * from './MemoryUtilization';
 export * from './ServerHealth';

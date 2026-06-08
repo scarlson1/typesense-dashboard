@@ -1,6 +1,6 @@
-import { Box, Stack, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
 import { designTokens } from '@/theme/themePrimitives';
+import { Box, Stack, Typography, type SxProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 interface StatCardProps {
   label: string;
@@ -10,6 +10,7 @@ interface StatCardProps {
   delta?: ReactNode;
   deltaPositive?: boolean;
   children?: ReactNode;
+  sx?: SxProps;
 }
 
 export const StatCard = ({
@@ -20,6 +21,7 @@ export const StatCard = ({
   delta,
   deltaPositive,
   children,
+  sx = {},
 }: StatCardProps) => {
   return (
     <Box
@@ -30,6 +32,7 @@ export const StatCard = ({
         px: 2,
         py: 1.75,
         boxShadow: 'none',
+        ...sx,
       }}
     >
       <Typography
@@ -44,7 +47,10 @@ export const StatCard = ({
       >
         {label}
       </Typography>
-      <Stack direction='row' sx={{ alignItems: 'baseline', gap: 0.5, mb: 0.75 }}>
+      <Stack
+        direction='row'
+        sx={{ alignItems: 'baseline', gap: 0.5, mb: 0.75 }}
+      >
         <Typography
           sx={{
             fontSize: 22,

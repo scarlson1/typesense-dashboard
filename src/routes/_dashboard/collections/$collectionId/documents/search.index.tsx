@@ -232,7 +232,7 @@ function RouteComponent() {
               overflowX: 'hidden',
               mx: { xs: -2.5, md: 0 },
               px: { xs: 2.5, md: 0 },
-              pb: mobile ? `${SCOPE_STRIP_HEIGHT + 80}px` : 0,
+              pb: mobile ? `${SCOPE_STRIP_HEIGHT + 32}px` : 0,
               WebkitOverflowScrolling: 'touch',
             }}
           >
@@ -253,13 +253,14 @@ function RouteComponent() {
               <ResultsCount />
             </Box>
             <Stack
-              direction='row'
+              direction={{ xs: 'row-reverse', md: 'row' }}
               spacing={2}
               sx={{
                 flex: '1 1 auto',
-                justifyContent: { xs: 'flex-end', md: 'flex-end' },
+                justifyContent: 'flex-end',
                 alignItems: 'center',
                 width: { xs: '100%', md: 'auto' },
+                ml: { xs: 0 },
               }}
             >
               <Box sx={{ display: { xs: 'none', md: 'block' } }}>

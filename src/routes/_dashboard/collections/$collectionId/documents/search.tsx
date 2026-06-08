@@ -8,6 +8,7 @@ import {
   PageHeader,
   primaryButtonSx,
 } from '@/components/redesign';
+import { PresetPersistence } from '@/components/search';
 import { SearchSlotsProvider } from '@/components/search/SearchSlotsProvider';
 import {
   useCollectionSearchPreset,
@@ -93,6 +94,7 @@ function SearchLayout() {
         clusterId={clusterId}
         initialPreset={initialPreset}
       >
+        <PresetPersistence collectionId={collectionId} />
         <SearchSlotsProvider
           key={`search-slots-${collectionId}`}
           collectionId={collectionId}

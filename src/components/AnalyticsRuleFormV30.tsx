@@ -1,10 +1,12 @@
 import { NumberSpinner } from '@/components/forms/NumberSpinner';
 import { primaryButtonSx } from '@/components/redesign';
 import {
-  analyticsEventType,
   analyticsFormOptsV30,
   analyticsRuleType,
+  analyticsRuleUiConfigV30,
   collectionQueryKeys,
+  eventTypesByRuleType,
+  type AnalyticsEventType,
 } from '@/constants';
 import { useTypesenseClient, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -115,6 +117,14 @@ export const AnalyticsRuleFormV30 = withForm({
           listeners={{
             onChange: ({ value }) => {
               // https://github.com/TanStack/form/issues/1874
+
+              // Reset to the first valid event_type for the new rule type so a stale
+              // 'click' from a previous counter/log selection can't ship with a query rule.
+              form.setFieldValue(
+                'event_type',
+                analyticsRuleUiConfigV30[value].eventTypes[0],
+              );
+
               // Clear submit errors for the now-irrelevant field
               if (value === 'log' || value === 'counter') {
                 form.setFieldMeta('params.limit', (prev) => ({
@@ -142,6 +152,7 @@ export const AnalyticsRuleFormV30 = withForm({
                   },
                 }));
               }
+              form.setFieldValue('event_type', eventTypesByRuleType[value][0]);
             },
           }}
         >
@@ -281,29 +292,33 @@ export const AnalyticsRuleFormV30 = withForm({
           )}
         </form.Field>
 
-        {/* Event type */}
-        {/* <Stack direction='row' spacing={{ xs: 1, sm: 1.5, md: 2 }}> */}
-        <Typography sx={labelSx}>Event Type</Typography>
-        <form.AppField name='event_type'>
-          {({ state, handleChange, handleBlur }) => (
-            <MuiTextField
-              value={state.value}
-              onChange={(e) => handleChange(e.target.value)}
-              onBlur={handleBlur}
-              fullWidth
-              size='small'
-              sx={compactInputSx}
-              select
-            >
-              {analyticsEventType.options.map((o) => (
-                <MenuItem key={o} value={o}>
-                  {o}
-                </MenuItem>
-              ))}
-            </MuiTextField>
-          )}
-        </form.AppField>
-        {/* </Stack> */}
+        {/* Event type - 'search' is only option for popular_queries and nohits_queries */}
+        {!analyticsRuleUiConfigV30[ruleType].eventTypeFixed ? (
+          <>
+            <Typography sx={labelSx}>Event Type</Typography>
+            <form.AppField name='event_type'>
+              {({ state, handleChange, handleBlur }) => (
+                <MuiTextField
+                  value={state.value}
+                  onChange={(e) =>
+                    handleChange(e.target.value as AnalyticsEventType)
+                  }
+                  onBlur={handleBlur}
+                  fullWidth
+                  size='small'
+                  sx={compactInputSx}
+                  select
+                >
+                  {eventTypesByRuleType[ruleType].map((o) => (
+                    <MenuItem key={o} value={o}>
+                      {o}
+                    </MenuItem>
+                  ))}
+                </MuiTextField>
+              )}
+            </form.AppField>
+          </>
+        ) : null}
 
         {!isCounterOrLogs ? (
           <Stack direction='column' spacing={1} sx={{ mt: 1, mb: 1.5 }}>

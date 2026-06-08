@@ -5,6 +5,8 @@ import {
   analyticsFormOpts,
   analyticsFormOptsV30,
   analyticsQueryKeys,
+  analyticsRuleCreateSchemaV30,
+  analyticsRuleUiConfigV30,
   collectionQueryKeys,
 } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
@@ -490,19 +492,28 @@ function NewRulePanelV30() {
     defaultValues: analyticsFormDefaultValuesV30,
     onSubmit: async ({ value }) => {
       console.log('VALUE: ', value);
-      const { name, params } = value;
-      const schema: AnalyticsRuleCreateSchema = {
+
+      const cfg = analyticsRuleUiConfigV30[value.type];
+
+      // Force the implied event_type for query-aggregation types before validating.
+      const normalized = {
         ...value,
-        params: {
-          ...params,
-          // limit: isNaN(Number(params.limit)) ? undefined : Number(params.limit),
-          // weight: isNaN(Number(params.weight))
-          //   ? undefined
-          //   : Number(params.weight),
-        },
+        event_type: cfg.eventTypeFixed ? cfg.eventTypes[0] : value.event_type,
       };
+
+      const result = analyticsRuleCreateSchemaV30.safeParse(normalized);
+      if (!result.success) {
+        toast.error(
+          result.error.issues[0]?.message ?? 'invalid analytics rule',
+        );
+        return;
+      }
+
       try {
-        await mutation.mutateAsync({ name, schema });
+        await mutation.mutateAsync({
+          name: value.name,
+          schema: result.data, // as AnalyticsRuleCreateSchema,
+        });
         form.reset();
       } catch (err) {
         console.log(err);
