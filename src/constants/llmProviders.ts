@@ -30,6 +30,22 @@ export interface LlmProviderDef {
   modelExample: string;
 }
 
+/**
+ * A provider-specific credential/config input. The `key` is the request field
+ * name (e.g. `api_key`, `api_url`, `account_id`). Resource forms (NL search /
+ * conversation models) supply their own provider→fields mapping since the two
+ * resources accept different field sets.
+ */
+export interface LlmFieldDef {
+  key: string;
+  label: string;
+  required?: boolean;
+  /** Render as a password input and treat as write-only. */
+  secret?: boolean;
+  placeholder?: string;
+  helper?: string;
+}
+
 export const LLM_PROVIDERS: readonly LlmProviderDef[] = [
   { id: 'openai', label: 'OpenAI', prefix: 'openai', modelExample: 'gpt-4.1' },
   {

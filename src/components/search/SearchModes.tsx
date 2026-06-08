@@ -11,6 +11,7 @@ import type { SearchMode } from '@/utils';
 import {
   AddRounded,
   AutoAwesomeRounded,
+  CloseRounded,
   ContentCopyRounded,
   GrainRounded,
   SearchRounded,
@@ -464,11 +465,13 @@ const NoticeShell = ({
   tone,
   children,
   action,
+  onDismiss,
 }: {
   icon: ReactNode;
   tone: 'warning' | 'neutral';
   children: ReactNode;
   action?: ReactNode;
+  onDismiss?: () => void;
 }) => (
   <Stack
     direction='row'
@@ -490,18 +493,33 @@ const NoticeShell = ({
     </Box>
     <Box sx={{ flex: 1 }} />
     {action}
+    {onDismiss ? (
+      <Tooltip title='Dismiss'>
+        <IconButton
+          size='small'
+          onClick={onDismiss}
+          aria-label='Dismiss'
+          sx={{ color: designTokens.textFaint, ml: 0.25 }}
+        >
+          <CloseRounded sx={{ fontSize: 15 }} />
+        </IconButton>
+      </Tooltip>
+    ) : null}
   </Stack>
 );
 
 export const EmbeddingUnavailableNotice = ({
   collectionName,
   onConfigure,
+  onDismiss,
 }: {
   collectionName?: string;
   onConfigure?: () => void;
+  onDismiss?: () => void;
 }) => (
   <NoticeShell
     tone='warning'
+    onDismiss={onDismiss}
     icon={<WarningAmberRounded sx={{ fontSize: 15, color: designTokens.warning }} />}
     action={
       <Button
@@ -533,9 +551,16 @@ export const EmbeddingUnavailableNotice = ({
   </NoticeShell>
 );
 
-export const NlUnavailableNotice = ({ onCreate }: { onCreate?: () => void }) => (
+export const NlUnavailableNotice = ({
+  onCreate,
+  onDismiss,
+}: {
+  onCreate?: () => void;
+  onDismiss?: () => void;
+}) => (
   <NoticeShell
     tone='neutral'
+    onDismiss={onDismiss}
     icon={<AutoAwesomeRounded sx={{ fontSize: 15, color: designTokens.textFaint }} />}
     action={
       <Button

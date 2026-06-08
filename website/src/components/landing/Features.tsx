@@ -58,6 +58,26 @@ const features: Feature[] = [
         strokeLinecap='round'
         strokeLinejoin='round'
       >
+        <path d='M3 3v18h18' />
+        <path d='m7 14 3-4 3 3 4-6' />
+      </svg>
+    ),
+    title: 'NL & Conversational Search',
+    body: 'Easy test natural language and conversational search functionality. Instantly see how LLM converts natural language to query filters.',
+    // title: 'Cluster health at a glance',
+    // body: 'Live memory, disk and CPU, document counts, indexing status and a search/write volume view — know your node is healthy before users do.',
+    delay: 'd2',
+  },
+  {
+    icon: (
+      <svg
+        viewBox='0 0 24 24'
+        fill='none'
+        stroke='currentColor'
+        strokeWidth={2}
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      >
         <path d='M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z' />
         <circle cx='12' cy='10' r='3' />
       </svg>
@@ -100,24 +120,6 @@ const features: Feature[] = [
     title: 'Curation & synonyms',
     body: 'Pin or hide results for any query, manage synonym sets and stopwords, and save reusable search presets your whole team can share.',
     delay: 'd1',
-  },
-  {
-    icon: (
-      <svg
-        viewBox='0 0 24 24'
-        fill='none'
-        stroke='currentColor'
-        strokeWidth={2}
-        strokeLinecap='round'
-        strokeLinejoin='round'
-      >
-        <path d='M3 3v18h18' />
-        <path d='m7 14 3-4 3 3 4-6' />
-      </svg>
-    ),
-    title: 'Cluster health at a glance',
-    body: 'Live memory, disk and CPU, document counts, indexing status and a search/write volume view — know your node is healthy before users do.',
-    delay: 'd2',
   },
 ];
 

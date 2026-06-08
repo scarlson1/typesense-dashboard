@@ -9,7 +9,9 @@ import { designTokens } from '@/theme/themePrimitives';
 import { typesenseStore } from '@/utils';
 import {
   AddRounded,
+  AutoAwesomeRounded,
   AutoFixHighRounded,
+  ChatBubbleOutlineRounded,
   CompareArrowsRounded,
   DatasetRounded,
   ExpandMoreRounded,
@@ -475,6 +477,11 @@ export function Sidebar() {
         <Typography sx={headerLabelSx}>Cluster</Typography>
 
         <SidebarLink
+          to='/conversational-search'
+          icon={<ChatBubbleOutlineRounded fontSize='small' />}
+          label='Conversational search'
+        />
+        <SidebarLink
           to='/keys'
           icon={<KeyRounded fontSize='small' />}
           label='API keys'
@@ -483,6 +490,16 @@ export function Sidebar() {
           to='/analytics'
           icon={<InsightsRounded fontSize='small' />}
           label='Analytics'
+        />
+        <SidebarLink
+          to='/nl-models'
+          icon={<AutoAwesomeRounded fontSize='small' />}
+          label='NL models'
+        />
+        <SidebarLink
+          to='/conversation-models'
+          icon={<ChatBubbleOutlineRounded fontSize='small' />}
+          label='Conversation models'
         />
         <SidebarLink
           to='/server'

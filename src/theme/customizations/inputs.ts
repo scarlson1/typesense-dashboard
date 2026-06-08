@@ -111,20 +111,20 @@ export const inputCustomizations: Components<Theme> = {
           },
           WebkitFontSmoothing: 'antialiased',
           // '& .MuiAutocomplete-input': { padding: '0 4px' },
-          '& fieldset': {
-            borderColor: 'var(--ts-borderStrong)',
-            transition: 'border-color 120ms ease',
-          },
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--ts-borderStrong)',
-          },
-          '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--ts-accent)',
-          },
-          '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline':
-            {
-              borderColor: 'var(--ts-accent)',
-            },
+          // '& fieldset': {
+          //   borderColor: 'var(--ts-borderStrong)',
+          //   transition: 'border-color 120ms ease',
+          // },
+          // '& .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: 'var(--ts-borderStrong)',
+          // },
+          // '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: 'var(--ts-accent)',
+          // },
+          // '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline':
+          //   {
+          //     borderColor: 'var(--ts-accent)',
+          //   },
           '& .MuiAutocomplete-endAdornment': { right: 4 },
         },
       }, // ),

@@ -55,6 +55,10 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
   const [alpha, setAlpha] = useState(0.7);
   const [threshold, setThreshold] = useState(0.45);
   const [nlModel, setNlModel] = useState('');
+  const [dismissed, setDismissed] = useState<{
+    embedding?: boolean;
+    nl?: boolean;
+  }>({});
 
   const nlModelIds = useMemo(() => (nlModels ?? []).map((m) => m.id), [nlModels]);
   const effectiveNlModel = nlModel || nlModelIds[0] || '';
@@ -117,7 +121,7 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
         )}
       </Stack>
 
-      {!embeddingField ? (
+      {!embeddingField && !dismissed.embedding ? (
         <EmbeddingUnavailableNotice
           collectionName={collectionId}
           onConfigure={() =>
@@ -126,9 +130,13 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
               params: { collectionId } as never,
             })
           }
+          onDismiss={() => setDismissed((d) => ({ ...d, embedding: true }))}
         />
-      ) : !nlModelIds.length ? (
-        <NlUnavailableNotice />
+      ) : !nlModelIds.length && !dismissed.nl ? (
+        <NlUnavailableNotice
+          onCreate={() => navigate({ to: '/nl-models' as never })}
+          onDismiss={() => setDismissed((d) => ({ ...d, nl: true }))}
+        />
       ) : null}
 
       {mode === 'nl' && (isFetching || nl) && (
