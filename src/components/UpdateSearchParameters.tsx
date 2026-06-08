@@ -85,8 +85,9 @@ export function UpdateSearchParameters({
           presetId: preset,
           params: { value: newValues },
         });
-      } catch (err) {
-        console.log(err);
+      } catch {
+        // The failure is surfaced to the user via useUpsertPreset's onError
+        // toast; swallow here so the form's submit promise resolves cleanly.
       }
     },
   });

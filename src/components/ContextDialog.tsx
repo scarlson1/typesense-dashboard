@@ -42,12 +42,6 @@ CtxDialog.Title = Title;
 
 const Content = () => {
   const { slots, slotProps, description, content } = useDialog();
-
-  // need to clone element to inject props (if props change after dialog is opened)??
-  // let clone = content
-  //   ? cloneElement(content as ReactElement, slotProps.content || {})
-  //   : null;
-
   // TODO: fix naming for "content" (different than slots.content)
   return slots.content ? (
     <slots.content {...slotProps?.content}>
@@ -77,12 +71,12 @@ const Actions = () => {
   } = useDialog();
 
   const handleSubmit = useCallback(() => {
-    let fn = onSubmit ?? handleAccept;
+    const fn = onSubmit ?? handleAccept;
     fn && fn();
   }, [onSubmit, handleAccept]);
 
   const handleCancel = useCallback(() => {
-    let fn = onCancel ?? handleClose;
+    const fn = onCancel ?? handleClose;
     fn && fn();
   }, []);
 

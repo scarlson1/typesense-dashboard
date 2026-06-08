@@ -169,10 +169,10 @@ function PopularQueriesCard({
   name: string;
   destination: string;
 }) {
-  const [client] = useTypesenseClient();
+  const [client, clusterId] = useTypesenseClient();
 
   const { data: hits, isLoading } = useQuery({
-    queryKey: ['analytics', 'popular-queries', destination],
+    queryKey: [clusterId, 'analytics', 'popular-queries', destination],
     queryFn: async () => {
       const res = (await client.collections(destination).documents().search({
         q: '*',

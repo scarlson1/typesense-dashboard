@@ -22,7 +22,7 @@ interface UseDocumentEditorDialogProps {
 }
 
 export const useDocumentEditorDialog = (
-  props?: UseDocumentEditorDialogProps
+  props?: UseDocumentEditorDialogProps,
 ) => {
   const { initialOptions = DEFAULT_MONACO_OPTIONS } = props || {};
 
@@ -68,13 +68,13 @@ export const useDocumentEditorDialog = (
         return;
       }
 
-      let value = editorRef.current?.getValue();
+      const value = editorRef.current?.getValue();
       if (!value) return;
 
       const updates = JSON.parse(value);
       mutation.mutate({ collectionId, docId, updates });
     },
-    [mutation.mutate]
+    [mutation.mutate],
   );
 
   return useCallback(
@@ -148,6 +148,7 @@ export const useDocumentEditorDialog = (
       mutation.isPending,
       handleEditorDidMount,
       handleSave,
-    ]
+      options,
+    ],
   );
 };

@@ -108,11 +108,7 @@ describe('logout', () => {
     expect(currentCredsKey).toBe(keyB);
   });
 
-  // KNOWN BUG (README: "Fix multi-cluster auth"). When logging out of the
-  // *active* cluster, `nextCred` is read from the pre-removal credentials, so
-  // it can resolve back to the cluster that was just removed. This test pins
-  // the current (incorrect) behavior so the fix is intentional and visible.
-  it('pins the current buggy behavior when logging out of the active cluster', () => {
+  it('falls back to a remaining cluster when logging out of the active one', () => {
     const { setCredentials, setCredsKey, logout } = typesenseStore.getState();
     setCredentials(credsA); // inserted first
     setCredentials(credsB);
@@ -122,15 +118,21 @@ describe('logout', () => {
 
     const { credentials, currentCredsKey } = typesenseStore.getState();
     expect(Object.keys(credentials)).toEqual([keyB]); // A is gone from creds
-    // BUG: currentCredsKey points at the removed cluster instead of keyB.
-    expect(currentCredsKey).toBe(keyA);
+    // currentCredsKey now points at the surviving cluster, not the removed one.
+    expect(currentCredsKey).toBe(keyB);
   });
 
-  it.todo(
-    'should fall back to a remaining cluster when logging out of the active one'
-    // Intended: after logout(keyA) with active=keyA, currentCredsKey === keyB.
-    // Fix: compute nextCred from the post-removal credentials (`rest`).
-  );
+  it('sets currentCredsKey to null when logging out of the last cluster', () => {
+    const { setCredentials, setCredsKey, logout } = typesenseStore.getState();
+    setCredentials(credsA);
+    setCredsKey(keyA);
+
+    logout(keyA);
+
+    const { credentials, currentCredsKey } = typesenseStore.getState();
+    expect(credentials).toEqual({});
+    expect(currentCredsKey).toBeNull();
+  });
 });
 
 describe('getTypesenseClient', () => {

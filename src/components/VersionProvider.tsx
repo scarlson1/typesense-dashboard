@@ -45,7 +45,7 @@ export const VersionProvider = ({ children }: { children: ReactNode }) => {
       })
       .catch(() => {
         /* search-only key, fall back to default */
-        updateVersion('29.0');
+        if (!cancelled) updateVersion('29.0');
       });
     return () => {
       cancelled = true;

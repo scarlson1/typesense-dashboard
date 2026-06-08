@@ -68,7 +68,8 @@ export function ClusterSelect() {
   const setCluster = useStore(typesenseStore, (state) => state.setCredsKey);
   const [open, setOpen] = useState(false);
 
-  // BUG: clearing query client not working - need to add cluster in query key ??
+  // Query keys are namespaced by clusterId, so switching surfaces the new
+  // cluster's data via fresh keys; refetchQueries re-runs the active ones.
   const handleChange = useCallback(
     (event: SelectChangeEvent) => {
       if (event.target.value === ADD_CLUSTER_VALUE) {

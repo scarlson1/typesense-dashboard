@@ -58,7 +58,10 @@ export const typesenseStore = create<TypesenseStore>()(
             creds = rest;
           }
 
-          const nextCred = Object.keys(state.credentials)[0];
+          // Pick the fallback from the post-removal map (`creds`); reading
+          // state.credentials here could resolve back to the cluster we just
+          // removed when it happens to be the first key.
+          const nextCred = Object.keys(creds)[0];
 
           return {
             credentials: creds,
