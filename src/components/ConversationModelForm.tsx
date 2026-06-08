@@ -1,3 +1,4 @@
+import { HistoryCollectionField } from '@/components/HistoryCollectionField';
 import { LlmModelFields } from '@/components/LlmModelFields';
 import { primaryButtonSx } from '@/components/redesign';
 import { fieldInputSx, sectionLabelSx } from '@/constants/redesignSx';
@@ -123,19 +124,9 @@ export function ConversationModelForm({
 
       <Box>
         <Label>History collection</Label>
-        <TextField
-          fullWidth
-          size='small'
-          placeholder='e.g. conversation_store'
+        <HistoryCollectionField
           value={historyCollection}
-          onChange={(e) => setHistoryCollection(e.target.value)}
-          sx={fieldInputSx}
-          helperText='Required — an existing collection that stores conversation turns (conversation_id, role, message, …).'
-          slotProps={{
-            formHelperText: {
-              sx: { fontSize: 11, color: designTokens.textFaint, mx: 0 },
-            },
-          }}
+          onChange={setHistoryCollection}
         />
       </Box>
 

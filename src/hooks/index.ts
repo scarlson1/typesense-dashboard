@@ -9,6 +9,7 @@ export * from './useCollectionEditorDialog';
 export * from './useCollectionSchema';
 export * from './useCollectionSearchPreset';
 export * from './useConversationModels';
+export * from './useCreateHistoryCollection';
 export * from './useCountdown';
 export * from './useCounter';
 export * from './useDebounce';

@@ -55,13 +55,13 @@ export const compactMonoInputSx: SxProps<Theme> = {
 
 // Uppercase section label used above redesign form fields.
 export const sectionLabelSx: SxProps<Theme> = {
-  fontSize: 10.5,
+  fontSize: 10,
   fontWeight: 700,
   color: designTokens.textFaint,
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
-  mb: 0.75,
-  mt: 1.5,
+  mb: 0.5,
+  mt: 1,
 };
 
 // Hairline border for popover/autocomplete Paper surfaces.

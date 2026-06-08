@@ -1,5 +1,6 @@
 export * from './analyticsRulesForm';
 export * from './collectionForm';
+export * from './conversationHistory';
 export * from './curationForm';
 export * from './dialog';
 export * from './llmProviders';

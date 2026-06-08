@@ -8,6 +8,7 @@ import {
 import { collectionQueryKeys } from '@/constants';
 import {
   useConversationModels,
+  useCreateHistoryCollection,
   useTypesenseClient,
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -161,6 +162,8 @@ function RouteComponent() {
 
   const noModel = convModels != null && convModels.length === 0;
   const needsSetup = !noModel && (!embeddingField || !historyOk);
+
+  const createHistory = useCreateHistoryCollection();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -342,6 +345,12 @@ function RouteComponent() {
                 params: { collectionId: collectionName } as never,
               })
             }
+            onCreateHistory={
+              selectedModel?.history_collection
+                ? () => createHistory.mutate(selectedModel.history_collection!)
+                : undefined
+            }
+            creatingHistory={createHistory.isPending}
           />
         ) : turns.length === 0 ? (
           <EmptyState
@@ -1005,6 +1014,8 @@ function SetupRequiredState({
   hasEmbedding,
   collectionName,
   onConfigureEmbedding,
+  onCreateHistory,
+  creatingHistory,
 }: {
   modelReady: boolean;
   historyOk: boolean;
@@ -1012,6 +1023,8 @@ function SetupRequiredState({
   hasEmbedding: boolean;
   collectionName: string;
   onConfigureEmbedding: () => void;
+  onCreateHistory?: () => void;
+  creatingHistory?: boolean;
 }) {
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', px: 3.5, py: 5 }}>
@@ -1075,17 +1088,35 @@ function SetupRequiredState({
               value={hasEmbedding ? 'configured' : 'float[] embedding — not configured'}
             />
           </Box>
-          {!hasEmbedding ? (
-            <Button
-              size='small'
-              variant='contained'
-              startIcon={<SettingsRounded sx={{ fontSize: 13 }} />}
-              onClick={onConfigureEmbedding}
-              sx={{ ...primaryButtonSx, color: designTokens.onAccent }}
-            >
-              Configure embeddings
-            </Button>
-          ) : null}
+          <Stack direction='row' sx={{ gap: 1, flexWrap: 'wrap' }}>
+            {!historyOk && onCreateHistory ? (
+              <Button
+                size='small'
+                variant='contained'
+                startIcon={<AddRounded sx={{ fontSize: 13 }} />}
+                onClick={onCreateHistory}
+                loading={creatingHistory}
+                sx={{ ...primaryButtonSx, color: designTokens.onAccent }}
+              >
+                Create history collection
+              </Button>
+            ) : null}
+            {!hasEmbedding ? (
+              <Button
+                size='small'
+                variant={!historyOk ? 'outlined' : 'contained'}
+                startIcon={<SettingsRounded sx={{ fontSize: 13 }} />}
+                onClick={onConfigureEmbedding}
+                sx={
+                  !historyOk
+                    ? smallButtonSx
+                    : { ...primaryButtonSx, color: designTokens.onAccent }
+                }
+              >
+                Configure embeddings
+              </Button>
+            ) : null}
+          </Stack>
         </Box>
       </Box>
     </Box>
