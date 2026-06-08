@@ -106,34 +106,12 @@ export function AnalyticsRulesList() {
     },
   });
 
-  // const openJsonDialog = useDocumentEditorDialog({
-  //   initialOptions:
-  // })
-  // const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
-  // const [options, setOptions] =
-  //   useState<EditorProps['options']>(DEFAULT_MONACO_OPTIONS);
-  // const [markers, setMarkers] = useState<editor.IMarker[]>([]);
-
-  // const handleEditorDidMount: OnMount = useCallback((editor) => {
-  //   editorRef.current = editor;
-  // }, []);
-
   const viewRule = useCallback(
     async (rule: AnalyticsRuleSchemaV1 | AnalyticsRuleSchema) => {
-      // openJsonDialog({
-      //   value: JSON.stringify(rule, null, 2),
-      //   title: `Analytics Rule ${rule.name}`,
-      //   // collectionId,
-      //   // docId,
-      // })
-
-      console.log('RULE: ', rule);
-
       await dialog.prompt({
         variant: 'info',
         catchOnCancel: false,
         title: `Analytics Rule [${rule.name}]`,
-        // description: ``,
         content: ((props?: JsonEditorProps) => {
           return (
             <Suspense
@@ -144,17 +122,24 @@ export function AnalyticsRulesList() {
               <JsonEditor
                 height='calc(100% - 12px)'
                 options={DEFAULT_MONACO_OPTIONS}
-                // onMount={handleEditorDidMount}
                 {...(props || {})}
                 value={JSON.stringify(rule, null, 2)}
-                // onValidate={(m) => {
-                //   setMarkers(m);
-                // }}
               />
             </Suspense>
           );
         })(),
-        slotProps: { dialog: { maxWidth: 'sm' } },
+        slotProps: {
+          content: {
+            sx: { height: '75vh' },
+          },
+          dialog: {
+            maxWidth: 'sm',
+            fullWidth: true,
+          },
+          acceptButton: {
+            children: 'Close',
+          },
+        },
       });
     },
     [dialog],
