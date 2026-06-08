@@ -2,6 +2,7 @@
 
 export * from './form';
 export * from './formContext';
+export * from './useAnalyticsData';
 export * from './useAsyncToast';
 export * from './useBoolean';
 export * from './useCollectionEditorDialog';

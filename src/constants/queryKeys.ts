@@ -77,6 +77,14 @@ export const analyticsQueryKeys = {
     [...analyticsQueryKeys.all(clusterId), 'rules'] as const,
 };
 
+// Aggregated analytics data lives in a rule's destination collection
+// (popular_queries / nohits_queries write `{ q, count }` documents).
+export const analyticsDataQueryKeys = {
+  all: (clusterId: string) => [...analyticsQueryKeys.all(clusterId), 'data'] as const,
+  destination: (clusterId: string, destination: string) =>
+    [...analyticsDataQueryKeys.all(clusterId), destination] as const,
+};
+
 export const presetQueryKeys = {
   all: (clusterId: string) => [clusterId, 'presets'] as const,
   // collection: (clusterId: string, collectionId: string) => [...presetQueryKeys.all(clusterId), collectionId] as const
