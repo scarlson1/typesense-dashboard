@@ -44,6 +44,11 @@
   --ts-codeText: #e1e7ed;
   --ts-codeTextMuted: #8c9fb3;
   --ts-codeBorder: #2a3a55;
+  --ts-codeKey: #7cc4ff;
+  --ts-codeStr: #9be6b4;
+  --ts-codeNum: #ffd479;
+  --ts-codeFaint: #8c9fb3;
+  --ts-codeSurfaceMuted: rgba(255, 255, 255, 0.07);
 }
 
 [data-mui-color-scheme='dark'] {
@@ -83,6 +88,11 @@
   --ts-codeText: #e1e7ed;
   --ts-codeTextMuted: #8c9fb3;
   --ts-codeBorder: #2a3a55;
+  --ts-codeKey: #7cc4ff;
+  --ts-codeStr: #9be6b4;
+  --ts-codeNum: #ffd479;
+  --ts-codeFaint: #8c9fb3;
+  --ts-codeSurfaceMuted: rgba(255, 255, 255, 0.07);
 }
 
 html,

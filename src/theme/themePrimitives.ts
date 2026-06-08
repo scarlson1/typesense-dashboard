@@ -529,6 +529,14 @@ export const designTokens = {
   codeText: 'var(--ts-codeText)',
   codeTextMuted: 'var(--ts-codeTextMuted)',
   codeBorder: 'var(--ts-codeBorder)',
+  // Syntax colors for JSON shown on the code surface (e.g. the NL
+  // "Translated to" inspector). The code surface is dark in both schemes, so
+  // these read the same in light and dark.
+  codeKey: 'var(--ts-codeKey)',
+  codeStr: 'var(--ts-codeStr)',
+  codeNum: 'var(--ts-codeNum)',
+  codeFaint: 'var(--ts-codeFaint)',
+  codeSurfaceMuted: 'var(--ts-codeSurfaceMuted)',
   fontMono: '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
   // Elevation tokens. Static strings (not CSS vars) shared across redesign
   // primitives so component shadows stay consistent and live in one place.

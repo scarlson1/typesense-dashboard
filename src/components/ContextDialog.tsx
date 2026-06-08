@@ -78,7 +78,7 @@ const Actions = () => {
   const handleCancel = useCallback(() => {
     const fn = onCancel ?? handleClose;
     fn && fn();
-  }, []);
+  }, [onCancel, handleClose]);
 
   return slots.actions ? (
     <slots.actions {...slotProps.actions}>
