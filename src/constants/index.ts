@@ -2,6 +2,7 @@ export * from './analyticsRulesForm';
 export * from './collectionForm';
 export * from './curationForm';
 export * from './dialog';
+export * from './llmProviders';
 export * from './monaco';
 export * from './presetsForm';
 export * from './queryKeys';

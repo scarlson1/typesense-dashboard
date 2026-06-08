@@ -89,3 +89,12 @@ export const presetQueryKeys = {
   all: (clusterId: string) => [clusterId, 'presets'] as const,
   // collection: (clusterId: string, collectionId: string) => [...presetQueryKeys.all(clusterId), collectionId] as const
 };
+
+// LLM-backed model resources (foundation for NL search + conversational/RAG).
+export const nlSearchModelQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'nlSearchModels'] as const,
+};
+
+export const conversationModelQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'conversationModels'] as const,
+};
