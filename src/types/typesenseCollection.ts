@@ -96,6 +96,16 @@ export const collectionField = z
     range_index: z.boolean().optional(), // TODO: only if number type ??
     stem: z.boolean().optional(),
     stem_dictionary: z.string().optional(),
+    // Auto-embedding config for `float[]` vector fields.
+    embed: z
+      .object({
+        from: z.array(z.string()),
+        model_config: z
+          .object({ model_name: z.string() })
+          .and(z.record(z.string(), z.unknown())),
+      })
+      .optional(),
+    hnsw_params: z.record(z.string(), z.unknown()).optional(),
   })
   .and(z.record(z.string(), z.unknown()));
 

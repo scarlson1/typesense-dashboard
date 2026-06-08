@@ -304,6 +304,7 @@ function CollectionSettings() {
         <SchemaFieldEditDialog
           field={editingField}
           creating={addingField}
+          availableFields={data.fields ?? []}
           onClose={() => {
             setEditingField(null);
             setAddingField(false);

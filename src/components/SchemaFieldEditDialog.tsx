@@ -2,6 +2,7 @@ import { primaryButtonSx, smallButtonSx } from '@/components/redesign';
 import { fieldInputSx } from '@/constants/redesignSx';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseFieldType } from '@/types';
+import { pruneEmpty } from '@/utils';
 import { CheckRounded } from '@mui/icons-material';
 import {
   Box,
@@ -16,21 +17,54 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type {
   CollectionFieldSchema,
   FieldType,
 } from 'typesense/lib/Typesense/Collection';
 
+const FieldLabel = ({ children }: { children: ReactNode }) => (
+  <Typography
+    sx={{
+      fontSize: 12,
+      fontWeight: 600,
+      color: designTokens.text,
+      mb: 0.75,
+    }}
+  >
+    {children}
+  </Typography>
+);
+
+const InlineCode = ({ children }: { children: ReactNode }) => (
+  <Box component='code' sx={{ fontFamily: designTokens.fontMono, fontSize: 11 }}>
+    {children}
+  </Box>
+);
+
 interface SchemaFieldEditDialogProps {
   field: CollectionFieldSchema | null;
   /** When true, opens the dialog in create mode (with an editable name field). */
   creating?: boolean;
+  /** Sibling fields in the collection — used as `embed.from` options. */
+  availableFields?: CollectionFieldSchema[];
   onClose: () => void;
   onSave: (updated: CollectionFieldSchema) => void;
   /** Called instead of onSave when in create mode. */
   onCreate?: (created: CollectionFieldSchema) => void;
   saving?: boolean;
+}
+
+// `float[]` is the vector field type; vector/embed controls only apply to it.
+const VECTOR_TYPE: FieldType = 'float[]';
+const DEFAULT_EMBED_MODEL = 'ts/all-MiniLM-L12-v2';
+const VEC_DIST_OPTIONS = ['cosine', 'ip'] as const;
+// Fields whose text can be auto-embedded.
+const EMBEDDABLE_TYPES = new Set<FieldType>(['string', 'string[]']);
+
+interface FieldEmbed {
+  from?: string[];
+  model_config?: { model_name?: string; api_key?: string };
 }
 
 interface EditState {
@@ -41,17 +75,32 @@ interface EditState {
   sort: boolean;
   range_index: boolean;
   optional: boolean;
+  num_dim: string;
+  autoEmbed: boolean;
+  embedFrom: string[];
+  embedModelName: string;
+  embedApiKey: string;
+  vecDist: string;
 }
 
-const buildInitialState = (field: CollectionFieldSchema | null): EditState => ({
-  name: field?.name ?? '',
-  type: (field?.type as FieldType) ?? 'string',
-  index: field?.index ?? true,
-  facet: field?.facet ?? false,
-  sort: field?.sort ?? false,
-  range_index: field?.range_index ?? false,
-  optional: field?.optional ?? false,
-});
+const buildInitialState = (field: CollectionFieldSchema | null): EditState => {
+  const embed = field?.embed as FieldEmbed | undefined;
+  return {
+    name: field?.name ?? '',
+    type: (field?.type as FieldType) ?? 'string',
+    index: field?.index ?? true,
+    facet: field?.facet ?? false,
+    sort: field?.sort ?? false,
+    range_index: field?.range_index ?? false,
+    optional: field?.optional ?? false,
+    num_dim: field?.num_dim != null ? String(field.num_dim) : '',
+    autoEmbed: Boolean(embed),
+    embedFrom: embed?.from ?? [],
+    embedModelName: embed?.model_config?.model_name ?? DEFAULT_EMBED_MODEL,
+    embedApiKey: embed?.model_config?.api_key ?? '',
+    vecDist: (field?.vec_dist as string) ?? 'cosine',
+  };
+};
 
 const TOGGLES: {
   key: keyof Omit<EditState, 'type'>;
@@ -76,6 +125,7 @@ const TOGGLES: {
 export const SchemaFieldEditDialog = ({
   field,
   creating,
+  availableFields,
   onClose,
   onSave,
   onCreate,
@@ -93,6 +143,24 @@ export const SchemaFieldEditDialog = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field, creating]);
 
+  const isVector = state?.type === VECTOR_TYPE;
+
+  // Text fields that can be embedded from, excluding the field being edited.
+  const embedFromOptions = (availableFields ?? [])
+    .filter(
+      (f) =>
+        EMBEDDABLE_TYPES.has(f.type as FieldType) && f.name !== state?.name,
+    )
+    .map((f) => f.name);
+
+  // A vector field needs either explicit dimensions OR an auto-embed config
+  // (source fields + model); guard the save button accordingly.
+  const vectorInvalid =
+    isVector &&
+    (state!.autoEmbed
+      ? state!.embedFrom.length === 0 || !state!.embedModelName.trim()
+      : !(Number.isInteger(Number(state!.num_dim)) && Number(state!.num_dim) > 0));
+
   const handleSave = () => {
     if (!state) return;
     const payload: CollectionFieldSchema = {
@@ -104,6 +172,21 @@ export const SchemaFieldEditDialog = ({
       range_index: state.range_index,
       optional: state.optional,
     };
+    if (state.type === VECTOR_TYPE) {
+      if (state.autoEmbed) {
+        payload.embed = {
+          from: state.embedFrom,
+          model_config: pruneEmpty({
+            model_name: state.embedModelName.trim(),
+            api_key: state.embedApiKey.trim(),
+          }),
+        };
+      } else {
+        const dim = parseInt(state.num_dim, 10);
+        if (!Number.isNaN(dim)) payload.num_dim = dim;
+      }
+      if (state.vecDist) payload.vec_dist = state.vecDist;
+    }
     if (isCreate) {
       if (!payload.name) return;
       onCreate?.(payload);
@@ -221,6 +304,192 @@ export const SchemaFieldEditDialog = ({
               ) : null}
             </Box>
 
+            {isVector ? (
+              <Box
+                sx={{
+                  border: `1px solid ${designTokens.border}`,
+                  borderRadius: 1,
+                  p: 1.5,
+                  background: designTokens.surfaceTinted,
+                }}
+              >
+                <Stack
+                  direction='row'
+                  sx={{
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1.5,
+                  }}
+                >
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: designTokens.text,
+                      }}
+                    >
+                      Auto-embed
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: 11.5,
+                        color: designTokens.textMuted,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      Generate vectors from other fields with an embedding model
+                    </Typography>
+                  </Box>
+                  <Switch
+                    size='small'
+                    checked={state.autoEmbed}
+                    onChange={(_, checked) =>
+                      setState({ ...state, autoEmbed: checked })
+                    }
+                  />
+                </Stack>
+
+                {state.autoEmbed ? (
+                  <Stack sx={{ gap: 1.5, mt: 1.5 }}>
+                    <Box>
+                      <FieldLabel>Embed from fields</FieldLabel>
+                      <TextField
+                        select
+                        fullWidth
+                        size='small'
+                        disabled={embedFromOptions.length === 0}
+                        value={state.embedFrom}
+                        slotProps={{
+                          select: {
+                            multiple: true,
+                            renderValue: (sel) =>
+                              (sel as string[]).join(', '),
+                          },
+                        }}
+                        onChange={(e) =>
+                          setState({
+                            ...state,
+                            embedFrom:
+                              typeof e.target.value === 'string'
+                                ? e.target.value.split(',')
+                                : (e.target.value as unknown as string[]),
+                          })
+                        }
+                        sx={fieldInputSx}
+                      >
+                        {embedFromOptions.map((name) => (
+                          <MenuItem key={name} value={name}>
+                            {name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                      {embedFromOptions.length === 0 ? (
+                        <Typography
+                          sx={{
+                            fontSize: 11.5,
+                            color: designTokens.textMuted,
+                            mt: 0.5,
+                          }}
+                        >
+                          Add a <InlineCode>string</InlineCode> or{' '}
+                          <InlineCode>string[]</InlineCode> field first to embed
+                          from.
+                        </Typography>
+                      ) : null}
+                    </Box>
+                    <Box>
+                      <FieldLabel>Embedding model</FieldLabel>
+                      <TextField
+                        fullWidth
+                        size='small'
+                        placeholder={DEFAULT_EMBED_MODEL}
+                        value={state.embedModelName}
+                        onChange={(e) =>
+                          setState({
+                            ...state,
+                            embedModelName: e.target.value,
+                          })
+                        }
+                        sx={fieldInputSx}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: 11.5,
+                          color: designTokens.textMuted,
+                          mt: 0.5,
+                        }}
+                      >
+                        Built-in models use a <InlineCode>ts/</InlineCode>{' '}
+                        prefix; external models (e.g.{' '}
+                        <InlineCode>openai/text-embedding-3-small</InlineCode>)
+                        need an API key.
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <FieldLabel>Model API key (external providers)</FieldLabel>
+                      <TextField
+                        fullWidth
+                        size='small'
+                        type='password'
+                        autoComplete='off'
+                        placeholder='Leave blank for built-in models'
+                        value={state.embedApiKey}
+                        onChange={(e) =>
+                          setState({ ...state, embedApiKey: e.target.value })
+                        }
+                        sx={fieldInputSx}
+                      />
+                    </Box>
+                  </Stack>
+                ) : (
+                  <Box sx={{ mt: 1.5 }}>
+                    <FieldLabel>Dimensions (num_dim)</FieldLabel>
+                    <TextField
+                      fullWidth
+                      size='small'
+                      type='number'
+                      placeholder='e.g. 768'
+                      value={state.num_dim}
+                      onChange={(e) =>
+                        setState({ ...state, num_dim: e.target.value })
+                      }
+                      sx={fieldInputSx}
+                    />
+                    <Typography
+                      sx={{
+                        fontSize: 11.5,
+                        color: designTokens.textMuted,
+                        mt: 0.5,
+                      }}
+                    >
+                      Required length of the vectors you index yourself.
+                    </Typography>
+                  </Box>
+                )}
+
+                <Box sx={{ mt: 1.5 }}>
+                  <FieldLabel>Distance metric</FieldLabel>
+                  <TextField
+                    select
+                    fullWidth
+                    size='small'
+                    value={state.vecDist}
+                    onChange={(e) =>
+                      setState({ ...state, vecDist: e.target.value })
+                    }
+                    sx={fieldInputSx}
+                  >
+                    {VEC_DIST_OPTIONS.map((o) => (
+                      <MenuItem key={o} value={o}>
+                        {o}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Box>
+              </Box>
+            ) : null}
+
             <Stack sx={{ gap: 0.5 }}>
               {TOGGLES.map((t) => (
                 <Stack
@@ -291,7 +560,7 @@ export const SchemaFieldEditDialog = ({
           size='small'
           onClick={handleSave}
           loading={saving}
-          disabled={isCreate && !state?.name.trim()}
+          disabled={(isCreate && !state?.name.trim()) || vectorInvalid}
           startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
           sx={primaryButtonSx}
         >
