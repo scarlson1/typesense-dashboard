@@ -1,9 +1,13 @@
-import { primaryButtonSx, smallButtonSx } from '@/components/redesign';
+import {
+  ChipMultiField,
+  primaryButtonSx,
+  smallButtonSx,
+} from '@/components/redesign';
 import { fieldInputSx } from '@/constants/redesignSx';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseFieldType } from '@/types';
 import { pruneEmpty } from '@/utils';
-import { CheckRounded } from '@mui/icons-material';
+import { CheckRounded, OpenInNewRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -11,6 +15,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
   MenuItem,
   Stack,
   Switch,
@@ -277,7 +282,7 @@ export const SchemaFieldEditDialog = ({
         ) : null}
       </DialogTitle>
 
-      <DialogContent sx={{ py: 2, px: 2.5, pt: 2 }}>
+      <DialogContent sx={{ '&&': { py: 2, px: 2.5 } }}>
         {state ? (
           <Stack sx={{ gap: 2 }}>
             {isCreate ? (
@@ -395,35 +400,26 @@ export const SchemaFieldEditDialog = ({
                   <Stack sx={{ gap: 1.5, mt: 1.5 }}>
                     <Box>
                       <FieldLabel>Embed from fields</FieldLabel>
-                      <TextField
-                        select
-                        fullWidth
-                        size='small'
-                        disabled={embedFromOptions.length === 0}
-                        value={state.embedFrom}
-                        slotProps={{
-                          select: {
-                            multiple: true,
-                            renderValue: (sel) => (sel as string[]).join(', '),
-                          },
+                      <ChipMultiField
+                        values={state.embedFrom}
+                        options={embedFromOptions}
+                        placeholder='Add field...'
+                        onAdd={(val) => {
+                          if (!state.embedFrom.includes(val))
+                            setState({
+                              ...state,
+                              embedFrom: [...state.embedFrom, val],
+                            });
                         }}
-                        onChange={(e) =>
+                        onRemove={(i) =>
                           setState({
                             ...state,
-                            embedFrom:
-                              typeof e.target.value === 'string'
-                                ? e.target.value.split(',')
-                                : (e.target.value as unknown as string[]),
+                            embedFrom: state.embedFrom.filter(
+                              (_, idx) => idx !== i,
+                            ),
                           })
                         }
-                        sx={fieldInputSx}
-                      >
-                        {embedFromOptions.map((name) => (
-                          <MenuItem key={name} value={name}>
-                            {name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
+                      />
                       {embedFromOptions.length === 0 ? (
                         <Typography
                           sx={{
@@ -463,7 +459,15 @@ export const SchemaFieldEditDialog = ({
                         Built-in models use a <InlineCode>ts/</InlineCode>{' '}
                         prefix; external models (e.g.{' '}
                         <InlineCode>openai/text-embedding-3-small</InlineCode>)
-                        need an API key.
+                        need an API key.{' '}
+                        <Link
+                          href='https://typesense.org/docs/30.2/api/vector-search.html#index-embeddings'
+                          target='_blank'
+                          rel='noopener noreferrer'
+                        >
+                          Supported models{' '}
+                          <OpenInNewRounded fontSize='inherit' />
+                        </Link>
                       </Typography>
                     </Box>
                     <Box>
