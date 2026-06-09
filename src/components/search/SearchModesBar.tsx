@@ -91,8 +91,12 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
   return (
     <Box sx={{ flexShrink: 0 }}>
       <Stack
-        direction='row'
-        sx={{ alignItems: 'center', gap: 1.25, flexWrap: 'wrap' }}
+        direction={{ xs: 'column', md: 'row' }}
+        sx={{
+          alignItems: { xs: 'stretch', md: 'center' },
+          gap: 1.25,
+          flexWrap: { xs: 'nowrap', md: 'wrap' },
+        }}
       >
         <Typography
           sx={{
@@ -101,6 +105,7 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
             color: designTokens.textFaint,
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
+            display: { xs: 'none', md: 'block' },
           }}
         >
           Mode

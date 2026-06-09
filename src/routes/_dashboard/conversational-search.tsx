@@ -5,7 +5,10 @@ import {
   primaryButtonSx,
   smallButtonSx,
 } from '@/components/redesign';
-import { collectionQueryKeys } from '@/constants';
+import {
+  collectionQueryKeys,
+  isConversationHistoryCollection,
+} from '@/constants';
 import {
   useConversationModels,
   useCreateHistoryCollection,
@@ -34,6 +37,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  type Theme,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -111,9 +116,37 @@ function hitToSource(hit: {
   };
 }
 
+// On mobile the on-screen keyboard overlays the layout viewport without
+// shrinking `100dvh`, so a bottom-pinned composer ends up hidden behind it.
+// `visualViewport` reports the actually-visible area; the overlap between it
+// and the layout viewport is the keyboard height we shrink the surface by so
+// the composer rides the top of the keyboard.
+function useKeyboardInset() {
+  const [inset, setInset] = useState(0);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const overlap = window.innerHeight - vv.height - vv.offsetTop;
+      // Ignore small deltas (browser chrome) — only treat a real keyboard.
+      setInset(overlap > 80 ? Math.round(overlap) : 0);
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
+  return inset;
+}
+
 function RouteComponent() {
   const [client, clusterId] = useTypesenseClient();
   const navigate = useNavigate();
+  const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+  const keyboardInset = useKeyboardInset();
 
   const { data: convModels } = useConversationModels();
   const { data: collections } = useQuery({
@@ -127,14 +160,21 @@ function RouteComponent() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
 
+  // You retrieve against content collections, never the internal conversation
+  // history store — exclude history-schema collections from "Retrieve from".
+  const retrievableCollections = useMemo(
+    () => (collections ?? []).filter((c) => !isConversationHistoryCollection(c)),
+    [collections],
+  );
+
   // Default the scope selectors once data arrives.
   useEffect(() => {
     if (!modelId && convModels?.length) setModelId(convModels[0].id);
   }, [convModels, modelId]);
   useEffect(() => {
-    if (!collectionName && collections?.length)
-      setCollectionName(collections[0].name);
-  }, [collections, collectionName]);
+    if (!collectionName && retrievableCollections.length)
+      setCollectionName(retrievableCollections[0].name);
+  }, [retrievableCollections, collectionName]);
 
   const selectedCollection = useMemo(
     () => collections?.find((c) => c.name === collectionName),
@@ -246,7 +286,12 @@ function RouteComponent() {
       sx={{
         minWidth: 0,
         height: {
-          xs: `calc(100dvh - ${MOBILE_BOTTOM_NAV_HEIGHT}px - env(safe-area-inset-bottom))`,
+          // When the keyboard is open, shrink to the visible viewport so the
+          // composer sits just above it; otherwise leave room for the bottom nav.
+          xs:
+            mobile && keyboardInset > 0
+              ? `calc(100dvh - ${keyboardInset}px)`
+              : `calc(100dvh - ${MOBILE_BOTTOM_NAV_HEIGHT}px - env(safe-area-inset-bottom))`,
           md: 'calc(100dvh - 48px)',
         },
         overflow: 'hidden',
@@ -266,16 +311,47 @@ function RouteComponent() {
             </>
           }
           actions={
-            <Button
-              variant='contained'
-              size='small'
-              startIcon={<AddRounded sx={{ fontSize: 14 }} />}
-              onClick={handleNewConversation}
-              disabled={turns.length === 0}
-              sx={{ ...primaryButtonSx, color: designTokens.onAccent }}
-            >
-              New conversation
-            </Button>
+            <>
+              {/* Mobile: compact "+" sits where the menu button was (nav is now
+                  the bottom nav). Desktop: full "New conversation" button. */}
+              <Tooltip title='New conversation'>
+                <Box
+                  component='span'
+                  sx={{ display: { xs: 'inline-flex', md: 'none' } }}
+                >
+                  <IconButton
+                    onClick={handleNewConversation}
+                    disabled={turns.length === 0}
+                    aria-label='New conversation'
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '8px',
+                      border: `1px solid ${designTokens.border}`,
+                      background: designTokens.surface,
+                      color: designTokens.text,
+                      '&:hover': { borderColor: designTokens.borderStrong },
+                    }}
+                  >
+                    <AddRounded sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Box>
+              </Tooltip>
+              <Button
+                variant='contained'
+                size='small'
+                startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+                onClick={handleNewConversation}
+                disabled={turns.length === 0}
+                sx={{
+                  ...primaryButtonSx,
+                  color: designTokens.onAccent,
+                  display: { xs: 'none', md: 'inline-flex' },
+                }}
+              >
+                New conversation
+              </Button>
+            </>
           }
         />
       </Box>
@@ -287,11 +363,15 @@ function RouteComponent() {
           flexShrink: 0,
           alignItems: 'center',
           gap: 1.25,
-          px: { xs: 2.5, md: 3.5 },
+          px: { xs: 1.75, md: 3.5 },
           py: 1.25,
           background: 'background.paper',
           borderBottom: `1px solid ${designTokens.border}`,
-          flexWrap: 'wrap',
+          // Mobile: single scrollable row of compact chips. Desktop: wrap.
+          flexWrap: { xs: 'nowrap', md: 'wrap' },
+          overflowX: { xs: 'auto', md: 'visible' },
+          '&::-webkit-scrollbar': { display: 'none' },
+          scrollbarWidth: 'none',
         }}
       >
         <ScopeSelect
@@ -306,17 +386,19 @@ function RouteComponent() {
           icon={<ChatBubbleOutlineRounded sx={{ fontSize: 13 }} />}
           label='Retrieve from'
           value={collectionName}
-          options={(collections ?? []).map((c) => c.name)}
+          options={retrievableCollections.map((c) => c.name)}
           onChange={(v) => {
             setCollectionName(v);
             handleNewConversation();
           }}
         />
-        <Box sx={{ flex: 1 }} />
+        <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }} />
         {turns.length > 0 ? (
-          <Badge tone='neutral'>
-            {turns.filter((t) => t.role === 'user').length} turns
-          </Badge>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, flexShrink: 0 }}>
+            <Badge tone='neutral'>
+              {turns.filter((t) => t.role === 'user').length} turns
+            </Badge>
+          </Box>
         ) : null}
       </Stack>
 
@@ -339,11 +421,14 @@ function RouteComponent() {
             historyCollection={selectedModel?.history_collection}
             hasEmbedding={Boolean(embeddingField)}
             collectionName={collectionName}
-            onConfigureEmbedding={() =>
-              navigate({
-                to: '/collections/$collectionId/config' as never,
-                params: { collectionId: collectionName } as never,
-              })
+            onConfigureEmbedding={
+              collectionName
+                ? () =>
+                    navigate({
+                      to: '/collections/$collectionId/config' as never,
+                      params: { collectionId: collectionName } as never,
+                    })
+                : undefined
             }
             onCreateHistory={
               selectedModel?.history_collection
@@ -430,7 +515,8 @@ function RouteComponent() {
                 }
               }}
               slotProps={{ input: { disableUnderline: true } }}
-              sx={{ '& textarea': { fontSize: 13.5, lineHeight: 1.5 } }}
+              // 16px on mobile keeps iOS Safari from auto-zooming on focus.
+              sx={{ '& textarea': { fontSize: { xs: 16, md: 13.5 }, lineHeight: 1.5 } }}
             />
             <IconButton
               onClick={handleSend}
@@ -450,13 +536,23 @@ function RouteComponent() {
             </IconButton>
           </Stack>
           <Typography
-            sx={{ fontSize: 11, color: designTokens.textSubtle, mt: 0.75, px: 0.5 }}
+            sx={{
+              fontSize: 11,
+              color: designTokens.textSubtle,
+              mt: 0.75,
+              px: 0.5,
+              textAlign: { xs: 'center', md: 'left' },
+            }}
           >
-            Answers cite retrieved documents ·{' '}
-            <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
-              {modelId || 'no model'}
-            </Box>{' '}
-            · Enter to send, Shift+Enter for newline
+            Answers cite retrieved documents
+            <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}>
+              {' '}
+              ·{' '}
+              <Box component='span' sx={{ fontFamily: designTokens.fontMono }}>
+                {modelId || 'no model'}
+              </Box>{' '}
+              · Enter to send, Shift+Enter for newline
+            </Box>
           </Typography>
         </Box>
       </Box>
@@ -493,11 +589,18 @@ function ScopeSelect({
         background: designTokens.surface,
         boxShadow: designTokens.shadowButton,
         maxWidth: 280,
+        flexShrink: 0,
       }}
     >
       <Box sx={{ color: designTokens.textFaint, display: 'flex' }}>{icon}</Box>
       <Typography
-        sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}
+        sx={{
+          fontSize: 11.5,
+          color: designTokens.textFaint,
+          fontWeight: 500,
+          // Drop the label on mobile so the chips stay compact in the row.
+          display: { xs: 'none', md: 'block' },
+        }}
       >
         {label}
       </Typography>
@@ -1022,7 +1125,7 @@ function SetupRequiredState({
   historyCollection?: string;
   hasEmbedding: boolean;
   collectionName: string;
-  onConfigureEmbedding: () => void;
+  onConfigureEmbedding?: () => void;
   onCreateHistory?: () => void;
   creatingHistory?: boolean;
 }) {
@@ -1101,7 +1204,7 @@ function SetupRequiredState({
                 Create history collection
               </Button>
             ) : null}
-            {!hasEmbedding ? (
+            {!hasEmbedding && onConfigureEmbedding ? (
               <Button
                 size='small'
                 variant={!historyOk ? 'outlined' : 'contained'}

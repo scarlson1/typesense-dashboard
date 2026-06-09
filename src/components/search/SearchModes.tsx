@@ -31,7 +31,9 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  useMediaQuery,
   type SvgIconProps,
+  type Theme,
 } from '@mui/material';
 import type { ComponentType, ReactNode } from 'react';
 
@@ -58,7 +60,87 @@ export const SearchModeControl = ({
   mode,
   onChange,
   disabled = [],
-}: SearchModeControlProps) => (
+}: SearchModeControlProps) => {
+  const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+  if (mobile) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 0.75,
+          overflowX: 'auto',
+          py: 0.25,
+          '&::-webkit-scrollbar': { display: 'none' },
+          scrollbarWidth: 'none',
+        }}
+      >
+        {MODE_META.map(({ id, label, Icon }) => {
+          const active = id === mode;
+          const off = disabled.includes(id);
+          return (
+            <Box
+              key={id}
+              component='button'
+              type='button'
+              disabled={off}
+              onClick={() => !off && onChange(id)}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.625,
+                height: 30,
+                px: 1.375,
+                flexShrink: 0,
+                borderRadius: '16px',
+                fontFamily: 'inherit',
+                fontSize: 12,
+                fontWeight: active ? 600 : 500,
+                cursor: off ? 'default' : 'pointer',
+                color: off
+                  ? designTokens.textSubtle
+                  : active
+                    ? designTokens.accent
+                    : designTokens.textMuted,
+                background: active ? designTokens.accentSoft : designTokens.surface,
+                border: `1px solid ${active ? designTokens.accentBorder : designTokens.border}`,
+                opacity: off ? 0.55 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Icon
+                sx={{
+                  fontSize: 12,
+                  color: off
+                    ? designTokens.textSubtle
+                    : active
+                      ? designTokens.accent
+                      : designTokens.textFaint,
+                }}
+              />
+              {label}
+              {off ? (
+                <Box
+                  component='span'
+                  sx={{
+                    fontSize: 8.5,
+                    fontFamily: designTokens.fontMono,
+                    color: designTokens.textSubtle,
+                    border: `1px solid ${designTokens.border}`,
+                    borderRadius: '3px',
+                    px: 0.375,
+                    lineHeight: '12px',
+                  }}
+                >
+                  off
+                </Box>
+              ) : null}
+            </Box>
+          );
+        })}
+      </Box>
+    );
+  }
+  return (
   <ToggleButtonGroup
     exclusive
     size='small'
@@ -73,10 +155,10 @@ export const SearchModeControl = ({
       '& .MuiToggleButtonGroup-grouped': {
         border: 'none',
         borderRadius: 0,
-        height: 34,
+        height: 28,
         px: 1.625,
         textTransform: 'none',
-        fontSize: 12.5,
+        fontSize: 11,
         fontWeight: 500,
         color: designTokens.textMuted,
         gap: 0.75,
@@ -116,7 +198,8 @@ export const SearchModeControl = ({
       </ToggleButton>
     ))}
   </ToggleButtonGroup>
-);
+  );
+};
 
 // shared pill container for the inline controls
 const controlShellSx = {
@@ -128,6 +211,8 @@ const controlShellSx = {
   border: `1px solid ${designTokens.border}`,
   borderRadius: '8px',
   background: designTokens.surface,
+  // Full-width stacked controls on mobile; inline pills on desktop.
+  width: { xs: '100%', md: 'auto' },
 } as const;
 
 // ── Hybrid alpha slider ───────────────────────────────────────────────────
@@ -139,7 +224,9 @@ export const HybridAlphaControl = ({
   onChange: (value: number) => void;
 }) => (
   <Box sx={controlShellSx}>
-    <Typography sx={{ fontSize: 11, color: designTokens.textFaint, fontWeight: 500 }}>
+    <Typography
+      sx={{ fontSize: 11, color: designTokens.textFaint, fontWeight: 500 }}
+    >
       keyword
     </Typography>
     <Slider
@@ -149,9 +236,16 @@ export const HybridAlphaControl = ({
       step={0.05}
       value={value}
       onChange={(_, v) => onChange(v as number)}
-      sx={{ width: 150, color: designTokens.accent, py: 0 }}
+      sx={{
+        width: { xs: 'auto', md: 150 },
+        flex: { xs: 1, md: 'none' },
+        color: designTokens.accent,
+        py: 0,
+      }}
     />
-    <Typography sx={{ fontSize: 11, color: designTokens.accent, fontWeight: 500 }}>
+    <Typography
+      sx={{ fontSize: 11, color: designTokens.accent, fontWeight: 500 }}
+    >
       vector
     </Typography>
     <Box
@@ -183,7 +277,9 @@ export const SemanticThresholdControl = ({
 }) => (
   <Box sx={controlShellSx}>
     <GrainRounded sx={{ fontSize: 14, color: designTokens.textFaint }} />
-    <Typography sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}>
+    <Typography
+      sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}
+    >
       Max distance
     </Typography>
     <TextField
@@ -216,7 +312,9 @@ export const NlModelPicker = ({
 }) => (
   <Box sx={{ ...controlShellSx, gap: 1 }}>
     <AutoAwesomeRounded sx={{ fontSize: 14, color: designTokens.textFaint }} />
-    <Typography sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}>
+    <Typography
+      sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}
+    >
       NL model
     </Typography>
     <TextField
@@ -226,6 +324,8 @@ export const NlModelPicker = ({
       onChange={(e) => onChange(e.target.value)}
       slotProps={{ input: { disableUnderline: true } }}
       sx={{
+        // Push the model + chevron to the right edge on mobile.
+        ml: { xs: 'auto', md: 0 },
         '& .MuiSelect-select': {
           fontFamily: designTokens.fontMono,
           fontSize: 12.5,
@@ -294,7 +394,9 @@ export const TranslatedToPanel = ({
         }}
       >
         <AutoAwesomeRounded sx={{ fontSize: 14, color: designTokens.accent }} />
-        <Typography sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text }}>
+        <Typography
+          sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text }}
+        >
           Translated to
         </Typography>
         <Badge tone='indigo'>read-only</Badge>
@@ -305,7 +407,11 @@ export const TranslatedToPanel = ({
           </Typography>
         ) : parseTimeMs != null ? (
           <Typography
-            sx={{ fontSize: 11, color: designTokens.textFaint, fontFamily: designTokens.fontMono }}
+            sx={{
+              fontSize: 11,
+              color: designTokens.textFaint,
+              fontFamily: designTokens.fontMono,
+            }}
           >
             parsed in {parseTimeMs} ms
           </Typography>
@@ -344,7 +450,11 @@ export const TranslatedToPanel = ({
           </Stack>
         ) : entries.length === 0 ? (
           <Typography
-            sx={{ fontFamily: designTokens.fontMono, fontSize: 12, color: designTokens.codeFaint }}
+            sx={{
+              fontFamily: designTokens.fontMono,
+              fontSize: 12,
+              color: designTokens.codeFaint,
+            }}
           >
             no parameters generated
           </Typography>
@@ -375,7 +485,12 @@ export const TranslatedToPanel = ({
               </Box>
               <Box
                 component='span'
-                sx={{ color: designTokens.codeFaint, fontFamily: designTokens.fontMono, fontSize: 12, mr: 0.75 }}
+                sx={{
+                  color: designTokens.codeFaint,
+                  fontFamily: designTokens.fontMono,
+                  fontSize: 12,
+                  mr: 0.75,
+                }}
               >
                 :
               </Box>
@@ -412,7 +527,10 @@ export const TranslatedToPanel = ({
           {modelName ? (
             <Box
               component='span'
-              sx={{ fontFamily: designTokens.fontMono, color: designTokens.textMuted }}
+              sx={{
+                fontFamily: designTokens.fontMono,
+                color: designTokens.textMuted,
+              }}
             >
               {modelName}
             </Box>
@@ -483,12 +601,16 @@ const NoticeShell = ({
       alignItems: 'center',
       gap: 1.25,
       background:
-        tone === 'warning' ? designTokens.warningSoft : designTokens.surfaceMuted,
+        tone === 'warning'
+          ? designTokens.warningSoft
+          : designTokens.surfaceMuted,
       border: `1px solid ${tone === 'warning' ? designTokens.warningBorder : designTokens.border}`,
     }}
   >
     {icon}
-    <Box sx={{ fontSize: 12.5, color: designTokens.textMuted, lineHeight: 1.4 }}>
+    <Box
+      sx={{ fontSize: 12.5, color: designTokens.textMuted, lineHeight: 1.4 }}
+    >
       {children}
     </Box>
     <Box sx={{ flex: 1 }} />
@@ -520,7 +642,9 @@ export const EmbeddingUnavailableNotice = ({
   <NoticeShell
     tone='warning'
     onDismiss={onDismiss}
-    icon={<WarningAmberRounded sx={{ fontSize: 15, color: designTokens.warning }} />}
+    icon={
+      <WarningAmberRounded sx={{ fontSize: 15, color: designTokens.warning }} />
+    }
     action={
       <Button
         size='small'
@@ -533,7 +657,10 @@ export const EmbeddingUnavailableNotice = ({
       </Button>
     }
   >
-    <Box component='strong' sx={{ color: designTokens.warningDeep, fontWeight: 600 }}>
+    <Box
+      component='strong'
+      sx={{ color: designTokens.warningDeep, fontWeight: 600 }}
+    >
       Semantic &amp; Hybrid need an embedding field.
     </Box>{' '}
     {collectionName ? (
@@ -561,7 +688,11 @@ export const NlUnavailableNotice = ({
   <NoticeShell
     tone='neutral'
     onDismiss={onDismiss}
-    icon={<AutoAwesomeRounded sx={{ fontSize: 15, color: designTokens.textFaint }} />}
+    icon={
+      <AutoAwesomeRounded
+        sx={{ fontSize: 15, color: designTokens.textFaint }}
+      />
+    }
     action={
       <Button
         size='small'

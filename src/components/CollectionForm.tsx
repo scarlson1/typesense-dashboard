@@ -37,7 +37,7 @@ const fieldInputSx = {
       fontFamily: designTokens.fontMono,
       color: designTokens.text,
     },
-    '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
+    // '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
   },
   '& .MuiSelect-select': {
     fontFamily: designTokens.fontMono,

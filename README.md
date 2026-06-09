@@ -317,6 +317,23 @@ This is an independent project. It's not associated with [typesense.org](https:/
 - Map zoom to bounds on load
 - theme matching toasts
 - use version from context for docs links ??
+- create collection missing `embed.from` ?? [docs](https://typesense.org/docs/30.2/api/vector-search.html#creating-an-auto-embedding-field)
+
+```typescript
+{
+  "name": "embedding",
+  "type": "float[]",
+  "embed": {
+    "from": [
+      "product_name",
+      "categories"
+    ],
+    "model_config": {
+      "model_name": "ts/e5-small"
+    }
+  }
+}
+```
 
 - **Vector / semantic search** — no UI to define embedding fields or issue `vector_query`/
   semantic search (v30).

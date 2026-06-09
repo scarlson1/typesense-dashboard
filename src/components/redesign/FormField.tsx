@@ -1,6 +1,6 @@
+import { designTokens } from '@/theme/themePrimitives';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { designTokens } from '@/theme/themePrimitives';
 
 interface FormFieldProps {
   label?: ReactNode;
@@ -10,6 +10,8 @@ interface FormFieldProps {
   htmlFor?: string;
   children: ReactNode;
 }
+
+// TODO: clean up claude duplicated components (theres 3+ implementations of the same input label design)
 
 export const FormField = ({
   label,
