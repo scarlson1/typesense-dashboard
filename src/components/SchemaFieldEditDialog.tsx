@@ -50,6 +50,47 @@ const InlineCode = ({ children }: { children: ReactNode }) => (
   </Box>
 );
 
+const EmbedField = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+  multiline,
+  helper,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  multiline?: boolean;
+  helper?: ReactNode;
+}) => (
+  <Box>
+    <FieldLabel>{label}</FieldLabel>
+    <TextField
+      fullWidth
+      size='small'
+      type={type}
+      multiline={multiline}
+      minRows={multiline ? 2 : undefined}
+      autoComplete='off'
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      sx={fieldInputSx}
+    />
+    {helper ? (
+      <Typography
+        sx={{ fontSize: 11.5, color: designTokens.textMuted, mt: 0.5 }}
+      >
+        {helper}
+      </Typography>
+    ) : null}
+  </Box>
+);
+
 interface SchemaFieldEditDialogProps {
   field: CollectionFieldSchema | null;
   /** When true, opens the dialog in create mode (with an editable name field). */
@@ -70,6 +111,16 @@ const VEC_DIST_OPTIONS = ['cosine', 'ip'] as const;
 // Fields whose text can be auto-embedded.
 const EMBEDDABLE_TYPES = new Set<FieldType>(['string', 'string[]']);
 
+type EmbedProvider = 'builtin' | 'openai' | 'azure' | 'gcp_vertex' | 'custom';
+
+const EMBED_PROVIDERS: { value: EmbedProvider; label: string }[] = [
+  { value: 'builtin', label: 'Built-in (ts/…)' },
+  { value: 'openai', label: 'OpenAI / Google PaLM' },
+  { value: 'azure', label: 'Azure / OpenAI-compatible' },
+  { value: 'gcp_vertex', label: 'GCP Vertex AI' },
+  { value: 'custom', label: 'Custom (self-hosted)' },
+];
+
 interface FieldEmbed {
   from?: string[];
   model_config?: {
@@ -78,6 +129,14 @@ interface FieldEmbed {
     url?: string;
     indexing_prefix?: string;
     query_prefix?: string;
+    // GCP Vertex AI (OAuth)
+    access_token?: string;
+    refresh_token?: string;
+    client_id?: string;
+    client_secret?: string;
+    project_id?: string;
+    // GCP Vertex AI (service account)
+    service_account?: { client_email?: string; private_key?: string };
   };
 }
 
@@ -97,8 +156,29 @@ interface EditState {
   embedUrl: string;
   embedIndexingPrefix: string;
   embedQueryPrefix: string;
+  embedProvider: EmbedProvider;
+  embedAccessToken: string;
+  embedRefreshToken: string;
+  embedClientId: string;
+  embedClientSecret: string;
+  embedProjectId: string;
+  embedSaClientEmail: string;
+  embedSaPrivateKey: string;
   vecDist: string;
 }
+
+// When editing an existing field, recover which provider its model_config used.
+const inferEmbedProvider = (
+  mc: FieldEmbed['model_config'],
+): EmbedProvider => {
+  if (!mc) return 'builtin';
+  if (mc.access_token || mc.refresh_token || mc.client_id || mc.service_account)
+    return 'gcp_vertex';
+  if (mc.url) return 'azure';
+  if (mc.indexing_prefix || mc.query_prefix) return 'custom';
+  if (mc.api_key) return 'openai';
+  return 'builtin';
+};
 
 const buildInitialState = (field: CollectionFieldSchema | null): EditState => {
   const embed = field?.embed as FieldEmbed | undefined;
@@ -118,6 +198,14 @@ const buildInitialState = (field: CollectionFieldSchema | null): EditState => {
     embedUrl: embed?.model_config?.url ?? '',
     embedIndexingPrefix: embed?.model_config?.indexing_prefix ?? '',
     embedQueryPrefix: embed?.model_config?.query_prefix ?? '',
+    embedProvider: inferEmbedProvider(embed?.model_config),
+    embedAccessToken: embed?.model_config?.access_token ?? '',
+    embedRefreshToken: embed?.model_config?.refresh_token ?? '',
+    embedClientId: embed?.model_config?.client_id ?? '',
+    embedClientSecret: embed?.model_config?.client_secret ?? '',
+    embedProjectId: embed?.model_config?.project_id ?? '',
+    embedSaClientEmail: embed?.model_config?.service_account?.client_email ?? '',
+    embedSaPrivateKey: embed?.model_config?.service_account?.private_key ?? '',
     vecDist: (field?.vec_dist as string) ?? 'cosine',
   };
 };
@@ -149,6 +237,33 @@ const TOGGLES: {
   },
 ];
 
+// Per-provider credential requirements for an auto-embed config. GCP Vertex
+// accepts OAuth credentials OR a service account — one full set is required.
+const embedCredentialsInvalid = (s: EditState): boolean => {
+  switch (s.embedProvider) {
+    case 'openai':
+      return !s.embedApiKey.trim();
+    case 'azure':
+      return !s.embedApiKey.trim() || !s.embedUrl.trim();
+    case 'gcp_vertex': {
+      if (!s.embedProjectId.trim()) return true;
+      const oauthComplete =
+        Boolean(s.embedAccessToken.trim()) &&
+        Boolean(s.embedRefreshToken.trim()) &&
+        Boolean(s.embedClientId.trim()) &&
+        Boolean(s.embedClientSecret.trim());
+      const saComplete =
+        Boolean(s.embedSaClientEmail.trim()) &&
+        Boolean(s.embedSaPrivateKey.trim());
+      return !(oauthComplete || saComplete);
+    }
+    case 'builtin':
+    case 'custom':
+    default:
+      return false;
+  }
+};
+
 export const SchemaFieldEditDialog = ({
   field,
   creating,
@@ -178,12 +293,6 @@ export const SchemaFieldEditDialog = ({
     ? TOGGLES.filter((t) => t.vectorSafe)
     : TOGGLES;
 
-  // indexing_prefix / query_prefix are only honored for self-hosted custom
-  // models — not built-in (`ts/`) or managed providers (openai/azure/gcp/palm).
-  const embedModel = state?.embedModelName.trim() ?? '';
-  const isCustomModel =
-    embedModel !== '' && !/^(ts|openai|azure|gcp|palm)\b|\//.test(embedModel);
-
   // Text fields that can be embedded from, excluding the field being edited.
   const embedFromOptions = (availableFields ?? [])
     .filter(
@@ -197,7 +306,9 @@ export const SchemaFieldEditDialog = ({
   const vectorInvalid =
     isVector &&
     (state!.autoEmbed
-      ? state!.embedFrom.length === 0 || !state!.embedModelName.trim()
+      ? state!.embedFrom.length === 0 ||
+        !state!.embedModelName.trim() ||
+        embedCredentialsInvalid(state!)
       : !(
           Number.isInteger(Number(state!.num_dim)) && Number(state!.num_dim) > 0
         ));
@@ -217,16 +328,42 @@ export const SchemaFieldEditDialog = ({
     };
     if (isVectorField) {
       if (state.autoEmbed) {
-        payload.embed = {
-          from: state.embedFrom,
-          model_config: pruneEmpty({
-            model_name: state.embedModelName.trim(),
-            api_key: state.embedApiKey.trim(),
-            url: state.embedUrl.trim(),
-            indexing_prefix: state.embedIndexingPrefix.trim(),
-            query_prefix: state.embedQueryPrefix.trim(),
-          }),
+        const provider = state.embedProvider;
+        const modelConfig: NonNullable<FieldEmbed['model_config']> = {
+          model_name: state.embedModelName.trim(),
         };
+        if (provider === 'openai' || provider === 'azure') {
+          const key = state.embedApiKey.trim();
+          if (key) modelConfig.api_key = key;
+        }
+        if (provider === 'azure') {
+          const url = state.embedUrl.trim();
+          if (url) modelConfig.url = url;
+        }
+        if (provider === 'custom') {
+          const ip = state.embedIndexingPrefix.trim();
+          const qp = state.embedQueryPrefix.trim();
+          if (ip) modelConfig.indexing_prefix = ip;
+          if (qp) modelConfig.query_prefix = qp;
+        }
+        if (provider === 'gcp_vertex') {
+          const oauth: Record<string, string> = {
+            access_token: state.embedAccessToken.trim(),
+            refresh_token: state.embedRefreshToken.trim(),
+            client_id: state.embedClientId.trim(),
+            client_secret: state.embedClientSecret.trim(),
+            project_id: state.embedProjectId.trim(),
+          };
+          for (const [k, v] of Object.entries(oauth)) {
+            if (v) (modelConfig as Record<string, unknown>)[k] = v;
+          }
+          const sa = pruneEmpty({
+            client_email: state.embedSaClientEmail.trim(),
+            private_key: state.embedSaPrivateKey.trim(),
+          });
+          if (Object.keys(sa).length) modelConfig.service_account = sa;
+        }
+        payload.embed = { from: state.embedFrom, model_config: modelConfig };
       } else {
         const dim = parseInt(state.num_dim, 10);
         if (!Number.isNaN(dim)) payload.num_dim = dim;
@@ -435,117 +572,189 @@ export const SchemaFieldEditDialog = ({
                       ) : null}
                     </Box>
                     <Box>
-                      <FieldLabel>Embedding model</FieldLabel>
+                      <FieldLabel>Provider</FieldLabel>
                       <TextField
+                        select
                         fullWidth
                         size='small'
-                        placeholder={DEFAULT_EMBED_MODEL}
-                        value={state.embedModelName}
+                        value={state.embedProvider}
                         onChange={(e) =>
                           setState({
                             ...state,
-                            embedModelName: e.target.value,
+                            embedProvider: e.target.value as EmbedProvider,
                           })
                         }
                         sx={fieldInputSx}
-                      />
-                      <Typography
-                        sx={{
-                          fontSize: 11.5,
-                          color: designTokens.textMuted,
-                          mt: 0.5,
-                        }}
                       >
-                        Built-in models use a <InlineCode>ts/</InlineCode>{' '}
-                        prefix; external models (e.g.{' '}
-                        <InlineCode>openai/text-embedding-3-small</InlineCode>)
-                        need an API key.{' '}
-                        <Link
-                          href='https://typesense.org/docs/30.2/api/vector-search.html#index-embeddings'
-                          target='_blank'
-                          rel='noopener noreferrer'
-                        >
-                          Supported models{' '}
-                          <OpenInNewRounded fontSize='inherit' />
-                        </Link>
-                      </Typography>
+                        {EMBED_PROVIDERS.map((p) => (
+                          <MenuItem key={p.value} value={p.value}>
+                            {p.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Box>
-                    <Box>
-                      <FieldLabel>
-                        Model API key (external providers)
-                      </FieldLabel>
-                      <TextField
-                        fullWidth
-                        size='small'
+
+                    <EmbedField
+                      label='Model name'
+                      placeholder={DEFAULT_EMBED_MODEL}
+                      value={state.embedModelName}
+                      onChange={(v) =>
+                        setState({ ...state, embedModelName: v })
+                      }
+                      helper={
+                        <>
+                          e.g. <InlineCode>ts/e5-small</InlineCode>,{' '}
+                          <InlineCode>openai/text-embedding-3-small</InlineCode>,
+                          or a Vertex model.{' '}
+                          <Link
+                            href='https://typesense.org/docs/30.2/api/vector-search.html#index-embeddings'
+                            target='_blank'
+                            rel='noopener noreferrer'
+                          >
+                            Supported models{' '}
+                            <OpenInNewRounded fontSize='inherit' />
+                          </Link>
+                        </>
+                      }
+                    />
+
+                    {(state.embedProvider === 'openai' ||
+                      state.embedProvider === 'azure') && (
+                      <EmbedField
+                        label='API key'
                         type='password'
-                        autoComplete='off'
-                        placeholder='Leave blank for built-in models'
+                        placeholder='Provider API key'
                         value={state.embedApiKey}
-                        onChange={(e) =>
-                          setState({ ...state, embedApiKey: e.target.value })
-                        }
-                        sx={fieldInputSx}
+                        onChange={(v) => setState({ ...state, embedApiKey: v })}
                       />
-                    </Box>
-                    <Box>
-                      <FieldLabel>API endpoint URL (optional)</FieldLabel>
-                      <TextField
-                        fullWidth
-                        size='small'
+                    )}
+
+                    {state.embedProvider === 'azure' && (
+                      <EmbedField
+                        label='API endpoint URL'
                         placeholder='https://your-resource.openai.azure.com/...'
                         value={state.embedUrl}
-                        onChange={(e) =>
-                          setState({ ...state, embedUrl: e.target.value })
+                        onChange={(v) => setState({ ...state, embedUrl: v })}
+                        helper={
+                          <>
+                            Azure OpenAI or OpenAI-compatible endpoint (model
+                            name must start with{' '}
+                            <InlineCode>openai</InlineCode>).
+                          </>
                         }
-                        sx={fieldInputSx}
                       />
-                      <Typography
-                        sx={{
-                          fontSize: 11.5,
-                          color: designTokens.textMuted,
-                          mt: 0.5,
-                        }}
-                      >
-                        For Azure OpenAI or OpenAI-compatible endpoints (model
-                        name must start with <InlineCode>openai</InlineCode>).
-                      </Typography>
-                    </Box>
-                    {isCustomModel ? (
+                    )}
+
+                    {state.embedProvider === 'gcp_vertex' && (
+                      <Stack sx={{ gap: 1.5 }}>
+                        <EmbedField
+                          label='Project ID'
+                          placeholder='my-gcp-project'
+                          value={state.embedProjectId}
+                          onChange={(v) =>
+                            setState({ ...state, embedProjectId: v })
+                          }
+                        />
+                        <Typography
+                          sx={{
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            color: designTokens.textMuted,
+                          }}
+                        >
+                          OAuth credentials
+                        </Typography>
+                        <EmbedField
+                          label='Access token'
+                          type='password'
+                          value={state.embedAccessToken}
+                          onChange={(v) =>
+                            setState({ ...state, embedAccessToken: v })
+                          }
+                        />
+                        <EmbedField
+                          label='Refresh token'
+                          type='password'
+                          value={state.embedRefreshToken}
+                          onChange={(v) =>
+                            setState({ ...state, embedRefreshToken: v })
+                          }
+                        />
+                        <Stack direction='row' sx={{ gap: 1.5 }}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <EmbedField
+                              label='Client ID'
+                              value={state.embedClientId}
+                              onChange={(v) =>
+                                setState({ ...state, embedClientId: v })
+                              }
+                            />
+                          </Box>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <EmbedField
+                              label='Client secret'
+                              type='password'
+                              value={state.embedClientSecret}
+                              onChange={(v) =>
+                                setState({ ...state, embedClientSecret: v })
+                              }
+                            />
+                          </Box>
+                        </Stack>
+                        <Typography
+                          sx={{
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            color: designTokens.textMuted,
+                          }}
+                        >
+                          …or a service account
+                        </Typography>
+                        <EmbedField
+                          label='Client email'
+                          placeholder='svc@my-project.iam.gserviceaccount.com'
+                          value={state.embedSaClientEmail}
+                          onChange={(v) =>
+                            setState({ ...state, embedSaClientEmail: v })
+                          }
+                        />
+                        <EmbedField
+                          label='Private key'
+                          type='password'
+                          multiline
+                          placeholder='-----BEGIN PRIVATE KEY-----'
+                          value={state.embedSaPrivateKey}
+                          onChange={(v) =>
+                            setState({ ...state, embedSaPrivateKey: v })
+                          }
+                        />
+                      </Stack>
+                    )}
+
+                    {state.embedProvider === 'custom' && (
                       <Stack direction='row' sx={{ gap: 1.5 }}>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <FieldLabel>Indexing prefix</FieldLabel>
-                          <TextField
-                            fullWidth
-                            size='small'
+                          <EmbedField
+                            label='Indexing prefix'
                             placeholder='e.g. passage:'
                             value={state.embedIndexingPrefix}
-                            onChange={(e) =>
-                              setState({
-                                ...state,
-                                embedIndexingPrefix: e.target.value,
-                              })
+                            onChange={(v) =>
+                              setState({ ...state, embedIndexingPrefix: v })
                             }
-                            sx={fieldInputSx}
                           />
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <FieldLabel>Query prefix</FieldLabel>
-                          <TextField
-                            fullWidth
-                            size='small'
+                          <EmbedField
+                            label='Query prefix'
                             placeholder='e.g. query:'
                             value={state.embedQueryPrefix}
-                            onChange={(e) =>
-                              setState({
-                                ...state,
-                                embedQueryPrefix: e.target.value,
-                              })
+                            onChange={(v) =>
+                              setState({ ...state, embedQueryPrefix: v })
                             }
-                            sx={fieldInputSx}
                           />
                         </Box>
                       </Stack>
-                    ) : null}
+                    )}
                   </Stack>
                 ) : (
                   <Box sx={{ mt: 1.5 }}>
