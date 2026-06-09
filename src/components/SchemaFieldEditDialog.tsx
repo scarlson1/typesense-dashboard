@@ -37,7 +37,10 @@ const FieldLabel = ({ children }: { children: ReactNode }) => (
 );
 
 const InlineCode = ({ children }: { children: ReactNode }) => (
-  <Box component='code' sx={{ fontFamily: designTokens.fontMono, fontSize: 11 }}>
+  <Box
+    component='code'
+    sx={{ fontFamily: designTokens.fontMono, fontSize: 11 }}
+  >
     {children}
   </Box>
 );
@@ -64,7 +67,13 @@ const EMBEDDABLE_TYPES = new Set<FieldType>(['string', 'string[]']);
 
 interface FieldEmbed {
   from?: string[];
-  model_config?: { model_name?: string; api_key?: string };
+  model_config?: {
+    model_name?: string;
+    api_key?: string;
+    url?: string;
+    indexing_prefix?: string;
+    query_prefix?: string;
+  };
 }
 
 interface EditState {
@@ -80,6 +89,9 @@ interface EditState {
   embedFrom: string[];
   embedModelName: string;
   embedApiKey: string;
+  embedUrl: string;
+  embedIndexingPrefix: string;
+  embedQueryPrefix: string;
   vecDist: string;
 }
 
@@ -98,6 +110,9 @@ const buildInitialState = (field: CollectionFieldSchema | null): EditState => {
     embedFrom: embed?.from ?? [],
     embedModelName: embed?.model_config?.model_name ?? DEFAULT_EMBED_MODEL,
     embedApiKey: embed?.model_config?.api_key ?? '',
+    embedUrl: embed?.model_config?.url ?? '',
+    embedIndexingPrefix: embed?.model_config?.indexing_prefix ?? '',
+    embedQueryPrefix: embed?.model_config?.query_prefix ?? '',
     vecDist: (field?.vec_dist as string) ?? 'cosine',
   };
 };
@@ -106,6 +121,8 @@ const TOGGLES: {
   key: keyof Omit<EditState, 'type'>;
   label: string;
   help: string;
+  /** Toggles meaningless for vector (`float[]`) fields are hidden for them. */
+  vectorSafe?: boolean;
 }[] = [
   {
     key: 'index',
@@ -119,7 +136,12 @@ const TOGGLES: {
     label: 'Range',
     help: 'Enable range queries (numeric fields)',
   },
-  { key: 'optional', label: 'Optional', help: 'Documents may omit this field' },
+  {
+    key: 'optional',
+    label: 'Optional',
+    help: 'Documents may omit this field',
+    vectorSafe: true,
+  },
 ];
 
 export const SchemaFieldEditDialog = ({
@@ -145,6 +167,18 @@ export const SchemaFieldEditDialog = ({
 
   const isVector = state?.type === VECTOR_TYPE;
 
+  // Vector fields can't be faceted/sorted/range-indexed — only show toggles
+  // that make sense for them.
+  const visibleToggles = isVector
+    ? TOGGLES.filter((t) => t.vectorSafe)
+    : TOGGLES;
+
+  // indexing_prefix / query_prefix are only honored for self-hosted custom
+  // models — not built-in (`ts/`) or managed providers (openai/azure/gcp/palm).
+  const embedModel = state?.embedModelName.trim() ?? '';
+  const isCustomModel =
+    embedModel !== '' && !/^(ts|openai|azure|gcp|palm)\b|\//.test(embedModel);
+
   // Text fields that can be embedded from, excluding the field being edited.
   const embedFromOptions = (availableFields ?? [])
     .filter(
@@ -159,26 +193,33 @@ export const SchemaFieldEditDialog = ({
     isVector &&
     (state!.autoEmbed
       ? state!.embedFrom.length === 0 || !state!.embedModelName.trim()
-      : !(Number.isInteger(Number(state!.num_dim)) && Number(state!.num_dim) > 0));
+      : !(
+          Number.isInteger(Number(state!.num_dim)) && Number(state!.num_dim) > 0
+        ));
 
   const handleSave = () => {
     if (!state) return;
+    const isVectorField = state.type === VECTOR_TYPE;
     const payload: CollectionFieldSchema = {
       name: state.name.trim(),
       type: state.type,
-      index: state.index,
-      facet: state.facet,
-      sort: state.sort,
-      range_index: state.range_index,
+      // Vectors are always indexed; faceting/sorting/range don't apply.
+      index: isVectorField ? true : state.index,
+      facet: isVectorField ? false : state.facet,
+      sort: isVectorField ? false : state.sort,
+      range_index: isVectorField ? false : state.range_index,
       optional: state.optional,
     };
-    if (state.type === VECTOR_TYPE) {
+    if (isVectorField) {
       if (state.autoEmbed) {
         payload.embed = {
           from: state.embedFrom,
           model_config: pruneEmpty({
             model_name: state.embedModelName.trim(),
             api_key: state.embedApiKey.trim(),
+            url: state.embedUrl.trim(),
+            indexing_prefix: state.embedIndexingPrefix.trim(),
+            query_prefix: state.embedQueryPrefix.trim(),
           }),
         };
       } else {
@@ -236,7 +277,7 @@ export const SchemaFieldEditDialog = ({
         ) : null}
       </DialogTitle>
 
-      <DialogContent sx={{ py: 2.25, px: 2.75 }}>
+      <DialogContent sx={{ py: 2, px: 2.5, pt: 2 }}>
         {state ? (
           <Stack sx={{ gap: 2 }}>
             {isCreate ? (
@@ -363,8 +404,7 @@ export const SchemaFieldEditDialog = ({
                         slotProps={{
                           select: {
                             multiple: true,
-                            renderValue: (sel) =>
-                              (sel as string[]).join(', '),
+                            renderValue: (sel) => (sel as string[]).join(', '),
                           },
                         }}
                         onChange={(e) =>
@@ -427,7 +467,9 @@ export const SchemaFieldEditDialog = ({
                       </Typography>
                     </Box>
                     <Box>
-                      <FieldLabel>Model API key (external providers)</FieldLabel>
+                      <FieldLabel>
+                        Model API key (external providers)
+                      </FieldLabel>
                       <TextField
                         fullWidth
                         size='small'
@@ -441,6 +483,65 @@ export const SchemaFieldEditDialog = ({
                         sx={fieldInputSx}
                       />
                     </Box>
+                    <Box>
+                      <FieldLabel>API endpoint URL (optional)</FieldLabel>
+                      <TextField
+                        fullWidth
+                        size='small'
+                        placeholder='https://your-resource.openai.azure.com/...'
+                        value={state.embedUrl}
+                        onChange={(e) =>
+                          setState({ ...state, embedUrl: e.target.value })
+                        }
+                        sx={fieldInputSx}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: 11.5,
+                          color: designTokens.textMuted,
+                          mt: 0.5,
+                        }}
+                      >
+                        For Azure OpenAI or OpenAI-compatible endpoints (model
+                        name must start with <InlineCode>openai</InlineCode>).
+                      </Typography>
+                    </Box>
+                    {isCustomModel ? (
+                      <Stack direction='row' sx={{ gap: 1.5 }}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <FieldLabel>Indexing prefix</FieldLabel>
+                          <TextField
+                            fullWidth
+                            size='small'
+                            placeholder='e.g. passage:'
+                            value={state.embedIndexingPrefix}
+                            onChange={(e) =>
+                              setState({
+                                ...state,
+                                embedIndexingPrefix: e.target.value,
+                              })
+                            }
+                            sx={fieldInputSx}
+                          />
+                        </Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <FieldLabel>Query prefix</FieldLabel>
+                          <TextField
+                            fullWidth
+                            size='small'
+                            placeholder='e.g. query:'
+                            value={state.embedQueryPrefix}
+                            onChange={(e) =>
+                              setState({
+                                ...state,
+                                embedQueryPrefix: e.target.value,
+                              })
+                            }
+                            sx={fieldInputSx}
+                          />
+                        </Box>
+                      </Stack>
+                    ) : null}
                   </Stack>
                 ) : (
                   <Box sx={{ mt: 1.5 }}>
@@ -491,7 +592,7 @@ export const SchemaFieldEditDialog = ({
             ) : null}
 
             <Stack sx={{ gap: 0.5 }}>
-              {TOGGLES.map((t) => (
+              {visibleToggles.map((t) => (
                 <Stack
                   key={t.key}
                   direction='row'
