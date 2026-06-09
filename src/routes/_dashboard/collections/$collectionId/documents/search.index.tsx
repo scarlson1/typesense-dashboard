@@ -7,6 +7,7 @@ import {
   CtxSearchError,
   DashboardDisplayOptions,
   SearchBox,
+  SearchModesBar,
 } from '@/components/search';
 import { CtxFacetOptions } from '@/components/search/FacetOptions';
 import { CtxSortBy } from '@/components/search/SortBy';
@@ -154,7 +155,6 @@ function RouteComponent() {
                 sx={{
                   my: 0,
                   '& .MuiInput-root': {
-                    fontSize: 14,
                     '&:before, &:after': { display: 'none' },
                   },
                   '& .MuiFormHelperText-root': { display: 'none' },
@@ -193,6 +193,11 @@ function RouteComponent() {
                 </Badge>
               </IconButton>
             </Box>
+          </Box>
+
+          {/* ── Search mode (keyword / semantic / hybrid / NL) ── */}
+          <Box sx={{ flexShrink: 0, mt: 0.5 }}>
+            <SearchModesBar collectionId={collectionId} />
           </Box>
 
           {/* ── Stats line + sort indicator ── */}

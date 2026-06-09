@@ -152,6 +152,10 @@ instead bake a default token in at build time with
 
 ![geo search](docs/images/typesense-map-light.png)
 
+![natural language search](docs/images/nl-search-light.png)
+
+![conversational search](docs/images/chat-search-light.png)
+
 <!-- ![geo search mobile](docs/images/map_mobile_dark.png) -->
 <img src="docs/images/map_mobile_dark.png" width="280" />
 
@@ -317,3 +321,31 @@ This is an independent project. It's not associated with [typesense.org](https:/
 - Map zoom to bounds on load
 - theme matching toasts
 - use version from context for docs links ??
+- refactor conversational search to be a third option alongside grid & map views
+- create collection missing `embed.from` ?? [docs](https://typesense.org/docs/30.2/api/vector-search.html#creating-an-auto-embedding-field)
+
+```typescript
+{
+  "name": "embedding",
+  "type": "float[]",
+  "embed": {
+    "from": [
+      "product_name",
+      "categories"
+    ],
+    "model_config": {
+      "model_name": "ts/e5-small"
+    }
+  }
+}
+```
+
+- **Vector / semantic search** — no UI to define embedding fields or issue `vector_query`/
+  semantic search (v30).
+- **Natural Language Search (`nl_search`) + NL search models** — key-actions exist
+  (`typesenseApiKeyActions.ts`) but no routes/components to manage NL models or run NL queries.
+- **Conversational Search / RAG + conversation models** — same: actions defined, no UI.
+- **Document edit/view + partial update + update-by-query** —
+  `documents/$documentId.tsx` is a "TODO: view not set up yet" stub; `useUpdateDocument.ts` exists
+  but isn't wired into the UI; no PATCH-by-filter.
+- **Federated multi-search** — no cross-collection multi-search UI.

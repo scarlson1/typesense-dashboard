@@ -35,5 +35,6 @@ export const CONTEXT_DIALOG_DEFAULT_SLOT_PROPS: DialogSlotProps = {
   },
   cancelButton: {
     color: 'inherit',
+    sx: { textTransform: 'none' },
   },
 };

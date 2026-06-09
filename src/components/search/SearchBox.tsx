@@ -14,7 +14,7 @@ export function SearchBox({ disabled, helperText, ...props }: SearchBoxProps) {
     (event) => {
       setQuery(event.target.value);
     },
-    [],
+    [setQuery],
   );
 
   const queryByValid = Boolean(params?.query_by?.length);

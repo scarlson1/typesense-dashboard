@@ -5,6 +5,10 @@ import {
   primaryButtonSx,
   smallButtonSx,
 } from '@/components/redesign';
+import {
+  compactMonoInputSx,
+  fieldLabelSx,
+} from '@/constants/redesignSx';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
@@ -685,36 +689,8 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
     });
   };
 
-  const compactInputSx = {
-    '& .MuiOutlinedInput-root': {
-      backgroundColor: designTokens.surface,
-      fontSize: 12.5,
-      fontFamily: designTokens.fontMono,
-      minHeight: 32,
-      borderRadius: '6px',
-      '& fieldset': { borderColor: designTokens.border },
-      '&:hover fieldset': { borderColor: designTokens.borderStrong },
-      '&.Mui-focused fieldset': {
-        borderColor: designTokens.accent,
-        borderWidth: 1,
-      },
-      '& input': {
-        fontSize: 12.5,
-        fontFamily: designTokens.fontMono,
-        padding: '6px 10px !important',
-      },
-    },
-  };
-
-  const labelSx = {
-    fontSize: 10.5,
-    fontWeight: 700,
-    color: designTokens.textFaint,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.06em',
-    mb: 0.75,
-    mt: 1.5,
-  };
+  const compactInputSx = compactMonoInputSx;
+  const labelSx = fieldLabelSx;
 
   return (
     <Box

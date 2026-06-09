@@ -107,7 +107,15 @@ function useToastCountdown(t: Toast) {
     return () => stopCountdown();
   }, [stopCountdown, startCountdown, t.visible, t.type]);
 
-  const timeRemaining = (count / countStart) * 100;
+  // `count` is seeded once from the initial `countStart`. When an async toast
+  // starts as `loading` (duration Infinity) and later transitions to
+  // success/error (finite duration), `count` stays Infinity while `countStart`
+  // becomes finite, yielding Infinity/NaN. Clamp to a valid [0, 100] range so
+  // the progress components never receive a non-finite value.
+  const rawRemaining = (count / countStart) * 100;
+  const timeRemaining = Number.isFinite(rawRemaining)
+    ? Math.min(100, Math.max(0, rawRemaining))
+    : 100;
 
   return [timeRemaining, { startCountdown, stopCountdown }] as const;
 }

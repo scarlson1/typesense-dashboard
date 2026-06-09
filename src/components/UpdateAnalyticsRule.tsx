@@ -5,9 +5,7 @@ import {
   type AnalyticsRuleCreateValues,
 } from '@/constants';
 import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
-import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { queryClient } from '@/utils';
-import { upsertAnalyticsRule } from '@/utils/versionAdaptations';
 import { Box } from '@mui/material';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import type { AnalyticsRuleCreateSchemaV1 } from 'typesense';
@@ -24,7 +22,6 @@ export function UpdateAnalyticsRule({
 }: UpdateAnalyticsRuleProps) {
   const toast = useAsyncToast();
   const [client, clusterId] = useTypesenseClient();
-  const { is30Plus } = useTypesenseVersion();
 
   const mutation = useMutation({
     mutationFn: ({
@@ -33,7 +30,7 @@ export function UpdateAnalyticsRule({
     }: {
       name: string;
       schema: AnalyticsRuleCreateSchemaV1;
-    }) => upsertAnalyticsRule(client, name, schema, is30Plus), //client.analytics.rules().upsert(name, schema),
+    }) => client.analyticsV1.rules().upsert(name, schema),
     onMutate: (vars) => {
       toast.loading(`saving analytics rule`, {
         id: `rule-updated-${vars.name}`,

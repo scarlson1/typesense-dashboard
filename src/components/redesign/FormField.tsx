@@ -1,6 +1,7 @@
+import { fieldLabelSx } from '@/constants/redesignSx';
+import { designTokens } from '@/theme/themePrimitives';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { designTokens } from '@/theme/themePrimitives';
 
 interface FormFieldProps {
   label?: ReactNode;
@@ -24,14 +25,7 @@ export const FormField = ({
       <Typography
         component='label'
         htmlFor={htmlFor}
-        sx={{
-          fontSize: 11,
-          fontWeight: 600,
-          color: designTokens.textFaint,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          lineHeight: 1.2,
-        }}
+        sx={{ ...fieldLabelSx, lineHeight: 1.2 }}
       >
         {label}
         {hint ? (

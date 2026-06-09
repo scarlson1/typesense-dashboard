@@ -1,12 +1,16 @@
+import { ChipMultiField, smallButtonSx } from '@/components/redesign';
 import {
   filteredParamKeys,
   NEW_EMPTY_OTHER_PARAM,
   searchParamsFormOpts,
 } from '@/constants';
+import {
+  dividerPaperSx as paperSx,
+  fieldLabelSx,
+} from '@/constants/redesignSx';
 import { usePrevious, withForm } from '@/hooks';
-import { getArrayVal, splitIfString } from '@/utils';
-import { ChipMultiField, smallButtonSx } from '@/components/redesign';
 import { designTokens } from '@/theme/themePrimitives';
+import { getArrayVal, splitIfString } from '@/utils';
 import {
   AddRounded,
   ExpandMoreRounded,
@@ -36,15 +40,7 @@ import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
 
 type SearchParamsFormFieldsProps = Parameters<typeof SearchParamsForm>[0];
 
-const sectionLabelSx: SxProps<Theme> = {
-  fontSize: 10.5,
-  fontWeight: 700,
-  color: designTokens.textFaint,
-  textTransform: 'uppercase',
-  letterSpacing: '0.07em',
-  mb: 0.75,
-};
-
+// TODO: add style as variant ??
 const compactInputSx: SxProps<Theme> = {
   '& .MuiOutlinedInput-root': {
     fontSize: 12.5,
@@ -58,7 +54,10 @@ const compactInputSx: SxProps<Theme> = {
       transition: 'border-color 120ms ease',
     },
     '&:hover fieldset': { borderColor: designTokens.borderStrong },
-    '&.Mui-focused fieldset': { borderColor: designTokens.accent, borderWidth: '1px' },
+    '&.Mui-focused fieldset': {
+      borderColor: designTokens.accent,
+      borderWidth: '1px',
+    },
     '& input': {
       fontSize: 12.5,
       padding: '0 4px !important',
@@ -69,8 +68,6 @@ const compactInputSx: SxProps<Theme> = {
   },
 };
 
-const paperSx = { border: (theme: Theme) => `1px solid ${theme.palette.divider}` };
-
 const SearchParamsFormFields = ({
   form,
   presets,
@@ -79,6 +76,7 @@ const SearchParamsFormFields = ({
   facetByOptions,
   groupByOptions,
   submitButtonText,
+  onClear,
 }: SearchParamsFormFieldsProps) => {
   const presetOptions = useMemo(() => presets.map((p) => p.name), [presets]);
   const formValues = useStore(form.store, (state) => state.values);
@@ -88,7 +86,10 @@ const SearchParamsFormFields = ({
     if (!currentPresetName) return false;
     const matched = presets.find((p) => p.name === currentPresetName);
     if (!matched) return true;
-    return !isEqual(omitPreset(formValues), omitPreset(presetToFormValues(matched)));
+    return !isEqual(
+      omitPreset(formValues),
+      omitPreset(presetToFormValues(matched)),
+    );
   }, [formValues, presets]);
 
   const prevQueryByOptions = usePrevious(queryByOptions);
@@ -128,7 +129,8 @@ const SearchParamsFormFields = ({
     form.setFieldValue('facet_by', []);
     form.setFieldValue('group_by', []);
     form.setFieldValue('other_params', [NEW_EMPTY_OTHER_PARAM]);
-  }, [form.setFieldValue, queryByOptions]);
+    onClear?.();
+  }, [form.setFieldValue, queryByOptions, onClear]);
 
   const queryByValues = useMemo(
     () => (formValues.query_by as string[]).filter(Boolean),
@@ -150,11 +152,21 @@ const SearchParamsFormFields = ({
   return (
     <Box>
       {/* Preset row */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 2.5, px: 0.25 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.75,
+          mb: 2.5,
+          px: 0.25,
+        }}
+      >
         <StarBorderRounded
           sx={{
             fontSize: 15,
-            color: hasUnsavedChanges ? designTokens.warning : designTokens.textFaint,
+            color: hasUnsavedChanges
+              ? designTokens.warning
+              : designTokens.textFaint,
             flexShrink: 0,
           }}
         />
@@ -182,7 +194,10 @@ const SearchParamsFormFields = ({
                     color: designTokens.text,
                     padding: '2px 4px !important',
                   },
-                  '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
+                  '& input::placeholder': {
+                    color: designTokens.textFaint,
+                    opacity: 1,
+                  },
                 },
               }}
             />
@@ -191,7 +206,12 @@ const SearchParamsFormFields = ({
         />
         {hasUnsavedChanges && (
           <Typography
-            sx={{ fontSize: 12, fontWeight: 500, color: designTokens.warningDeep, flexShrink: 0 }}
+            sx={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: designTokens.warningDeep,
+              flexShrink: 0,
+            }}
           >
             unsaved
           </Typography>
@@ -201,7 +221,7 @@ const SearchParamsFormFields = ({
       <Stack direction='column' spacing={2}>
         {/* QUERY BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Query by</Typography>
+          <Typography sx={fieldLabelSx}>Query by</Typography>
           <ChipMultiField
             values={queryByValues}
             options={queryByOptions}
@@ -210,14 +230,17 @@ const SearchParamsFormFields = ({
                 form.setFieldValue('query_by', [...queryByValues, val]);
             }}
             onRemove={(i) =>
-              form.setFieldValue('query_by', queryByValues.filter((_, idx) => idx !== i))
+              form.setFieldValue(
+                'query_by',
+                queryByValues.filter((_, idx) => idx !== i),
+              )
             }
           />
         </Box>
 
         {/* SORT BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Sort by</Typography>
+          <Typography sx={fieldLabelSx}>Sort by</Typography>
           <ChipMultiField
             values={sortByValues}
             options={sortByOptions}
@@ -226,14 +249,17 @@ const SearchParamsFormFields = ({
                 form.setFieldValue('sort_by', [...sortByValues, val]);
             }}
             onRemove={(i) =>
-              form.setFieldValue('sort_by', sortByValues.filter((_, idx) => idx !== i))
+              form.setFieldValue(
+                'sort_by',
+                sortByValues.filter((_, idx) => idx !== i),
+              )
             }
           />
         </Box>
 
         {/* FACET & FILTER BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Facet & filter by</Typography>
+          <Typography sx={fieldLabelSx}>Facet & filter by</Typography>
           <ChipMultiField
             values={facetByValues}
             options={facetByOptions}
@@ -242,14 +268,17 @@ const SearchParamsFormFields = ({
                 form.setFieldValue('facet_by', [...facetByValues, val]);
             }}
             onRemove={(i) =>
-              form.setFieldValue('facet_by', facetByValues.filter((_, idx) => idx !== i))
+              form.setFieldValue(
+                'facet_by',
+                facetByValues.filter((_, idx) => idx !== i),
+              )
             }
           />
         </Box>
 
         {/* GROUP BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Group by</Typography>
+          <Typography sx={fieldLabelSx}>Group by</Typography>
           <ChipMultiField
             values={groupByValues}
             options={groupByOptions}
@@ -258,7 +287,10 @@ const SearchParamsFormFields = ({
                 form.setFieldValue('group_by', [...groupByValues, val]);
             }}
             onRemove={(i) =>
-              form.setFieldValue('group_by', groupByValues.filter((_, idx) => idx !== i))
+              form.setFieldValue(
+                'group_by',
+                groupByValues.filter((_, idx) => idx !== i),
+              )
             }
             placeholder='— none —'
           />
@@ -266,13 +298,17 @@ const SearchParamsFormFields = ({
 
         {/* ADDITIONAL */}
         <Box>
-          <Typography sx={sectionLabelSx}>Additional</Typography>
+          <Typography sx={fieldLabelSx}>Additional</Typography>
           <form.AppField name='other_params' mode='array'>
             {({ state, pushValue, removeValue }) => (
               <Stack direction='column' spacing={0.75}>
                 {state.value.map((_, i) => (
                   <Fragment key={`param-${i}`}>
-                    <Stack direction='row' spacing={0.75} sx={{ alignItems: 'center' }}>
+                    <Stack
+                      direction='row'
+                      spacing={0.75}
+                      sx={{ alignItems: 'center' }}
+                    >
                       <form.Field name={`other_params[${i}].param`}>
                         {({ state: fState, handleChange, handleBlur }) => (
                           <MuiAutocomplete
@@ -294,10 +330,19 @@ const SearchParamsFormFields = ({
                             slotProps={{ paper: { sx: paperSx } }}
                             popupIcon={
                               <ExpandMoreRounded
-                                sx={{ fontSize: 15, color: designTokens.textFaint }}
+                                sx={{
+                                  fontSize: 15,
+                                  color: designTokens.textFaint,
+                                }}
                               />
                             }
-                            sx={{ flex: 1, minWidth: 0, '& .MuiAutocomplete-popupIndicator': { mr: '-2px' } }}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              '& .MuiAutocomplete-popupIndicator': {
+                                mr: '-2px',
+                              },
+                            }}
                           />
                         )}
                       </form.Field>
@@ -329,7 +374,10 @@ const SearchParamsFormFields = ({
                             background: designTokens.dangerSoft,
                             borderColor: designTokens.danger,
                           },
-                          '&.Mui-disabled': { color: designTokens.textFaint, opacity: 0.5 },
+                          '&.Mui-disabled': {
+                            color: designTokens.textFaint,
+                            opacity: 0.5,
+                          },
                         }}
                       >
                         <RemoveRounded sx={{ fontSize: 12 }} />
@@ -408,6 +456,7 @@ export const SearchParamsForm = withForm({
     facetByOptions: [] as string[],
     groupByOptions: [] as string[],
     submitButtonText: 'Save as preset',
+    onClear: undefined as (() => void) | undefined,
   },
   render: (props) => <SearchParamsFormFields {...props} />,
 });
@@ -421,7 +470,9 @@ function getParams<T extends DocumentSchema = DocumentSchema>(
 }
 
 function presetToFormValues(preset: PresetSchema<DocumentSchema>) {
-  const { query_by, sort_by, facet_by, group_by, ...rest } = getParams(preset.value);
+  const { query_by, sort_by, facet_by, group_by, ...rest } = getParams(
+    preset.value,
+  );
   let otherParams = [NEW_EMPTY_OTHER_PARAM];
   const otherParamsEntries = Object.entries(rest);
   if (otherParamsEntries.length) {

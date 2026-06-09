@@ -1,4 +1,9 @@
 import { overrideFormOpts, overrideQueryMatch } from '@/constants';
+import {
+  compactMonoInputSx as compactInputSx,
+  fieldLabelSx,
+  sectionLabelSx as labelSx,
+} from '@/constants/redesignSx';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { primaryButtonSx } from '@/components/redesign';
@@ -15,44 +20,6 @@ import {
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { Suspense, useEffect, useState } from 'react';
-
-const labelSx = {
-  fontSize: 10.5,
-  fontWeight: 700,
-  color: designTokens.textFaint,
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.06em',
-  mb: 0.75,
-  mt: 1.5,
-};
-
-const compactInputSx = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: designTokens.surface,
-    fontSize: 12.5,
-    fontFamily: designTokens.fontMono,
-    minHeight: 32,
-    borderRadius: '6px',
-    '& fieldset': {
-      borderColor: designTokens.border,
-      transition: 'border-color 120ms ease',
-    },
-    '&:hover fieldset': { borderColor: designTokens.borderStrong },
-    '&.Mui-focused fieldset': {
-      borderColor: designTokens.accent,
-      borderWidth: 1,
-    },
-    '& input': {
-      fontSize: 12.5,
-      fontFamily: designTokens.fontMono,
-      padding: '6px 10px !important',
-    },
-    '& input::placeholder': {
-      color: designTokens.textMuted,
-      opacity: 1,
-    },
-  },
-};
 
 const switchRowSx = {
   display: 'flex',
@@ -122,7 +89,7 @@ export const CurationForm = withForm({
         </form.AppField>
 
         {/* Trigger type */}
-        <Typography sx={labelSx}>Trigger</Typography>
+        <Typography sx={fieldLabelSx}>Trigger</Typography>
         <Box
           sx={{
             display: 'grid',
@@ -161,7 +128,7 @@ export const CurationForm = withForm({
 
         {/* Query (when query trigger) */}
         <Collapse in={bools.rule_query_bool} unmountOnExit>
-          <Typography sx={labelSx}>Query</Typography>
+          <Typography sx={fieldLabelSx}>Query</Typography>
           <form.AppField name='rule.query'>
             {({ state, handleChange, handleBlur }) => (
               <MuiTextField
@@ -179,7 +146,7 @@ export const CurationForm = withForm({
 
         {/* Filter (when filter trigger) */}
         <Collapse in={bools.rule_filter_bool} unmountOnExit>
-          <Typography sx={labelSx}>Filter by</Typography>
+          <Typography sx={fieldLabelSx}>Filter by</Typography>
           <form.AppField name='rule.filter_by'>
             {({ state, handleChange, handleBlur }) => (
               <MuiTextField
@@ -197,7 +164,7 @@ export const CurationForm = withForm({
 
         {/* Tags */}
         <Collapse in={bools.rule_tags_bool} unmountOnExit>
-          <Typography sx={labelSx}>Tags</Typography>
+          <Typography sx={fieldLabelSx}>Tags</Typography>
           <form.AppField name='rule.tags'>
             {({ state, handleChange, handleBlur }) => (
               <MuiTextField

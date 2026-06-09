@@ -76,7 +76,7 @@ export interface DialogCtx extends DialogOptions {
 
 export const DialogProvider = ({ children }: { children: ReactNode }) => {
   const [dialogOptions, setDialogOptions] = useState<DialogOptions | null>(
-    null
+    null,
   );
   const [submitDisabled, setSubmitDisabled] = useState(false);
 
@@ -89,7 +89,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
 
       setDialogOptions(null);
     },
-    [awaitingPromiseRef]
+    [awaitingPromiseRef],
   );
 
   const handleClose = useCallback(() => {
@@ -107,7 +107,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
         awaitingPromiseRef.current = { resolve, reject };
       });
     },
-    [awaitingPromiseRef]
+    [awaitingPromiseRef],
   );
 
   const handleSubmitDisabled = useCallback(
@@ -115,7 +115,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       if (!dialogOptions) return;
       setSubmitDisabled(val);
     },
-    [dialogOptions]
+    [dialogOptions],
   );
 
   const updateSlotProps = useCallback(
@@ -128,7 +128,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
         };
       });
     },
-    [dialogOptions?.slotProps]
+    [],
   );
 
   const slots = useMemo(
@@ -136,13 +136,13 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       ...CONTEXT_DIALOG_DEFAULT_SLOTS_COMPONENTS,
       ...(dialogOptions?.slots || {}),
     }),
-    [dialogOptions]
+    [dialogOptions],
   );
 
   const slotProps = useMemo(
     () =>
       merge(CONTEXT_DIALOG_DEFAULT_SLOT_PROPS, dialogOptions?.slotProps || {}),
-    [dialogOptions]
+    [dialogOptions],
   );
 
   const memoed = useMemo<DialogCtx>(
@@ -170,7 +170,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       slotProps,
       handleSubmitDisabled,
       updateSlotProps,
-    ]
+    ],
   );
 
   return (

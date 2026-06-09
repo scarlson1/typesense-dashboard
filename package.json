@@ -15,7 +15,10 @@
     "onlyBuiltDependencies": [
       "electron",
       "esbuild"
-    ]
+    ],
+    "patchedDependencies": {
+      "@monaco-editor/react": "patches/@monaco-editor__react.patch"
+    }
   },
   "scripts": {
     "dev": "vite",

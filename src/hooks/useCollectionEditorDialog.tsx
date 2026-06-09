@@ -1,6 +1,5 @@
 import { type JsonEditorProps } from '@/components/JsonEditor';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
-import { gray } from '@/theme/themePrimitives';
 import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import { type EditorProps, type OnMount } from '@monaco-editor/react';
 import { OpenInNewRounded } from '@mui/icons-material';
@@ -12,7 +11,6 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import Color from 'color';
 import { editor } from 'monaco-editor';
 import {
   lazy,
@@ -34,7 +32,7 @@ interface UseCollectionEditorDialogProps {
 }
 
 export function useCollectionEditorDialog(
-  props?: UseCollectionEditorDialogProps | undefined
+  props?: UseCollectionEditorDialogProps | undefined,
 ) {
   const { initialOptions = DEFAULT_MONACO_OPTIONS } = props || {};
 
@@ -65,7 +63,7 @@ export function useCollectionEditorDialog(
   useEffect(() => {
     if (!dialog.isOpen) return;
 
-    let slotProps = {
+    const slotProps = {
       ...dialog.slotProps,
       cancelButton: {
         disabled: mutation.isPending,
@@ -94,10 +92,10 @@ export function useCollectionEditorDialog(
       return;
     }
 
-    let value = editorRef.current?.getValue();
+    const value = editorRef.current?.getValue();
     if (!value) return;
     // typesense only supports updating metadata & fields ??
-    let { fields, metadata = {} } = JSON.parse(value);
+    const { fields, metadata = {} } = JSON.parse(value);
     // editorRef.current?.updateOptions({ readOnly: true });
     setReadOnly(true);
 
@@ -113,7 +111,7 @@ export function useCollectionEditorDialog(
 
     // TODO: add confirmation if/once useDialog context supports multiple dialogs
 
-    let updates: CollectionUpdateSchema = {
+    const updates: CollectionUpdateSchema = {
       metadata,
       fields: fieldUpdates,
     };
@@ -125,7 +123,7 @@ export function useCollectionEditorDialog(
     ({ value, title }: { value: string; title: string }) => {
       initialSchema.current = value;
 
-      let readOnly = editorRef.current?.getRawOptions()?.readOnly ?? true;
+      const readOnly = editorRef.current?.getRawOptions()?.readOnly ?? true;
 
       dialog.prompt({
         title: (() => {
@@ -152,7 +150,7 @@ export function useCollectionEditorDialog(
         variant: 'danger',
         catchOnCancel: false,
         onSubmit: () => {
-          let currentReadOnly =
+          const currentReadOnly =
             editorRef.current?.getRawOptions()?.readOnly ?? true;
 
           if (currentReadOnly) {
@@ -162,13 +160,13 @@ export function useCollectionEditorDialog(
           }
         },
         onCancel: () => {
-          let currentReadOnly =
+          const currentReadOnly =
             editorRef.current?.getRawOptions()?.readOnly ?? true;
 
           if (currentReadOnly) {
             dialog.handleClose();
           } else {
-            let resetValue = initialSchema.current;
+            const resetValue = initialSchema.current;
             if (resetValue) {
               editorRef.current?.setValue(resetValue);
             }
@@ -190,7 +188,6 @@ export function useCollectionEditorDialog(
                 }}
               >
                 <JsonEditor
-                  // height='calc(100% - 12px)'
                   height='100%'
                   options={initialOptions}
                   onMount={handleEditorDidMount}
@@ -200,11 +197,6 @@ export function useCollectionEditorDialog(
                     setMarkers(m);
                   }}
                   schema={COLLECTION_SCHEMA}
-                  slotProps={{
-                    background: {
-                      dark: Color(gray[800]).hex(),
-                    },
-                  }}
                 />
               </Paper>
             </Suspense>
@@ -240,6 +232,6 @@ export function useCollectionEditorDialog(
       mutation.isPending,
       handleEditorDidMount,
       handleSave,
-    ]
+    ],
   );
 }

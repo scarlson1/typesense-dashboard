@@ -7,7 +7,7 @@ import {
   smallButtonSx,
 } from '@/components/redesign';
 import { analyticsQueryKeys } from '@/constants';
-import { useTypesenseClient } from '@/hooks';
+import { useAnalyticsData, useTypesenseClient } from '@/hooks';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
@@ -28,16 +28,12 @@ import {
   Zoom,
 } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { Suspense, useCallback, useMemo } from 'react';
+import { Suspense, useCallback, useMemo, type ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import type { AnalyticsRuleSchema } from 'typesense/lib/Typesense/AnalyticsRule';
 import type { AnalyticsRuleSchemaV1 } from 'typesense/lib/Typesense/AnalyticsRuleV1';
-import type {
-  DocumentSchema,
-  SearchResponse,
-} from 'typesense/lib/Typesense/Documents';
 
 export const Route = createFileRoute('/_dashboard/analytics')({
   component: RouteComponent,
@@ -99,17 +95,56 @@ function RouteComponent() {
   );
 }
 
+interface NormalizedAnalyticsRule {
+  name: string;
+  type: string;
+  destination?: string;
+  limit?: number;
+}
+
+// Flatten the v29 (analyticsV1) and v30 rule shapes into one view. Only the
+// rule envelope differs between versions — the aggregated data written to the
+// destination collection is identical — so the data UI stays version-agnostic.
+function normalizeRule(
+  rule: AnalyticsRuleSchema | AnalyticsRuleSchemaV1,
+  is30Plus: boolean,
+): NormalizedAnalyticsRule {
+  if (is30Plus) {
+    const r = rule as AnalyticsRuleSchema;
+    return {
+      name: r.name,
+      type: r.type,
+      destination: r.params?.destination_collection,
+      limit: r.params?.limit,
+    };
+  }
+  const r = rule as AnalyticsRuleSchemaV1;
+  return {
+    name: r.name,
+    type: r.type,
+    destination: r.params?.destination?.collection,
+    limit: r.params?.limit,
+  };
+}
+
+// Rule types that aggregate into a queryable `{ q, count }` destination.
+const QUERY_DATA_TYPES = new Set(['popular_queries', 'nohits_queries']);
+
 function AnalyticsInsight() {
   const [client, clusterId] = useTypesenseClient();
   const { is30Plus } = useTypesenseVersion();
 
   const { data: rules } = useSuspenseQuery({
-    queryKey: analyticsQueryKeys.rules(clusterId),
+    // is30Plus is part of the key so a post-switch version correction
+    // refetches under the right API branch instead of keeping a stale result.
+    queryKey: [...analyticsQueryKeys.rules(clusterId), is30Plus],
     queryFn: async () => {
       if (!is30Plus) {
         const res = await client.analyticsV1.rules().retrieve();
 
-        return res.rules as AnalyticsRuleSchemaV1[];
+        // Guard: useSuspenseQuery throws if the queryFn returns undefined,
+        // which happens when analytics is disabled and `rules` is absent.
+        return (res?.rules ?? []) as AnalyticsRuleSchemaV1[];
       } else {
         // The SDK types retrieve() as AnalyticsRuleSchema[], but Typesense 28+
         // actually returns { rules: [...] }. Normalize to an array.
@@ -121,70 +156,74 @@ function AnalyticsInsight() {
     },
   });
 
-  if (rules.length === 0) return <EnableAnalyticsCard />;
+  const dataRules = rules
+    .map((r) => normalizeRule(r, is30Plus))
+    .filter((r) => r.destination && QUERY_DATA_TYPES.has(r.type));
 
-  const popularRule = rules.find((r) => {
-    if (!is30Plus)
-      return (
-        r.type === 'popular_queries' &&
-        Boolean((r as AnalyticsRuleSchemaV1).params.destination?.collection)
-      );
-
-    return (
-      r.type === 'popular_queries' &&
-      Boolean((r as AnalyticsRuleSchema).params?.destination_collection)
-    );
-  });
-
-  if (!popularRule) return <EnableAnalyticsCard />;
-
-  const destination = is30Plus
-    ? (popularRule as AnalyticsRuleSchema).params?.destination_collection
-    : (popularRule as AnalyticsRuleSchemaV1).params.destination?.collection;
+  if (dataRules.length === 0) return <EnableAnalyticsCard />;
 
   return (
-    <PopularQueriesCard
-      // rule={popularRule}
-      name={popularRule.name}
-      destination={destination || ''}
-    />
+    <Stack spacing={2}>
+      {dataRules.map((rule) => (
+        <AnalyticsDataCard key={rule.name} rule={rule} />
+      ))}
+      <Typography sx={{ fontSize: 11.5, color: designTokens.textFaint }}>
+        Counts aggregate on the server&apos;s analytics flush interval, so
+        recent searches may take a moment to appear, and values are current
+        totals rather than a time series.
+      </Typography>
+    </Stack>
   );
 }
 
-interface PopularQueryHit {
-  q: string;
-  count: number;
-}
+// Per-type copy. popular_queries and nohits_queries share the `{ q, count }`
+// bar visualization; only the framing differs (frequent searches vs content
+// gaps). Unknown types fall back to the popular_queries copy.
+const DATA_RULE_COPY: Record<
+  string,
+  { title: string; describe: (name: string) => ReactNode; empty: ReactNode }
+> = {
+  popular_queries: {
+    title: 'Popular queries',
+    describe: (name) => (
+      <>
+        most frequent searches, collected via{' '}
+        <Box component='code' sx={inlineCodeSx}>
+          {name}
+        </Box>
+      </>
+    ),
+    empty: (
+      <>
+        Once your application sends search traffic, the most popular queries
+        will appear here.
+      </>
+    ),
+  },
+  nohits_queries: {
+    title: 'No-results queries',
+    describe: (name) => (
+      <>
+        searches that returned zero hits — content gaps worth addressing,
+        collected via{' '}
+        <Box component='code' sx={inlineCodeSx}>
+          {name}
+        </Box>
+      </>
+    ),
+    empty: <>No zero-result searches captured yet — users are finding matches.</>,
+  },
+};
 
-function PopularQueriesCard({
-  // rule,
-  name,
-  destination,
-}: {
-  // rule: AnalyticsRuleSchema;
-  name: string;
-  destination: string;
-}) {
-  const [client] = useTypesenseClient();
+const DISPLAY_LIMIT = 10;
 
-  const { data: hits, isLoading } = useQuery({
-    queryKey: ['analytics', 'popular-queries', destination],
-    queryFn: async () => {
-      const res = (await client.collections(destination).documents().search({
-        q: '*',
-        query_by: 'q',
-        sort_by: 'count:desc',
-        per_page: 5,
-      })) as SearchResponse<DocumentSchema>;
-      return (
-        res.hits
-          ?.map((h) => h.document as PopularQueryHit)
-          .filter((d) => d.q) ?? []
-      );
-    },
-    enabled: Boolean(destination),
-    retry: false,
-  });
+function AnalyticsDataCard({ rule }: { rule: NormalizedAnalyticsRule }) {
+  const copy = DATA_RULE_COPY[rule.type] ?? DATA_RULE_COPY.popular_queries;
+  const {
+    data: hits,
+    isLoading,
+    isError,
+  } = useAnalyticsData(rule.destination, DISPLAY_LIMIT);
 
   const max = useMemo(
     () => Math.max(1, ...(hits?.map((h) => h.count) ?? [0])),
@@ -201,10 +240,10 @@ function PopularQueriesCard({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `popular-queries-${destination}.csv`;
+    a.download = `${rule.type}-${rule.destination}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [hits, destination]);
+  }, [hits, rule.type, rule.destination]);
 
   return (
     <SectionCard
@@ -217,28 +256,23 @@ function PopularQueriesCard({
             component='span'
             sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}
           >
-            Popular queries
+            {copy.title}
           </Typography>
-          <Typography
-            component='span'
-            sx={{
-              fontSize: 12,
-              color: designTokens.textFaint,
-              fontFamily: designTokens.fontMono,
-            }}
-          >
-            · top {hits?.length ?? 5}
-          </Typography>
+          {Boolean(hits?.length) && (
+            <Typography
+              component='span'
+              sx={{
+                fontSize: 12,
+                color: designTokens.textFaint,
+                fontFamily: designTokens.fontMono,
+              }}
+            >
+              · top {hits?.length}
+            </Typography>
+          )}
         </Stack>
       }
-      description={
-        <>
-          collected via{' '}
-          <Box component='code' sx={inlineCodeSx}>
-            {name}
-          </Box>
-        </>
-      }
+      description={copy.describe(rule.name)}
       actions={
         <Button
           variant='outlined'
@@ -258,16 +292,30 @@ function PopularQueriesCard({
             <Skeleton key={i} variant='rectangular' height={14} />
           ))}
         </Stack>
-      ) : !hits?.length ? (
+      ) : isError ? (
         <Box sx={{ py: 2, textAlign: 'center' }}>
           <Typography sx={{ fontSize: 13, color: designTokens.textMuted }}>
-            No queries captured yet.
+            Couldn&apos;t read the destination collection{' '}
+            <Box component='code' sx={inlineCodeSx}>
+              {rule.destination}
+            </Box>
+            .
           </Typography>
           <Typography
             sx={{ fontSize: 12, color: designTokens.textFaint, mt: 0.5 }}
           >
-            Once your application sends search traffic, the most popular queries
-            will appear here.
+            It may not have been created yet, or it has no aggregated data.
+          </Typography>
+        </Box>
+      ) : !hits?.length ? (
+        <Box sx={{ py: 2, textAlign: 'center' }}>
+          <Typography sx={{ fontSize: 13, color: designTokens.textMuted }}>
+            No data captured yet.
+          </Typography>
+          <Typography
+            sx={{ fontSize: 12, color: designTokens.textFaint, mt: 0.5 }}
+          >
+            {copy.empty}
           </Typography>
         </Box>
       ) : (

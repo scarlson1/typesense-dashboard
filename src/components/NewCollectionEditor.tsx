@@ -1,15 +1,11 @@
 import { DEFAULT_MONACO_OPTIONS } from '@/constants';
 import { useAsyncToast, useNewCollection } from '@/hooks';
+import { useInitMonaco } from '@/hooks/useInitMonaco';
 import { createCollectionSchema, type CollectionSchema } from '@/types';
-import {
-  Editor,
-  type EditorProps,
-  type Monaco,
-  type OnMount,
-} from '@monaco-editor/react';
+import { Editor, type EditorProps } from '@monaco-editor/react';
 import { Box, Button, Paper, Skeleton, useColorScheme } from '@mui/material';
 import { editor } from 'monaco-editor';
-import { useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { toJSONSchema } from 'zod/v4';
 
 const DEFAULT_INITIAL_VALUE: CollectionSchema = {
@@ -37,12 +33,24 @@ const NewCollectionEditor = ({
   options,
   ...props
 }: NewCollectionEditorProps) => {
-  const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
-  const monacoRef = useRef<Monaco>(null);
+  // const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
+  // const monacoRef = useRef<Monaco>(null);
   const { mode, systemMode } = useColorScheme();
   const themeMode = mode === 'system' ? systemMode : mode;
   const toast = useAsyncToast();
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
+  const editorId = useId();
+
+  const { editorRef, onMount, editorPath } = useInitMonaco({
+    schema: {
+      uri: '',
+      fileMatch: ['*'], // associate with any file
+      schema: toJSONSchema(createCollectionSchema),
+    },
+    slotProps: {},
+    // onMount: onMountProp,
+    editorId,
+  });
 
   const mutation = useNewCollection();
 
@@ -54,24 +62,6 @@ const NewCollectionEditor = ({
     }),
     [options, mutation.isPending],
   ); // merge nested objects ??
-
-  const handleEditorDidMount: OnMount = (editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-    setTimeout(() => {
-      editor.getAction('editor.action.formatDocument')?.run();
-      monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-        validate: true,
-        schemas: [
-          {
-            uri: '',
-            fileMatch: ['*'], // associate with any file
-            schema: toJSONSchema(createCollectionSchema),
-          },
-        ],
-      });
-    }, 50);
-  };
 
   const handleSave = async () => {
     const value = editorRef.current?.getValue();
@@ -89,16 +79,23 @@ const NewCollectionEditor = ({
 
   return (
     <Box>
-      <Paper sx={{ borderRadius: 1, overflow: 'hidden' }}>
+      <Paper
+        sx={{
+          borderRadius: 1,
+          overflow: 'hidden',
+          bgcolor: 'background.paper',
+        }}
+      >
         <Editor
           height='60vh'
           defaultLanguage='json'
           theme={themeMode === 'light' ? 'vs-light' : 'vs-dark'}
-          onMount={handleEditorDidMount}
+          onMount={onMount} // {handleEditorDidMount}
           defaultValue={defaultValue}
           onValidate={(m) => {
             setMarkers(m);
           }}
+          path={editorPath}
           options={mergedOptions}
           loading={<Skeleton variant='rounded' height={'100%'} />}
           {...props}

@@ -151,7 +151,7 @@ export const CollectionSwitcher = ({
               maxWidth: '92vw',
               border: `1px solid ${designTokens.border}`,
               borderRadius: 1,
-              boxShadow: '0 4px 20px rgba(0,0,0,.1)',
+              boxShadow: designTokens.shadowDropdown,
               overflow: 'hidden',
             }}
           >

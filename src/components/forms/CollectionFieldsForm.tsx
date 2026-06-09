@@ -35,30 +35,30 @@ const FIELD_FLAGS = [
   { key: 'range_index', label: 'Range' },
 ] as const;
 
-const fieldInputSx = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: designTokens.surface,
-    minHeight: 38,
-    borderRadius: '7px',
-    '& fieldset': { borderColor: designTokens.border },
-    '&:hover fieldset': { borderColor: designTokens.borderStrong },
-    '&.Mui-focused fieldset': {
-      borderColor: designTokens.accent,
-      borderWidth: 1,
-    },
-    '& input': {
-      fontSize: 13,
-      fontFamily: designTokens.fontMono,
-      color: designTokens.text,
-    },
-    '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
-  },
-  '& .MuiSelect-select': {
-    fontFamily: designTokens.fontMono,
-    fontSize: 13,
-    color: designTokens.text,
-  },
-};
+// const fieldInputSx = {
+//   // '& .MuiOutlinedInput-root': {
+//   //   // backgroundColor: designTokens.surface,
+//   //   // minHeight: 38,
+//   //   // borderRadius: '7px',
+//   //   // '& fieldset': { borderColor: designTokens.border },
+//   //   // '&:hover fieldset': { borderColor: designTokens.borderStrong },
+//   //   // '&.Mui-focused fieldset': {
+//   //   //   borderColor: designTokens.accent,
+//   //   //   borderWidth: 1,
+//   //   // },
+//   //   // '& input': {
+//   //   //   fontSize: 13,
+//   //   //   fontFamily: designTokens.fontMono,
+//   //   //   color: designTokens.text,
+//   //   // },
+//   //   '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
+//   // },
+//   // '& .MuiSelect-select': {
+//   //   fontFamily: designTokens.fontMono,
+//   //   fontSize: 13,
+//   //   color: designTokens.text,
+//   // },
+// };
 
 export const CollectionFieldsForm = withForm({
   ...collectionFormOpts,
@@ -158,7 +158,6 @@ export const CollectionFieldsForm = withForm({
                             error={
                               state.meta.isTouched && !!state.meta.errors.length
                             }
-                            sx={fieldInputSx}
                           />
                         )}
                       </form.Field>
@@ -177,7 +176,6 @@ export const CollectionFieldsForm = withForm({
                             error={
                               state.meta.isTouched && !!state.meta.errors.length
                             }
-                            sx={fieldInputSx}
                             slotProps={{
                               select: {
                                 displayEmpty: true,

@@ -33,12 +33,16 @@ describe('AuthForm', () => {
     renderWithProviders(<Harness onSubmit={vi.fn()} />);
 
     expect(await screen.findByText('Login')).toBeInTheDocument();
-    expect(await screen.findByLabelText(/node/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/host/i)).toBeInTheDocument();
     expect(await screen.findByLabelText(/port/i)).toBeInTheDocument();
     expect(await screen.findByLabelText(/api key/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/protocol/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/environment/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('group', { name: /environment/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /connect to cluster/i }),
+    ).toBeInTheDocument();
   });
 
   it('masks the API key input', async () => {
@@ -52,17 +56,22 @@ describe('AuthForm', () => {
     const onSubmit = vi.fn();
     renderWithProviders(<Harness onSubmit={onSubmit} />);
 
-    await user.type(await screen.findByLabelText(/node/i), 'localhost');
+    await user.type(await screen.findByLabelText(/host/i), 'localhost');
     await user.type(screen.getByLabelText(/port/i), '8108');
     await user.type(screen.getByLabelText(/api key/i), 'secret-key');
 
     // MUI Select interaction for the protocol field.
-    await user.click(screen.getByLabelText(/protocol/i));
+    await user.click(screen.getByRole('combobox', { name: /protocol/i }));
     await user.click(await screen.findByRole('option', { name: 'http' }));
+
+    // Environment is a segmented control of toggle buttons.
+    await user.click(screen.getByRole('button', { name: /production/i }));
 
     // jsdom doesn't perform implicit form submission on a submit-button click,
     // so submit the form directly (still exercises the real onSubmit wiring).
-    const submitBtn = screen.getByRole('button', { name: /submit/i });
+    const submitBtn = screen.getByRole('button', {
+      name: /connect to cluster/i,
+    });
     fireEvent.submit(submitBtn.closest('form')!);
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
@@ -72,6 +81,7 @@ describe('AuthForm', () => {
         port: '8108',
         apiKey: 'secret-key',
         protocol: 'http',
+        env: 'production',
       })
     );
   });

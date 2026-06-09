@@ -21,30 +21,30 @@ const NUMERIC_TYPES = ['int32', 'int64', 'float'];
 
 type CollectionFormValues = (typeof collectionFormOpts)['defaultValues'];
 
-const fieldInputSx = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: designTokens.surface,
-    minHeight: 38,
-    borderRadius: '7px',
-    '& fieldset': { borderColor: designTokens.border },
-    '&:hover fieldset': { borderColor: designTokens.borderStrong },
-    '&.Mui-focused fieldset': {
-      borderColor: designTokens.accent,
-      borderWidth: 1,
-    },
-    '& input': {
-      fontSize: 14,
-      fontFamily: designTokens.fontMono,
-      color: designTokens.text,
-    },
-    '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
-  },
-  '& .MuiSelect-select': {
-    fontFamily: designTokens.fontMono,
-    fontSize: 13,
-    color: designTokens.text,
-  },
-};
+// const fieldInputSx = {
+//   '& .MuiOutlinedInput-root': {
+//     backgroundColor: designTokens.surface,
+//     // minHeight: 38,
+//     // borderRadius: '7px',
+//     // '& fieldset': { borderColor: designTokens.border },
+//     // '&:hover fieldset': { borderColor: designTokens.borderStrong },
+//     // '&.Mui-focused fieldset': {
+//     //   borderColor: designTokens.accent,
+//     //   borderWidth: 1,
+//     // },
+//     // '& input': {
+//     //   // fontSize: 14,
+//     //   fontFamily: designTokens.fontMono,
+//     //   color: designTokens.text,
+//     // },
+//     // '& input::placeholder': { color: designTokens.textFaint, opacity: 1 },
+//   },
+//   // '& .MuiSelect-select': {
+//   //   fontFamily: designTokens.fontMono,
+//   //   fontSize: 13,
+//   //   color: designTokens.text,
+//   // },
+// };
 
 // Build a clean Typesense schema object from the live form values for the
 // summary rail and JSON preview — only non-default flags are emitted.
@@ -196,7 +196,7 @@ export const CollectionForm = withForm({
                       required
                       fullWidth
                       error={state.meta.isTouched && !!state.meta.errors.length}
-                      sx={fieldInputSx}
+                      // sx={fieldInputSx}
                     />
                   )}
                 </form.Field>
@@ -222,7 +222,7 @@ export const CollectionForm = withForm({
                             onChange={(e) => handleChange(e.target.value)}
                             onBlur={handleBlur}
                             fullWidth
-                            sx={fieldInputSx}
+                            // sx={fieldInputSx}
                             slotProps={{
                               select: {
                                 displayEmpty: true,

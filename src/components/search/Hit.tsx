@@ -1,5 +1,7 @@
+import { VectorDistanceBadge } from '@/components/search/SearchModes';
 import { ExpandMoreRounded } from '@mui/icons-material';
 import {
+  Box,
   Card,
   CardActions,
   CardContent,
@@ -102,9 +104,20 @@ export function Hit({
         />
       ) : null}
       <CardContent sx={{ pb: 1.5 }}>
-        <Stack direction='row' spacing={3} sx={{ display: 'flex', pb: 1.5 }}>
+        <Stack
+          direction='row'
+          spacing={3}
+          sx={{ display: 'flex', alignItems: 'center', pb: 1.5 }}
+        >
           <HitLabel>ID</HitLabel>
           <HitValue> {hit?.document.id}</HitValue>
+          {(hit as { vector_distance?: number }).vector_distance != null ? (
+            <Box sx={{ ml: 'auto', flexShrink: 0 }}>
+              <VectorDistanceBadge
+                value={(hit as { vector_distance?: number }).vector_distance!}
+              />
+            </Box>
+          ) : null}
         </Stack>
         <Stack
           direction='column'

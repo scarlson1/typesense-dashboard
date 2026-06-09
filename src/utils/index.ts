@@ -1,9 +1,27 @@
 export * from './diffArrayOfObjects';
 export * from './getObjectDiff';
+export * from './presetCollection';
+export * from './searchModeParams';
 export * from './mapboxStore';
 export * from './queryClient';
 export * from './typesenseStore';
 export * from './uiStore';
+
+/**
+ * Drop keys whose value is `undefined`, `null`, or an empty string — useful for
+ * building create/upsert payloads from form state, where blank optional fields
+ * (e.g. an unset `api_key` or `system_prompt`) should be omitted rather than
+ * sent as empty values. Preserves falsy-but-meaningful values like `0`/`false`.
+ */
+export function pruneEmpty<T extends Record<string, unknown>>(
+  obj: T,
+): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([, v]) => v !== undefined && v !== null && v !== '',
+    ),
+  ) as Partial<T>;
+}
 
 export function splitIfString(val?: string | string[]) {
   if (!val) return [];

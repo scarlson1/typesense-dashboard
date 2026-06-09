@@ -2,7 +2,9 @@ import { ClusterSelect } from '@/components/ClusterSelect';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
 import {
+  AutoAwesomeRounded,
   AutoFixHighRounded,
+  ChatBubbleOutlineRounded,
   CloseRounded,
   DarkModeRounded,
   FrontHandRounded,
@@ -195,7 +197,7 @@ const ThemeToggle = () => {
               backgroundColor: 'background.paper',
               color: designTokens.text,
               fontWeight: 600,
-              boxShadow: '0 1px 2px rgba(0,0,0,.06)',
+              boxShadow: designTokens.shadowSheet,
             },
             '&:hover': { backgroundColor: 'transparent' },
             '&.Mui-selected:hover': { backgroundColor: 'background.paper' },
@@ -289,6 +291,21 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
 
       {/* Navigation items */}
       <Box sx={{ py: 0.5 }}>
+        <SheetItem
+          icon={<ChatBubbleOutlineRounded />}
+          label='Conversational search'
+          to='/conversational-search'
+        />
+        <SheetItem
+          icon={<AutoAwesomeRounded />}
+          label='NL models'
+          to='/nl-models'
+        />
+        <SheetItem
+          icon={<ChatBubbleOutlineRounded />}
+          label='Conversation models'
+          to='/conversation-models'
+        />
         <SheetItem
           icon={<InsightsRounded />}
           label='Analytics rules'

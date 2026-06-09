@@ -34,6 +34,7 @@ const DeleteForm = withForm({
             required
             fullWidth
             variant='outlined'
+            size='small'
             {...textFieldProps}
           />
         )}
@@ -114,11 +115,11 @@ export const useConfirmDelete = (options?: UseConfirmDeleteOptions) => {
           },
         },
       }),
-    [options]
+    [options],
   );
 
   return useMemo(
     () => ({ ...dialog, openConfirmDelete }),
-    [dialog, openConfirmDelete]
+    [dialog, openConfirmDelete],
   );
 };

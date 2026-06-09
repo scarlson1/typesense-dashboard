@@ -4,6 +4,7 @@ import {
   usePreset,
   useTypesenseClient,
 } from '@/hooks';
+import { presetAppliesToCollection } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -33,18 +34,37 @@ export function PresetPersistence({ collectionId }: PresetPersistenceProps) {
     },
   });
 
+  // Drop the active preset if it no longer exists (deleted) or pins a different
+  // collection than the one being searched. Clearing the stored key (rather
+  // than writing the '' cleared sentinel) lets the auto-default below reselect
+  // a compatible preset, so a leaked preset self-heals on the next render.
+  useEffect(() => {
+    if (!preset) return;
+    if (presets === undefined) return; // not loaded yet
+    const active = presets.find((p) => p.name === preset);
+    if (!active || !presetAppliesToCollection(active.value, collectionId)) {
+      setPreset(null);
+      setStoredPreset(null);
+    }
+  }, [preset, presets, collectionId, setPreset, setStoredPreset]);
+
   // persist the active preset whenever it changes
   useEffect(() => {
     if (preset) setStoredPreset(preset);
   }, [preset, setStoredPreset]);
 
-  // auto-default to the first preset when nothing is active or stored
+  // auto-default to the first applicable preset when nothing is active or
+  // stored. '' (explicitly cleared) suppresses the default; only an absent key
+  // (null, never chosen) auto-selects.
   useEffect(() => {
     if (preset) return;
     if (!presets?.length) return;
-    if (getStoredPreset()) return;
-    setPreset(presets[0].name);
-  }, [preset, presets, getStoredPreset, setPreset]);
+    if (getStoredPreset() !== null) return;
+    const firstApplicable = presets.find((p) =>
+      presetAppliesToCollection(p.value, collectionId),
+    );
+    if (firstApplicable) setPreset(firstApplicable.name);
+  }, [preset, presets, collectionId, getStoredPreset, setPreset]);
 
   return null;
 }

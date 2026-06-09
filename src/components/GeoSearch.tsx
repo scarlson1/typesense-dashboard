@@ -117,7 +117,7 @@ const GeoSearch = ({
     // TODO: don't overwrite other filter_by params
     const polygonBounds = boundingBoxToPolygon(filterBounds);
     updateParams({ filter_by: `${geoFieldName}:(${polygonBounds})` });
-  }, [debouncedBounds, updateParams]);
+  }, [debouncedBounds, updateParams, geoFieldName]);
 
   const handleViewStateChange = useCallback(
     ({ viewState }: any) => {
@@ -137,7 +137,8 @@ const GeoSearch = ({
       const newBounds = test.getBounds(); // [minX, minY, maxX, maxY] = minLng, minLat, maxLng, maxLat
       setBounds(newBounds);
     },
-    [geoFieldName],
+    // Only uses the stable setBounds; no reactive deps.
+    [],
   );
 
   const handleCloseTooltip = () => {

@@ -17,8 +17,11 @@ import { Route as DashboardSynonymsRouteImport } from './routes/_dashboard/synon
 import { Route as DashboardStopwordsRouteImport } from './routes/_dashboard/stopwords'
 import { Route as DashboardServerRouteImport } from './routes/_dashboard/server'
 import { Route as DashboardPresetsRouteImport } from './routes/_dashboard/presets'
+import { Route as DashboardNlModelsRouteImport } from './routes/_dashboard/nl-models'
 import { Route as DashboardKeysRouteImport } from './routes/_dashboard/keys'
 import { Route as DashboardCurationRouteImport } from './routes/_dashboard/curation'
+import { Route as DashboardConversationalSearchRouteImport } from './routes/_dashboard/conversational-search'
+import { Route as DashboardConversationModelsRouteImport } from './routes/_dashboard/conversation-models'
 import { Route as DashboardAnalyticsRouteImport } from './routes/_dashboard/analytics'
 import { Route as DashboardAliasRouteImport } from './routes/_dashboard/alias'
 import { Route as DashboardCollectionsIndexRouteImport } from './routes/_dashboard/collections/index'
@@ -32,6 +35,7 @@ import { Route as DashboardCollectionsCollectionIdDocumentsExportRouteImport } f
 import { Route as DashboardCollectionsCollectionIdDocumentsDocumentIdRouteImport } from './routes/_dashboard/collections/$collectionId/documents/$documentId'
 import { Route as DashboardCollectionsCollectionIdDocumentsSearchIndexRouteImport } from './routes/_dashboard/collections/$collectionId/documents/search.index'
 import { Route as DashboardCollectionsCollectionIdDocumentsSearchMapRouteImport } from './routes/_dashboard/collections/$collectionId/documents/search.map'
+import { Route as DashboardCollectionsCollectionIdDocumentsSearchChatRouteImport } from './routes/_dashboard/collections/$collectionId/documents/search.chat'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -72,6 +76,11 @@ const DashboardPresetsRoute = DashboardPresetsRouteImport.update({
   path: '/presets',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardNlModelsRoute = DashboardNlModelsRouteImport.update({
+  id: '/nl-models',
+  path: '/nl-models',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardKeysRoute = DashboardKeysRouteImport.update({
   id: '/keys',
   path: '/keys',
@@ -82,6 +91,18 @@ const DashboardCurationRoute = DashboardCurationRouteImport.update({
   path: '/curation',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardConversationalSearchRoute =
+  DashboardConversationalSearchRouteImport.update({
+    id: '/conversational-search',
+    path: '/conversational-search',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardConversationModelsRoute =
+  DashboardConversationModelsRouteImport.update({
+    id: '/conversation-models',
+    path: '/conversation-models',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -157,6 +178,12 @@ const DashboardCollectionsCollectionIdDocumentsSearchMapRoute =
     path: '/map',
     getParentRoute: () => DashboardCollectionsCollectionIdDocumentsSearchRoute,
   } as any)
+const DashboardCollectionsCollectionIdDocumentsSearchChatRoute =
+  DashboardCollectionsCollectionIdDocumentsSearchChatRouteImport.update({
+    id: '/chat',
+    path: '/chat',
+    getParentRoute: () => DashboardCollectionsCollectionIdDocumentsSearchRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
@@ -164,8 +191,11 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
   '/analytics': typeof DashboardAnalyticsRoute
+  '/conversation-models': typeof DashboardConversationModelsRoute
+  '/conversational-search': typeof DashboardConversationalSearchRoute
   '/curation': typeof DashboardCurationRoute
   '/keys': typeof DashboardKeysRoute
+  '/nl-models': typeof DashboardNlModelsRoute
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
@@ -179,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
   '/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
   '/collections/$collectionId/documents/search': typeof DashboardCollectionsCollectionIdDocumentsSearchRouteWithChildren
+  '/collections/$collectionId/documents/search/chat': typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   '/collections/$collectionId/documents/search/map': typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   '/collections/$collectionId/documents/search/': typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
@@ -187,8 +218,11 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/alias': typeof DashboardAliasRoute
   '/analytics': typeof DashboardAnalyticsRoute
+  '/conversation-models': typeof DashboardConversationModelsRoute
+  '/conversational-search': typeof DashboardConversationalSearchRoute
   '/curation': typeof DashboardCurationRoute
   '/keys': typeof DashboardKeysRoute
+  '/nl-models': typeof DashboardNlModelsRoute
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
   '/stopwords': typeof DashboardStopwordsRoute
@@ -202,6 +236,7 @@ export interface FileRoutesByTo {
   '/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
   '/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
   '/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
+  '/collections/$collectionId/documents/search/chat': typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   '/collections/$collectionId/documents/search/map': typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   '/collections/$collectionId/documents/search': typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
@@ -212,8 +247,11 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/_dashboard/alias': typeof DashboardAliasRoute
   '/_dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/_dashboard/conversation-models': typeof DashboardConversationModelsRoute
+  '/_dashboard/conversational-search': typeof DashboardConversationalSearchRoute
   '/_dashboard/curation': typeof DashboardCurationRoute
   '/_dashboard/keys': typeof DashboardKeysRoute
+  '/_dashboard/nl-models': typeof DashboardNlModelsRoute
   '/_dashboard/presets': typeof DashboardPresetsRoute
   '/_dashboard/server': typeof DashboardServerRoute
   '/_dashboard/stopwords': typeof DashboardStopwordsRoute
@@ -228,6 +266,7 @@ export interface FileRoutesById {
   '/_dashboard/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
   '/_dashboard/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
   '/_dashboard/collections/$collectionId/documents/search': typeof DashboardCollectionsCollectionIdDocumentsSearchRouteWithChildren
+  '/_dashboard/collections/$collectionId/documents/search/chat': typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   '/_dashboard/collections/$collectionId/documents/search/map': typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   '/_dashboard/collections/$collectionId/documents/search/': typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
@@ -239,8 +278,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/alias'
     | '/analytics'
+    | '/conversation-models'
+    | '/conversational-search'
     | '/curation'
     | '/keys'
+    | '/nl-models'
     | '/presets'
     | '/server'
     | '/stopwords'
@@ -254,6 +296,7 @@ export interface FileRouteTypes {
     | '/collections/$collectionId/documents/export'
     | '/collections/$collectionId/documents/new'
     | '/collections/$collectionId/documents/search'
+    | '/collections/$collectionId/documents/search/chat'
     | '/collections/$collectionId/documents/search/map'
     | '/collections/$collectionId/documents/search/'
   fileRoutesByTo: FileRoutesByTo
@@ -262,8 +305,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/alias'
     | '/analytics'
+    | '/conversation-models'
+    | '/conversational-search'
     | '/curation'
     | '/keys'
+    | '/nl-models'
     | '/presets'
     | '/server'
     | '/stopwords'
@@ -277,6 +323,7 @@ export interface FileRouteTypes {
     | '/collections/$collectionId/documents/$documentId'
     | '/collections/$collectionId/documents/export'
     | '/collections/$collectionId/documents/new'
+    | '/collections/$collectionId/documents/search/chat'
     | '/collections/$collectionId/documents/search/map'
     | '/collections/$collectionId/documents/search'
   id:
@@ -286,8 +333,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/_dashboard/alias'
     | '/_dashboard/analytics'
+    | '/_dashboard/conversation-models'
+    | '/_dashboard/conversational-search'
     | '/_dashboard/curation'
     | '/_dashboard/keys'
+    | '/_dashboard/nl-models'
     | '/_dashboard/presets'
     | '/_dashboard/server'
     | '/_dashboard/stopwords'
@@ -302,6 +352,7 @@ export interface FileRouteTypes {
     | '/_dashboard/collections/$collectionId/documents/export'
     | '/_dashboard/collections/$collectionId/documents/new'
     | '/_dashboard/collections/$collectionId/documents/search'
+    | '/_dashboard/collections/$collectionId/documents/search/chat'
     | '/_dashboard/collections/$collectionId/documents/search/map'
     | '/_dashboard/collections/$collectionId/documents/search/'
   fileRoutesById: FileRoutesById
@@ -370,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPresetsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/nl-models': {
+      id: '/_dashboard/nl-models'
+      path: '/nl-models'
+      fullPath: '/nl-models'
+      preLoaderRoute: typeof DashboardNlModelsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/keys': {
       id: '/_dashboard/keys'
       path: '/keys'
@@ -382,6 +440,20 @@ declare module '@tanstack/react-router' {
       path: '/curation'
       fullPath: '/curation'
       preLoaderRoute: typeof DashboardCurationRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/conversational-search': {
+      id: '/_dashboard/conversational-search'
+      path: '/conversational-search'
+      fullPath: '/conversational-search'
+      preLoaderRoute: typeof DashboardConversationalSearchRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/conversation-models': {
+      id: '/_dashboard/conversation-models'
+      path: '/conversation-models'
+      fullPath: '/conversation-models'
+      preLoaderRoute: typeof DashboardConversationModelsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/analytics': {
@@ -475,16 +547,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchMapRouteImport
       parentRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchRoute
     }
+    '/_dashboard/collections/$collectionId/documents/search/chat': {
+      id: '/_dashboard/collections/$collectionId/documents/search/chat'
+      path: '/chat'
+      fullPath: '/collections/$collectionId/documents/search/chat'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchChatRouteImport
+      parentRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchRoute
+    }
   }
 }
 
 interface DashboardCollectionsCollectionIdDocumentsSearchRouteChildren {
+  DashboardCollectionsCollectionIdDocumentsSearchChatRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   DashboardCollectionsCollectionIdDocumentsSearchMapRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   DashboardCollectionsCollectionIdDocumentsSearchIndexRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
 
 const DashboardCollectionsCollectionIdDocumentsSearchRouteChildren: DashboardCollectionsCollectionIdDocumentsSearchRouteChildren =
   {
+    DashboardCollectionsCollectionIdDocumentsSearchChatRoute:
+      DashboardCollectionsCollectionIdDocumentsSearchChatRoute,
     DashboardCollectionsCollectionIdDocumentsSearchMapRoute:
       DashboardCollectionsCollectionIdDocumentsSearchMapRoute,
     DashboardCollectionsCollectionIdDocumentsSearchIndexRoute:
@@ -499,8 +581,11 @@ const DashboardCollectionsCollectionIdDocumentsSearchRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardAliasRoute: typeof DashboardAliasRoute
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardConversationModelsRoute: typeof DashboardConversationModelsRoute
+  DashboardConversationalSearchRoute: typeof DashboardConversationalSearchRoute
   DashboardCurationRoute: typeof DashboardCurationRoute
   DashboardKeysRoute: typeof DashboardKeysRoute
+  DashboardNlModelsRoute: typeof DashboardNlModelsRoute
   DashboardPresetsRoute: typeof DashboardPresetsRoute
   DashboardServerRoute: typeof DashboardServerRoute
   DashboardStopwordsRoute: typeof DashboardStopwordsRoute
@@ -520,8 +605,11 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAliasRoute: DashboardAliasRoute,
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardConversationModelsRoute: DashboardConversationModelsRoute,
+  DashboardConversationalSearchRoute: DashboardConversationalSearchRoute,
   DashboardCurationRoute: DashboardCurationRoute,
   DashboardKeysRoute: DashboardKeysRoute,
+  DashboardNlModelsRoute: DashboardNlModelsRoute,
   DashboardPresetsRoute: DashboardPresetsRoute,
   DashboardServerRoute: DashboardServerRoute,
   DashboardStopwordsRoute: DashboardStopwordsRoute,

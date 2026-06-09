@@ -527,7 +527,27 @@ export const designTokens = {
   mark: 'var(--ts-mark)',
   codeSurface: 'var(--ts-codeSurface)',
   codeText: 'var(--ts-codeText)',
+  codeTextMuted: 'var(--ts-codeTextMuted)',
+  codeBorder: 'var(--ts-codeBorder)',
+  // Syntax colors for JSON shown on the code surface (e.g. the NL
+  // "Translated to" inspector). The code surface is dark in both schemes, so
+  // these read the same in light and dark.
+  codeKey: 'var(--ts-codeKey)',
+  codeStr: 'var(--ts-codeStr)',
+  codeNum: 'var(--ts-codeNum)',
+  codeFaint: 'var(--ts-codeFaint)',
+  codeSurfaceMuted: 'var(--ts-codeSurfaceMuted)',
   fontMono: '"JetBrains Mono", "SF Mono", Menlo, Consolas, Monaco, monospace',
+  // Elevation tokens. Static strings (not CSS vars) shared across redesign
+  // primitives so component shadows stay consistent and live in one place.
+  shadowButton: '0 1px 1px rgba(50,50,90,.04), 0 1px 1px rgba(50,50,90,.05)',
+  shadowButtonPrimary:
+    '0 1px 1px rgba(50,50,90,.06), 0 1px 2px rgba(50,50,90,.08), inset 0 -1px 0 rgba(0,0,0,.12)',
+  shadowSheet: '0 1px 2px rgba(0,0,0,.06)',
+  shadowDropdown: '0 4px 20px rgba(0,0,0,.1)',
+  shadowCardHover: '0 8px 24px rgba(0,0,0,0.08)',
+  shadowScope: '0 6px 20px rgba(10,37,64,.08)',
+  shadowNav: '0 12px 32px rgba(10,37,64,.18), 0 2px 6px rgba(10,37,64,.06)',
 };
 
 const defaultShadows: Shadows = [...defaultTheme.shadows];

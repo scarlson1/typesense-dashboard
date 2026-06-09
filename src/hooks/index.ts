@@ -2,11 +2,14 @@
 
 export * from './form';
 export * from './formContext';
+export * from './useAnalyticsData';
 export * from './useAsyncToast';
 export * from './useBoolean';
 export * from './useCollectionEditorDialog';
 export * from './useCollectionSchema';
 export * from './useCollectionSearchPreset';
+export * from './useConversationModels';
+export * from './useCreateHistoryCollection';
 export * from './useCountdown';
 export * from './useCounter';
 export * from './useDebounce';
@@ -20,6 +23,7 @@ export * from './useImportDocuments';
 export * from './useInterval';
 export * from './useMutationToast';
 export * from './useNewCollection';
+export * from './useNlSearchModels';
 export * from './usePreset';
 export * from './usePrevious';
 export * from './useSchema';

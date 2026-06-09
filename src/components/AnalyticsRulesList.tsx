@@ -1,4 +1,5 @@
 import { AnalyticsRuleFormV30 } from '@/components/AnalyticsRuleFormV30';
+import type { JsonEditorProps } from '@/components/JsonEditor';
 import {
   analyticsFormDefaultValues,
   analyticsFormDefaultValuesV30,
@@ -9,15 +10,23 @@ import {
   analyticsRuleUiConfigV30,
   analyticsRuleV1SubmitSchema,
   collectionQueryKeys,
+  DEFAULT_MONACO_OPTIONS,
 } from '@/constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import {
+  useAppForm,
+  useAsyncToast,
+  useDialog,
+  useTypesenseClient,
+} from '@/hooks';
 import { useTypesenseVersion } from '@/hooks/useTypesenseVersion';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
-import { DeleteOutlineRounded } from '@mui/icons-material';
+import { DataObjectRounded, DeleteOutlineRounded } from '@mui/icons-material';
 import {
   Box,
   IconButton,
+  Skeleton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -29,7 +38,7 @@ import {
 } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense } from 'react';
+import { lazy, Suspense, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import type {
   AnalyticsRuleCreateSchema,
@@ -43,58 +52,25 @@ import { AnalyticsRuleForm } from './AnalyticsRuleForm';
 import { ErrorFallback } from './ErrorFallback';
 import { Badge } from './redesign';
 
-//V29
-// export interface AnalyticsRuleCreateSchemaV1 {
-//   type: "popular_queries" | "nohits_queries" | "counter" | "log";
-//   params: {
-//       enable_auto_aggregation?: boolean;
-//       source: {
-//           collections: string[];
-//           events?: {
-//               type: string;
-//               weight?: number;
-//               name: string;
-//           }[];
-//       };
-//       expand_query?: boolean;
-//       destination?: {
-//           collection: string;
-//           counter_field?: string;
-//       };
-//       limit?: number;
-//   };
-// }
-
-// V30
-// export interface AnalyticsRuleCreateSchema {
-//   name: string;
-//   type: string; // ["popular_queries", "nohits_queries", "counter", "log"]
-//   collection: string;
-//   event_type: string; // search, click, conversion, and visit
-//   rule_tag?: string;
-//   params?: {
-//       destination_collection?: string;
-//       limit?: number;
-//       capture_search_requests?: boolean;
-//       meta_fields?: string[];
-//       expand_query?: boolean;
-//       counter_field?: string;
-//       weight?: number;
-//   };
-// }
+const JsonEditor = lazy(() => import('../components/JsonEditor'));
 
 export function AnalyticsRulesList() {
   const [client, clusterId] = useTypesenseClient();
   const { is30Plus } = useTypesenseVersion();
+  const dialog = useDialog();
 
   const { data: rules } = useSuspenseQuery({
     // TODO: type rules depending on version
-    queryKey: analyticsQueryKeys.rules(clusterId),
+    // is30Plus is part of the key so a post-switch version correction
+    // refetches under the right API branch instead of keeping a stale result.
+    queryKey: [...analyticsQueryKeys.rules(clusterId), is30Plus],
     queryFn: async () => {
       if (!is30Plus) {
         const res = await client.analyticsV1.rules().retrieve();
 
-        return res.rules as AnalyticsRuleSchemaV1[];
+        // Guard: useSuspenseQuery throws if the queryFn returns undefined,
+        // which happens when analytics is disabled and `rules` is absent.
+        return (res?.rules ?? []) as AnalyticsRuleSchemaV1[];
       } else {
         // The SDK types retrieve() as AnalyticsRuleSchema[], but Typesense 28+
         // actually returns { rules: [...] }. Normalize to an array.
@@ -105,6 +81,7 @@ export function AnalyticsRulesList() {
       }
     },
   });
+
   const toast = useAsyncToast();
   const deleteMutation = useMutation({
     mutationFn: (name: string) =>
@@ -128,6 +105,45 @@ export function AnalyticsRulesList() {
       });
     },
   });
+
+  const viewRule = useCallback(
+    async (rule: AnalyticsRuleSchemaV1 | AnalyticsRuleSchema) => {
+      await dialog.prompt({
+        variant: 'info',
+        catchOnCancel: false,
+        title: `Analytics Rule [${rule.name}]`,
+        content: ((props?: JsonEditorProps) => {
+          return (
+            <Suspense
+              fallback={
+                <Skeleton variant='rounded' height={'calc(100% - 12px)'} />
+              }
+            >
+              <JsonEditor
+                height='calc(100% - 12px)'
+                options={DEFAULT_MONACO_OPTIONS}
+                {...(props || {})}
+                value={JSON.stringify(rule, null, 2)}
+              />
+            </Suspense>
+          );
+        })(),
+        slotProps: {
+          content: {
+            sx: { height: '75vh' },
+          },
+          dialog: {
+            maxWidth: 'sm',
+            fullWidth: true,
+          },
+          acceptButton: {
+            children: 'Close',
+          },
+        },
+      });
+    },
+    [dialog],
+  );
 
   return (
     <Box
@@ -271,25 +287,47 @@ export function AnalyticsRulesList() {
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ textAlign: 'right' }}>
-                          <Tooltip title='Delete rule'>
-                            <IconButton
-                              size='small'
-                              onClick={() => deleteMutation.mutate(r.name)}
-                              disabled={deleteMutation.isPending}
-                              sx={{
-                                width: 26,
-                                height: 26,
-                                borderRadius: '5px',
-                                color: designTokens.textFaint,
-                                '&:hover': {
-                                  color: designTokens.danger,
-                                  background: designTokens.dangerSoft,
-                                },
-                              }}
-                            >
-                              <DeleteOutlineRounded sx={{ fontSize: 14 }} />
-                            </IconButton>
-                          </Tooltip>
+                          <Stack direction='row' spacing={0.5}>
+                            {/* viewRule */}
+                            <Tooltip title='View rule'>
+                              <IconButton
+                                size='small'
+                                onClick={() => viewRule(r)}
+                                disabled={dialog.isOpen}
+                                sx={{
+                                  width: 26,
+                                  height: 26,
+                                  borderRadius: '5px',
+                                  color: designTokens.textFaint,
+                                  '&:hover': {
+                                    color: designTokens.accent,
+                                    background: designTokens.accentSoft,
+                                  },
+                                }}
+                              >
+                                <DataObjectRounded sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title='Delete rule'>
+                              <IconButton
+                                size='small'
+                                onClick={() => deleteMutation.mutate(r.name)}
+                                disabled={deleteMutation.isPending}
+                                sx={{
+                                  width: 26,
+                                  height: 26,
+                                  borderRadius: '5px',
+                                  color: designTokens.textFaint,
+                                  '&:hover': {
+                                    color: designTokens.danger,
+                                    background: designTokens.dangerSoft,
+                                  },
+                                }}
+                              >
+                                <DeleteOutlineRounded sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     );

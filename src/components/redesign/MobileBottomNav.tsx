@@ -133,7 +133,7 @@ export function MobileBottomNav() {
           backgroundColor: 'background.paper',
           border: `1px solid ${designTokens.border}`,
           borderRadius: '999px',
-          boxShadow: '0 12px 32px rgba(10,37,64,.18), 0 2px 6px rgba(10,37,64,.06)',
+          boxShadow: designTokens.shadowNav,
           px: '4px',
           alignItems: 'stretch',
         }}

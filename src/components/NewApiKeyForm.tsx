@@ -1,6 +1,10 @@
 import { FormField, primaryButtonSx } from '@/components/redesign';
 import { collectionQueryKeys } from '@/constants';
-import { fieldChipSx, fieldInputSx } from '@/constants/redesignSx';
+import {
+  dividerPaperSx as autocompletePaperSx,
+  fieldChipSx,
+  fieldInputSx,
+} from '@/constants/redesignSx';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import {
@@ -28,7 +32,6 @@ import {
   Button,
   Stack,
   TextField,
-  type Theme,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -110,10 +113,6 @@ const NewApiKeyForm = ({
     val: KeyCreateSchema[K],
   ) => {
     onChange({ ...values, [key]: val });
-  };
-
-  const autocompletePaperSx = {
-    border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
   };
 
   const canSubmit =
