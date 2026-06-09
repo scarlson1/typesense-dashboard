@@ -1,5 +1,6 @@
 export * from './diffArrayOfObjects';
 export * from './getObjectDiff';
+export * from './presetCollection';
 export * from './searchModeParams';
 export * from './mapboxStore';
 export * from './queryClient';

@@ -1643,7 +1643,7 @@ function SetupRequiredState({
                     : { ...primaryButtonSx, color: designTokens.onAccent }
                 }
               >
-                Configure embeddings
+                Configure&nbsp;embeddings
               </Button>
             ) : null}
           </Stack>

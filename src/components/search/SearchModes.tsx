@@ -655,7 +655,7 @@ export const EmbeddingUnavailableNotice = ({
         onClick={onConfigure}
         sx={smallButtonSx}
       >
-        Configure embeddings
+        Configure&nbsp;embeddings
       </Button>
     }
   >

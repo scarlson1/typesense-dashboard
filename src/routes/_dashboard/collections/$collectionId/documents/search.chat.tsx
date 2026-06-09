@@ -1614,7 +1614,7 @@ function SetupRequiredState({
               }
             />
           </Box>
-          <Stack direction='row' sx={{ gap: 1, flexWrap: 'wrap' }}>
+          <Stack direction='row' useFlexGap sx={{ gap: 1, flexWrap: 'wrap' }}>
             {!historyOk && onCreateHistory ? (
               <Button
                 size='small'
@@ -1639,7 +1639,7 @@ function SetupRequiredState({
                     : { ...primaryButtonSx, color: designTokens.onAccent }
                 }
               >
-                Configure embeddings
+                Configure&nbsp;embeddings
               </Button>
             ) : null}
           </Stack>

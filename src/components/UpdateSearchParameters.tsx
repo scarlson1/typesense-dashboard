@@ -92,27 +92,10 @@ export function UpdateSearchParameters({
     },
   });
 
-  // reset search preset on collection change (TODO: unless multi-collection ?? or preset includes filter on current collection ??)
-  // TODO: need to move up higher ?? reset query_by and sort_by ??
-  // useEffect(() => {
-  //   const p: PresetSchema<DocumentSchema> | undefined = presets.find(
-  //     (pre) => pre.name === preset,
-  //   );
-  //   console.log('CURRENT PRESET: ', p);
-  //   if (p) {
-  //     const pre = p.value;
-
-  //     if (
-  //       // @ts-expect-error collection doesn't exist on PresetSchema ??
-  //       !(pre.collectionId == collectionId || pre.collection == collectionId)
-  //     ) {
-  //       // reset if preset does not explicitly include collection
-  //       setPreset(null);
-  //     }
-  //   } else {
-  //     setPreset(null);
-  //   }
-  // }, [collectionId, presets]);
+  // Note: resetting a preset that belongs to (or pins) a different collection
+  // is handled centrally in the always-mounted <PresetPersistence /> (the Params
+  // UI here is only mounted on the active configure tab, so it can't reliably
+  // own that guard).
 
   const formPresetValue = useStore(form.store, (state) => state.values.preset);
   const prevFormPresetValue = usePrevious(formPresetValue);

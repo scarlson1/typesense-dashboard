@@ -379,11 +379,7 @@ function ViewToggleButtons() {
           Map
         </Typography>
       </ToggleButton>
-      <ToggleButton
-        value='chat'
-        aria-label='conversational search'
-        disabled={!enableMap}
-      >
+      <ToggleButton value='chat' aria-label='conversational search'>
         <ChatBubbleOutlineRounded fontSize='inherit' sx={{ mr: 0.5 }} />
         <Typography
           component='span'
