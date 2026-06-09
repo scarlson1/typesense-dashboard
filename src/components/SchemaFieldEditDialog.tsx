@@ -5,8 +5,14 @@ import {
 } from '@/components/redesign';
 import { fieldInputSx } from '@/constants/redesignSx';
 import { designTokens } from '@/theme/themePrimitives';
-import { typesenseFieldType } from '@/types';
-import { pruneEmpty } from '@/utils';
+import {
+  embedForm,
+  typesenseFieldType,
+  type EmbedFormValues,
+  type EmbedProvider,
+  type FieldEmbed,
+  type GcpAuthMode,
+} from '@/types';
 import { CheckRounded, OpenInNewRounded } from '@mui/icons-material';
 import {
   Box,
@@ -20,6 +26,8 @@ import {
   Stack,
   Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -111,8 +119,6 @@ const VEC_DIST_OPTIONS = ['cosine', 'ip'] as const;
 // Fields whose text can be auto-embedded.
 const EMBEDDABLE_TYPES = new Set<FieldType>(['string', 'string[]']);
 
-type EmbedProvider = 'builtin' | 'openai' | 'azure' | 'gcp_vertex' | 'custom';
-
 const EMBED_PROVIDERS: { value: EmbedProvider; label: string }[] = [
   { value: 'builtin', label: 'Built-in (ts/…)' },
   { value: 'openai', label: 'OpenAI / Google PaLM' },
@@ -120,25 +126,6 @@ const EMBED_PROVIDERS: { value: EmbedProvider; label: string }[] = [
   { value: 'gcp_vertex', label: 'GCP Vertex AI' },
   { value: 'custom', label: 'Custom (self-hosted)' },
 ];
-
-interface FieldEmbed {
-  from?: string[];
-  model_config?: {
-    model_name?: string;
-    api_key?: string;
-    url?: string;
-    indexing_prefix?: string;
-    query_prefix?: string;
-    // GCP Vertex AI (OAuth)
-    access_token?: string;
-    refresh_token?: string;
-    client_id?: string;
-    client_secret?: string;
-    project_id?: string;
-    // GCP Vertex AI (service account)
-    service_account?: { client_email?: string; private_key?: string };
-  };
-}
 
 interface EditState {
   name: string;
@@ -162,6 +149,7 @@ interface EditState {
   embedClientId: string;
   embedClientSecret: string;
   embedProjectId: string;
+  embedGcpAuthMode: GcpAuthMode;
   embedSaClientEmail: string;
   embedSaPrivateKey: string;
   vecDist: string;
@@ -169,7 +157,7 @@ interface EditState {
 
 // When editing an existing field, recover which provider its model_config used.
 const inferEmbedProvider = (
-  mc: FieldEmbed['model_config'],
+  mc: FieldEmbed['model_config'] | undefined,
 ): EmbedProvider => {
   if (!mc) return 'builtin';
   if (mc.access_token || mc.refresh_token || mc.client_id || mc.service_account)
@@ -204,6 +192,9 @@ const buildInitialState = (field: CollectionFieldSchema | null): EditState => {
     embedClientId: embed?.model_config?.client_id ?? '',
     embedClientSecret: embed?.model_config?.client_secret ?? '',
     embedProjectId: embed?.model_config?.project_id ?? '',
+    embedGcpAuthMode: embed?.model_config?.service_account
+      ? 'service_account'
+      : 'oauth',
     embedSaClientEmail: embed?.model_config?.service_account?.client_email ?? '',
     embedSaPrivateKey: embed?.model_config?.service_account?.private_key ?? '',
     vecDist: (field?.vec_dist as string) ?? 'cosine',
@@ -237,32 +228,25 @@ const TOGGLES: {
   },
 ];
 
-// Per-provider credential requirements for an auto-embed config. GCP Vertex
-// accepts OAuth credentials OR a service account — one full set is required.
-const embedCredentialsInvalid = (s: EditState): boolean => {
-  switch (s.embedProvider) {
-    case 'openai':
-      return !s.embedApiKey.trim();
-    case 'azure':
-      return !s.embedApiKey.trim() || !s.embedUrl.trim();
-    case 'gcp_vertex': {
-      if (!s.embedProjectId.trim()) return true;
-      const oauthComplete =
-        Boolean(s.embedAccessToken.trim()) &&
-        Boolean(s.embedRefreshToken.trim()) &&
-        Boolean(s.embedClientId.trim()) &&
-        Boolean(s.embedClientSecret.trim());
-      const saComplete =
-        Boolean(s.embedSaClientEmail.trim()) &&
-        Boolean(s.embedSaPrivateKey.trim());
-      return !(oauthComplete || saComplete);
-    }
-    case 'builtin':
-    case 'custom':
-    default:
-      return false;
-  }
-};
+// Map the dialog's flat edit state onto the `embedForm` Zod schema's inputs,
+// which owns per-provider validation and builds the `embed` payload.
+const toEmbedFormValues = (s: EditState): EmbedFormValues => ({
+  provider: s.embedProvider,
+  from: s.embedFrom,
+  model_name: s.embedModelName,
+  api_key: s.embedApiKey,
+  url: s.embedUrl,
+  indexing_prefix: s.embedIndexingPrefix,
+  query_prefix: s.embedQueryPrefix,
+  gcp_auth_mode: s.embedGcpAuthMode,
+  access_token: s.embedAccessToken,
+  refresh_token: s.embedRefreshToken,
+  client_id: s.embedClientId,
+  client_secret: s.embedClientSecret,
+  project_id: s.embedProjectId,
+  sa_client_email: s.embedSaClientEmail,
+  sa_private_key: s.embedSaPrivateKey,
+});
 
 export const SchemaFieldEditDialog = ({
   field,
@@ -302,13 +286,11 @@ export const SchemaFieldEditDialog = ({
     .map((f) => f.name);
 
   // A vector field needs either explicit dimensions OR an auto-embed config
-  // (source fields + model); guard the save button accordingly.
+  // that passes the `embedForm` schema; guard the save button accordingly.
   const vectorInvalid =
     isVector &&
     (state!.autoEmbed
-      ? state!.embedFrom.length === 0 ||
-        !state!.embedModelName.trim() ||
-        embedCredentialsInvalid(state!)
+      ? !embedForm.safeParse(toEmbedFormValues(state!)).success
       : !(
           Number.isInteger(Number(state!.num_dim)) && Number(state!.num_dim) > 0
         ));
@@ -328,42 +310,10 @@ export const SchemaFieldEditDialog = ({
     };
     if (isVectorField) {
       if (state.autoEmbed) {
-        const provider = state.embedProvider;
-        const modelConfig: NonNullable<FieldEmbed['model_config']> = {
-          model_name: state.embedModelName.trim(),
-        };
-        if (provider === 'openai' || provider === 'azure') {
-          const key = state.embedApiKey.trim();
-          if (key) modelConfig.api_key = key;
-        }
-        if (provider === 'azure') {
-          const url = state.embedUrl.trim();
-          if (url) modelConfig.url = url;
-        }
-        if (provider === 'custom') {
-          const ip = state.embedIndexingPrefix.trim();
-          const qp = state.embedQueryPrefix.trim();
-          if (ip) modelConfig.indexing_prefix = ip;
-          if (qp) modelConfig.query_prefix = qp;
-        }
-        if (provider === 'gcp_vertex') {
-          const oauth: Record<string, string> = {
-            access_token: state.embedAccessToken.trim(),
-            refresh_token: state.embedRefreshToken.trim(),
-            client_id: state.embedClientId.trim(),
-            client_secret: state.embedClientSecret.trim(),
-            project_id: state.embedProjectId.trim(),
-          };
-          for (const [k, v] of Object.entries(oauth)) {
-            if (v) (modelConfig as Record<string, unknown>)[k] = v;
-          }
-          const sa = pruneEmpty({
-            client_email: state.embedSaClientEmail.trim(),
-            private_key: state.embedSaPrivateKey.trim(),
-          });
-          if (Object.keys(sa).length) modelConfig.service_account = sa;
-        }
-        payload.embed = { from: state.embedFrom, model_config: modelConfig };
+        const parsed = embedForm.safeParse(toEmbedFormValues(state));
+        // Guarded by `vectorInvalid`, but bail rather than emit a bad payload.
+        if (!parsed.success) return;
+        payload.embed = parsed.data as CollectionFieldSchema['embed'];
       } else {
         const dim = parseInt(state.num_dim, 10);
         if (!Number.isNaN(dim)) payload.num_dim = dim;
@@ -655,79 +605,115 @@ export const SchemaFieldEditDialog = ({
                             setState({ ...state, embedProjectId: v })
                           }
                         />
-                        <Typography
-                          sx={{
-                            fontSize: 11.5,
-                            fontWeight: 600,
-                            color: designTokens.textMuted,
-                          }}
-                        >
-                          OAuth credentials
-                        </Typography>
-                        <EmbedField
-                          label='Access token'
-                          type='password'
-                          value={state.embedAccessToken}
-                          onChange={(v) =>
-                            setState({ ...state, embedAccessToken: v })
-                          }
-                        />
-                        <EmbedField
-                          label='Refresh token'
-                          type='password'
-                          value={state.embedRefreshToken}
-                          onChange={(v) =>
-                            setState({ ...state, embedRefreshToken: v })
-                          }
-                        />
-                        <Stack direction='row' sx={{ gap: 1.5 }}>
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box>
+                          <FieldLabel>Authentication</FieldLabel>
+                          <ToggleButtonGroup
+                            exclusive
+                            size='small'
+                            value={state.embedGcpAuthMode}
+                            onChange={(_, next: GcpAuthMode | null) =>
+                              next &&
+                              setState({ ...state, embedGcpAuthMode: next })
+                            }
+                            sx={{
+                              border: `1px solid ${designTokens.border}`,
+                              borderRadius: '8px',
+                              overflow: 'hidden',
+                              background: designTokens.surface,
+                              '& .MuiToggleButtonGroup-grouped': {
+                                border: 'none',
+                                borderRadius: 0,
+                                height: 28,
+                                px: 1.625,
+                                textTransform: 'none',
+                                fontSize: 11,
+                                fontWeight: 500,
+                                color: designTokens.textMuted,
+                                borderLeft: `1px solid ${designTokens.border}`,
+                                '&:first-of-type': { borderLeft: 'none' },
+                                '&.Mui-selected': {
+                                  fontWeight: 600,
+                                  color: designTokens.accent,
+                                  background: designTokens.accentSoft,
+                                  '&:hover': {
+                                    background: designTokens.accentSoft,
+                                  },
+                                },
+                              },
+                            }}
+                          >
+                            <ToggleButton value='oauth'>OAuth</ToggleButton>
+                            <ToggleButton value='service_account'>
+                              Service account
+                            </ToggleButton>
+                          </ToggleButtonGroup>
+                        </Box>
+
+                        {state.embedGcpAuthMode === 'oauth' ? (
+                          <>
                             <EmbedField
-                              label='Client ID'
-                              value={state.embedClientId}
-                              onChange={(v) =>
-                                setState({ ...state, embedClientId: v })
-                              }
-                            />
-                          </Box>
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <EmbedField
-                              label='Client secret'
+                              label='Access token'
                               type='password'
-                              value={state.embedClientSecret}
+                              value={state.embedAccessToken}
                               onChange={(v) =>
-                                setState({ ...state, embedClientSecret: v })
+                                setState({ ...state, embedAccessToken: v })
                               }
                             />
-                          </Box>
-                        </Stack>
-                        <Typography
-                          sx={{
-                            fontSize: 11.5,
-                            fontWeight: 600,
-                            color: designTokens.textMuted,
-                          }}
-                        >
-                          …or a service account
-                        </Typography>
-                        <EmbedField
-                          label='Client email'
-                          placeholder='svc@my-project.iam.gserviceaccount.com'
-                          value={state.embedSaClientEmail}
-                          onChange={(v) =>
-                            setState({ ...state, embedSaClientEmail: v })
-                          }
-                        />
-                        <EmbedField
-                          label='Private key'
-                          type='password'
-                          multiline
-                          placeholder='-----BEGIN PRIVATE KEY-----'
-                          value={state.embedSaPrivateKey}
-                          onChange={(v) =>
-                            setState({ ...state, embedSaPrivateKey: v })
-                          }
-                        />
+                            <EmbedField
+                              label='Refresh token'
+                              type='password'
+                              value={state.embedRefreshToken}
+                              onChange={(v) =>
+                                setState({ ...state, embedRefreshToken: v })
+                              }
+                            />
+                            <Stack direction='row' sx={{ gap: 1.5 }}>
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <EmbedField
+                                  label='Client ID'
+                                  value={state.embedClientId}
+                                  onChange={(v) =>
+                                    setState({ ...state, embedClientId: v })
+                                  }
+                                />
+                              </Box>
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <EmbedField
+                                  label='Client secret'
+                                  type='password'
+                                  value={state.embedClientSecret}
+                                  onChange={(v) =>
+                                    setState({
+                                      ...state,
+                                      embedClientSecret: v,
+                                    })
+                                  }
+                                />
+                              </Box>
+                            </Stack>
+                          </>
+                        ) : (
+                          <>
+                            <EmbedField
+                              label='Client email'
+                              placeholder='svc@my-project.iam.gserviceaccount.com'
+                              value={state.embedSaClientEmail}
+                              onChange={(v) =>
+                                setState({ ...state, embedSaClientEmail: v })
+                              }
+                            />
+                            <EmbedField
+                              label='Private key'
+                              type='password'
+                              multiline
+                              placeholder='-----BEGIN PRIVATE KEY-----'
+                              value={state.embedSaPrivateKey}
+                              onChange={(v) =>
+                                setState({ ...state, embedSaPrivateKey: v })
+                              }
+                            />
+                          </>
+                        )}
                       </Stack>
                     )}
 
