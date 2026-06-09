@@ -1,14 +1,10 @@
 import {
   Badge,
   MOBILE_BOTTOM_NAV_HEIGHT,
-  PageHeader,
   primaryButtonSx,
   smallButtonSx,
 } from '@/components/redesign';
-import {
-  collectionQueryKeys,
-  isConversationHistoryCollection,
-} from '@/constants';
+import { collectionQueryKeys } from '@/constants';
 import {
   useConversationModels,
   useCreateHistoryCollection,
@@ -40,7 +36,7 @@ import {
   useMediaQuery,
   type Theme,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
   useEffect,
@@ -55,9 +51,11 @@ import type {
   SearchResponse,
 } from 'typesense/lib/Typesense/Documents';
 
-export const Route = createFileRoute('/_dashboard/conversational-search')({
+export const Route = createFileRoute(
+  '/_dashboard/collections/$collectionId/documents/search/chat',
+)({
   component: RouteComponent,
-  staticData: { crumb: 'Conversational search' },
+  staticData: { crumb: 'Chat' },
 });
 
 const COLUMN = 760;
@@ -154,58 +152,51 @@ function useKeyboardInset() {
 }
 
 function RouteComponent() {
+  const { collectionId } = Route.useParams();
   const [client, clusterId] = useTypesenseClient();
   const navigate = useNavigate();
   const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const keyboardInset = useKeyboardInset();
-
-  const { data: convModels } = useConversationModels();
-  const { data: collections } = useQuery({
-    queryKey: collectionQueryKeys.all(clusterId),
-    queryFn: () => client.collections().retrieve(),
-  });
+  const createHistory = useCreateHistoryCollection();
 
   const [modelId, setModelId] = useState('');
-  const [collectionName, setCollectionName] = useState('');
   const [conversationId, setConversationId] = useState<string | undefined>();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
 
-  // You retrieve against content collections, never the internal conversation
-  // history store — exclude history-schema collections from "Retrieve from".
-  const retrievableCollections = useMemo(
-    () =>
-      (collections ?? []).filter((c) => !isConversationHistoryCollection(c)),
-    [collections],
-  );
+  const { data: convModels } = useConversationModels();
+  const { data: collection } = useSuspenseQuery({
+    queryKey: collectionQueryKeys.collection(clusterId, collectionId),
+    queryFn: () => client.collections(collectionId).retrieve(),
+  });
 
   // Default the scope selectors once data arrives.
   useEffect(() => {
     if (!modelId && convModels?.length) setModelId(convModels[0].id);
   }, [convModels, modelId]);
-  useEffect(() => {
-    if (!collectionName && retrievableCollections.length)
-      setCollectionName(retrievableCollections[0].name);
-  }, [retrievableCollections, collectionName]);
+  // useEffect(() => {
+  //   if (!collectionId && retrievableCollections.length)
+  //     setCollectionName(retrievableCollections[0].name);
+  // }, [retrievableCollections, collectionId]);
 
-  const selectedCollection = useMemo(
-    () => collections?.find((c) => c.name === collectionName),
-    [collections, collectionName],
-  );
   const embeddingField = useMemo(
     () =>
-      selectedCollection?.fields?.find(
+      collection?.fields?.find(
         (f) =>
           f.type === 'float[]' &&
           ((f as { embed?: unknown }).embed != null || f.num_dim != null),
       )?.name,
-    [selectedCollection],
+    [collection],
   );
   const selectedModel = useMemo(
     () => convModels?.find((m) => m.id === modelId),
     [convModels, modelId],
   );
 
+  const { data: collections } = useSuspenseQuery({
+    queryKey: collectionQueryKeys.all(clusterId),
+    queryFn: () => client.collections().retrieve(),
+  });
   const historyOk =
     !selectedModel?.history_collection ||
     Boolean(
@@ -214,8 +205,6 @@ function RouteComponent() {
 
   const noModel = convModels != null && convModels.length === 0;
   const needsSetup = !noModel && (!embeddingField || !historyOk);
-
-  const createHistory = useCreateHistoryCollection();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -236,7 +225,7 @@ function RouteComponent() {
   // Non-streaming fallback (used if streaming fails before any tokens arrive).
   const fetchOnce = async (q: string) =>
     (await client
-      .collections(collectionName)
+      .collections(collectionId)
       .documents()
       .search({
         q,
@@ -274,9 +263,10 @@ function RouteComponent() {
       });
       if (conversationId) params.set('conversation_id', conversationId);
 
+      // sdk doesn't support streaming ??
       const res = await fetch(
         `${node.protocol}://${node.host}:${node.port}/collections/${encodeURIComponent(
-          collectionName,
+          collectionId,
         )}/documents/search?${params.toString()}`,
         {
           headers: { 'X-TYPESENSE-API-KEY': client.configuration.apiKey },
@@ -434,7 +424,7 @@ function RouteComponent() {
         overflow: 'hidden',
       }}
     >
-      <Box sx={{ flexShrink: 0 }}>
+      {/* <Box sx={{ flexShrink: 0 }}>
         <PageHeader
           title='Conversational search'
           badges={
@@ -449,8 +439,6 @@ function RouteComponent() {
           }
           actions={
             <>
-              {/* Mobile: compact "+" sits where the menu button was (nav is now
-                  the bottom nav). Desktop: full "New conversation" button. */}
               <Tooltip title='New conversation'>
                 <Box
                   component='span'
@@ -461,8 +449,8 @@ function RouteComponent() {
                     disabled={turns.length === 0}
                     aria-label='New conversation'
                     sx={{
-                      width: 36,
-                      height: 36,
+                      width: 30,
+                      height: 30,
                       borderRadius: '8px',
                       border: `1px solid ${designTokens.border}`,
                       background: designTokens.surface,
@@ -491,7 +479,7 @@ function RouteComponent() {
             </>
           }
         />
-      </Box>
+      </Box> */}
 
       {/* scope bar */}
       <Stack
@@ -500,8 +488,8 @@ function RouteComponent() {
           flexShrink: 0,
           alignItems: 'center',
           gap: 1.25,
-          px: { xs: 1.75, md: 3.5 },
-          py: 1.25,
+          // px: { xs: 1.75, md: 3.5 },
+          pb: 1,
           background: 'background.paper',
           borderBottom: `1px solid ${designTokens.border}`,
           // Mobile: single scrollable row of compact chips. Desktop: wrap.
@@ -519,16 +507,6 @@ function RouteComponent() {
           onChange={setModelId}
           placeholder='none'
         />
-        <ScopeSelect
-          icon={<ChatBubbleOutlineRounded sx={{ fontSize: 13 }} />}
-          label='Retrieve from'
-          value={collectionName}
-          options={retrievableCollections.map((c) => c.name)}
-          onChange={(v) => {
-            setCollectionName(v);
-            handleNewConversation();
-          }}
-        />
         <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }} />
         {turns.length > 0 ? (
           <Box sx={{ display: { xs: 'none', md: 'flex' }, flexShrink: 0 }}>
@@ -537,6 +515,24 @@ function RouteComponent() {
             </Badge>
           </Box>
         ) : null}
+        <Tooltip title='New conversation'>
+          <IconButton
+            onClick={handleNewConversation}
+            disabled={turns.length === 0}
+            aria-label='New conversation'
+            sx={{
+              width: 30,
+              height: 30,
+              borderRadius: 1,
+              border: `1px solid ${designTokens.border}`,
+              background: designTokens.surface,
+              color: designTokens.text,
+              '&:hover': { borderColor: designTokens.borderStrong },
+            }}
+          >
+            <AddRounded sx={{ fontSize: 16 }} />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
       {/* thread / states */}
@@ -559,13 +555,13 @@ function RouteComponent() {
             historyOk={historyOk}
             historyCollection={selectedModel?.history_collection}
             hasEmbedding={Boolean(embeddingField)}
-            collectionName={collectionName}
+            collectionName={collectionId}
             onConfigureEmbedding={
-              collectionName
+              collectionId
                 ? () =>
                     navigate({
                       to: '/collections/$collectionId/config' as never,
-                      params: { collectionId: collectionName } as never,
+                      params: { collectionId: collectionId } as never,
                     })
                 : undefined
             }
@@ -579,7 +575,7 @@ function RouteComponent() {
         ) : turns.length === 0 ? (
           <EmptyState
             model={modelId}
-            collection={collectionName}
+            collection={collectionId}
             onPick={(q) => setInput(q)}
           />
         ) : (
@@ -599,7 +595,7 @@ function RouteComponent() {
                   key={t.key}
                   turn={t}
                   model={modelId}
-                  collection={collectionName}
+                  collection={collectionId}
                   onRetry={() => retryTurn(t)}
                 />
               ),
@@ -649,7 +645,7 @@ function RouteComponent() {
                   ? 'Configure a conversation model to begin…'
                   : needsSetup
                     ? 'Finish setup to start a conversation…'
-                    : `Ask a question about ${collectionName}…`
+                    : `Ask a question about ${collectionId}…`
               }
               value={input}
               disabled={noModel || needsSetup}

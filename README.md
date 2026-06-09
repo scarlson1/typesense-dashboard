@@ -317,6 +317,7 @@ This is an independent project. It's not associated with [typesense.org](https:/
 - Map zoom to bounds on load
 - theme matching toasts
 - use version from context for docs links ??
+- refactor conversational search to be a third option alongside grid & map views
 - create collection missing `embed.from` ?? [docs](https://typesense.org/docs/30.2/api/vector-search.html#creating-an-auto-embedding-field)
 
 ```typescript

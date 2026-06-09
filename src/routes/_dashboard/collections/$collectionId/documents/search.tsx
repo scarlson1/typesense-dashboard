@@ -16,7 +16,12 @@ import {
   useTypesenseClient,
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { AddRounded, GridViewRounded, MapRounded } from '@mui/icons-material';
+import {
+  AddRounded,
+  ChatBubbleOutlineRounded,
+  GridViewRounded,
+  MapRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -302,7 +307,11 @@ function ViewToggleButtons() {
   const navigate = Route.useNavigate();
   const location = useLocation();
   const [view, setView] = useState(() =>
-    location.pathname.includes('map') ? 'map' : 'grid',
+    location.pathname.includes('map')
+      ? 'map'
+      : location.pathname.includes('chat')
+        ? 'chat'
+        : 'grid',
   );
 
   const { geoFieldOptions } = useDefaultIndexParams();
@@ -312,7 +321,7 @@ function ViewToggleButtons() {
     (_: MouseEvent<HTMLElement>, nextView: string) => {
       if (!nextView) return;
       setView(nextView);
-      navigate({ to: nextView === 'map' ? 'map' : '.' });
+      navigate({ to: nextView === 'grid' ? '.' : nextView });
     },
     [navigate],
   );
@@ -368,6 +377,24 @@ function ViewToggleButtons() {
           }}
         >
           Map
+        </Typography>
+      </ToggleButton>
+      <ToggleButton
+        value='chat'
+        aria-label='conversational search'
+        disabled={!enableMap}
+      >
+        <ChatBubbleOutlineRounded fontSize='inherit' sx={{ mr: 0.5 }} />
+        <Typography
+          component='span'
+          variant='body2'
+          sx={{
+            display: { xs: 'none', lg: 'block' },
+            fontSize: '0.675rem',
+            fontWeight: 600,
+          }}
+        >
+          Chat
         </Typography>
       </ToggleButton>
     </ToggleButtonGroup>

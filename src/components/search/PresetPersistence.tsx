@@ -42,7 +42,9 @@ export function PresetPersistence({ collectionId }: PresetPersistenceProps) {
   useEffect(() => {
     if (preset) return;
     if (!presets?.length) return;
-    if (getStoredPreset()) return;
+    // '' (explicitly cleared) suppresses the default; only an absent key
+    // (null, never chosen) auto-selects the first preset.
+    if (getStoredPreset() !== null) return;
     setPreset(presets[0].name);
   }, [preset, presets, getStoredPreset, setPreset]);
 

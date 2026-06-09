@@ -76,6 +76,7 @@ const SearchParamsFormFields = ({
   facetByOptions,
   groupByOptions,
   submitButtonText,
+  onClear,
 }: SearchParamsFormFieldsProps) => {
   const presetOptions = useMemo(() => presets.map((p) => p.name), [presets]);
   const formValues = useStore(form.store, (state) => state.values);
@@ -128,7 +129,8 @@ const SearchParamsFormFields = ({
     form.setFieldValue('facet_by', []);
     form.setFieldValue('group_by', []);
     form.setFieldValue('other_params', [NEW_EMPTY_OTHER_PARAM]);
-  }, [form.setFieldValue, queryByOptions]);
+    onClear?.();
+  }, [form.setFieldValue, queryByOptions, onClear]);
 
   const queryByValues = useMemo(
     () => (formValues.query_by as string[]).filter(Boolean),
@@ -454,6 +456,7 @@ export const SearchParamsForm = withForm({
     facetByOptions: [] as string[],
     groupByOptions: [] as string[],
     submitButtonText: 'Save as preset',
+    onClear: undefined as (() => void) | undefined,
   },
   render: (props) => <SearchParamsFormFields {...props} />,
 });

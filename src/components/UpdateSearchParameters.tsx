@@ -18,7 +18,7 @@ import {
 import { Box } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import type {
   DocumentSchema,
   SearchParams,
@@ -49,7 +49,7 @@ export function UpdateSearchParameters({
     facetByOptions,
     groupByOptions,
   } = useDefaultIndexParams();
-  const { getStoredPreset } = useCollectionSearchPreset(
+  const { getStoredPreset, setStoredPreset } = useCollectionSearchPreset(
     clusterId,
     collectionId,
   );
@@ -178,6 +178,13 @@ export function UpdateSearchParameters({
     queryByOptions,
   ]);
 
+  // explicit Clear: drop the active preset and persist a "cleared" sentinel so
+  // it stays cleared on return (rather than auto-defaulting or restoring it)
+  const onClear = useCallback(() => {
+    setPreset(null);
+    setStoredPreset('');
+  }, [setPreset, setStoredPreset]);
+
   return (
     <Box
       component='form'
@@ -196,6 +203,7 @@ export function UpdateSearchParameters({
         facetByOptions={facetByOptions}
         groupByOptions={groupByOptions}
         submitButtonText='Save as preset'
+        onClear={onClear}
       />
     </Box>
   );

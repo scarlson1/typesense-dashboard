@@ -35,6 +35,7 @@ import { Route as DashboardCollectionsCollectionIdDocumentsExportRouteImport } f
 import { Route as DashboardCollectionsCollectionIdDocumentsDocumentIdRouteImport } from './routes/_dashboard/collections/$collectionId/documents/$documentId'
 import { Route as DashboardCollectionsCollectionIdDocumentsSearchIndexRouteImport } from './routes/_dashboard/collections/$collectionId/documents/search.index'
 import { Route as DashboardCollectionsCollectionIdDocumentsSearchMapRouteImport } from './routes/_dashboard/collections/$collectionId/documents/search.map'
+import { Route as DashboardCollectionsCollectionIdDocumentsSearchChatRouteImport } from './routes/_dashboard/collections/$collectionId/documents/search.chat'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -177,6 +178,12 @@ const DashboardCollectionsCollectionIdDocumentsSearchMapRoute =
     path: '/map',
     getParentRoute: () => DashboardCollectionsCollectionIdDocumentsSearchRoute,
   } as any)
+const DashboardCollectionsCollectionIdDocumentsSearchChatRoute =
+  DashboardCollectionsCollectionIdDocumentsSearchChatRouteImport.update({
+    id: '/chat',
+    path: '/chat',
+    getParentRoute: () => DashboardCollectionsCollectionIdDocumentsSearchRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
   '/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
   '/collections/$collectionId/documents/search': typeof DashboardCollectionsCollectionIdDocumentsSearchRouteWithChildren
+  '/collections/$collectionId/documents/search/chat': typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   '/collections/$collectionId/documents/search/map': typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   '/collections/$collectionId/documents/search/': typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
@@ -228,6 +236,7 @@ export interface FileRoutesByTo {
   '/collections/$collectionId/documents/$documentId': typeof DashboardCollectionsCollectionIdDocumentsDocumentIdRoute
   '/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
   '/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
+  '/collections/$collectionId/documents/search/chat': typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   '/collections/$collectionId/documents/search/map': typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   '/collections/$collectionId/documents/search': typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
@@ -257,6 +266,7 @@ export interface FileRoutesById {
   '/_dashboard/collections/$collectionId/documents/export': typeof DashboardCollectionsCollectionIdDocumentsExportRoute
   '/_dashboard/collections/$collectionId/documents/new': typeof DashboardCollectionsCollectionIdDocumentsNewRoute
   '/_dashboard/collections/$collectionId/documents/search': typeof DashboardCollectionsCollectionIdDocumentsSearchRouteWithChildren
+  '/_dashboard/collections/$collectionId/documents/search/chat': typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   '/_dashboard/collections/$collectionId/documents/search/map': typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   '/_dashboard/collections/$collectionId/documents/search/': typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/collections/$collectionId/documents/export'
     | '/collections/$collectionId/documents/new'
     | '/collections/$collectionId/documents/search'
+    | '/collections/$collectionId/documents/search/chat'
     | '/collections/$collectionId/documents/search/map'
     | '/collections/$collectionId/documents/search/'
   fileRoutesByTo: FileRoutesByTo
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/collections/$collectionId/documents/$documentId'
     | '/collections/$collectionId/documents/export'
     | '/collections/$collectionId/documents/new'
+    | '/collections/$collectionId/documents/search/chat'
     | '/collections/$collectionId/documents/search/map'
     | '/collections/$collectionId/documents/search'
   id:
@@ -340,6 +352,7 @@ export interface FileRouteTypes {
     | '/_dashboard/collections/$collectionId/documents/export'
     | '/_dashboard/collections/$collectionId/documents/new'
     | '/_dashboard/collections/$collectionId/documents/search'
+    | '/_dashboard/collections/$collectionId/documents/search/chat'
     | '/_dashboard/collections/$collectionId/documents/search/map'
     | '/_dashboard/collections/$collectionId/documents/search/'
   fileRoutesById: FileRoutesById
@@ -534,16 +547,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchMapRouteImport
       parentRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchRoute
     }
+    '/_dashboard/collections/$collectionId/documents/search/chat': {
+      id: '/_dashboard/collections/$collectionId/documents/search/chat'
+      path: '/chat'
+      fullPath: '/collections/$collectionId/documents/search/chat'
+      preLoaderRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchChatRouteImport
+      parentRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchRoute
+    }
   }
 }
 
 interface DashboardCollectionsCollectionIdDocumentsSearchRouteChildren {
+  DashboardCollectionsCollectionIdDocumentsSearchChatRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchChatRoute
   DashboardCollectionsCollectionIdDocumentsSearchMapRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchMapRoute
   DashboardCollectionsCollectionIdDocumentsSearchIndexRoute: typeof DashboardCollectionsCollectionIdDocumentsSearchIndexRoute
 }
 
 const DashboardCollectionsCollectionIdDocumentsSearchRouteChildren: DashboardCollectionsCollectionIdDocumentsSearchRouteChildren =
   {
+    DashboardCollectionsCollectionIdDocumentsSearchChatRoute:
+      DashboardCollectionsCollectionIdDocumentsSearchChatRoute,
     DashboardCollectionsCollectionIdDocumentsSearchMapRoute:
       DashboardCollectionsCollectionIdDocumentsSearchMapRoute,
     DashboardCollectionsCollectionIdDocumentsSearchIndexRoute:

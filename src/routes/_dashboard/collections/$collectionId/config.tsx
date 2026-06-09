@@ -1,17 +1,17 @@
 import { ErrorFallback } from '@/components';
-import { MobileCollectionScopeStrip } from '@/components/redesign';
-import { SchemaCardView } from '@/components/SchemaCardView';
-import { SchemaFieldEditDialog } from '@/components/SchemaFieldEditDialog';
-import { SchemaTableView } from '@/components/SchemaTableView';
 import {
   Badge,
   CollectionTabBar,
   dangerButtonSx,
+  MobileCollectionScopeStrip,
   PageHeader,
   primaryButtonSx,
   SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
+import { SchemaCardView } from '@/components/SchemaCardView';
+import { SchemaFieldEditDialog } from '@/components/SchemaFieldEditDialog';
+import { SchemaTableView } from '@/components/SchemaTableView';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
 import {
   useAsyncToast,
@@ -215,30 +215,13 @@ function CollectionSettings() {
                 startIcon={<AddRounded sx={{ fontSize: 16 }} />}
                 sx={{
                   ...primaryButtonSx,
-                  display: { xs: 'inline-flex', md: 'none' },
+                  // display: { xs: 'inline-flex', md: 'none' },
                 }}
                 onClick={() => setAddingField(true)}
               >
                 Field
               </Button>
             ) : null}
-            <Button
-              variant='contained'
-              size='small'
-              startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
-              sx={{
-                ...primaryButtonSx,
-                display: {
-                  xs: view === 'json' ? 'inline-flex' : 'none',
-                  md: 'inline-flex',
-                },
-              }}
-              onClick={() => handleUpdateSchema()}
-              loading={mutation.isPending}
-              disabled={Boolean(markers.length)}
-            >
-              Save schema
-            </Button>
           </>
         }
       />
@@ -263,7 +246,14 @@ function CollectionSettings() {
       >
         <Box sx={{ minWidth: 0 }}>
           <SectionCard noBodyPadding>
-            <SchemaViewTabs view={view} onChange={setView} onCopyJSON={handleCopyJSON} />
+            <SchemaViewTabs
+              view={view}
+              onChange={setView}
+              onCopyJSON={handleCopyJSON}
+              isPending={mutation.isPending}
+              saveDisabled={Boolean(markers.length)}
+              updateSchema={handleUpdateSchema}
+            />
             <Box
               sx={{
                 borderRadius: 0,
@@ -341,10 +331,16 @@ function SchemaViewTabs({
   view,
   onChange,
   onCopyJSON,
+  isPending,
+  saveDisabled,
+  updateSchema,
 }: {
   view: SchemaView;
   onChange: (next: SchemaView) => void;
   onCopyJSON: () => void;
+  isPending: boolean;
+  saveDisabled: boolean;
+  updateSchema: () => void;
 }) {
   return (
     <Stack
@@ -386,6 +382,28 @@ function SchemaViewTabs({
         );
       })}
       <Box sx={{ flex: 1 }} />
+
+      {view === 'json' ? (
+        <Button
+          variant='contained'
+          size='small'
+          startIcon={<CheckRounded sx={{ fontSize: 14 }} />}
+          sx={{
+            ...primaryButtonSx,
+            height: 28,
+            // display: {
+            //   xs: view === 'json' ? 'inline-flex' : 'none',
+            //   md: 'inline-flex',
+            // },
+          }}
+          onClick={() => updateSchema()}
+          loading={isPending}
+          disabled={Boolean(saveDisabled)}
+        >
+          Save schema
+        </Button>
+      ) : null}
+
       <Tooltip title='Copy as JSON'>
         <IconButton
           size='small'

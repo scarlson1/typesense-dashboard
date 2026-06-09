@@ -39,7 +39,7 @@ export const collectionFieldForm = z
     range_index: z.boolean(), // .optional(), // .default(false), // .optional(), // TODO: only if number type ??
     stem: z.boolean(), // .optional(),
   })
-  .and(z.record(z.string(), z.unknown()));
+  .loose();
 
 export const languageCodes = z.enum([
   'ar',
@@ -100,14 +100,12 @@ export const collectionField = z
     embed: z
       .object({
         from: z.array(z.string()),
-        model_config: z
-          .object({ model_name: z.string() })
-          .and(z.record(z.string(), z.unknown())),
+        model_config: z.object({ model_name: z.string() }).loose(),
       })
       .optional(),
     hnsw_params: z.record(z.string(), z.unknown()).optional(),
   })
-  .and(z.record(z.string(), z.unknown()));
+  .loose();
 
 export const createCollectionSchema = z.object({
   name: z.string(),
@@ -122,10 +120,18 @@ export const createCollectionSchema = z.object({
       model_name: z.string().optional(),
     })
     .optional(),
+  truncate_len: z.number().optional(),
+  curation_sets: z.array(z.string()).optional(),
+  synonym_sets: z.array(z.string()).optional(),
 });
 
-export const collectionSchema = createCollectionSchema.extend({
-  created_at: z.number().optional(),
-  num_documents: z.number().optional(),
-});
+export const collectionSchema = createCollectionSchema
+  .extend({
+    created_at: z.number().optional(),
+    num_documents: z.number().optional(),
+  })
+  // Typesense returns server-managed keys (e.g. curation_sets, synonym_sets)
+  // that we don't model; allow them so the JSON editor doesn't flag the live
+  // schema as invalid and disable the Save button.
+  .loose();
 export type CollectionSchema = z.infer<typeof collectionSchema>;

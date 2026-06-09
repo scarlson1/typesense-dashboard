@@ -28,10 +28,11 @@ export function useCollectionSearchPreset(
   const setStoredPreset = useCallback(
     (presetName: string | null) => {
       try {
-        if (presetName) {
-          localStorage.setItem(storageKey(clusterId, collectionId), presetName);
-        } else {
+        if (presetName === null) {
           localStorage.removeItem(storageKey(clusterId, collectionId));
+        } else {
+          // '' is an explicit "cleared" sentinel, distinct from an absent key
+          localStorage.setItem(storageKey(clusterId, collectionId), presetName);
         }
       } catch {
         // ignore

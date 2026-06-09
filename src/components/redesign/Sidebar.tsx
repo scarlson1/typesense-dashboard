@@ -493,11 +493,6 @@ export function Sidebar() {
         <Typography sx={headerLabelSx}>Cluster</Typography>
 
         <SidebarLink
-          to='/conversational-search'
-          icon={<ChatBubbleOutlineRounded fontSize='small' />}
-          label='Conversational search'
-        />
-        <SidebarLink
           to='/keys'
           icon={<KeyRounded fontSize='small' />}
           label='API keys'

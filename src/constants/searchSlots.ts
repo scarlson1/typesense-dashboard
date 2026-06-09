@@ -30,10 +30,12 @@ export const SEARCH_DEFAULT_SLOTS: SearchSlotComponents = {
 
 export const SEARCH_DEFAULT_SLOT_PROPS: SearchSlotProps = {
   noHitsFound: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 200,
+    sx: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: 200,
+    },
   },
   hits: {
     // direction: 'column',
