@@ -10,7 +10,7 @@ import {
 } from '@/constants';
 import {
   compactMonoInputSx as compactInputSx,
-  sectionLabelSx as labelSx,
+  fieldLabelSx as labelSx,
 } from '@/constants/redesignSx';
 import { useTypesenseClient, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -75,192 +75,203 @@ export const AnalyticsRuleFormV30 = withForm({
     const isCounterOrLogs = ruleType === 'counter' || ruleType === 'log';
 
     return (
-      <Box>
+      <Stack direction='column' spacing={2}>
         {/* Rule type grid */}
-        <Typography sx={labelSx}>Rule type</Typography>
-        <form.Field
-          name='type'
-          listeners={{
-            onChange: ({ value }) => {
-              // https://github.com/TanStack/form/issues/1874
+        <Box>
+          <Typography sx={labelSx}>Rule type</Typography>
+          <form.Field
+            name='type'
+            listeners={{
+              onChange: ({ value }) => {
+                // https://github.com/TanStack/form/issues/1874
 
-              // Reset to the first valid event_type for the new rule type so a stale
-              // 'click' from a previous counter/log selection can't ship with a query rule.
-              form.setFieldValue(
-                'event_type',
-                analyticsRuleUiConfigV30[value].eventTypes[0],
-              );
-
-              // Clear submit errors for the now-irrelevant field
-              if (value === 'log' || value === 'counter') {
-                form.setFieldMeta('params.limit', (prev) => ({
-                  ...prev,
-                  errorMap: { ...prev.errorMap, onSubmit: undefined },
-                  errorSourceMap: {
-                    ...prev.errorSourceMap,
-                    onSubmit: undefined,
-                  },
-                }));
-                form.setFieldMeta('params.meta_fields', (prev) => ({
-                  ...prev,
-                  errorMap: { ...prev.errorMap, onSubmit: undefined },
-                  errorSourceMap: {
-                    ...prev.errorSourceMap,
-                    onSubmit: undefined,
-                  },
-                }));
-                form.setFieldMeta('params.expand_query', (prev) => ({
-                  ...prev,
-                  errorMap: { ...prev.errorMap, onSubmit: undefined },
-                  errorSourceMap: {
-                    ...prev.errorSourceMap,
-                    onSubmit: undefined,
-                  },
-                }));
-              }
-              form.setFieldValue('event_type', eventTypesByRuleType[value][0]);
-            },
-          }}
-        >
-          {({ state, handleChange }: any) => (
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 0.75,
-                mb: 1.5,
-              }}
-            >
-              {RULE_TYPES.map((t) => {
-                const active = state.value === t;
-                return (
-                  <Box
-                    key={t}
-                    component='button'
-                    type='button'
-                    onClick={() => handleChange(t)}
-                    sx={{
-                      py: 1,
-                      px: 1.25,
-                      borderRadius: '5px',
-                      fontSize: 11.5,
-                      fontFamily: designTokens.fontMono,
-                      textAlign: 'left',
-                      border: `1px solid ${active ? designTokens.accentBorder : designTokens.border}`,
-                      background: active
-                        ? designTokens.accentSoft
-                        : designTokens.surface,
-                      color: active
-                        ? designTokens.accentDeep
-                        : designTokens.text,
-                      cursor: 'pointer',
-                      font: 'inherit',
-                      fontWeight: active ? 600 : 400,
-                      transition: 'all 120ms ease',
-                      '&:hover': {
-                        borderColor: active
-                          ? designTokens.accentBorder
-                          : designTokens.borderStrong,
-                      },
-                    }}
-                  >
-                    {t}
-                  </Box>
+                // Reset to the first valid event_type for the new rule type so a stale
+                // 'click' from a previous counter/log selection can't ship with a query rule.
+                form.setFieldValue(
+                  'event_type',
+                  analyticsRuleUiConfigV30[value].eventTypes[0],
                 );
-              })}
-            </Box>
-          )}
-        </form.Field>
+
+                // Clear submit errors for the now-irrelevant field
+                if (value === 'log' || value === 'counter') {
+                  form.setFieldMeta('params.limit', (prev) => ({
+                    ...prev,
+                    errorMap: { ...prev.errorMap, onSubmit: undefined },
+                    errorSourceMap: {
+                      ...prev.errorSourceMap,
+                      onSubmit: undefined,
+                    },
+                  }));
+                  form.setFieldMeta('params.meta_fields', (prev) => ({
+                    ...prev,
+                    errorMap: { ...prev.errorMap, onSubmit: undefined },
+                    errorSourceMap: {
+                      ...prev.errorSourceMap,
+                      onSubmit: undefined,
+                    },
+                  }));
+                  form.setFieldMeta('params.expand_query', (prev) => ({
+                    ...prev,
+                    errorMap: { ...prev.errorMap, onSubmit: undefined },
+                    errorSourceMap: {
+                      ...prev.errorSourceMap,
+                      onSubmit: undefined,
+                    },
+                  }));
+                }
+                form.setFieldValue(
+                  'event_type',
+                  eventTypesByRuleType[value][0],
+                );
+              },
+            }}
+          >
+            {({ state, handleChange }: any) => (
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 0.75,
+                  mb: 1.5,
+                }}
+              >
+                {RULE_TYPES.map((t) => {
+                  const active = state.value === t;
+                  return (
+                    <Box
+                      key={t}
+                      component='button'
+                      type='button'
+                      onClick={() => handleChange(t)}
+                      sx={{
+                        py: 1,
+                        px: 1.25,
+                        borderRadius: '5px',
+                        fontSize: 11.5,
+                        fontFamily: designTokens.fontMono,
+                        textAlign: 'left',
+                        border: `1px solid ${active ? designTokens.accentBorder : designTokens.border}`,
+                        background: active
+                          ? designTokens.accentSoft
+                          : designTokens.surface,
+                        color: active
+                          ? designTokens.accentDeep
+                          : designTokens.text,
+                        cursor: 'pointer',
+                        font: 'inherit',
+                        fontWeight: active ? 600 : 400,
+                        transition: 'all 120ms ease',
+                        '&:hover': {
+                          borderColor: active
+                            ? designTokens.accentBorder
+                            : designTokens.borderStrong,
+                        },
+                      }}
+                    >
+                      {t}
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
+          </form.Field>
+        </Box>
 
         {/* Name */}
-        <Typography sx={labelSx}>Name</Typography>
-        <form.AppField name='name'>
-          {({ state, handleChange, handleBlur }) => (
-            <MuiTextField
-              value={state.value}
-              onChange={(e) => handleChange(e.target.value)}
-              onBlur={handleBlur}
-              placeholder='suggested_searches'
-              fullWidth
-              size='small'
-              required
-              error={state.meta.isTouched && !state.meta.isValid}
-              sx={compactInputSx}
-            />
-          )}
-        </form.AppField>
+        <Box>
+          <Typography sx={labelSx}>Name</Typography>
+          <form.AppField name='name'>
+            {({ state, handleChange, handleBlur }) => (
+              <MuiTextField
+                value={state.value}
+                onChange={(e) => handleChange(e.target.value)}
+                onBlur={handleBlur}
+                placeholder='suggested_searches'
+                fullWidth
+                size='small'
+                required
+                error={state.meta.isTouched && !state.meta.isValid}
+                sx={compactInputSx}
+              />
+            )}
+          </form.AppField>
+        </Box>
 
         {/* Source collection */}
-        <Typography sx={labelSx}>Source collection</Typography>
-        <form.Field name='collection'>
-          {({ state, handleChange, handleBlur }: any) => (
-            <Autocomplete
-              freeSolo
-              options={sourceOptions}
-              size='small'
-              value={state.value}
-              onChange={(_, newVal) => handleChange(newVal)}
-              renderInput={(params) => (
-                <MuiTextField
-                  {...params}
-                  onBlur={handleBlur}
-                  placeholder='select collections…'
-                  required
-                  sx={compactInputSx}
-                />
-              )}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: `1px solid ${designTokens.border}`,
-                    fontFamily: designTokens.fontMono,
-                    fontSize: 12.5,
+        <Box>
+          <Typography sx={labelSx}>Source collection</Typography>
+          <form.Field name='collection'>
+            {({ state, handleChange, handleBlur }: any) => (
+              <Autocomplete
+                freeSolo
+                options={sourceOptions}
+                size='small'
+                value={state.value}
+                onChange={(_, newVal) => handleChange(newVal)}
+                renderInput={(params) => (
+                  <MuiTextField
+                    {...params}
+                    onBlur={handleBlur}
+                    placeholder='select collections…'
+                    required
+                    sx={compactInputSx}
+                  />
+                )}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      border: `1px solid ${designTokens.border}`,
+                      fontFamily: designTokens.fontMono,
+                      fontSize: 12.5,
+                    },
                   },
-                },
-              }}
-            />
-          )}
-        </form.Field>
+                }}
+              />
+            )}
+          </form.Field>
+        </Box>
 
         {/* Destination collection */}
-        <Typography sx={labelSx}>Destination collection</Typography>
-        <form.Field name='params.destination_collection'>
-          {({ state, handleChange, handleBlur }: any) => (
-            <Autocomplete
-              freeSolo
-              options={destinationOptions}
-              size='small'
-              value={state.value ?? ''}
-              onChange={(_, newVal) =>
-                handleChange(typeof newVal === 'string' ? newVal : '')
-              }
-              onInputChange={(_, newVal, reason) => {
-                if (reason === 'input') handleChange(newVal);
-              }}
-              renderInput={(params) => (
-                <MuiTextField
-                  {...params}
-                  onBlur={handleBlur}
-                  placeholder='queries_suggestions'
-                  sx={compactInputSx}
-                />
-              )}
-              slotProps={{
-                paper: {
-                  sx: {
-                    border: `1px solid ${designTokens.border}`,
-                    fontFamily: designTokens.fontMono,
-                    fontSize: 12.5,
+        <Box>
+          <Typography sx={labelSx}>Destination collection</Typography>
+          <form.Field name='params.destination_collection'>
+            {({ state, handleChange, handleBlur }: any) => (
+              <Autocomplete
+                freeSolo
+                options={destinationOptions}
+                size='small'
+                value={state.value ?? ''}
+                onChange={(_, newVal) =>
+                  handleChange(typeof newVal === 'string' ? newVal : '')
+                }
+                onInputChange={(_, newVal, reason) => {
+                  if (reason === 'input') handleChange(newVal);
+                }}
+                renderInput={(params) => (
+                  <MuiTextField
+                    {...params}
+                    onBlur={handleBlur}
+                    placeholder='queries_suggestions'
+                    sx={compactInputSx}
+                  />
+                )}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      border: `1px solid ${designTokens.border}`,
+                      fontFamily: designTokens.fontMono,
+                      fontSize: 12.5,
+                    },
                   },
-                },
-              }}
-            />
-          )}
-        </form.Field>
+                }}
+              />
+            )}
+          </form.Field>
+        </Box>
 
         {/* Event type - 'search' is only option for popular_queries and nohits_queries */}
         {!analyticsRuleUiConfigV30[ruleType].eventTypeFixed ? (
-          <>
+          <Box>
             <Typography sx={labelSx}>Event Type</Typography>
             <form.AppField name='event_type'>
               {({ state, handleChange, handleBlur }) => (
@@ -283,7 +294,7 @@ export const AnalyticsRuleFormV30 = withForm({
                 </MuiTextField>
               )}
             </form.AppField>
-          </>
+          </Box>
         ) : null}
 
         {!isCounterOrLogs ? (
@@ -535,7 +546,7 @@ export const AnalyticsRuleFormV30 = withForm({
             )}
           </form.Subscribe>
         </form.AppForm>
-      </Box>
+      </Stack>
     );
   },
 });

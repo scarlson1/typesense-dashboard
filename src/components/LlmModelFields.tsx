@@ -3,7 +3,7 @@
 // parent owns state and supplies the provider-specific `fields` mapping, since
 // NL models and conversation models accept different field sets.
 
-import { fieldInputSx, sectionLabelSx } from '@/constants/redesignSx';
+import { fieldInputSx, fieldLabelSx } from '@/constants/redesignSx';
 import {
   getLlmProvider,
   LLM_PROVIDERS,
@@ -15,7 +15,7 @@ import { designTokens } from '@/theme/themePrimitives';
 import { Box, InputAdornment, MenuItem, Stack, TextField } from '@mui/material';
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <Box component='div' sx={sectionLabelSx}>
+  <Box component='div' sx={fieldLabelSx}>
     {children}
   </Box>
 );

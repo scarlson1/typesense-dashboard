@@ -213,25 +213,6 @@ export function Sidebar() {
     return collections.length ? collections[0].name : '';
   });
 
-  const prevCollection = usePrevious(selectedCollection);
-  useEffect(() => {
-    const match = matches.find((m) => m.fullPath.includes('$collectionId'));
-    if (
-      selectedCollection &&
-      prevCollection !== null &&
-      selectedCollection !== prevCollection &&
-      match?.fullPath &&
-      // @ts-expect-error match params shape varies
-      match?.params?.collectionId !== selectedCollection
-    ) {
-      navigate({
-        // @ts-expect-error route type
-        to: match.fullPath,
-        params: { collectionId: selectedCollection },
-      });
-    }
-  }, [navigate, prevCollection, matches, selectedCollection]);
-
   const prevClusterId = usePrevious(clusterId);
   useEffect(() => {
     if (clusterId !== prevClusterId && prevClusterId) {
@@ -243,6 +224,41 @@ export function Sidebar() {
       }
     }
   }, [collections, clusterId, prevClusterId, getParamCollectionId]);
+
+  // Route is the single source of truth: when a collection is in the URL
+  // (e.g. selecting a row in the collections table, or any external nav),
+  // mirror it into the picker. State→route is handled imperatively in the
+  // picker's onChange below, so the two never fight in an effect loop.
+  const paramCollectionId = getParamCollectionId();
+  useEffect(() => {
+    if (
+      paramCollectionId &&
+      paramCollectionId !== selectedCollection &&
+      collections.some((c) => c.name === paramCollectionId)
+    ) {
+      setSelectedCollection(paramCollectionId);
+    }
+  }, [paramCollectionId, selectedCollection, collections]);
+
+  const handleSelectCollection = useCallback(
+    (name: string) => {
+      // On a collection route, switch collections by navigating (keeping the
+      // same sub-page); the sync effect above then mirrors the new param back
+      // into state. Off a collection route there's nothing to navigate to, so
+      // just remember the choice for the nested links.
+      const match = matches.find((m) => m.fullPath.includes('$collectionId'));
+      if (name && match?.fullPath && 'collectionId' in (match.params ?? {})) {
+        navigate({
+          // @ts-expect-error route type
+          to: match.fullPath,
+          params: { collectionId: name },
+        });
+      } else {
+        setSelectedCollection(name);
+      }
+    },
+    [navigate, matches],
+  );
 
   // Note: design's "Workspace" grouping puts search/curation/etc under
   // Collections. We preserve current route layout but mirror that grouping.
@@ -384,7 +400,7 @@ export function Sidebar() {
             <Select
               value={selectedCollection}
               onChange={(e: SelectChangeEvent) =>
-                setSelectedCollection(e.target.value)
+                handleSelectCollection(e.target.value)
               }
               displayEmpty
               size='small'

@@ -26,6 +26,7 @@ import {
   RefreshRounded,
   SendRounded,
   SettingsRounded,
+  StopRounded,
   WarningAmberRounded,
 } from '@mui/icons-material';
 import {
@@ -40,7 +41,7 @@ import {
   useMediaQuery,
   type Theme,
 } from '@mui/material';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
   useEffect,
@@ -48,6 +49,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type ReactNode,
 } from 'react';
 import type {
   DocumentSchema,
@@ -73,9 +75,11 @@ interface Turn {
   key: string;
   role: 'user' | 'assistant';
   content: string;
-  status?: 'pending' | 'done' | 'error';
+  status?: 'pending' | 'streaming' | 'done' | 'error';
   sources?: Source[];
   error?: string;
+  /** The user question this assistant turn answers (for Retry). */
+  question?: string;
 }
 
 const TITLE_FIELDS = ['name', 'title', 'heading', 'label'];
@@ -213,53 +217,148 @@ function RouteComponent() {
     });
   }, [turns]);
 
-  const mutation = useMutation({
-    mutationFn: async (vars: { q: string; asstKey: string }) => {
-      const res = (await client
-        .collections(collectionName)
-        .documents()
-        .search({
-          q: vars.q,
-          query_by: embeddingField as string,
-          conversation: true,
-          conversation_model_id: modelId,
-          exclude_fields: embeddingField as string,
-          per_page: 5,
-          ...(conversationId ? { conversation_id: conversationId } : {}),
-        } as Record<string, unknown>)) as SearchResponse<DocumentSchema>;
-      return res;
-    },
-    onSuccess: (res, vars) => {
-      const answer = res.conversation?.answer ?? '(no answer returned)';
-      const sources = (res.hits ?? []).map((h) =>
-        hitToSource(h as unknown as { document: Record<string, unknown>; vector_distance?: number }),
+  const abortRef = useRef<AbortController | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const updateTurn = (key: string, patch: Partial<Turn>) =>
+    setTurns((prev) => prev.map((t) => (t.key === key ? { ...t, ...patch } : t)));
+
+  // Non-streaming fallback (used if streaming fails before any tokens arrive).
+  const fetchOnce = async (q: string) =>
+    (await client
+      .collections(collectionName)
+      .documents()
+      .search({
+        q,
+        query_by: embeddingField as string,
+        conversation: true,
+        conversation_model_id: modelId,
+        exclude_fields: embeddingField as string,
+        per_page: 5,
+        ...(conversationId ? { conversation_id: conversationId } : {}),
+      } as Record<string, unknown>)) as SearchResponse<DocumentSchema>;
+
+  const runConversation = async (q: string, asstKey: string) => {
+    if (!embeddingField || !modelId) return;
+    setBusy(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    let displayed = '';
+    let finalHits: unknown[] | undefined;
+    let finalConv: SearchResponse<DocumentSchema>['conversation'] | undefined;
+
+    try {
+      const node = client.configuration.nodes[0] as {
+        protocol: string;
+        host: string;
+        port: number | string;
+      };
+      const params = new URLSearchParams({
+        q,
+        query_by: embeddingField,
+        conversation: 'true',
+        conversation_stream: 'true',
+        conversation_model_id: modelId,
+        exclude_fields: embeddingField,
+        per_page: '5',
+      });
+      if (conversationId) params.set('conversation_id', conversationId);
+
+      const res = await fetch(
+        `${node.protocol}://${node.host}:${node.port}/collections/${encodeURIComponent(
+          collectionName,
+        )}/documents/search?${params.toString()}`,
+        {
+          headers: { 'X-TYPESENSE-API-KEY': client.configuration.apiKey },
+          signal: controller.signal,
+        },
       );
-      if (res.conversation?.conversation_id)
-        setConversationId(res.conversation.conversation_id);
-      setTurns((prev) =>
-        prev.map((t) =>
-          t.key === vars.asstKey
-            ? { ...t, content: answer, sources, status: 'done' }
-            : t,
+      if (!res.ok || !res.body) throw new Error(`Search failed (HTTP ${res.status})`);
+
+      updateTurn(asstKey, { status: 'streaming' });
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split('\n\n');
+        buffer = events.pop() ?? '';
+        for (const evt of events) {
+          const dataLine = evt.split('\n').find((l) => l.startsWith('data:'));
+          if (!dataLine) continue;
+          const data = dataLine.slice(5).trim();
+          if (!data || data === '[DONE]') continue;
+          let obj: Record<string, unknown>;
+          try {
+            obj = JSON.parse(data);
+          } catch {
+            continue;
+          }
+          const conv = obj.conversation as typeof finalConv;
+          const frag = (conv?.answer ??
+            (obj.message as string) ??
+            (obj.answer as string)) as string | undefined;
+          if (typeof frag === 'string' && frag) {
+            // Handle both cumulative and token-delta stream shapes.
+            displayed = frag.startsWith(displayed) ? frag : displayed + frag;
+            updateTurn(asstKey, { content: displayed });
+          }
+          if (Array.isArray(obj.hits)) finalHits = obj.hits;
+          if (conv) finalConv = conv;
+        }
+      }
+
+      // Stream produced nothing usable → fall through to the non-streaming path.
+      if (!displayed && !finalConv?.answer) throw new Error('empty-stream');
+
+      if (finalConv?.conversation_id) setConversationId(finalConv.conversation_id);
+      updateTurn(asstKey, {
+        content: displayed || finalConv?.answer || '(no answer returned)',
+        sources: (finalHits ?? []).map((h) =>
+          hitToSource(h as { document: Record<string, unknown>; vector_distance?: number }),
         ),
-      );
-    },
-    onError: (err: Error, vars) => {
-      setTurns((prev) =>
-        prev.map((t) =>
-          t.key === vars.asstKey
-            ? { ...t, status: 'error', error: err.message }
-            : t,
-        ),
-      );
-    },
-  });
+        status: 'done',
+      });
+    } catch (err) {
+      if (controller.signal.aborted) {
+        updateTurn(asstKey, { status: 'done', content: displayed || '(stopped)' });
+      } else if (displayed) {
+        // Partial answer arrived before the error — keep what we have.
+        updateTurn(asstKey, { status: 'done', content: displayed });
+      } else {
+        try {
+          const res = await fetchOnce(q);
+          if (res.conversation?.conversation_id)
+            setConversationId(res.conversation.conversation_id);
+          updateTurn(asstKey, {
+            content: res.conversation?.answer ?? '(no answer returned)',
+            sources: (res.hits ?? []).map((h) =>
+              hitToSource(
+                h as unknown as { document: Record<string, unknown>; vector_distance?: number },
+              ),
+            ),
+            status: 'done',
+          });
+        } catch (e2) {
+          updateTurn(asstKey, {
+            status: 'error',
+            error: (e2 as Error).message || (err as Error).message,
+          });
+        }
+      }
+    } finally {
+      abortRef.current = null;
+      setBusy(false);
+    }
+  };
 
   const canSend =
     Boolean(input.trim()) &&
     Boolean(embeddingField) &&
     Boolean(modelId) &&
-    !mutation.isPending &&
+    !busy &&
     !needsSetup;
 
   const handleSend = () => {
@@ -269,13 +368,22 @@ function RouteComponent() {
     setTurns((prev) => [
       ...prev,
       { key: `u-${Date.now()}`, role: 'user', content: q },
-      { key: asstKey, role: 'assistant', content: '', status: 'pending' },
+      { key: asstKey, role: 'assistant', content: '', status: 'pending', question: q },
     ]);
     setInput('');
-    mutation.mutate({ q, asstKey });
+    void runConversation(q, asstKey);
+  };
+
+  const handleStop = () => abortRef.current?.abort();
+
+  const retryTurn = (turn: Turn) => {
+    if (busy || !turn.question) return;
+    updateTurn(turn.key, { status: 'pending', content: '', error: undefined });
+    void runConversation(turn.question, turn.key);
   };
 
   const handleNewConversation = () => {
+    abortRef.current?.abort();
     setTurns([]);
     setConversationId(undefined);
     setInput('');
@@ -454,7 +562,7 @@ function RouteComponent() {
                   turn={t}
                   model={modelId}
                   collection={collectionName}
-                  onRetry={handleSend}
+                  onRetry={() => retryTurn(t)}
                 />
               ),
             )}
@@ -518,22 +626,42 @@ function RouteComponent() {
               // 16px on mobile keeps iOS Safari from auto-zooming on focus.
               sx={{ '& textarea': { fontSize: { xs: 16, md: 13.5 }, lineHeight: 1.5 } }}
             />
-            <IconButton
-              onClick={handleSend}
-              disabled={!canSend}
-              sx={{
-                width: 34,
-                height: 30,
-                borderRadius: '7px',
-                flexShrink: 0,
-                background: canSend ? designTokens.accent : designTokens.borderStrong,
-                color: '#fff',
-                '&:hover': { background: designTokens.accentHover },
-                '&.Mui-disabled': { color: '#fff', opacity: 0.8 },
-              }}
-            >
-              <SendRounded sx={{ fontSize: 15 }} />
-            </IconButton>
+            {busy ? (
+              <IconButton
+                onClick={handleStop}
+                aria-label='Stop generating'
+                sx={{
+                  width: 34,
+                  height: 30,
+                  borderRadius: '7px',
+                  flexShrink: 0,
+                  border: `1px solid ${designTokens.border}`,
+                  color: designTokens.text,
+                  background: designTokens.surface,
+                  '&:hover': { background: designTokens.surfaceMuted },
+                }}
+              >
+                <StopRounded sx={{ fontSize: 15 }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={handleSend}
+                disabled={!canSend}
+                aria-label='Send'
+                sx={{
+                  width: 34,
+                  height: 30,
+                  borderRadius: '7px',
+                  flexShrink: 0,
+                  background: canSend ? designTokens.accent : designTokens.borderStrong,
+                  color: '#fff',
+                  '&:hover': { background: designTokens.accentHover },
+                  '&.Mui-disabled': { color: '#fff', opacity: 0.8 },
+                }}
+              >
+                <SendRounded sx={{ fontSize: 15 }} />
+              </IconButton>
+            )}
           </Stack>
           <Typography
             sx={{
@@ -667,6 +795,64 @@ function UserTurn({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Inline citation chip — scrolls to the matching source card. Citations only
+// render if the model emits [n] markers in its answer; otherwise the prose is
+// shown plain and grounding still lives in the Sources strip below.
+function Cite({ n, turnKey }: { n: string; turnKey: string }) {
+  return (
+    <Box
+      component='sup'
+      role='button'
+      onClick={() =>
+        document
+          .getElementById(`source-${turnKey}-${n}`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 15,
+        height: 15,
+        px: '4px',
+        mx: '1px',
+        borderRadius: '4px',
+        background: designTokens.accentSoft,
+        color: designTokens.accent,
+        border: `1px solid ${designTokens.accentBorder}`,
+        fontFamily: designTokens.fontMono,
+        fontSize: 9.5,
+        fontWeight: 600,
+        lineHeight: 1,
+        cursor: 'pointer',
+        verticalAlign: '2px',
+      }}
+    >
+      {n}
+    </Box>
+  );
+}
+
+const CITE_RE = /\[(\d+(?:\s*,\s*\d+)*)\]/g;
+
+// Split answer text on [n] / [n, m] markers, replacing them with Cite chips.
+function renderAnswer(text: string, turnKey: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  let last = 0;
+  let key = 0;
+  let m: RegExpExecArray | null;
+  CITE_RE.lastIndex = 0;
+  while ((m = CITE_RE.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    for (const num of m[1].split(',').map((s) => s.trim())) {
+      out.push(<Cite key={`${turnKey}-cite-${key++}`} n={num} turnKey={turnKey} />);
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
 function AssistantTurn({
   turn,
   model,
@@ -705,7 +891,7 @@ function AssistantTurn({
           <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: designTokens.text }}>
             Assistant
           </Typography>
-          {turn.status === 'pending' ? (
+          {turn.status === 'pending' || turn.status === 'streaming' ? (
             <Box
               component='span'
               sx={{
@@ -729,7 +915,9 @@ function AssistantTurn({
                   background: designTokens.accent,
                 }}
               />
-              Retrieving &amp; generating…
+              {turn.status === 'streaming'
+                ? 'Generating…'
+                : 'Retrieving & generating…'}
             </Box>
           ) : (
             <Typography sx={{ fontSize: 11, color: designTokens.textFaint, fontFamily: designTokens.fontMono }}>
@@ -765,23 +953,50 @@ function AssistantTurn({
           </Box>
         ) : turn.status === 'pending' ? null : (
           <>
-            <Typography sx={{ fontSize: 13.5, lineHeight: 1.62, color: designTokens.text, whiteSpace: 'pre-wrap' }}>
-              {turn.content}
+            <Typography
+              sx={{
+                fontSize: 13.5,
+                lineHeight: 1.62,
+                color: designTokens.text,
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {renderAnswer(turn.content, turn.key)}
+              {turn.status === 'streaming' ? (
+                <Box
+                  component='span'
+                  sx={{
+                    display: 'inline-block',
+                    width: 7,
+                    height: 14,
+                    ml: '2px',
+                    verticalAlign: '-2px',
+                    borderRadius: '1px',
+                    background: designTokens.accent,
+                  }}
+                />
+              ) : null}
             </Typography>
             {turn.sources?.length ? (
-              <Sources sources={turn.sources} collection={collection} />
+              <Sources
+                sources={turn.sources}
+                collection={collection}
+                turnKey={turn.key}
+              />
             ) : null}
-            <Stack direction='row' sx={{ alignItems: 'center', gap: 0.5, mt: 1.5 }}>
-              <Tooltip title='Copy answer'>
-                <IconButton
-                  size='small'
-                  onClick={() => navigator.clipboard?.writeText(turn.content)}
-                  sx={{ color: designTokens.textFaint }}
-                >
-                  <ContentCopyRounded sx={{ fontSize: 13 }} />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+            {turn.status === 'done' ? (
+              <Stack direction='row' sx={{ alignItems: 'center', gap: 0.5, mt: 1.5 }}>
+                <Tooltip title='Copy answer'>
+                  <IconButton
+                    size='small'
+                    onClick={() => navigator.clipboard?.writeText(turn.content)}
+                    sx={{ color: designTokens.textFaint }}
+                  >
+                    <ContentCopyRounded sx={{ fontSize: 13 }} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            ) : null}
           </>
         )}
       </Box>
@@ -793,9 +1008,11 @@ function AssistantTurn({
 function Sources({
   sources,
   collection,
+  turnKey,
 }: {
   sources: Source[];
   collection: string;
+  turnKey: string;
 }) {
   return (
     <Box
@@ -846,16 +1063,25 @@ function Sources({
         }}
       >
         {sources.map((s, i) => (
-          <SourceCard key={s.id} n={i + 1} source={s} />
+          <SourceCard key={s.id} n={i + 1} source={s} turnKey={turnKey} />
         ))}
       </Box>
     </Box>
   );
 }
 
-function SourceCard({ n, source }: { n: number; source: Source }) {
+function SourceCard({
+  n,
+  source,
+  turnKey,
+}: {
+  n: number;
+  source: Source;
+  turnKey: string;
+}) {
   return (
     <Stack
+      id={`source-${turnKey}-${n}`}
       sx={{
         background: 'background.paper',
         border: `1px solid ${designTokens.border}`,
@@ -864,6 +1090,7 @@ function SourceCard({ n, source }: { n: number; source: Source }) {
         gap: 0.75,
         minWidth: 0,
         boxShadow: designTokens.shadowButton,
+        scrollMarginTop: 80,
       }}
     >
       <Stack direction='row' sx={{ alignItems: 'center', gap: 0.875 }}>

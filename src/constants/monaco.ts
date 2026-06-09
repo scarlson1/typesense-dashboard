@@ -5,6 +5,7 @@ import { z } from 'zod/v4';
 export const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions =
   {
     tabSize: 2,
+    fontFamily: 'Jetbrains-Mono',
     minimap: { enabled: false },
     // lineNumbers: true,
     quickSuggestions: true, // Auto-completion

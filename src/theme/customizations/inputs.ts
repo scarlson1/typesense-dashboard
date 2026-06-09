@@ -60,27 +60,32 @@ export const inputCustomizations: Components<Theme> = {
         // minHeight: 28,
         // padding: '0 8px',
         // borderRadius: theme.shape.borderRadius,
+        backgroundColor: designTokens.surface,
         fontFamily: designTokens.fontMono,
-        '& fieldset': {
-          borderColor: 'var(--ts-borderStrong)', // theme.vars.palette. // designTokens.borderStrong
-          transition: 'border-color 120ms ease',
+
+        '& input': {
+          fontFamily: designTokens.fontMono,
+          color: designTokens.text,
         },
-        '&:hover fieldset': {
-          borderColor: designTokens.accent,
-          borderWidth: '1px',
+        '& input::placeholder': {
+          color: designTokens.textFaint,
+          opacity: 1,
         },
+
         '& .MuiAutocomplete-endAdornment': {
           right: 4,
         },
         '& .MuiOutlinedInput-notchedOutline': {
-          borderColor: 'var(--ts-borderStrong)',
+          borderColor: designTokens.border, // 'var(--ts-border)',
           transition: 'border-color 120ms ease',
         },
         '&:hover .MuiOutlinedInput-notchedOutline': {
-          borderColor: 'var(--ts-accent)',
+          // borderColor: 'var(--ts-accent)',
+          borderColor: designTokens.borderStrong,
+          borderWidth: '1px',
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          borderColor: 'var(--ts-accent)',
+          borderColor: designTokens.accent, // 'var(--ts-accent)',
           borderWidth: '1px', // MUI defaults to 2px on focus
         },
       }, // ),
@@ -94,12 +99,19 @@ export const inputCustomizations: Components<Theme> = {
       },
     },
   },
+  MuiSelect: {
+    styleOverrides: {
+      select: {
+        fontFamily: designTokens.fontMono,
+        // fontSize: 13,
+        color: designTokens.text,
+      },
+    },
+  },
   MuiAutocomplete: {
     styleOverrides: {
       root: {
         // ({ theme }) => ({
-        // Targets the options list
-
         '& .MuiOutlinedInput-root': {
           // borderRadius: theme.shape.borderRadius,
           fontFamily: designTokens.fontMono,

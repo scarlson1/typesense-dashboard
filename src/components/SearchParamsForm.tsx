@@ -4,7 +4,10 @@ import {
   NEW_EMPTY_OTHER_PARAM,
   searchParamsFormOpts,
 } from '@/constants';
-import { dividerPaperSx as paperSx } from '@/constants/redesignSx';
+import {
+  dividerPaperSx as paperSx,
+  fieldLabelSx,
+} from '@/constants/redesignSx';
 import { usePrevious, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { getArrayVal, splitIfString } from '@/utils';
@@ -37,14 +40,6 @@ import type { PresetSchema } from 'typesense/lib/Typesense/Preset';
 
 type SearchParamsFormFieldsProps = Parameters<typeof SearchParamsForm>[0];
 
-const sectionLabelSx: SxProps<Theme> = {
-  fontSize: 10,
-  fontWeight: 600,
-  color: designTokens.textFaint,
-  textTransform: 'uppercase',
-  letterSpacing: '0.07em',
-  mb: 0.5,
-};
 // TODO: add style as variant ??
 const compactInputSx: SxProps<Theme> = {
   '& .MuiOutlinedInput-root': {
@@ -224,7 +219,7 @@ const SearchParamsFormFields = ({
       <Stack direction='column' spacing={2}>
         {/* QUERY BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Query by</Typography>
+          <Typography sx={fieldLabelSx}>Query by</Typography>
           <ChipMultiField
             values={queryByValues}
             options={queryByOptions}
@@ -243,7 +238,7 @@ const SearchParamsFormFields = ({
 
         {/* SORT BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Sort by</Typography>
+          <Typography sx={fieldLabelSx}>Sort by</Typography>
           <ChipMultiField
             values={sortByValues}
             options={sortByOptions}
@@ -262,7 +257,7 @@ const SearchParamsFormFields = ({
 
         {/* FACET & FILTER BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Facet & filter by</Typography>
+          <Typography sx={fieldLabelSx}>Facet & filter by</Typography>
           <ChipMultiField
             values={facetByValues}
             options={facetByOptions}
@@ -281,7 +276,7 @@ const SearchParamsFormFields = ({
 
         {/* GROUP BY */}
         <Box>
-          <Typography sx={sectionLabelSx}>Group by</Typography>
+          <Typography sx={fieldLabelSx}>Group by</Typography>
           <ChipMultiField
             values={groupByValues}
             options={groupByOptions}
@@ -301,7 +296,7 @@ const SearchParamsFormFields = ({
 
         {/* ADDITIONAL */}
         <Box>
-          <Typography sx={sectionLabelSx}>Additional</Typography>
+          <Typography sx={fieldLabelSx}>Additional</Typography>
           <form.AppField name='other_params' mode='array'>
             {({ state, pushValue, removeValue }) => (
               <Stack direction='column' spacing={0.75}>

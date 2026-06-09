@@ -2,7 +2,7 @@ import { LlmModelFields } from '@/components/LlmModelFields';
 import { primaryButtonSx } from '@/components/redesign';
 import {
   fieldInputSx,
-  sectionLabelSx,
+  fieldLabelSx,
 } from '@/constants/redesignSx';
 import { toModelName, type LlmFieldDef, type LlmProviderId } from '@/constants';
 import { useCreateNlSearchModel } from '@/hooks';
@@ -49,7 +49,7 @@ const NL_PROVIDER_FIELDS: Record<LlmProviderId, LlmFieldDef[]> = {
 };
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <Box component='div' sx={sectionLabelSx}>
+  <Box component='div' sx={fieldLabelSx}>
     {children}
   </Box>
 );

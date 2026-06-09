@@ -1,6 +1,6 @@
 import {
   compactMonoInputSx as compactInputSx,
-  sectionLabelSx as labelSx,
+  fieldLabelSx as labelSx,
 } from '@/constants/redesignSx';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';

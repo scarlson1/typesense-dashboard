@@ -7,7 +7,7 @@ import {
 } from '@/components/redesign';
 import {
   compactMonoInputSx,
-  sectionLabelSx,
+  fieldLabelSx,
 } from '@/constants/redesignSx';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
@@ -690,7 +690,7 @@ function NewSetPanel({ onCreated }: { onCreated: (id: string) => void }) {
   };
 
   const compactInputSx = compactMonoInputSx;
-  const labelSx = sectionLabelSx;
+  const labelSx = fieldLabelSx;
 
   return (
     <Box

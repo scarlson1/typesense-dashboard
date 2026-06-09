@@ -1,15 +1,9 @@
 import { authFormOpts } from '@/constants/authForm';
+import { fieldLabelSx } from '@/constants/redesignSx';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { ArrowForwardRounded } from '@mui/icons-material';
-import {
-  Box,
-  ButtonBase,
-  Stack,
-  Typography,
-  type SxProps,
-  type Theme,
-} from '@mui/material';
+import { Box, ButtonBase, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 // TODO: implement "remember" - use localStorage instead of sessionStorage ??
@@ -22,16 +16,6 @@ const ENV_OPTIONS = [
   { value: 'production', color: designTokens.danger },
 ] as const;
 
-const fieldLabelSx: SxProps<Theme> = {
-  display: 'block',
-  mb: 0.5,
-  fontSize: 9,
-  fontWeight: 600,
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
-  color: designTokens.textMuted,
-};
-
 const FieldLabel = ({
   htmlFor,
   id,
@@ -41,7 +25,12 @@ const FieldLabel = ({
   id?: string;
   children: ReactNode;
 }) => (
-  <Typography component='label' htmlFor={htmlFor} id={id} sx={fieldLabelSx}>
+  <Typography
+    component='label'
+    htmlFor={htmlFor}
+    id={id}
+    sx={{ ...fieldLabelSx, display: 'block' }}
+  >
     {children}
   </Typography>
 );

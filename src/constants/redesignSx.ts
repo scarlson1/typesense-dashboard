@@ -53,6 +53,16 @@ export const compactMonoInputSx: SxProps<Theme> = {
   },
 };
 
+// Uppercase label for a single form field (HOST, API KEY, QUERY BY, …).
+export const fieldLabelSx: SxProps<Theme> = {
+  fontSize: 10,
+  fontWeight: 700,
+  color: designTokens.textFaint,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  mb: 0.5,
+};
+
 // Uppercase section label used above redesign form fields.
 export const sectionLabelSx: SxProps<Theme> = {
   fontSize: 10,

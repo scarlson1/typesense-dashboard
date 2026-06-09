@@ -1,6 +1,7 @@
 import { overrideFormOpts, overrideQueryMatch } from '@/constants';
 import {
   compactMonoInputSx as compactInputSx,
+  fieldLabelSx,
   sectionLabelSx as labelSx,
 } from '@/constants/redesignSx';
 import { withForm } from '@/hooks';
@@ -88,7 +89,7 @@ export const CurationForm = withForm({
         </form.AppField>
 
         {/* Trigger type */}
-        <Typography sx={labelSx}>Trigger</Typography>
+        <Typography sx={fieldLabelSx}>Trigger</Typography>
         <Box
           sx={{
             display: 'grid',
@@ -127,7 +128,7 @@ export const CurationForm = withForm({
 
         {/* Query (when query trigger) */}
         <Collapse in={bools.rule_query_bool} unmountOnExit>
-          <Typography sx={labelSx}>Query</Typography>
+          <Typography sx={fieldLabelSx}>Query</Typography>
           <form.AppField name='rule.query'>
             {({ state, handleChange, handleBlur }) => (
               <MuiTextField
@@ -145,7 +146,7 @@ export const CurationForm = withForm({
 
         {/* Filter (when filter trigger) */}
         <Collapse in={bools.rule_filter_bool} unmountOnExit>
-          <Typography sx={labelSx}>Filter by</Typography>
+          <Typography sx={fieldLabelSx}>Filter by</Typography>
           <form.AppField name='rule.filter_by'>
             {({ state, handleChange, handleBlur }) => (
               <MuiTextField
@@ -163,7 +164,7 @@ export const CurationForm = withForm({
 
         {/* Tags */}
         <Collapse in={bools.rule_tags_bool} unmountOnExit>
-          <Typography sx={labelSx}>Tags</Typography>
+          <Typography sx={fieldLabelSx}>Tags</Typography>
           <form.AppField name='rule.tags'>
             {({ state, handleChange, handleBlur }) => (
               <MuiTextField

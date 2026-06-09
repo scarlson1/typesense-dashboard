@@ -1,7 +1,7 @@
 import { HistoryCollectionField } from '@/components/HistoryCollectionField';
 import { LlmModelFields } from '@/components/LlmModelFields';
 import { primaryButtonSx } from '@/components/redesign';
-import { fieldInputSx, sectionLabelSx } from '@/constants/redesignSx';
+import { fieldInputSx, fieldLabelSx } from '@/constants/redesignSx';
 import {
   LLM_PROVIDERS,
   toModelName,
@@ -48,7 +48,7 @@ const CONVERSATION_PROVIDER_FIELDS: Partial<
 };
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <Box component='div' sx={sectionLabelSx}>
+  <Box component='div' sx={fieldLabelSx}>
     {children}
   </Box>
 );

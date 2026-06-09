@@ -8,7 +8,7 @@ import {
 } from '@/constants';
 import {
   compactMonoInputSx as compactInputSx,
-  sectionLabelSx as labelSx,
+  fieldLabelSx as labelSx,
 } from '@/constants/redesignSx';
 import { useTypesenseClient, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';

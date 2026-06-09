@@ -6,6 +6,7 @@ import {
   type MultiParameterKeys,
   type ParameterKeys,
 } from '@/constants';
+import { fieldLabelSx } from '@/constants/redesignSx';
 import {
   useAppForm,
   useUpsertPreset,
@@ -377,18 +378,7 @@ function FieldGroup({
 }) {
   return (
     <Box>
-      <Typography
-        sx={{
-          fontSize: 11,
-          fontWeight: 600,
-          color: designTokens.textFaint,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          mb: 0.625,
-        }}
-      >
-        {label}
-      </Typography>
+      <Typography sx={fieldLabelSx}>{label}</Typography>
       {children}
     </Box>
   );
