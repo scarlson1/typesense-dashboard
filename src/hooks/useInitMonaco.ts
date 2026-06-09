@@ -56,6 +56,8 @@ export function useInitMonaco({
 
   const handleEditorDidMount: OnMount = useCallback(
     (editor, monaco) => {
+      editorRef.current = editor;
+
       // applySchema is deferred; if the editor is disposed within this window
       // (React StrictMode's dev mount/unmount/remount, or the dialog closing /
       // route changing before it fires) the callback would touch torn-down
