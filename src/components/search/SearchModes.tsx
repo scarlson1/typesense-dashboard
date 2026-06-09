@@ -101,7 +101,9 @@ export const SearchModeControl = ({
                   : active
                     ? designTokens.accent
                     : designTokens.textMuted,
-                background: active ? designTokens.accentSoft : designTokens.surface,
+                background: active
+                  ? designTokens.accentSoft
+                  : designTokens.surface,
                 border: `1px solid ${active ? designTokens.accentBorder : designTokens.border}`,
                 opacity: off ? 0.55 : 1,
                 whiteSpace: 'nowrap',
@@ -141,63 +143,63 @@ export const SearchModeControl = ({
     );
   }
   return (
-  <ToggleButtonGroup
-    exclusive
-    size='small'
-    value={mode}
-    onChange={(_, next: SearchMode | null) => next && onChange(next)}
-    sx={{
-      border: `1px solid ${designTokens.border}`,
-      borderRadius: '8px',
-      overflow: 'hidden',
-      background: designTokens.surface,
-      boxShadow: designTokens.shadowButton,
-      '& .MuiToggleButtonGroup-grouped': {
-        border: 'none',
-        borderRadius: 0,
-        height: 28,
-        px: 1.625,
-        textTransform: 'none',
-        fontSize: 11,
-        fontWeight: 500,
-        color: designTokens.textMuted,
-        gap: 0.75,
-        borderLeft: `1px solid ${designTokens.border}`,
-        '&:first-of-type': { borderLeft: 'none' },
-        '&.Mui-selected': {
-          fontWeight: 600,
-          color: designTokens.accent,
-          background: designTokens.accentSoft,
-          '&:hover': { background: designTokens.accentSoft },
+    <ToggleButtonGroup
+      exclusive
+      size='small'
+      value={mode}
+      onChange={(_, next: SearchMode | null) => next && onChange(next)}
+      sx={{
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: '8px',
+        overflow: 'hidden',
+        background: designTokens.surface,
+        boxShadow: designTokens.shadowButton,
+        '& .MuiToggleButtonGroup-grouped': {
+          border: 'none',
+          borderRadius: 0,
+          height: 28,
+          px: 1.625,
+          textTransform: 'none',
+          fontSize: 11,
+          fontWeight: 500,
+          color: designTokens.textMuted,
+          gap: 0.75,
+          borderLeft: `1px solid ${designTokens.border}`,
+          '&:first-of-type': { borderLeft: 'none' },
+          '&.Mui-selected': {
+            fontWeight: 600,
+            color: designTokens.accent,
+            background: designTokens.accentSoft,
+            '&:hover': { background: designTokens.accentSoft },
+          },
+          '&.Mui-disabled': { color: designTokens.textSubtle },
         },
-        '&.Mui-disabled': { color: designTokens.textSubtle },
-      },
-    }}
-  >
-    {MODE_META.map(({ id, label, Icon }) => (
-      <ToggleButton key={id} value={id} disabled={disabled.includes(id)}>
-        <Icon sx={{ fontSize: 14 }} />
-        {label}
-        {disabled.includes(id) ? (
-          <Box
-            component='span'
-            sx={{
-              ml: 0.25,
-              fontSize: 8.5,
-              fontFamily: designTokens.fontMono,
-              color: designTokens.textSubtle,
-              border: `1px solid ${designTokens.border}`,
-              borderRadius: '3px',
-              px: 0.375,
-              lineHeight: '12px',
-            }}
-          >
-            off
-          </Box>
-        ) : null}
-      </ToggleButton>
-    ))}
-  </ToggleButtonGroup>
+      }}
+    >
+      {MODE_META.map(({ id, label, Icon }) => (
+        <ToggleButton key={id} value={id} disabled={disabled.includes(id)}>
+          <Icon sx={{ fontSize: 14 }} />
+          {label}
+          {disabled.includes(id) ? (
+            <Box
+              component='span'
+              sx={{
+                ml: 0.25,
+                fontSize: 8.5,
+                fontFamily: designTokens.fontMono,
+                color: designTokens.textSubtle,
+                border: `1px solid ${designTokens.border}`,
+                borderRadius: '3px',
+                px: 0.375,
+                lineHeight: '12px',
+              }}
+            >
+              off
+            </Box>
+          ) : null}
+        </ToggleButton>
+      ))}
+    </ToggleButtonGroup>
   );
 };
 
@@ -206,8 +208,8 @@ const controlShellSx = {
   display: 'flex',
   alignItems: 'center',
   gap: 1.25,
-  px: 1.75,
-  height: 34,
+  px: 1.5,
+  height: 32,
   border: `1px solid ${designTokens.border}`,
   borderRadius: '8px',
   background: designTokens.surface,
@@ -252,7 +254,7 @@ export const HybridAlphaControl = ({
       component='span'
       sx={{
         fontFamily: designTokens.fontMono,
-        fontSize: 11.5,
+        fontSize: 11,
         color: designTokens.text,
         background: designTokens.surfaceMuted,
         border: `1px solid ${designTokens.border}`,
@@ -278,7 +280,7 @@ export const SemanticThresholdControl = ({
   <Box sx={controlShellSx}>
     <GrainRounded sx={{ fontSize: 14, color: designTokens.textFaint }} />
     <Typography
-      sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}
+      sx={{ fontSize: 11, color: designTokens.textFaint, fontWeight: 500 }}
     >
       Max distance
     </Typography>
@@ -292,8 +294,8 @@ export const SemanticThresholdControl = ({
         width: 72,
         '& .MuiOutlinedInput-root': {
           fontFamily: designTokens.fontMono,
-          fontSize: 12.5,
-          '& input': { py: '3px' },
+          fontSize: 12,
+          '& input': { py: '2px' },
         },
       }}
     />
@@ -313,7 +315,7 @@ export const NlModelPicker = ({
   <Box sx={{ ...controlShellSx, gap: 1 }}>
     <AutoAwesomeRounded sx={{ fontSize: 14, color: designTokens.textFaint }} />
     <Typography
-      sx={{ fontSize: 11.5, color: designTokens.textFaint, fontWeight: 500 }}
+      sx={{ fontSize: 11, color: designTokens.textFaint, fontWeight: 500 }}
     >
       NL model
     </Typography>
@@ -328,7 +330,7 @@ export const NlModelPicker = ({
         ml: { xs: 'auto', md: 0 },
         '& .MuiSelect-select': {
           fontFamily: designTokens.fontMono,
-          fontSize: 12.5,
+          fontSize: 12,
           color: designTokens.text,
           fontWeight: 500,
           py: 0,
@@ -380,7 +382,7 @@ export const TranslatedToPanel = ({
         border: `1px solid ${designTokens.border}`,
         borderRadius: '8px',
         overflow: 'hidden',
-        mb: 2,
+        mb: 1,
       }}
     >
       <Stack
@@ -389,20 +391,20 @@ export const TranslatedToPanel = ({
           alignItems: 'center',
           gap: 1.25,
           px: 2,
-          py: 1.5,
+          py: 1,
           borderBottom: `1px solid ${designTokens.border}`,
         }}
       >
         <AutoAwesomeRounded sx={{ fontSize: 14, color: designTokens.accent }} />
         <Typography
-          sx={{ fontSize: 13, fontWeight: 600, color: designTokens.text }}
+          sx={{ fontSize: 12, fontWeight: 600, color: designTokens.text }}
         >
           Translated to
         </Typography>
         <Badge tone='indigo'>read-only</Badge>
         <Box sx={{ flex: 1 }} />
         {loading ? (
-          <Typography sx={{ fontSize: 11.5, color: designTokens.accent }}>
+          <Typography sx={{ fontSize: 11, color: designTokens.accent }}>
             translating…
           </Typography>
         ) : parseTimeMs != null ? (
@@ -452,7 +454,7 @@ export const TranslatedToPanel = ({
           <Typography
             sx={{
               fontFamily: designTokens.fontMono,
-              fontSize: 12,
+              fontSize: 11,
               color: designTokens.codeFaint,
             }}
           >

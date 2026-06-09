@@ -152,6 +152,10 @@ instead bake a default token in at build time with
 
 ![geo search](docs/images/typesense-map-light.png)
 
+![natural language search](docs/images/nl-search-light.png)
+
+![conversational search](docs/images/chat-search-light.png)
+
 <!-- ![geo search mobile](docs/images/map_mobile_dark.png) -->
 <img src="docs/images/map_mobile_dark.png" width="280" />
 
