@@ -49,7 +49,7 @@ export const test = base.extend<TsOptions & TsFixtures>({
       // Hash router under basepath /typesense-dashboard; the auth route reads
       // these search params and prefills the form.
       await page.goto(`/typesense-dashboard/#/auth?${params.toString()}`);
-      await page.getByRole('button', { name: /submit/i }).click();
+      await page.getByRole('button', { name: /connect to cluster/i }).click();
       // On success the app redirects away from /auth.
       await expect(page).not.toHaveURL(/\/auth/);
     });
