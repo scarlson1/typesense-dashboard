@@ -291,11 +291,11 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
 
       {/* Navigation items */}
       <Box sx={{ py: 0.5 }}>
-        <SheetItem
+        {/* <SheetItem
           icon={<ChatBubbleOutlineRounded />}
           label='Conversational search'
           to='/conversational-search'
-        />
+        /> */}
         <SheetItem
           icon={<AutoAwesomeRounded />}
           label='NL models'
