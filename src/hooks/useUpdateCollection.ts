@@ -1,9 +1,12 @@
 import { collectionQueryKeys } from '@/constants';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
-import type { CollectionSchema } from '@/types';
+// import type { CollectionSchema } from '@/types';
 import { queryClient } from '@/utils';
 import { useMutation, type MutationOptions } from '@tanstack/react-query';
-import type { CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection';
+import type {
+  CollectionSchema,
+  CollectionUpdateSchema,
+} from 'typesense/lib/Typesense/Collection';
 
 interface UpdateCollectionArgs {
   colName: string;
