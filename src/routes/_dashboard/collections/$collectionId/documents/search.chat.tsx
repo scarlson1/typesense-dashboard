@@ -4,6 +4,7 @@ import {
   primaryButtonSx,
   smallButtonSx,
 } from '@/components/redesign';
+import { ConversationHistoryDrawer } from '@/components/ConversationHistoryDrawer';
 import { collectionQueryKeys } from '@/constants';
 import {
   useConversationModels,
@@ -18,6 +19,7 @@ import {
   ChatBubbleOutlineRounded,
   ContentCopyRounded,
   FormatQuoteRounded,
+  HistoryRounded,
   RefreshRounded,
   SendRounded,
   SettingsRounded,
@@ -163,6 +165,7 @@ function RouteComponent() {
   const [conversationId, setConversationId] = useState<string | undefined>();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const { data: convModels } = useConversationModels();
   const { data: collection } = useSuspenseQuery({
@@ -408,6 +411,47 @@ function RouteComponent() {
     setInput('');
   };
 
+  // Reopen a past thread: pull its turns from the model's history collection
+  // (oldest-first) and rehydrate the chat. Stored turns only carry role +
+  // message — retrieved sources aren't persisted — so cards reconstruct without
+  // a Sources strip. Setting conversationId lets new messages continue it.
+  const loadConversation = async (id: string) => {
+    const hist = selectedModel?.history_collection;
+    if (!hist) return;
+    abortRef.current?.abort();
+    try {
+      const res = (await client
+        .collections(hist)
+        .documents()
+        .search({
+          q: '*',
+          query_by: 'conversation_id',
+          filter_by: `conversation_id:=\`${id}\``,
+          sort_by: 'timestamp:asc',
+          per_page: 250,
+          include_fields: 'conversation_id,role,message,timestamp',
+        } as Record<string, unknown>)) as SearchResponse<DocumentSchema>;
+      let lastUser = '';
+      const loaded: Turn[] = (res.hits ?? []).map((h, i) => {
+        const d = h.document as unknown as { role: string; message: string };
+        const role = d.role === 'user' ? 'user' : 'assistant';
+        if (role === 'user') lastUser = d.message;
+        return {
+          key: `${id}-${i}`,
+          role,
+          content: d.message,
+          status: 'done' as const,
+          question: role === 'assistant' ? lastUser : undefined,
+        };
+      });
+      setTurns(loaded);
+      setConversationId(id);
+    } catch {
+      setTurns([]);
+      setConversationId(id);
+    }
+  };
+
   return (
     <Stack
       sx={{
@@ -515,6 +559,25 @@ function RouteComponent() {
             </Badge>
           </Box>
         ) : null}
+        {selectedModel?.history_collection && historyOk ? (
+          <Tooltip title='Previous conversations'>
+            <IconButton
+              onClick={() => setHistoryOpen(true)}
+              aria-label='Previous conversations'
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: 1,
+                border: `1px solid ${designTokens.border}`,
+                background: designTokens.surface,
+                color: designTokens.text,
+                '&:hover': { borderColor: designTokens.borderStrong },
+              }}
+            >
+              <HistoryRounded sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Tooltip>
+        ) : null}
         <Tooltip title='New conversation'>
           <IconButton
             onClick={handleNewConversation}
@@ -534,6 +597,18 @@ function RouteComponent() {
           </IconButton>
         </Tooltip>
       </Stack>
+
+      <ConversationHistoryDrawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        historyCollection={selectedModel?.history_collection}
+        modelId={modelId}
+        activeConversationId={conversationId}
+        onSelect={(id) => {
+          setHistoryOpen(false);
+          void loadConversation(id);
+        }}
+      />
 
       {/* thread / states */}
       <Box
