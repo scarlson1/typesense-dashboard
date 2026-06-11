@@ -1,6 +1,7 @@
 import { Badge } from '@/components/redesign';
 import { apiKeyQueryKeys } from '@/constants';
 import { useAsyncToast, useDialog, useTypesenseClient } from '@/hooks';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
 import { DeleteOutlineRounded, ExpandMoreRounded } from '@mui/icons-material';
@@ -67,6 +68,7 @@ const ApiKeyGrid = () => {
   const [client, clusterId] = useTypesenseClient();
   const toast = useAsyncToast();
   const dialog = useDialog();
+  const [_, copy] = useCopyToClipboard();
 
   const { data, isError, error } = useQuery({
     queryKey: apiKeyQueryKeys.all(clusterId),
@@ -130,10 +132,7 @@ const ApiKeyGrid = () => {
   };
 
   const handleCopy = (text: string) => {
-    if (navigator?.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {});
-      toast.success('prefix copied', { id: 'copy-prefix' });
-    }
+    copy(text, true);
   };
 
   if (isError) {
@@ -170,16 +169,18 @@ const ApiKeyGrid = () => {
   return (
     <>
       {/* Mobile card list */}
-      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-        {keys.map((k, i) => (
+      <Stack sx={{ display: { xs: 'flex', md: 'none' }, gap: 1.25 }}>
+        {keys.map((k) => (
           <MobileKeyCard
             key={k.id}
             k={k}
-            isFirst={i === 0}
+            isDeleting={mutation.isPending && mutation.variables === k.id}
             onCopy={handleCopy}
+            onDelete={handleDelete}
+            deleteButtonSx={deleteButtonSx}
           />
         ))}
-      </Box>
+      </Stack>
 
       {/* Desktop table */}
       <TableContainer sx={{ display: { xs: 'none', md: 'block' } }}>
@@ -200,7 +201,7 @@ const ApiKeyGrid = () => {
                 key={k.id}
                 k={k}
                 isFirst={i === 0}
-                isDeleting={mutation.isPending}
+                isDeleting={mutation.isPending && mutation.variables === k.id}
                 onCopy={handleCopy}
                 onDelete={handleDelete}
                 deleteButtonSx={deleteButtonSx}
@@ -414,11 +415,19 @@ function DesktopKeyRow({
 
 interface MobileKeyCardProps {
   k: KeySchema;
-  isFirst: boolean;
+  isDeleting: boolean;
   onCopy: (text: string) => void;
+  onDelete: (key: KeySchema) => void;
+  deleteButtonSx: object;
 }
 
-function MobileKeyCard({ k, isFirst, onCopy }: MobileKeyCardProps) {
+function MobileKeyCard({
+  k,
+  isDeleting,
+  onCopy,
+  onDelete,
+  deleteButtonSx,
+}: MobileKeyCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const actions = k.actions ?? [];
@@ -448,26 +457,45 @@ function MobileKeyCard({ k, isFirst, onCopy }: MobileKeyCardProps) {
   return (
     <Box
       sx={{
+        backgroundColor: 'background.paper',
+        border: `1px solid ${designTokens.border}`,
+        borderRadius: 1.5,
         px: 2,
-        py: 1.625,
-        borderTop: isFirst ? 'none' : `1px solid ${designTokens.border}`,
+        py: 1.75,
       }}
     >
-      {/* Description + badge */}
+      {/* Description + badge + delete */}
       <Stack
         direction='row'
         sx={{
           mb: 0.625,
           justifyContent: 'space-between',
           alignItems: 'center',
+          gap: 1,
         }}
       >
-        <Typography
-          sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}
+        <Stack
+          direction='row'
+          sx={{ alignItems: 'center', gap: 1, minWidth: 0 }}
         >
-          {k.description || `Key #${k.id}`}
-        </Typography>
-        <KeyTypeBadge actions={k.actions} />
+          <Typography
+            noWrap
+            sx={{ fontSize: 14, fontWeight: 600, color: designTokens.text }}
+          >
+            {k.description || `Key #${k.id}`}
+          </Typography>
+          <KeyTypeBadge actions={k.actions} />
+        </Stack>
+        <Tooltip title='Delete key'>
+          <IconButton
+            size='small'
+            onClick={() => onDelete(k)}
+            disabled={isDeleting}
+            sx={{ ...deleteButtonSx, flexShrink: 0 }}
+          >
+            <DeleteOutlineRounded sx={{ fontSize: 14 }} />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
       {/* Key prefix + copy */}

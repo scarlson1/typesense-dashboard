@@ -349,3 +349,6 @@ This is an independent project. It's not associated with [typesense.org](https:/
   `documents/$documentId.tsx` is a "TODO: view not set up yet" stub; `useUpdateDocument.ts` exists
   but isn't wired into the UI; no PATCH-by-filter.
 - **Federated multi-search** — no cross-collection multi-search UI.
+
+- Cluster snapshots / re-election: `ServerOps.tsx` only does cache-clear + db-compact + schema-changes read. Missing POST /operations/snapshot (backup), vote, reset_peers.
+- Voice & image search: configurable on fields but no mic capture / image upload to actually issue those queries (larger builds).

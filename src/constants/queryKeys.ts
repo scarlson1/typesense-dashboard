@@ -90,6 +90,14 @@ export const presetQueryKeys = {
   // collection: (clusterId: string, collectionId: string) => [...presetQueryKeys.all(clusterId), collectionId] as const
 };
 
+// Global stemming dictionaries (the list endpoint only returns ids, so each
+// dictionary's word/root pairs are fetched lazily by id).
+export const stemmingQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'stemming'] as const,
+  dictionary: (clusterId: string, id: string) =>
+    [...stemmingQueryKeys.all(clusterId), id] as const,
+};
+
 // LLM-backed model resources (foundation for NL search + conversational/RAG).
 export const nlSearchModelQueryKeys = {
   all: (clusterId: string) => [clusterId, 'nlSearchModels'] as const,

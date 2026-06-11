@@ -5,7 +5,12 @@ import { authSchema } from '@/constants/authForm';
 import { useAppForm, useAsyncToast } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import type { Environment } from '@/types';
-import { getCredsKey, getTypesenseClient, typesenseStore } from '@/utils';
+import {
+  getCredsKey,
+  getTypesenseClient,
+  typesenseStore,
+  type TypesenseCreds,
+} from '@/utils';
 import {
   Check,
   DevicesRounded,
@@ -27,6 +32,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
 import { useCallback } from 'react';
 import { z } from 'zod/v4';
@@ -55,6 +61,30 @@ function AuthComponent() {
     (state) => state.setCredentials,
   );
 
+  const mutation = useMutation({
+    mutationFn: (creds: TypesenseCreds) => {
+      const client = getTypesenseClient(creds);
+
+      return client.collections().retrieve();
+    },
+    onMutate: () => {
+      // use use loading button instead ??
+      toast.loading('authenticating...');
+    },
+    onSuccess: (_, creds) => {
+      setCredentials(creds);
+      toast.dismiss();
+      navigate({ to: search?.redirect || '/', replace: true });
+    },
+    onError: async (err: Error) => {
+      console.error('AUTH ERROR: ', err);
+      toast.error('Failed to connect', { id: 'auth' });
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      toast.dismiss();
+    },
+    // onSettled,
+  });
+
   const form = useAppForm({
     defaultValues: {
       node: search.node ?? '',
@@ -72,19 +102,25 @@ function AuthComponent() {
         apiKey: apiKey.trim(),
         env: env as Environment,
       };
-      const client = getTypesenseClient(creds);
-      toast.loading('authenticating...', { id: 'auth' });
       try {
-        await client.collections().retrieve();
-        setCredentials(creds);
-        toast.dismiss();
-        navigate({ to: search?.redirect || '/', replace: true });
+        await mutation.mutate(creds);
       } catch (err) {
-        console.error('AUTH ERROR: ', err);
-        toast.error('Failed to connect', { id: 'auth' });
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        toast.dismiss();
+        console.error('Submission failed:', err);
       }
+
+      // const client = getTypesenseClient(creds);
+      // toast.loading('authenticating...', { id: 'auth' });
+      // try {
+      //   await client.collections().retrieve();
+      //   setCredentials(creds);
+      //   toast.dismiss();
+      //   navigate({ to: search?.redirect || '/', replace: true });
+      // } catch (err) {
+      //   console.error('AUTH ERROR: ', err);
+      //   toast.error('Failed to connect', { id: 'auth' });
+      //   await new Promise((resolve) => setTimeout(resolve, 2000));
+      //   toast.dismiss();
+      // }
     },
   });
 
@@ -418,23 +454,26 @@ function AuthComponent() {
 
           {/* CTAs */}
           <Stack direction='row' spacing={1.5} sx={{ mt: 0.5 }}>
-            <Button
-              variant='contained'
-              href='https://scarlson1.github.io/typesense-dashboard/#/auth?node=163.192.220.255.nip.io&port=443&protocol=https&apiKey=q0DAf2GWCdw0LPCzM72UytDVh719h4Tk&env=development'
-              target='_blank'
-              rel='noopener'
-              startIcon={<PlayArrowRounded />}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: 1.5,
-                px: 2.5,
-                py: 1.25,
-                boxShadow: '0 10px 28px -10px rgba(75,160,245,.65)',
-              }}
-            >
-              Try the live demo
-            </Button>
+            {import.meta.env.VITE_DEMO_AUTHED_URL ? (
+              <Button
+                variant='contained'
+                href={import.meta.env.VITE_DEMO_AUTHED_URL}
+                target='_blank'
+                rel='noopener'
+                startIcon={<PlayArrowRounded />}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  borderRadius: 1.5,
+                  px: 2.5,
+                  py: 1.25,
+                  boxShadow: '0 10px 28px -10px rgba(75,160,245,.65)',
+                }}
+              >
+                Try the live demo
+              </Button>
+            ) : null}
+
             <Button
               variant='outlined'
               href='https://github.com/scarlson1/typesense-dashboard'

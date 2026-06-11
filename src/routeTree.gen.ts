@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as DashboardSynonymsRouteImport } from './routes/_dashboard/synonyms'
 import { Route as DashboardStopwordsRouteImport } from './routes/_dashboard/stopwords'
+import { Route as DashboardStemmingRouteImport } from './routes/_dashboard/stemming'
 import { Route as DashboardServerRouteImport } from './routes/_dashboard/server'
 import { Route as DashboardPresetsRouteImport } from './routes/_dashboard/presets'
 import { Route as DashboardNlModelsRouteImport } from './routes/_dashboard/nl-models'
@@ -64,6 +65,11 @@ const DashboardSynonymsRoute = DashboardSynonymsRouteImport.update({
 const DashboardStopwordsRoute = DashboardStopwordsRouteImport.update({
   id: '/stopwords',
   path: '/stopwords',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStemmingRoute = DashboardStemmingRouteImport.update({
+  id: '/stemming',
+  path: '/stemming',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardServerRoute = DashboardServerRouteImport.update({
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/nl-models': typeof DashboardNlModelsRoute
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
+  '/stemming': typeof DashboardStemmingRoute
   '/stopwords': typeof DashboardStopwordsRoute
   '/synonyms': typeof DashboardSynonymsRoute
   '/collections/new': typeof DashboardCollectionsNewRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/nl-models': typeof DashboardNlModelsRoute
   '/presets': typeof DashboardPresetsRoute
   '/server': typeof DashboardServerRoute
+  '/stemming': typeof DashboardStemmingRoute
   '/stopwords': typeof DashboardStopwordsRoute
   '/synonyms': typeof DashboardSynonymsRoute
   '/': typeof DashboardIndexRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/_dashboard/nl-models': typeof DashboardNlModelsRoute
   '/_dashboard/presets': typeof DashboardPresetsRoute
   '/_dashboard/server': typeof DashboardServerRoute
+  '/_dashboard/stemming': typeof DashboardStemmingRoute
   '/_dashboard/stopwords': typeof DashboardStopwordsRoute
   '/_dashboard/synonyms': typeof DashboardSynonymsRoute
   '/_dashboard/': typeof DashboardIndexRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/nl-models'
     | '/presets'
     | '/server'
+    | '/stemming'
     | '/stopwords'
     | '/synonyms'
     | '/collections/new'
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/nl-models'
     | '/presets'
     | '/server'
+    | '/stemming'
     | '/stopwords'
     | '/synonyms'
     | '/'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/_dashboard/nl-models'
     | '/_dashboard/presets'
     | '/_dashboard/server'
+    | '/_dashboard/stemming'
     | '/_dashboard/stopwords'
     | '/_dashboard/synonyms'
     | '/_dashboard/'
@@ -405,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/stopwords'
       fullPath: '/stopwords'
       preLoaderRoute: typeof DashboardStopwordsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stemming': {
+      id: '/_dashboard/stemming'
+      path: '/stemming'
+      fullPath: '/stemming'
+      preLoaderRoute: typeof DashboardStemmingRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/server': {
@@ -588,6 +607,7 @@ interface DashboardRouteChildren {
   DashboardNlModelsRoute: typeof DashboardNlModelsRoute
   DashboardPresetsRoute: typeof DashboardPresetsRoute
   DashboardServerRoute: typeof DashboardServerRoute
+  DashboardStemmingRoute: typeof DashboardStemmingRoute
   DashboardStopwordsRoute: typeof DashboardStopwordsRoute
   DashboardSynonymsRoute: typeof DashboardSynonymsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -612,6 +632,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardNlModelsRoute: DashboardNlModelsRoute,
   DashboardPresetsRoute: DashboardPresetsRoute,
   DashboardServerRoute: DashboardServerRoute,
+  DashboardStemmingRoute: DashboardStemmingRoute,
   DashboardStopwordsRoute: DashboardStopwordsRoute,
   DashboardSynonymsRoute: DashboardSynonymsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
