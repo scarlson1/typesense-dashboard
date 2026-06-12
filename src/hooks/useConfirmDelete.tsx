@@ -65,8 +65,10 @@ export const useConfirmDelete = (options?: UseConfirmDeleteOptions) => {
       dialog.prompt({
         variant: 'danger',
         catchOnCancel: true,
-        title: `Confirm Deletion ["${correctValue}"]`,
-        description: `THIS ACTION CANNOT BE UNDONE. Type the value to confirm deletion (i.e. ${correctValue}).`,
+        title: options?.title ?? `Confirm Deletion ["${correctValue}"]`,
+        description:
+          options?.description ??
+          `THIS ACTION CANNOT BE UNDONE. Type the value to confirm deletion (i.e. ${correctValue}).`,
         content: (
           <Suspense fallback={<LoadingSpinner />}>
             <DeleteForm

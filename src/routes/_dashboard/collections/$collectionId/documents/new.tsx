@@ -45,6 +45,7 @@ import {
   Select,
   Skeleton,
   Stack,
+  TextField,
   Tooltip,
   Typography,
   Zoom,
@@ -233,6 +234,7 @@ function NewDocumentEditor() {
     useState<DocumentImportParameters['action']>('create');
   const [dirtyValues, setDirtyValues] =
     useState<DocumentImportParameters['dirty_values']>();
+  const [batchSize, setBatchSize] = useState('');
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
 
   const { data } = useSchema(collectionId);
@@ -267,12 +269,22 @@ function NewDocumentEditor() {
 
     const formatted = toJsonLinesString(JSON.parse(val));
 
+    const parsedBatchSize = Number.parseInt(batchSize, 10);
+
     mutation.mutate({
       collectionId,
       documents: formatted,
-      options: { action, dirty_values: dirtyValues, return_id: true },
+      options: {
+        action,
+        dirty_values: dirtyValues,
+        batch_size:
+          Number.isFinite(parsedBatchSize) && parsedBatchSize > 0
+            ? parsedBatchSize
+            : undefined,
+        return_id: true,
+      },
     });
-  }, [collectionId, markers, action, dirtyValues, mutation, toast]);
+  }, [collectionId, markers, action, dirtyValues, batchSize, mutation, toast]);
 
   return (
     <SectionCard
@@ -324,6 +336,17 @@ function NewDocumentEditor() {
               <MenuItem value='drop'>drop</MenuItem>
               <MenuItem value='reject'>reject</MenuItem>
             </Select>
+          </FormControl>
+          <FormControl size='small' sx={{ width: 110, flex: '0 1 auto' }}>
+            <TextField
+              label='Batch size'
+              size='small'
+              type='number'
+              value={batchSize}
+              onChange={(e) => setBatchSize(e.target.value)}
+              slotProps={{ htmlInput: { min: 1, step: 1 } }}
+            />
+            <FormHelperText>server default: 40</FormHelperText>
           </FormControl>
           <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }} />
           <Button

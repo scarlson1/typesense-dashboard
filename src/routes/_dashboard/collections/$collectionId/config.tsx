@@ -1,4 +1,5 @@
 import { ErrorFallback } from '@/components';
+import { BulkDocumentOpsCard } from '@/components/BulkDocumentOps';
 import {
   Badge,
   CollectionTabBar,
@@ -18,6 +19,7 @@ import {
   useDeleteCollection,
   useDialog,
   useSchema,
+  useTruncateCollection,
   useUpdateCollection,
 } from '@/hooks';
 import { useConfirmDelete } from '@/hooks/useConfirmDelete';
@@ -308,6 +310,12 @@ function CollectionSettings() {
           <CollectionSettingsCard collectionId={collectionId} />
 
           <IndexingHealthCard totalDocs={data.num_documents} />
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <BulkDocumentOpsCard collectionId={collectionId} />
+          </ErrorBoundary>
           <SchemaUpdateGuideCard />
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
@@ -799,13 +807,47 @@ function DangerZoneCard() {
           mb: 1.25,
         }}
       >
-        Drop this collection and all of its documents. This action cannot be
-        undone.
+        Truncate deletes every document but keeps the schema. Delete drops the
+        collection entirely. Neither action can be undone.
       </Typography>
-      <DeleteCollectionButton sx={{ width: '100%', ...dangerButtonSx }}>
-        Delete collection
-      </DeleteCollectionButton>
+      <Stack sx={{ gap: 1 }}>
+        <TruncateCollectionButton sx={{ width: '100%', ...dangerButtonSx }} />
+        <DeleteCollectionButton sx={{ width: '100%', ...dangerButtonSx }}>
+          Delete collection
+        </DeleteCollectionButton>
+      </Stack>
     </Box>
+  );
+}
+
+function TruncateCollectionButton({ sx, ...props }: ButtonProps) {
+  const { collectionId } = Route.useParams();
+  const { openConfirmDelete } = useConfirmDelete({
+    title: `Truncate "${collectionId}"`,
+    description: `THIS ACTION CANNOT BE UNDONE. Every document in "${collectionId}" will be deleted; the schema is kept. Type the collection name to confirm.`,
+  });
+
+  const truncateMutation = useTruncateCollection();
+
+  const handleTruncate = useCallback(async () => {
+    try {
+      await openConfirmDelete(collectionId);
+      truncateMutation.mutate(collectionId);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [collectionId, truncateMutation, openConfirmDelete]);
+
+  return (
+    <Button
+      variant='outlined'
+      sx={sx}
+      {...props}
+      onClick={() => void handleTruncate()}
+      loading={truncateMutation.isPending}
+    >
+      Truncate collection
+    </Button>
   );
 }
 

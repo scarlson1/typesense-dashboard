@@ -2,7 +2,6 @@ import type { Client } from 'typesense';
 import { E2E_COLLECTION } from './creds';
 
 const SCHEMA = {
-  name: E2E_COLLECTION,
   fields: [
     { name: 'title', type: 'string' as const },
     { name: 'brand', type: 'string' as const, facet: true },
@@ -18,18 +17,22 @@ const DOCS = [
 ];
 
 /**
- * Idempotently (re)create the E2E collection and import sample documents.
- * Safe to call before every test.
+ * Idempotently (re)create an E2E collection and import sample documents.
+ * Tests run fully parallel, so each test should seed its own uniquely named
+ * collection (see the `seededCollection` fixture) to avoid stomping others.
  */
-export const seedProducts = async (client: Client) => {
+export const seedProducts = async (
+  client: Client,
+  name: string = E2E_COLLECTION,
+) => {
   try {
-    await client.collections(E2E_COLLECTION).delete();
+    await client.collections(name).delete();
   } catch {
     // collection didn't exist — fine
   }
-  await client.collections().create(SCHEMA);
+  await client.collections().create({ ...SCHEMA, name });
   await client
-    .collections(E2E_COLLECTION)
+    .collections(name)
     .documents()
     .import(DOCS, { action: 'upsert' });
 };
