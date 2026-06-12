@@ -156,7 +156,27 @@ expires_at and filter_by embed correctly; copy-to-clipboard works
 
 ---
 
-## Phase 3 — Schema power features: reference (JOIN) fields + auto-embedding
+## Phase 3 — Schema power features: reference (JOIN) fields + auto-embedding ✅ DONE (2026-06-12)
+
+Implemented: reference (JOIN) picker per field card in the new-collection
+form (collection + field selects; `id` offered explicitly since it's
+implicit in schemas; `async_reference` checkbox); auto-embed/vector panel in
+the new-collection form via the shared `VectorFieldConfig` component
+(extracted from `SchemaFieldEditDialog`, which now reuses it); flat
+vector-state helpers in `utils/vectorFieldConfig.ts`; one payload builder
+(`utils/buildCollectionFields.ts`) feeding BOTH the live schema preview and
+submit; `async_reference` added to zod (and therefore the Monaco
+JSON-editor schema, which derives from it); reference carried through
+field edits in the dialog (drop+re-add no longer strips it) and shown
+read-only there (Typesense can't add references via alter); schema
+table/card views render reference links + embed summaries. Unit tests for
+the payload builder; e2e creates a referenced collection through the form
+on v29 + v30.
+
+Correction to the original brief: the field-edit dialog ALREADY had full
+auto-embedding support (providers, GCP auth, validation via `embedForm`) —
+the gap was only in the new-collection form path, plus reference UI
+everywhere.
 
 The zod schema (`src/types/typesenseCollection.ts:281`) already allows
 `reference`, but the field editor UI never exposes it, and there is no UI
@@ -204,7 +224,23 @@ and per-search error states; union mode gated to v30+.
 
 ---
 
-## Phase 5 — Analytics events
+## Phase 5 — Analytics events ✅ DONE (2026-06-12)
+
+Implemented: `useCreateAnalyticsEvent` + `useRecentAnalyticsEvents` hooks
+(`src/hooks/useAnalyticsEvents.ts`) and an `AnalyticsEventsPanel` on the
+analytics page with a "Send a test event" card (event-name autocomplete
+derived from rules, type select, user_id/doc_id/q) and a "Recent events"
+viewer (user_id + name + n). msw unit tests + e2e on both versions (the e2e
+compose now starts Typesense with analytics enabled).
+
+Facts verified against live v29/v30 servers (probed directly):
+- POST /analytics/events accepts `{ type, name, data }` on BOTH versions —
+  no version branching needed; always use `client.analytics.events()`.
+- v29 counter rules receive events under the rule's NAMED event
+  (`params.source.events[].name`), not the rule name; v30 uses the rule name.
+- GET /analytics/events exists on v29 too but returns `{"events":[]}` —
+  the viewer works everywhere and shows a v30 hint when empty; no hard gate.
+- v30 returns sent events from GET immediately (no flush-interval wait).
 
 Analytics **rules** are covered; **events** are not (only a key-action enum
 exists in `src/types/typesenseApiKeyActions.ts`).

@@ -75,6 +75,8 @@ export const analyticsQueryKeys = {
   all: (clusterId: string) => [clusterId, 'analytics'] as const,
   rules: (clusterId: string) =>
     [...analyticsQueryKeys.all(clusterId), 'rules'] as const,
+  events: (clusterId: string, params?: Record<string, unknown>) =>
+    [...analyticsQueryKeys.all(clusterId), 'events', params] as const,
 };
 
 // Aggregated analytics data lives in a rule's destination collection

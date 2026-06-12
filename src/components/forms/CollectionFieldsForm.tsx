@@ -22,7 +22,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import type { FieldType } from 'typesense/lib/Typesense/Collection';
+import type {
+  CollectionSchema,
+  FieldType,
+} from 'typesense/lib/Typesense/Collection';
 
 // Field types whose text can feed an auto-embedding (`embed.from`).
 const EMBED_SOURCE_TYPES = ['string', 'string[]'];
@@ -32,6 +35,25 @@ const EMBED_SOURCE_TYPES = ['string', 'string[]'];
 const splitReference = (ref: string): [string, string] => {
   const dot = ref.indexOf('.');
   return dot === -1 ? [ref, ''] : [ref.slice(0, dot), ref.slice(dot + 1)];
+};
+
+// Render-prop wrapper so the data hooks live in a real component — the
+// `withForm` render below isn't one as far as the rules-of-hooks lint goes.
+const ReferenceCollections = ({
+  children,
+}: {
+  children: (
+    collections: CollectionSchema[] | undefined,
+  ) => React.ReactNode;
+}) => {
+  const [client, clusterId] = useTypesenseClient();
+  // Existing collections + their fields feed the reference (JOIN) pickers.
+  const { data } = useQuery({
+    queryKey: collectionQueryKeys.list(clusterId, {}),
+    queryFn: () => client.collections().retrieve(),
+    staleTime: 1000 * 60,
+  });
+  return <>{children(data)}</>;
 };
 
 // Redesigned (Option A) field editor — one card per field with a numbered
@@ -76,15 +98,9 @@ const FIELD_FLAGS = [
 export const CollectionFieldsForm = withForm({
   ...collectionFormOpts,
   render: ({ form }) => {
-    const [client, clusterId] = useTypesenseClient();
-    // Existing collections + their fields feed the reference (JOIN) pickers.
-    const { data: collections } = useQuery({
-      queryKey: collectionQueryKeys.list(clusterId, {}),
-      queryFn: () => client.collections().retrieve(),
-      staleTime: 1000 * 60,
-    });
-
     return (
+      <ReferenceCollections>
+        {(collections) => (
       <form.AppField name='fields' mode='array'>
         {({ state, pushValue, removeValue }) => (
           <Box
@@ -518,6 +534,8 @@ export const CollectionFieldsForm = withForm({
           </Box>
         )}
       </form.AppField>
+        )}
+      </ReferenceCollections>
     );
   },
 });

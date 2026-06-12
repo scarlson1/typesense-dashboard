@@ -170,18 +170,17 @@ export const ReferenceNote = ({
       }}
     >
       <LinkRounded sx={{ fontSize: 11 }} />
-      <Box
-        component={Link}
+      <Link
         to='/collections/$collectionId/config'
         params={{ collectionId: refCollection }}
-        sx={{
+        title={`references ${reference}`}
+        style={{
           color: designTokens.accentDeep,
           textDecorationColor: designTokens.accentBorder,
         }}
-        title={`references ${reference}`}
       >
         {reference}
-      </Box>
+      </Link>
       {isAsync ? (
         <Box component='span' sx={{ color: designTokens.textFaint }}>
           (async)

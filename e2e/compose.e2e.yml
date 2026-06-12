@@ -4,7 +4,7 @@
 services:
   typesense-v29:
     image: typesense/typesense:29.0
-    command: '--data-dir=/data --api-key=xyz --api-port=8108 --enable-cors'
+    command: '--data-dir=/data --api-key=xyz --api-port=8108 --enable-cors --enable-search-analytics=true --analytics-dir=/data/analytics --analytics-flush-interval=60'
     ports:
       - '8108:8108'
     tmpfs:
@@ -12,7 +12,7 @@ services:
 
   typesense-v30:
     image: typesense/typesense:30.2
-    command: '--data-dir=/data --api-key=xyz --api-port=8108 --enable-cors'
+    command: '--data-dir=/data --api-key=xyz --api-port=8108 --enable-cors --enable-search-analytics=true --analytics-dir=/data/analytics --analytics-flush-interval=60'
     ports:
       - '8109:8108'
     tmpfs:
