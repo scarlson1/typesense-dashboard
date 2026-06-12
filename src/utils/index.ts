@@ -3,9 +3,11 @@ export * from './getObjectDiff';
 export * from './presetCollection';
 export * from './searchModeParams';
 export * from './mapboxStore';
+export * from './buildCollectionFields';
 export * from './queryClient';
 export * from './typesenseStore';
 export * from './uiStore';
+export * from './vectorFieldConfig';
 
 /**
  * Drop keys whose value is `undefined`, `null`, or an empty string — useful for

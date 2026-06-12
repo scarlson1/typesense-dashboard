@@ -1,8 +1,10 @@
 import { Badge, smallButtonSx } from '@/components/redesign';
-import { collectionFormOpts, NEW_EMPTY_FIELD } from '@/constants';
-import { withForm } from '@/hooks';
+import { VectorFieldConfig } from '@/components/VectorFieldConfig';
+import { collectionFormOpts, collectionQueryKeys, NEW_EMPTY_FIELD } from '@/constants';
+import { useTypesenseClient, withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseFieldType } from '@/types';
+import { buildVectorConfigState, VECTOR_TYPE } from '@/utils';
 import {
   AddRounded,
   AutoFixHighRounded,
@@ -19,7 +21,18 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import type { FieldType } from 'typesense/lib/Typesense/Collection';
+
+// Field types whose text can feed an auto-embedding (`embed.from`).
+const EMBED_SOURCE_TYPES = ['string', 'string[]'];
+
+// Split 'collection.field' into its two halves (field may contain dots when
+// nested fields are enabled, so only the first dot separates).
+const splitReference = (ref: string): [string, string] => {
+  const dot = ref.indexOf('.');
+  return dot === -1 ? [ref, ''] : [ref.slice(0, dot), ref.slice(dot + 1)];
+};
 
 // Redesigned (Option A) field editor — one card per field with a numbered
 // badge, name + type inputs, a remove action and a wrapped row of flag toggles.
@@ -63,6 +76,14 @@ const FIELD_FLAGS = [
 export const CollectionFieldsForm = withForm({
   ...collectionFormOpts,
   render: ({ form }) => {
+    const [client, clusterId] = useTypesenseClient();
+    // Existing collections + their fields feed the reference (JOIN) pickers.
+    const { data: collections } = useQuery({
+      queryKey: collectionQueryKeys.list(clusterId, {}),
+      queryFn: () => client.collections().retrieve(),
+      staleTime: 1000 * 60,
+    });
+
     return (
       <form.AppField name='fields' mode='array'>
         {({ state, pushValue, removeValue }) => (
@@ -271,6 +292,189 @@ export const CollectionFieldsForm = withForm({
                       </form.Field>
                     ))}
                   </Box>
+
+                  {/* Reference (JOIN) picker */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      gap: 1.25,
+                      mt: 1.5,
+                      pt: 1.5,
+                      pl: { xs: 0, sm: 4 },
+                      borderTop: `1px solid ${designTokens.border}`,
+                    }}
+                  >
+                    <form.Field name={`fields[${i}].reference`}>
+                      {({ state: refState, handleChange }) => {
+                        const [refCollection, refField] = splitReference(
+                          refState.value ?? '',
+                        );
+                        // `id` is implicit in every Typesense schema and is
+                        // the canonical JOIN target, so offer it first.
+                        const refFields = [
+                          'id',
+                          ...(collections
+                            ?.find((c) => c.name === refCollection)
+                            ?.fields?.map((f) => f.name) ?? []),
+                        ];
+                        return (
+                          <>
+                            <Box sx={{ width: { xs: '100%', sm: 200 } }}>
+                              <MuiTextField
+                                select
+                                fullWidth
+                                value={refCollection}
+                                onChange={(e) =>
+                                  handleChange(
+                                    e.target.value ? `${e.target.value}.` : '',
+                                  )
+                                }
+                                slotProps={{
+                                  select: {
+                                    displayEmpty: true,
+                                    renderValue: (v) =>
+                                      (v as string) || (
+                                        <Box
+                                          component='span'
+                                          sx={{ color: designTokens.textFaint }}
+                                        >
+                                          Reference (JOIN)
+                                        </Box>
+                                      ),
+                                  },
+                                }}
+                              >
+                                <MenuItem value='' dense>
+                                  <Box
+                                    component='em'
+                                    sx={{ color: designTokens.textMuted }}
+                                  >
+                                    None
+                                  </Box>
+                                </MenuItem>
+                                {(collections ?? []).map((c) => (
+                                  <MenuItem
+                                    key={c.name}
+                                    value={c.name}
+                                    dense
+                                    sx={{
+                                      fontFamily: designTokens.fontMono,
+                                      fontSize: 13,
+                                    }}
+                                  >
+                                    {c.name}
+                                  </MenuItem>
+                                ))}
+                              </MuiTextField>
+                            </Box>
+                            {refCollection ? (
+                              <Box sx={{ width: { xs: '100%', sm: 180 } }}>
+                                <MuiTextField
+                                  select
+                                  fullWidth
+                                  value={refField}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      `${refCollection}.${e.target.value}`,
+                                    )
+                                  }
+                                  slotProps={{
+                                    select: {
+                                      displayEmpty: true,
+                                      renderValue: (v) =>
+                                        (v as string) || (
+                                          <Box
+                                            component='span'
+                                            sx={{
+                                              color: designTokens.textFaint,
+                                            }}
+                                          >
+                                            referenced field *
+                                          </Box>
+                                        ),
+                                    },
+                                  }}
+                                >
+                                  {refFields.map((name) => (
+                                    <MenuItem
+                                      key={name}
+                                      value={name}
+                                      dense
+                                      sx={{
+                                        fontFamily: designTokens.fontMono,
+                                        fontSize: 13,
+                                      }}
+                                    >
+                                      {name}
+                                    </MenuItem>
+                                  ))}
+                                </MuiTextField>
+                              </Box>
+                            ) : null}
+                            {refCollection ? (
+                              <form.Field
+                                name={`fields[${i}].async_reference`}
+                              >
+                                {({
+                                  state: asyncState,
+                                  handleChange: onAsyncChange,
+                                }) => (
+                                  <FormControlLabel
+                                    sx={{
+                                      m: 0,
+                                      gap: 0.75,
+                                      '& .MuiFormControlLabel-label': {
+                                        fontSize: 13,
+                                        color: designTokens.textMuted,
+                                      },
+                                    }}
+                                    control={
+                                      <MuiCheckbox
+                                        size='small'
+                                        color='primary'
+                                        checked={!!asyncState.value}
+                                        onChange={(e) =>
+                                          onAsyncChange(e.target.checked)
+                                        }
+                                        sx={{ p: 0.5 }}
+                                      />
+                                    }
+                                    label='Async (referenced doc may not exist yet)'
+                                  />
+                                )}
+                              </form.Field>
+                            ) : null}
+                          </>
+                        );
+                      }}
+                    </form.Field>
+                  </Box>
+
+                  {/* Vector / auto-embed config for float[] fields */}
+                  {state.value[i]?.type === VECTOR_TYPE ? (
+                    <Box sx={{ mt: 1.5, pl: { xs: 0, sm: 4 } }}>
+                      <form.Field name={`fields[${i}].vectorConfig`}>
+                        {({ state: vcState, handleChange }) => (
+                          <VectorFieldConfig
+                            state={
+                              vcState.value ?? buildVectorConfigState(null)
+                            }
+                            onChange={handleChange}
+                            fromOptions={state.value
+                              .filter(
+                                (f, idx) =>
+                                  idx !== i &&
+                                  EMBED_SOURCE_TYPES.includes(f.type) &&
+                                  f.name,
+                              )
+                              .map((f) => f.name)}
+                          />
+                        )}
+                      </form.Field>
+                    </Box>
+                  ) : null}
                 </Box>
               ))}
             </Stack>
