@@ -3,21 +3,106 @@ import {
   SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
+import { DEFAULT_MONACO_OPTIONS } from '@/constants';
 import {
   useAsyncToast,
   useDeleteByQuery,
   useDialog,
+  useSchema,
   useTypesenseClient,
   useUpdateByQuery,
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { Button, Divider, Stack, TextField, Typography } from '@mui/material';
-import { useCallback, useState } from 'react';
+import type { TypesenseFieldType } from '@/types';
+import type { OnMount } from '@monaco-editor/react';
+import {
+  Box,
+  Button,
+  Divider,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { editor } from 'monaco-editor';
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { Client } from 'typesense';
 
-// TODO: use json editor for update by filter
+const JsonEditor = lazy(() => import('./JsonEditor'));
 
 type PendingCount = 'delete' | 'update' | null;
+
+// Map a Typesense field type to a JSON-schema fragment so Monaco can validate
+// a patch value against the field's declared type.
+const fieldTypeToJsonSchema = (
+  type: TypesenseFieldType,
+): Record<string, unknown> => {
+  switch (type) {
+    case 'string':
+    case 'string*':
+    case 'image':
+      return { type: 'string' };
+    case 'int32':
+    case 'int64':
+      return { type: 'integer' };
+    case 'float':
+      return { type: 'number' };
+    case 'bool':
+      return { type: 'boolean' };
+    case 'string[]':
+      return { type: 'array', items: { type: 'string' } };
+    case 'int32[]':
+    case 'int64[]':
+      return { type: 'array', items: { type: 'integer' } };
+    case 'float[]':
+      return { type: 'array', items: { type: 'number' } };
+    case 'bool[]':
+      return { type: 'array', items: { type: 'boolean' } };
+    case 'geopoint':
+      return {
+        type: 'array',
+        items: { type: 'number' },
+        minItems: 2,
+        maxItems: 2,
+      };
+    case 'geopoint[]':
+      return {
+        type: 'array',
+        items: { type: 'array', items: { type: 'number' } },
+      };
+    case 'geopolygon':
+      return { type: 'array', items: { type: 'number' } };
+    case 'object':
+      return { type: 'object' };
+    case 'object[]':
+      return { type: 'array', items: { type: 'object' } };
+    case 'auto':
+    default:
+      return {}; // accept anything
+  }
+};
+
+interface SchemaField {
+  name: string;
+  type: TypesenseFieldType;
+}
+
+// A valid update-by-filter patch is any non-empty subset of the collection's
+// fields, each constrained to its declared type. `additionalProperties: false`
+// makes typo'd field names surface in the editor instead of silently no-op'ing.
+const buildPatchSchema = (fields: SchemaField[] = []) => {
+  const properties: Record<string, unknown> = { id: { type: 'string' } };
+  for (const f of fields) {
+    if (f.name.includes('.')) continue; // nested child; covered by its object parent
+    properties[f.name] = fieldTypeToJsonSchema(f.type);
+  }
+  return {
+    type: 'object',
+    properties,
+    additionalProperties: false,
+    minProperties: 1,
+  };
+};
 
 const monoInputSlotProps = {
   input: { sx: { fontFamily: designTokens.fontMono, fontSize: 12.5 } },
@@ -72,8 +157,19 @@ function UpdateByQuery({
   const dialog = useDialog();
 
   const [updateFilter, setUpdateFilter] = useState('');
-  const [updateDoc, setUpdateDoc] = useState('');
   const [counting, setCounting] = useState<PendingCount>(null);
+
+  const { data } = useSchema(collectionId);
+  const patchSchema = useMemo(
+    () => buildPatchSchema(data?.fields as SchemaField[] | undefined),
+    [data?.fields],
+  );
+
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
+  const [markers, setMarkers] = useState<editor.IMarker[]>([]);
+  const handleMount: OnMount = useCallback((ed) => {
+    editorRef.current = ed;
+  }, []);
 
   const updateMutation = useUpdateByQuery();
 
@@ -91,10 +187,17 @@ function UpdateByQuery({
   const handleUpdate = useCallback(async () => {
     const filterBy = updateFilter.trim();
     if (!filterBy) return void toast.warn('filter_by is required');
+    if (markers.length)
+      return void toast.warn('fix the highlighted JSON errors', {
+        id: 'monaco-validation',
+      });
+
+    const raw = editorRef.current?.getValue()?.trim();
+    if (!raw) return void toast.warn('document patch is required');
 
     let document: Record<string, unknown>;
     try {
-      document = JSON.parse(updateDoc);
+      document = JSON.parse(raw);
     } catch {
       return void toast.warn('document patch is not valid JSON');
     }
@@ -145,8 +248,8 @@ function UpdateByQuery({
     collectionId,
     countMatches,
     dialog,
+    markers.length,
     toast,
-    updateDoc,
     updateFilter,
     updateMutation,
   ]);
@@ -167,22 +270,35 @@ function UpdateByQuery({
         fullWidth
         slotProps={monoInputSlotProps}
       />
-      <TextField
-        label='Document patch (JSON)'
-        placeholder='{ "on_sale": true }'
-        value={updateDoc}
-        onChange={(e) => setUpdateDoc(e.target.value)}
-        size='small'
-        fullWidth
-        multiline
-        minRows={3}
-        slotProps={monoInputSlotProps}
-      />
+      <Stack sx={{ gap: 0.5 }}>
+        <Typography sx={{ fontSize: 11.5, color: designTokens.textMuted }}>
+          Document patch (JSON)
+        </Typography>
+        <Box
+          sx={{
+            border: `1px solid ${designTokens.border}`,
+            borderRadius: 0.875,
+            overflow: 'hidden',
+          }}
+        >
+          <Suspense fallback={<Skeleton variant='rounded' height={160} />}>
+            <JsonEditor
+              height={160}
+              defaultValue={'{\n  \n}'}
+              onMount={handleMount}
+              onValidate={(m) => setMarkers(m)}
+              options={DEFAULT_MONACO_OPTIONS}
+              schema={patchSchema}
+            />
+          </Suspense>
+        </Box>
+      </Stack>
       <Button
         variant='outlined'
         size='small'
         sx={smallButtonSx}
         onClick={() => void handleUpdate()}
+        disabled={Boolean(markers.length)}
         loading={counting === 'update' || updateMutation.isPending}
       >
         Preview &amp; update matches
