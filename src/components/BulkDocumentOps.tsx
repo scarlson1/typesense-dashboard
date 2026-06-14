@@ -3,27 +3,43 @@ import {
   SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
-import { DEFAULT_MONACO_OPTIONS } from '@/constants';
 import {
+  DEFAULT_MONACO_OPTIONS,
+  buildFilterBy,
+  emptyCondition,
+  fieldKind,
+  OPERATORS,
+  operatorsByKind,
+  updateFilterFormOpts,
+  type FieldKind,
+} from '@/constants';
+import {
+  useAppForm,
   useAsyncToast,
   useDeleteByQuery,
   useDialog,
   useSchema,
   useTypesenseClient,
   useUpdateByQuery,
+  withForm,
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import type { TypesenseFieldType } from '@/types';
+import { AddRounded, CloseRounded } from '@mui/icons-material';
 import type { OnMount } from '@monaco-editor/react';
 import {
   Box,
   Button,
   Divider,
+  IconButton,
   Skeleton,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { useStore } from '@tanstack/react-form';
 import { editor } from 'monaco-editor';
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { Client } from 'typesense';
@@ -87,21 +103,50 @@ interface SchemaField {
   type: TypesenseFieldType;
 }
 
-// A valid update-by-filter patch is any non-empty subset of the collection's
-// fields, each constrained to its declared type. `additionalProperties: false`
-// makes typo'd field names surface in the editor instead of silently no-op'ing.
-const buildPatchSchema = (fields: SchemaField[] = []) => {
-  const properties: Record<string, unknown> = { id: { type: 'string' } };
-  for (const f of fields) {
-    if (f.name.includes('.')) continue; // nested child; covered by its object parent
-    properties[f.name] = fieldTypeToJsonSchema(f.type);
+interface FieldNode {
+  type?: TypesenseFieldType;
+  children: Map<string, FieldNode>;
+}
+
+// Turn a field tree node into a JSON-schema fragment. Nodes with children are
+// the nested object fields (`address` -> `address.state`); they rebuild into
+// real nested `properties` so the editor can autocomplete sub-keys.
+const nodeToJsonSchema = (node: FieldNode): Record<string, unknown> => {
+  if (node.children.size === 0) {
+    return node.type ? fieldTypeToJsonSchema(node.type) : {};
   }
-  return {
-    type: 'object',
-    properties,
-    additionalProperties: false,
-    minProperties: 1,
-  };
+  const properties: Record<string, unknown> = {};
+  for (const [name, child] of node.children) {
+    properties[name] = nodeToJsonSchema(child);
+  }
+  const objectSchema = { type: 'object', properties };
+  // An `object[]` parent holds an array of these nested objects.
+  return node.type?.endsWith('[]')
+    ? { type: 'array', items: objectSchema }
+    : objectSchema;
+};
+
+// A valid update-by-filter patch is any subset of the collection's fields, each
+// constrained to its declared type. Dotted field names (`address.state`) are
+// split so nested object fields rebuild into nested schemas, which is what
+// enables sub-key autocomplete. No `additionalProperties: false` — Typesense
+// documents may carry stored-only keys absent from the indexed schema.
+const buildPatchSchema = (fields: SchemaField[] = []) => {
+  const root: FieldNode = { children: new Map() };
+  for (const field of fields) {
+    if (field.name === '.*') continue; // auto-detect marker, not a real field
+    let node = root;
+    for (const part of field.name.split('.')) {
+      let child = node.children.get(part);
+      if (!child) {
+        child = { children: new Map() };
+        node.children.set(part, child);
+      }
+      node = child;
+    }
+    node.type = field.type;
+  }
+  return nodeToJsonSchema(root);
 };
 
 const monoInputSlotProps = {
@@ -156,8 +201,11 @@ function UpdateByQuery({
   const toast = useAsyncToast();
   const dialog = useDialog();
 
-  const [updateFilter, setUpdateFilter] = useState('');
   const [counting, setCounting] = useState<PendingCount>(null);
+  // Builder vs. raw escape hatch. The structured builder can't express mixed
+  // AND/OR precedence, geo, or object fields — raw mode covers those.
+  const [rawMode, setRawMode] = useState(false);
+  const [rawFilter, setRawFilter] = useState('');
 
   const { data } = useSchema(collectionId);
   const patchSchema = useMemo(
@@ -165,8 +213,25 @@ function UpdateByQuery({
     [data?.fields],
   );
 
+  const fields = (data?.fields ?? []) as SchemaField[];
+  // Read field kinds from a ref so the form's onSubmit closure always sees the
+  // latest schema without re-creating the form.
+  const fieldsRef = useRef<SchemaField[]>(fields);
+  fieldsRef.current = fields;
+  const kindOf = useCallback((name: string): FieldKind => {
+    const f = fieldsRef.current.find((x) => x.name === name);
+    return f ? fieldKind(f.type) : 'unsupported';
+  }, []);
+
+  // Monaco markers gate the document patch. Mirror them in a ref for the async
+  // submit path (where the state value would be stale).
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
+  const markersRef = useRef<editor.IMarker[]>([]);
   const [markers, setMarkers] = useState<editor.IMarker[]>([]);
+  const handleValidate = useCallback((m: editor.IMarker[]) => {
+    markersRef.current = m;
+    setMarkers(m);
+  }, []);
   const handleMount: OnMount = useCallback((ed) => {
     editorRef.current = ed;
   }, []);
@@ -184,92 +249,165 @@ function UpdateByQuery({
     [client, collectionId],
   );
 
-  const handleUpdate = useCallback(async () => {
-    const filterBy = updateFilter.trim();
-    if (!filterBy) return void toast.warn('filter_by is required');
-    if (markers.length)
-      return void toast.warn('fix the highlighted JSON errors', {
-        id: 'monaco-validation',
-      });
+  const runUpdate = useCallback(
+    async (filterBy: string) => {
+      filterBy = filterBy.trim();
+      if (!filterBy) return void toast.warn('a filter condition is required');
+      if (markersRef.current.length)
+        return void toast.warn('fix the highlighted JSON errors', {
+          id: 'monaco-validation',
+        });
 
-    const raw = editorRef.current?.getValue()?.trim();
-    if (!raw) return void toast.warn('document patch is required');
+      const raw = editorRef.current?.getValue()?.trim();
+      if (!raw) return void toast.warn('document patch is required');
 
-    let document: Record<string, unknown>;
-    try {
-      document = JSON.parse(raw);
-    } catch {
-      return void toast.warn('document patch is not valid JSON');
-    }
-    if (
-      !document ||
-      Array.isArray(document) ||
-      typeof document !== 'object' ||
-      !Object.keys(document).length
-    ) {
-      return void toast.warn(
-        'document patch must be a JSON object with at least one field',
-      );
-    }
+      let document: Record<string, unknown>;
+      try {
+        document = JSON.parse(raw);
+      } catch {
+        return void toast.warn('document patch is not valid JSON');
+      }
+      if (
+        !document ||
+        Array.isArray(document) ||
+        typeof document !== 'object' ||
+        !Object.keys(document).length
+      ) {
+        return void toast.warn(
+          'document patch must be a JSON object with at least one field',
+        );
+      }
 
-    setCounting('update');
-    let found: number;
-    try {
-      found = await countMatches(filterBy);
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'error counting matches',
-      );
-      return;
-    } finally {
-      setCounting(null);
-    }
+      setCounting('update');
+      let found: number;
+      try {
+        found = await countMatches(filterBy);
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : 'error counting matches',
+        );
+        return;
+      } finally {
+        setCounting(null);
+      }
 
-    if (!found) return void toast.info('no documents match this filter');
+      if (!found) return void toast.info('no documents match this filter');
 
-    try {
-      await dialog.prompt({
-        variant: 'danger',
-        catchOnCancel: true,
-        title: `Update ${found.toLocaleString()} documents?`,
-        description: `The fields ${Object.keys(document).join(', ')} will be patched onto every document in "${collectionId}" matching ${filterBy}.`,
-        slotProps: {
-          cancelButton: { children: 'cancel' },
-          acceptButton: { children: `update ${found.toLocaleString()} docs` },
-        },
-      });
-    } catch (err) {
-      console.log('cancelled update by query', err);
-      return;
-    }
+      try {
+        await dialog.prompt({
+          variant: 'danger',
+          catchOnCancel: true,
+          title: `Update ${found.toLocaleString()} documents?`,
+          description: `The fields ${Object.keys(document).join(', ')} will be patched onto every document in "${collectionId}" matching ${filterBy}.`,
+          slotProps: {
+            cancelButton: { children: 'cancel' },
+            acceptButton: { children: `update ${found.toLocaleString()} docs` },
+          },
+        });
+      } catch (err) {
+        console.log('cancelled update by query', err);
+        return;
+      }
 
-    updateMutation.mutate({ collectionId, document, filterBy });
-  }, [
-    collectionId,
-    countMatches,
-    dialog,
-    markers.length,
-    toast,
-    updateFilter,
-    updateMutation,
-  ]);
+      updateMutation.mutate({ collectionId, document, filterBy });
+    },
+    [collectionId, countMatches, dialog, toast, updateMutation],
+  );
+
+  const form = useAppForm({
+    ...updateFilterFormOpts,
+    onSubmit: async ({ value }) => {
+      await runUpdate(buildFilterBy(value, kindOf));
+    },
+  });
 
   return (
-    <Stack
-      direction='column'
-      spacing={1.25}
-      // sx={{ gap: 1.25 }}
-    >
-      <TextField
-        label='Update filter (filter_by)'
-        // placeholder='e.g. in_stock:false'
-        placeholder='e.g. num_employees:>1000'
-        value={updateFilter}
-        onChange={(e) => setUpdateFilter(e.target.value)}
-        size='small'
-        fullWidth
-        slotProps={monoInputSlotProps}
-      />
+    <Stack direction='column' spacing={1.25}>
+      <Stack
+        direction='row'
+        sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+      >
+        <Typography sx={{ fontSize: 11.5, color: designTokens.textMuted }}>
+          Update filter (filter_by)
+        </Typography>
+        <Button
+          size='small'
+          sx={smallButtonSx}
+          onClick={() => setRawMode((m) => !m)}
+        >
+          {rawMode ? 'Use builder' : 'Raw filter'}
+        </Button>
+      </Stack>
+
+      {rawMode ? (
+        <TextField
+          label='Raw filter (filter_by)'
+          placeholder='e.g. (num_employees:>1000 && country:=US) || featured:=true'
+          value={rawFilter}
+          onChange={(e) => setRawFilter(e.target.value)}
+          size='small'
+          fullWidth
+          slotProps={monoInputSlotProps}
+        />
+      ) : (
+        <Suspense fallback={<Skeleton variant='rounded' height={96} />}>
+          <form.AppField name='join'>
+            {({ state, handleChange }) => (
+              <ToggleButtonGroup
+                exclusive
+                size='small'
+                value={state.value}
+                onChange={(_, v) => v && handleChange(v)}
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                <ToggleButton value='&&'>Match ALL</ToggleButton>
+                <ToggleButton value='||'>Match ANY</ToggleButton>
+              </ToggleButtonGroup>
+            )}
+          </form.AppField>
+
+          <form.Field name='conditions' mode='array'>
+            {(arrayField) => (
+              <Stack spacing={1}>
+                {arrayField.state.value.map((_, i) => (
+                  <ConditionRow
+                    key={i}
+                    form={form}
+                    index={i}
+                    fields={fields}
+                    canRemove={arrayField.state.value.length > 1}
+                    onRemove={() => arrayField.removeValue(i)}
+                  />
+                ))}
+                <Button
+                  size='small'
+                  startIcon={<AddRounded sx={{ fontSize: 14 }} />}
+                  sx={{ ...smallButtonSx, alignSelf: 'flex-start' }}
+                  onClick={() => arrayField.pushValue({ ...emptyCondition })}
+                >
+                  Add condition
+                </Button>
+              </Stack>
+            )}
+          </form.Field>
+
+          <form.Subscribe selector={(s) => s.values}>
+            {(v) => (
+              <Typography
+                sx={{
+                  fontFamily: designTokens.fontMono,
+                  fontSize: 11.5,
+                  color: designTokens.textMuted,
+                  wordBreak: 'break-all',
+                }}
+              >
+                filter_by: {buildFilterBy(v, kindOf) || '—'}
+              </Typography>
+            )}
+          </form.Subscribe>
+        </Suspense>
+      )}
+
       <Stack sx={{ gap: 0.5 }}>
         <Typography sx={{ fontSize: 11.5, color: designTokens.textMuted }}>
           Document patch (JSON)
@@ -281,12 +419,12 @@ function UpdateByQuery({
             overflow: 'hidden',
           }}
         >
-          <Suspense fallback={<Skeleton variant='rounded' height={160} />}>
+          <Suspense fallback={<Skeleton variant='rounded' height={140} />}>
             <JsonEditor
-              height={160}
+              height={140}
               defaultValue={'{\n  \n}'}
               onMount={handleMount}
-              onValidate={(m) => setMarkers(m)}
+              onValidate={handleValidate}
               options={DEFAULT_MONACO_OPTIONS}
               schema={patchSchema}
             />
@@ -297,7 +435,9 @@ function UpdateByQuery({
         variant='outlined'
         size='small'
         sx={smallButtonSx}
-        onClick={() => void handleUpdate()}
+        onClick={() =>
+          rawMode ? void runUpdate(rawFilter) : void form.handleSubmit()
+        }
         disabled={Boolean(markers.length)}
         loading={counting === 'update' || updateMutation.isPending}
       >
@@ -306,6 +446,129 @@ function UpdateByQuery({
     </Stack>
   );
 }
+
+/**
+ * One `field <operator> value` row of the filter builder. Pulled into its own
+ * `withForm` component so each row subscribes only to its own slice of state —
+ * changing one row doesn't re-render the others, and the value control's shape
+ * stays derived from the selected field's kind.
+ */
+const ConditionRow = withForm({
+  ...updateFilterFormOpts,
+  props: {
+    index: 0,
+    fields: [] as SchemaField[],
+    canRemove: false,
+    onRemove: () => {},
+  },
+  render: function ConditionRow({ form, index, fields, canRemove, onRemove }) {
+    const base = `conditions[${index}]` as const;
+
+    const fieldName = useStore(
+      form.store,
+      (s) => s.values.conditions[index]?.field,
+    );
+    const operator = useStore(
+      form.store,
+      (s) => s.values.conditions[index]?.operator,
+    );
+
+    const kind = useMemo<FieldKind>(() => {
+      const f = fields.find((x) => x.name === fieldName);
+      return f ? fieldKind(f.type) : 'unsupported';
+    }, [fields, fieldName]);
+
+    // Only fields the builder can actually filter; geo/object need raw mode.
+    const fieldOptions = useMemo(
+      () =>
+        fields
+          .filter((f) => operatorsByKind[fieldKind(f.type)].length > 0)
+          .map((f) => f.name),
+      [fields],
+    );
+    const operatorOptions = operatorsByKind[kind].map((op) => ({
+      value: op,
+      label: OPERATORS[op].label,
+    }));
+    const inputKind = OPERATORS[operator]?.input ?? 'single';
+
+    return (
+      <Stack direction='row' spacing={1} sx={{ alignItems: 'flex-start' }}>
+        <form.AppField
+          name={`${base}.field`}
+          listeners={{
+            // Reset operator + value when the field changes so we never keep an
+            // operator that's illegal for the new field's kind.
+            onChange: ({ value }) => {
+              const f = fields.find((x) => x.name === value);
+              const k = f ? fieldKind(f.type) : 'unsupported';
+              form.setFieldValue(`${base}.operator`, operatorsByKind[k][0] ?? 'eq');
+              form.setFieldValue(`${base}.value`, '');
+              form.setFieldValue(`${base}.valueMax`, '');
+              form.setFieldValue(`${base}.values`, []);
+            },
+          }}
+        >
+          {({ Select }) => (
+            <Select label='Field' options={fieldOptions} size='small' />
+          )}
+        </form.AppField>
+
+        <form.AppField name={`${base}.operator`}>
+          {({ Select }) => (
+            <Select label='Operator' options={operatorOptions} size='small' />
+          )}
+        </form.AppField>
+
+        {kind === 'bool' ? (
+          <form.AppField name={`${base}.value`}>
+            {({ Select }) => (
+              <Select label='Value' options={['true', 'false']} size='small' />
+            )}
+          </form.AppField>
+        ) : inputKind === 'multi' ? (
+          <form.AppField name={`${base}.values`}>
+            {({ Autocomplete }) => (
+              <Autocomplete label='Values' multiple freeSolo options={[]} />
+            )}
+          </form.AppField>
+        ) : inputKind === 'range' ? (
+          <>
+            <form.AppField name={`${base}.value`}>
+              {({ TextField }) => (
+                <TextField label='Min' type='number' size='small' />
+              )}
+            </form.AppField>
+            <form.AppField name={`${base}.valueMax`}>
+              {({ TextField }) => (
+                <TextField label='Max' type='number' size='small' />
+              )}
+            </form.AppField>
+          </>
+        ) : (
+          <form.AppField name={`${base}.value`}>
+            {({ TextField }) => (
+              <TextField
+                label='Value'
+                type={kind === 'numeric' ? 'number' : 'text'}
+                size='small'
+              />
+            )}
+          </form.AppField>
+        )}
+
+        <IconButton
+          size='small'
+          disabled={!canRemove}
+          onClick={onRemove}
+          aria-label='remove condition'
+        >
+          <CloseRounded sx={{ fontSize: 16 }} />
+        </IconButton>
+      </Stack>
+    );
+  },
+});
 
 function DeleteByFilter({
   collectionId,
