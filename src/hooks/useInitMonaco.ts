@@ -37,39 +37,58 @@ export function useInitMonaco({
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorPath = `${editorId}.json`; // Unique path per editor instance
 
-  const applySchema: OnMount = useCallback((editor, monaco) => {
-    editor.getAction('editor.action.formatDocument')?.run();
-    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-      validate: true,
-      schemas: [
-        {
-          uri: `schema://${editorId}`, // '', // 'http://json-schema.org/draft-04/schema#',
-          fileMatch: [editorPath], // Match only this editor's path
-          schema,
-          // uri: '',
-          // fileMatch: ['*'], // ['*.json'], // associate with any file
-          // schema,
-        },
-      ],
-    });
-  }, []);
+  const applySchema: OnMount = useCallback(
+    (editor, monaco) => {
+      // Both this hook's deferred timer and its focus handler can fire after
+      // the editor (and Monaco's services) have been disposed — closing a
+      // dialog or changing route tears the webview port down. Guard against a
+      // missing editor and swallow the disposal race so it can't crash React.
+      if (!editor) return;
+      try {
+        editor.getAction('editor.action.formatDocument')?.run();
+        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+          validate: true,
+          schemas: [
+            {
+              uri: `schema://${editorId}`, // '', // 'http://json-schema.org/draft-04/schema#',
+              fileMatch: [editorPath], // Match only this editor's path
+              schema,
+              // uri: '',
+              // fileMatch: ['*'], // ['*.json'], // associate with any file
+              // schema,
+            },
+          ],
+        });
+      } catch {
+        // editor / InstantiationService disposed mid-flight; nothing to apply.
+      }
+    },
+    [editorId, editorPath, schema],
+  );
 
   const handleEditorDidMount: OnMount = useCallback(
     (editor, monaco) => {
+      if (!editor) return;
       editorRef.current = editor;
 
       // applySchema is deferred; if the editor is disposed within this window
       // (React StrictMode's dev mount/unmount/remount, or the dialog closing /
       // route changing before it fires) the callback would touch torn-down
       // Monaco services and throw "InstantiationService has been disposed".
-      // Cancel it when the editor disposes.
+      // Track disposal and cancel/skip every deferred path.
+      let disposed = false;
       const schemaTimer = setTimeout(() => {
+        if (disposed) return;
         applySchema(editor, monaco);
       }, 100);
-      editor.onDidDispose(() => clearTimeout(schemaTimer));
+      editor.onDidDispose(() => {
+        disposed = true;
+        clearTimeout(schemaTimer);
+      });
 
       // Re-apply schema when this editor gets focus
       editor.onDidFocusEditorText(() => {
+        if (disposed) return;
         applySchema(editor, monaco);
       });
 
