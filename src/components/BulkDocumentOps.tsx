@@ -1,11 +1,12 @@
 import {
   dangerButtonSx,
+  ghostButtonSx,
   SectionCard,
   smallButtonSx,
 } from '@/components/redesign';
 import {
-  DEFAULT_MONACO_OPTIONS,
   buildFilterBy,
+  DEFAULT_MONACO_OPTIONS,
   emptyCondition,
   fieldKind,
   OPERATORS,
@@ -25,8 +26,8 @@ import {
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import type { TypesenseFieldType } from '@/types';
-import { AddRounded, CloseRounded } from '@mui/icons-material';
 import type { OnMount } from '@monaco-editor/react';
+import { AddRounded, CloseRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -322,17 +323,28 @@ function UpdateByQuery({
   });
 
   return (
-    <Stack direction='column' spacing={1.25}>
+    <Stack direction='column' spacing={1}>
       <Stack
         direction='row'
         sx={{ justifyContent: 'space-between', alignItems: 'center' }}
       >
-        <Typography sx={{ fontSize: 11.5, color: designTokens.textMuted }}>
+        <Typography
+          sx={{
+            // fontSize: 11.5, color: designTokens.textMuted
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: designTokens.textFaint,
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.08em',
+            pb: 0.75,
+          }}
+        >
           Update filter (filter_by)
         </Typography>
         <Button
           size='small'
-          sx={smallButtonSx}
+          // sx={smallButtonSx}
+          sx={ghostButtonSx}
           onClick={() => setRawMode((m) => !m)}
         >
           {rawMode ? 'Use builder' : 'Raw filter'}
@@ -358,10 +370,18 @@ function UpdateByQuery({
                 size='small'
                 value={state.value}
                 onChange={(_, v) => v && handleChange(v)}
-                sx={{ alignSelf: 'flex-start' }}
+                sx={{
+                  alignSelf: 'flex-start',
+                  mb: 1,
+                  '& .MuiToggleButton-root': {
+                    textTransform: 'none',
+                    px: 1,
+                    py: 0.5,
+                  },
+                }}
               >
-                <ToggleButton value='&&'>Match ALL</ToggleButton>
-                <ToggleButton value='||'>Match ANY</ToggleButton>
+                <ToggleButton value='&&'>Match All</ToggleButton>
+                <ToggleButton value='||'>Match Any</ToggleButton>
               </ToggleButtonGroup>
             )}
           </form.AppField>
@@ -382,7 +402,7 @@ function UpdateByQuery({
                 <Button
                   size='small'
                   startIcon={<AddRounded sx={{ fontSize: 14 }} />}
-                  sx={{ ...smallButtonSx, alignSelf: 'flex-start' }}
+                  sx={{ ...ghostButtonSx, alignSelf: 'flex-start' }}
                   onClick={() => arrayField.pushValue({ ...emptyCondition })}
                 >
                   Add condition
@@ -409,10 +429,21 @@ function UpdateByQuery({
       )}
 
       <Stack sx={{ gap: 0.5 }}>
-        <Typography sx={{ fontSize: 11.5, color: designTokens.textMuted }}>
+        <Typography
+          sx={{
+            // fontSize: 11.5, color: designTokens.textMuted
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: designTokens.textFaint,
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.08em',
+            pb: 0.75,
+          }}
+        >
           Document patch (JSON)
         </Typography>
         <Box
+          data-testid='update-patch-editor'
           sx={{
             border: `1px solid ${designTokens.border}`,
             borderRadius: 0.875,
@@ -502,7 +533,10 @@ const ConditionRow = withForm({
             onChange: ({ value }) => {
               const f = fields.find((x) => x.name === value);
               const k = f ? fieldKind(f.type) : 'unsupported';
-              form.setFieldValue(`${base}.operator`, operatorsByKind[k][0] ?? 'eq');
+              form.setFieldValue(
+                `${base}.operator`,
+                operatorsByKind[k][0] ?? 'eq',
+              );
               form.setFieldValue(`${base}.value`, '');
               form.setFieldValue(`${base}.valueMax`, '');
               form.setFieldValue(`${base}.values`, []);
