@@ -54,12 +54,18 @@ export interface SearchModeControlProps {
   onChange: (mode: SearchMode) => void;
   /** Modes that can't be used (e.g. no embedding field / no NL model). */
   disabled?: SearchMode[];
+  /**
+   * Fired when a user clicks/taps a disabled mode. Lets the parent reveal the
+   * notice explaining why that mode is unavailable (instead of switching to it).
+   */
+  onDisabledClick?: (mode: SearchMode) => void;
 }
 
 export const SearchModeControl = ({
   mode,
   onChange,
   disabled = [],
+  onDisabledClick,
 }: SearchModeControlProps) => {
   const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   if (mobile) {
@@ -82,8 +88,7 @@ export const SearchModeControl = ({
               key={id}
               component='button'
               type='button'
-              disabled={off}
-              onClick={() => !off && onChange(id)}
+              onClick={() => (off ? onDisabledClick?.(id) : onChange(id))}
               sx={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -95,7 +100,7 @@ export const SearchModeControl = ({
                 fontFamily: 'inherit',
                 fontSize: 12,
                 fontWeight: active ? 600 : 500,
-                cursor: off ? 'default' : 'pointer',
+                cursor: 'pointer',
                 color: off
                   ? designTokens.textSubtle
                   : active
@@ -147,7 +152,11 @@ export const SearchModeControl = ({
       exclusive
       size='small'
       value={mode}
-      onChange={(_, next: SearchMode | null) => next && onChange(next)}
+      onChange={(_, next: SearchMode | null) => {
+        if (!next) return;
+        if (disabled.includes(next)) onDisabledClick?.(next);
+        else onChange(next);
+      }}
       sx={{
         border: `1px solid ${designTokens.border}`,
         borderRadius: '8px',
@@ -176,11 +185,20 @@ export const SearchModeControl = ({
         },
       }}
     >
-      {MODE_META.map(({ id, label, Icon }) => (
-        <ToggleButton key={id} value={id} disabled={disabled.includes(id)}>
+      {MODE_META.map(({ id, label, Icon }) => {
+        const off = disabled.includes(id);
+        return (
+        // Kept clickable (not `disabled`) so tapping an off mode can reveal the
+        // notice explaining why it's unavailable; the off styling is applied
+        // manually since the native disabled state no longer drives it.
+        <ToggleButton
+          key={id}
+          value={id}
+          sx={off ? { color: `${designTokens.textSubtle} !important` } : undefined}
+        >
           <Icon sx={{ fontSize: 14 }} />
           {label}
-          {disabled.includes(id) ? (
+          {off ? (
             <Box
               component='span'
               sx={{
@@ -198,7 +216,8 @@ export const SearchModeControl = ({
             </Box>
           ) : null}
         </ToggleButton>
-      ))}
+        );
+      })}
     </ToggleButtonGroup>
   );
 };

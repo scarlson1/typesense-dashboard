@@ -674,7 +674,7 @@ function DeleteByFilter({
   return (
     <Stack sx={{ gap: 1.25 }}>
       <TextField
-        label='Delete filter (filter_by)'
+        // label='Delete filter (filter_by)'
         placeholder='e.g. num_employees:<10'
         value={deleteFilter}
         onChange={(e) => setDeleteFilter(e.target.value)}

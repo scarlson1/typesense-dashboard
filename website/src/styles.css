@@ -1426,6 +1426,60 @@ h3 {
 .term-body[hidden] {
   display: none;
 }
+/* .term-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  /* Isolate onto its own compositing layer so the blink repaints only the
+     cursor, not the whole overflow:hidden + border-radius .start-card.
+  will-change: opacity;
+  transform: translateZ(0);
+  animation: term-cursor-blink 2.1s steps(1, end) infinite;
+}
+@keyframes term-cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor {
+    animation: term-cursor-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes term-cursor-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes port-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+} */
+
+@keyframes p-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 760px) {
   .start-card {
     grid-template-columns: 1fr;
