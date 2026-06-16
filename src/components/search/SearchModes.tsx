@@ -619,7 +619,7 @@ const NoticeShell = ({
       px: 1.625,
       py: 1.25,
       borderRadius: '8px',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       gap: 1.25,
       background:
         tone === 'warning'
@@ -628,21 +628,40 @@ const NoticeShell = ({
       border: `1px solid ${tone === 'warning' ? designTokens.warningBorder : designTokens.border}`,
     }}
   >
-    {icon}
-    <Box
-      sx={{ fontSize: 12.5, color: designTokens.textMuted, lineHeight: 1.4 }}
+    <Box sx={{ flexShrink: 0, display: 'flex', mt: '1px' }}>{icon}</Box>
+    {/* Text and action share a wrapping row so that on a narrow panel the
+        action drops below the text instead of overlapping it. */}
+    <Stack
+      direction='row'
+      sx={{
+        flex: 1,
+        minWidth: 0,
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        rowGap: 1,
+        columnGap: 1.25,
+      }}
     >
-      {children}
-    </Box>
-    <Box sx={{ flex: 1 }} />
-    {action}
+      <Box
+        sx={{
+          flex: '1 1 auto',
+          minWidth: 0,
+          fontSize: 12.5,
+          color: designTokens.textMuted,
+          lineHeight: 1.4,
+        }}
+      >
+        {children}
+      </Box>
+      {action ? <Box sx={{ flexShrink: 0 }}>{action}</Box> : null}
+    </Stack>
     {onDismiss ? (
       <Tooltip title='Dismiss'>
         <IconButton
           size='small'
           onClick={onDismiss}
           aria-label='Dismiss'
-          sx={{ color: designTokens.textFaint, ml: 0.25 }}
+          sx={{ flexShrink: 0, color: designTokens.textFaint, ml: 0.25 }}
         >
           <CloseRounded sx={{ fontSize: 15 }} />
         </IconButton>

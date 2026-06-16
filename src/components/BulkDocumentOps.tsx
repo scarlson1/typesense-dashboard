@@ -521,6 +521,15 @@ const ConditionRow = withForm({
       value: op,
       label: OPERATORS[op].label,
     }));
+    // Before a field is picked there are no valid operators, yet the row still
+    // defaults to `eq`. Keep the current value in the list so the controlled
+    // MUI Select doesn't warn about an out-of-range value.
+    if (operator && !operatorOptions.some((o) => o.value === operator)) {
+      operatorOptions.push({
+        value: operator,
+        label: OPERATORS[operator]?.label ?? operator,
+      });
+    }
     const inputKind = OPERATORS[operator]?.input ?? 'single';
 
     return (
