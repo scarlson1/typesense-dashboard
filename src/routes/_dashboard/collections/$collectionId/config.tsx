@@ -177,7 +177,7 @@ function CollectionSettings() {
     } catch (err) {
       console.log('cancelled schema update', err);
     }
-  }, [mutation, data, markers, dialog]);
+  }, [mutation, data, markers, dialog, collectionId, fullScreen, toast]);
 
   const handleEditorDidMount: OnMount = (ed) => {
     editorRef.current = ed;

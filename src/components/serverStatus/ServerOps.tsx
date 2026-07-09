@@ -13,8 +13,8 @@ import {
   Typography,
 } from '@mui/material';
 import { captureException } from '@sentry/react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export function ServerOps() {
@@ -200,9 +200,7 @@ export function ServerOps() {
             captureException(err);
           }}
         >
-          <Suspense>
-            <SchemaUpdatesInProgress />
-          </Suspense>
+          <SchemaUpdatesInProgress />
         </ErrorBoundary>
       </Box>
     </Stack>
@@ -419,14 +417,34 @@ interface SchemaUpdate {
   altered_docs: number;
 }
 
+// /operations/schema_changes is admin-only, so search-only keys get 401/403.
+// That's expected — surface a hint instead of the red error fallback.
+const isAuthError = (err: unknown): boolean => {
+  const status = (err as { httpStatus?: number } | null)?.httpStatus;
+  return status === 401 || status === 403;
+};
+
 function SchemaUpdatesInProgress() {
   const [client, clientId] = useTypesenseClient();
-  const { data } = useSuspenseQuery<SchemaUpdate[]>({
+  const { data, error } = useQuery<SchemaUpdate[]>({
     queryKey: [clientId, 'operations', 'schemaChanges'],
     queryFn: () => client.apiCall.get('/operations/schema_changes'), // client.operations.perform('schema_changes'),
     staleTime: 1000 * 4,
-    refetchInterval: 5000,
+    // Stop polling once we hit the expected auth error; keep it live otherwise.
+    refetchInterval: (query) =>
+      isAuthError(query.state.error) ? false : 5000,
+    retry: (failureCount, err) => !isAuthError(err) && failureCount < 2,
+    // Let genuine errors reach the ErrorBoundary; handle 401/403 inline.
+    throwOnError: (err) => !isAuthError(err),
   });
+
+  if (isAuthError(error)) {
+    return (
+      <Typography variant='body2' color='text.secondary'>
+        Viewing in-progress schema updates requires an admin API key.
+      </Typography>
+    );
+  }
 
   return Boolean(data?.length) ? (
     <>
