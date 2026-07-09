@@ -25,6 +25,7 @@ import {
   OpenInNewRounded,
   SearchRounded,
   SettingsInputSvideoRounded,
+  SpellcheckRounded,
   StarBorderRounded,
   StorageRounded,
 } from '@mui/icons-material';
@@ -474,6 +475,11 @@ export function Sidebar() {
           to='/stopwords'
           icon={<FrontHandRounded fontSize='small' />}
           label='Stopwords'
+        />
+        <SidebarLink
+          to='/stemming'
+          icon={<SpellcheckRounded fontSize='small' />}
+          label='Stemming'
         />
         {is30Plus ? (
           <SidebarLink

@@ -1,7 +1,25 @@
-import { createCollectionSchemaForm } from '@/types';
+import { createCollectionSchemaForm, type VectorConfigState } from '@/types';
 import { formOptions } from '@tanstack/react-form';
 
-export const NEW_EMPTY_FIELD = {
+export interface NewCollectionFieldDraft {
+  name: string;
+  type: string;
+  facet: boolean;
+  optional: boolean;
+  index: boolean;
+  store: boolean;
+  sort: boolean;
+  infix: boolean;
+  range_index: boolean;
+  stem: boolean;
+  /** 'OtherCollection.field_name' — empty string means no reference (JOIN). */
+  reference: string;
+  async_reference: boolean;
+  /** Draft vector/embed config; only meaningful for float[] fields. */
+  vectorConfig?: VectorConfigState;
+}
+
+export const NEW_EMPTY_FIELD: NewCollectionFieldDraft = {
   name: '',
   type: '',
   facet: false,
@@ -11,11 +29,10 @@ export const NEW_EMPTY_FIELD = {
   sort: false, // default true for number input (need to subscribe to changes ??)
   infix: false,
   // locale: '',
-  // num_dim: '',
-  // vec_dist: '',
-  // reference: '',
   range_index: false,
   stem: false,
+  reference: '',
+  async_reference: false,
 };
 
 export const collectionFormOpts = formOptions({

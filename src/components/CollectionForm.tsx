@@ -4,6 +4,7 @@ import { collectionFormOpts } from '@/constants';
 import { withForm } from '@/hooks';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { designTokens } from '@/theme/themePrimitives';
+import { buildCollectionFields } from '@/utils';
 import { CheckRounded, ContentCopyRounded } from '@mui/icons-material';
 import {
   Box,
@@ -47,7 +48,8 @@ type CollectionFormValues = (typeof collectionFormOpts)['defaultValues'];
 // };
 
 // Build a clean Typesense schema object from the live form values for the
-// summary rail and JSON preview — only non-default flags are emitted.
+// summary rail and JSON preview. Field payloads come from the same
+// `buildCollectionFields` used on submit, so the preview matches what is sent.
 const buildCollectionSchema = (
   values: CollectionFormValues,
 ): Record<string, unknown> => {
@@ -56,20 +58,7 @@ const buildCollectionSchema = (
   if (values.default_sorting_field) {
     schema.default_sorting_field = values.default_sorting_field;
   }
-  schema.fields = (values.fields ?? []).map((f) => {
-    const out: Record<string, unknown> = {
-      name: f.name || '',
-      type: f.type || '',
-    };
-    if (f.facet) out.facet = true;
-    if (f.sort) out.sort = true;
-    if (f.optional) out.optional = true;
-    if (f.infix) out.infix = true;
-    if (f.range_index) out.range_index = true;
-    if (!f.index) out.index = false;
-    if (!f.store) out.store = false;
-    return out;
-  });
+  schema.fields = buildCollectionFields(values.fields ?? []).fields;
   return schema;
 };
 

@@ -3,7 +3,7 @@ import { fieldLabelSx } from '@/constants/redesignSx';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { ArrowForwardRounded } from '@mui/icons-material';
-import { Box, ButtonBase, Stack, Typography } from '@mui/material';
+import { Box, ButtonBase, Grid, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 // TODO: implement "remember" - use localStorage instead of sessionStorage ??
@@ -53,20 +53,14 @@ export const AuthForm = withForm({
           </Typography>
         ) : null}
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '1.6fr 0.9fr 1.1fr',
-            gap: 1.5,
-          }}
-        >
-          <Box>
+        <Grid container spacing={1.5}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FieldLabel htmlFor='node'>Host</FieldLabel>
             <form.AppField name='node'>
               {({ TextField, state }) => (
                 <TextField
                   id='node'
-                  placeholder='localhost or [CLUSTER_ID]-1.a1.typesense.net'
+                  placeholder='localhost or [CLUSTER_ID]-1.a1.typesense.net or VM IP'
                   autoFocus
                   required
                   fullWidth
@@ -76,8 +70,8 @@ export const AuthForm = withForm({
                 />
               )}
             </form.AppField>
-          </Box>
-          <Box>
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
             <FieldLabel htmlFor='port'>Port</FieldLabel>
             <form.AppField name='port'>
               {({ TextField, state }) => (
@@ -92,8 +86,8 @@ export const AuthForm = withForm({
                 />
               )}
             </form.AppField>
-          </Box>
-          <Box>
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
             <FieldLabel>Protocol</FieldLabel>
             <form.AppField name='protocol'>
               {({ Select, state }) => (
@@ -110,8 +104,8 @@ export const AuthForm = withForm({
                 />
               )}
             </form.AppField>
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
 
         <Box>
           <FieldLabel htmlFor='apiKey'>API Key</FieldLabel>

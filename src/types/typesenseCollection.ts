@@ -36,6 +36,32 @@ export type EmbedProvider = z.infer<typeof embedProvider>;
 export const gcpAuthMode = z.enum(['oauth', 'service_account']);
 export type GcpAuthMode = z.infer<typeof gcpAuthMode>;
 
+/**
+ * Flat UI state for configuring a `float[]` vector field: either manual
+ * dimensions (`numDim`) or an auto-embed config. Shared by the schema-field
+ * edit dialog and the new-collection form (helpers in utils/vectorFieldConfig).
+ */
+export interface VectorConfigState {
+  autoEmbed: boolean;
+  numDim: string;
+  vecDist: string;
+  provider: EmbedProvider;
+  from: string[];
+  modelName: string;
+  apiKey: string;
+  url: string;
+  indexingPrefix: string;
+  queryPrefix: string;
+  gcpAuthMode: GcpAuthMode;
+  accessToken: string;
+  refreshToken: string;
+  clientId: string;
+  clientSecret: string;
+  projectId: string;
+  saClientEmail: string;
+  saPrivateKey: string;
+}
+
 // Shape of `embed.model_config` sent to Typesense. Known keys are typed; the
 // schema stays loose so provider-specific extras pass through untouched.
 export const fieldEmbedModelConfig = z
@@ -221,7 +247,11 @@ export const collectionFieldForm = z
     // locale: z.string().optional(),
     // num_dim: z.any().optional(),
     // vec_dist: z.string().optional(), // use enum ??
-    // reference: z.string().optional(),
+    // JOIN: 'OtherCollection.field_name' — only settable at creation time.
+    reference: z.string(),
+    async_reference: z.boolean(),
+    // Draft vector/embed UI state; transformed into embed/num_dim on submit.
+    vectorConfig: z.custom<VectorConfigState>().optional(),
     range_index: z.boolean(), // .optional(), // .default(false), // .optional(), // TODO: only if number type ??
     stem: z.boolean(), // .optional(),
   })
@@ -279,6 +309,7 @@ export const collectionField = z
     num_dim: z.any().optional(),
     vec_dist: z.string().optional(), // use enum ??
     reference: z.string().optional(),
+    async_reference: z.boolean().optional(),
     range_index: z.boolean().optional(), // TODO: only if number type ??
     stem: z.boolean().optional(),
     stem_dictionary: z.string().optional(),

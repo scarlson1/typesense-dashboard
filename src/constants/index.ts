@@ -11,3 +11,4 @@ export * from './searchParamsForm';
 export * from './searchSlots';
 export * from './stopwordsForm';
 export * from './toastTheme';
+export * from './updateFilterForm';

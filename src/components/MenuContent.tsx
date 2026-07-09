@@ -20,6 +20,7 @@ import {
   SearchRounded,
   SettingsInputSvideoRounded,
   SettingsRounded,
+  SpellcheckRounded,
   TroubleshootRounded,
 } from '@mui/icons-material';
 import {
@@ -293,6 +294,11 @@ export function MenuContent() {
         text: 'Stopwords',
         icon: <FrontHandRounded fontSize='small' />,
         route: { to: '/stopwords' as LinkProps['to'] },
+      },
+      {
+        text: 'Stemming',
+        icon: <SpellcheckRounded fontSize='small' />,
+        route: { to: '/stemming' as LinkProps['to'] },
       },
       {
         text: 'Curation',

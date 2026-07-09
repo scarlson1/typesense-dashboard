@@ -25,7 +25,7 @@ export const PageHeader = ({
     <Box
       sx={{
         px: { xs: 2, md: 3.5 },
-        pt: { xs: 2, md: 2.75 },
+        pt: { xs: 1.5, md: 2 },
         backgroundColor: 'background.paper',
         borderBottom: `1px solid ${designTokens.border}`,
       }}

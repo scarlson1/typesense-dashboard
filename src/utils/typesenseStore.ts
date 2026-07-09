@@ -96,5 +96,6 @@ export function getTypesenseClient(creds: TypesenseCreds) {
       },
     ],
     apiKey: creds.apiKey,
+    connectionTimeoutSeconds: 15,
   });
 }

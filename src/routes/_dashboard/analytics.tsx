@@ -1,4 +1,5 @@
 import { ErrorFallback } from '@/components';
+import { AnalyticsEventsPanel } from '@/components/AnalyticsEventsPanel';
 import { AnalyticsRulesList } from '@/components/AnalyticsRulesList';
 import {
   Badge,
@@ -87,6 +88,14 @@ function RouteComponent() {
           >
             <Suspense fallback={<EnableAnalyticsCard />}>
               <AnalyticsInsight />
+            </Suspense>
+          </ErrorBoundary>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onError={(err: unknown) => captureException(err)}
+          >
+            <Suspense fallback={null}>
+              <AnalyticsEventsPanel />
             </Suspense>
           </ErrorBoundary>
         </Stack>

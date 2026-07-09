@@ -115,8 +115,8 @@ function RouteComponent() {
       <Box
         sx={{
           flex: 1,
-          px: { xs: 0, md: 3.5 },
-          py: { xs: 0, md: 2.25 },
+          px: { xs: 2, md: 3.5 },
+          py: { xs: 2, md: 2.25 },
           background: designTokens.surfaceTinted,
           display: 'flex',
           flexDirection: { xs: 'column', lg: 'row' },
@@ -129,14 +129,10 @@ function RouteComponent() {
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Box
             sx={{
-              background: designTokens.surface,
+              background: { xs: 'transparent', md: designTokens.surface },
               border: { xs: 'none', md: `1px solid ${designTokens.border}` },
-              borderTop: {
-                xs: `1px solid ${designTokens.border}`,
-                md: `1px solid ${designTokens.border}`,
-              },
               borderRadius: { xs: 0, md: 1 },
-              overflow: 'hidden',
+              overflow: { xs: 'visible', md: 'hidden' },
             }}
           >
             <Suspense

@@ -34,7 +34,7 @@ export const CollectionTabBar = ({ collectionId }: CollectionTabBarProps) => {
       { label: 'Search', to: '/collections/$collectionId/documents/search' },
       { label: 'Documents', to: '/collections/$collectionId/documents/new' },
       { label: 'Schema', to: '/collections/$collectionId/config' },
-      ...(is30Plus
+      ...(!is30Plus
         ? [
             {
               label: 'Synonyms',

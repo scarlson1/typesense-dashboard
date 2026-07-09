@@ -1,0 +1,92 @@
+name: Sentry error triage
+
+# Automated first-pass triage of newly-seen unresolved Sentry issues.
+# Phase 1: manual (workflow_dispatch) only, TRIAGE_MODE=report-only (Sentry note + job summary).
+# To advance: uncomment the `schedule` trigger and bump the default TRIAGE_MODE (issues -> full).
+# See .github/prompts/sentry-triage.md for the triage contract Claude follows.
+
+on:
+    workflow_dispatch:
+        inputs:
+            issue_id:
+                description: 'Sentry issue ID/short-id to triage (blank = all new unresolved in the last 6h)'
+                required: false
+                type: string
+            mode:
+                description: 'Triage mode'
+                required: false
+                default: report-only
+                type: choice
+                options:
+                    - report-only
+                    - issues
+                    - full
+    # Phase 2: enable scheduled polling (every 6h). Keep the -6h query window in the prompt aligned to this.
+    # schedule:
+    #     - cron: '0 */6 * * *'
+
+# Least privilege for what the later phases need (issue creation, draft PRs).
+permissions:
+    contents: write
+    issues: write
+    pull-requests: write
+    id-token: write
+
+concurrency:
+    group: sentry-triage
+    cancel-in-progress: false
+
+jobs:
+    triage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0 # full history so Claude can `git show <dist-sha>:<path>` / blame
+
+            # Node/pnpm mirror .github/workflows/sentry-release.yaml so Claude can run
+            # `pnpm test` / `pnpm lint` when validating a draft fix (Phase 3).
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: '10.18.3'
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            # The action's `prompt` input takes text, not a file path, so load the
+            # versioned prompt file into a step output and pass it inline below.
+            - name: Load triage prompt
+              id: prompt
+              run: |
+                  {
+                    echo 'text<<PROMPT_EOF'
+                    cat .github/prompts/sentry-triage.md
+                    echo 'PROMPT_EOF'
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Triage Sentry issues
+              uses: anthropics/claude-code-action@v1
+              env:
+                  TRIAGE_MODE: ${{ inputs.mode || 'report-only' }}
+                  SENTRY_ISSUE_ID: ${{ inputs.issue_id }}
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for `gh` used inside the prompt
+              with:
+                  anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  prompt: ${{ steps.prompt.outputs.text }}
+                  # Hosted Sentry MCP (https://mcp.sentry.dev) with a token passed as a header.
+                  # skills= narrows the tool surface to inspection + triage + Seer root-cause.
+                  # Dedicated internal-integration token with Issue&Event read/write.
+                  # Distinct from SENTRY_AUTH_TOKEN (upload-only, injected at build time).
+                  claude_args: |
+                      --mcp-config {"mcpServers":{"sentry":{"type":"http","url":"https://mcp.sentry.dev/mcp?skills=inspect,triage,seer","headers":{"Sentry-Bearer":"${{ secrets.SENTRY_AUTH_TOKEN_ACTIONS }}"}}}}
+                      --allowedTools "mcp__sentry__find_issues,mcp__sentry__get_issue_details,mcp__sentry__update_issue,mcp__sentry__analyze_issue_with_seer,Bash(gh:*),Bash(git:*),Read,Grep,Glob"

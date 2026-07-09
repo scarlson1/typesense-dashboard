@@ -1,4 +1,6 @@
+import { EmbedNote, ReferenceNote } from '@/components/SchemaTableView';
 import { designTokens } from '@/theme/themePrimitives';
+import type { FieldEmbed } from '@/types';
 import { EditOutlined } from '@mui/icons-material';
 import { Box, IconButton, Stack } from '@mui/material';
 import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
@@ -78,6 +80,15 @@ export const SchemaCardView = ({
                     <FlagChip key={f.key} label={f.label} />
                   ))}
                 </Stack>
+                {field.reference ? (
+                  <ReferenceNote
+                    reference={String(field.reference)}
+                    isAsync={Boolean(field.async_reference)}
+                  />
+                ) : null}
+                {field.embed ? (
+                  <EmbedNote embed={field.embed as FieldEmbed} />
+                ) : null}
               </Stack>
 
               <IconButton

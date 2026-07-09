@@ -316,13 +316,13 @@ This is an independent project. It's not associated with [typesense.org](https:/
 - [Boolean operators](https://typesense.org/docs/guide/tips-for-filtering.html#boolean-operations)
 - [Geo operators](https://typesense.org/docs/guide/tips-for-filtering.html#filtering-geopoints)
 - [Geosearch filter & sort](https://typesense.org/docs/29.0/api/geosearch.html#searching-within-a-radius)
-- Delete documents by query
 - Export documents
 - Map zoom to bounds on load
 - theme matching toasts
 - use version from context for docs links ??
 - refactor conversational search to be a third option alongside grid & map views
 - create collection missing `embed.from` ?? [docs](https://typesense.org/docs/30.2/api/vector-search.html#creating-an-auto-embedding-field)
+- use json editor for update by filter (& add batch size to delete by query)
 
 ```typescript
 {
@@ -349,3 +349,6 @@ This is an independent project. It's not associated with [typesense.org](https:/
   `documents/$documentId.tsx` is a "TODO: view not set up yet" stub; `useUpdateDocument.ts` exists
   but isn't wired into the UI; no PATCH-by-filter.
 - **Federated multi-search** — no cross-collection multi-search UI.
+
+- Cluster snapshots / re-election: `ServerOps.tsx` only does cache-clear + db-compact + schema-changes read. Missing POST /operations/snapshot (backup), vote, reset_peers.
+- Voice & image search: configurable on fields but no mic capture / image upload to actually issue those queries (larger builds).

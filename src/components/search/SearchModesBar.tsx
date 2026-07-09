@@ -55,10 +55,11 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
   const [alpha, setAlpha] = useState(0.7);
   const [threshold, setThreshold] = useState(0.45);
   const [nlModel, setNlModel] = useState('');
-  const [dismissed, setDismissed] = useState<{
-    embedding?: boolean;
-    nl?: boolean;
-  }>({});
+  // Which "unavailable" notice to show. Only set when the user taps a disabled
+  // mode toggle; cleared on dismiss or when switching to a usable mode.
+  const [revealedNotice, setRevealedNotice] = useState<
+    'embedding' | 'nl' | null
+  >(null);
 
   const nlModelIds = useMemo(() => (nlModels ?? []).map((m) => m.id), [nlModels]);
   const effectiveNlModel = nlModel || nlModelIds[0] || '';
@@ -110,7 +111,17 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
         >
           Mode
         </Typography>
-        <SearchModeControl mode={mode} onChange={setMode} disabled={disabled} />
+        <SearchModeControl
+          mode={mode}
+          onChange={(next) => {
+            setMode(next);
+            setRevealedNotice(null);
+          }}
+          disabled={disabled}
+          onDisabledClick={(next) =>
+            setRevealedNotice(next === 'nl' ? 'nl' : 'embedding')
+          }
+        />
         {mode === 'hybrid' && (
           <HybridAlphaControl value={alpha} onChange={setAlpha} />
         )}
@@ -126,7 +137,7 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
         )}
       </Stack>
 
-      {!embeddingField && !dismissed.embedding ? (
+      {revealedNotice === 'embedding' && !embeddingField ? (
         <EmbeddingUnavailableNotice
           collectionName={collectionId}
           onConfigure={() =>
@@ -135,12 +146,12 @@ export function SearchModesBar({ collectionId }: { collectionId: string }) {
               params: { collectionId } as never,
             })
           }
-          onDismiss={() => setDismissed((d) => ({ ...d, embedding: true }))}
+          onDismiss={() => setRevealedNotice(null)}
         />
-      ) : !nlModelIds.length && !dismissed.nl ? (
+      ) : revealedNotice === 'nl' && !nlModelIds.length ? (
         <NlUnavailableNotice
           onCreate={() => navigate({ to: '/nl-models' as never })}
-          onDismiss={() => setDismissed((d) => ({ ...d, nl: true }))}
+          onDismiss={() => setRevealedNotice(null)}
         />
       ) : null}
 

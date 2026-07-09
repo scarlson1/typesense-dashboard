@@ -16,6 +16,7 @@ import {
   OpenInNewRounded,
   PersonAddRounded,
   SettingsInputSvideoRounded,
+  SpellcheckRounded,
   StarBorderRounded,
 } from '@mui/icons-material';
 import {
@@ -316,6 +317,11 @@ export function MobileMoreSheet({ open, onClose }: MobileMoreSheetProps) {
           icon={<FrontHandRounded />}
           label='Stopwords'
           to='/stopwords'
+        />
+        <SheetItem
+          icon={<SpellcheckRounded />}
+          label='Stemming'
+          to='/stemming'
         />
         {is30Plus ? (
           <SheetItem

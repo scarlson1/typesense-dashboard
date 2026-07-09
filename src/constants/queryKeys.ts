@@ -75,6 +75,8 @@ export const analyticsQueryKeys = {
   all: (clusterId: string) => [clusterId, 'analytics'] as const,
   rules: (clusterId: string) =>
     [...analyticsQueryKeys.all(clusterId), 'rules'] as const,
+  events: (clusterId: string, params?: Record<string, unknown>) =>
+    [...analyticsQueryKeys.all(clusterId), 'events', params] as const,
 };
 
 // Aggregated analytics data lives in a rule's destination collection
@@ -88,6 +90,14 @@ export const analyticsDataQueryKeys = {
 export const presetQueryKeys = {
   all: (clusterId: string) => [clusterId, 'presets'] as const,
   // collection: (clusterId: string, collectionId: string) => [...presetQueryKeys.all(clusterId), collectionId] as const
+};
+
+// Global stemming dictionaries (the list endpoint only returns ids, so each
+// dictionary's word/root pairs are fetched lazily by id).
+export const stemmingQueryKeys = {
+  all: (clusterId: string) => [clusterId, 'stemming'] as const,
+  dictionary: (clusterId: string, id: string) =>
+    [...stemmingQueryKeys.all(clusterId), id] as const,
 };
 
 // LLM-backed model resources (foundation for NL search + conversational/RAG).

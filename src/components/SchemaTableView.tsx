@@ -1,6 +1,8 @@
 import { designTokens } from '@/theme/themePrimitives';
-import { EditOutlined } from '@mui/icons-material';
+import type { FieldEmbed } from '@/types';
+import { AutoAwesomeRounded, EditOutlined, LinkRounded } from '@mui/icons-material';
 import { Box, IconButton, Stack } from '@mui/material';
+import { Link } from '@tanstack/react-router';
 import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 
 interface SchemaTableViewProps {
@@ -77,19 +79,30 @@ export const SchemaTableView = ({
               '&:hover': { background: designTokens.surfaceTinted },
             }}
           >
-          <Box
-            sx={{
-              fontFamily: designTokens.fontMono,
-              fontSize: 13,
-              color: designTokens.text,
-              fontWeight: 500,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            title={field.name}
-          >
-            {field.name}
+          <Box sx={{ minWidth: 0 }}>
+            <Box
+              sx={{
+                fontFamily: designTokens.fontMono,
+                fontSize: 13,
+                color: designTokens.text,
+                fontWeight: 500,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+              title={field.name}
+            >
+              {field.name}
+            </Box>
+            {field.reference ? (
+              <ReferenceNote
+                reference={String(field.reference)}
+                isAsync={Boolean(field.async_reference)}
+              />
+            ) : null}
+            {field.embed ? (
+              <EmbedNote embed={field.embed as FieldEmbed} />
+            ) : null}
           </Box>
 
           <Box>
@@ -132,6 +145,72 @@ export const SchemaTableView = ({
     </Box>
   );
 };
+
+/** 'collection.field' → link to the referenced collection's schema page. */
+export const ReferenceNote = ({
+  reference,
+  isAsync,
+}: {
+  reference: string;
+  isAsync: boolean;
+}) => {
+  const dot = reference.indexOf('.');
+  const refCollection = dot === -1 ? reference : reference.slice(0, dot);
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.5,
+        fontFamily: designTokens.fontMono,
+        fontSize: 11,
+        color: designTokens.accentDeep,
+        mt: 0.25,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <LinkRounded sx={{ fontSize: 11 }} />
+      <Link
+        to='/collections/$collectionId/config'
+        params={{ collectionId: refCollection }}
+        title={`references ${reference}`}
+        style={{
+          color: designTokens.accentDeep,
+          textDecorationColor: designTokens.accentBorder,
+        }}
+      >
+        {reference}
+      </Link>
+      {isAsync ? (
+        <Box component='span' sx={{ color: designTokens.textFaint }}>
+          (async)
+        </Box>
+      ) : null}
+    </Box>
+  );
+};
+
+/** Compact summary of an auto-embed config: model + source fields. */
+export const EmbedNote = ({ embed }: { embed: FieldEmbed }) => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 0.5,
+      fontFamily: designTokens.fontMono,
+      fontSize: 11,
+      color: designTokens.textMuted,
+      mt: 0.25,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }}
+    title={`auto-embedded from ${embed.from.join(', ')} via ${embed.model_config.model_name}`}
+  >
+    <AutoAwesomeRounded sx={{ fontSize: 11 }} />
+    {embed.model_config.model_name} ← {embed.from.join(', ')}
+  </Box>
+);
 
 const TypeChip = ({ type }: { type: string }) => (
   <Box

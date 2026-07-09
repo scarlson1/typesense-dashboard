@@ -1,6 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { Client } from 'typesense';
 import { getCreds, type E2eCreds, type TsTarget } from './creds';
+import { seedProducts } from './seed';
 
 export interface TsOptions {
   /** Which Typesense version this project targets; set per-project in the config. */
@@ -12,6 +13,12 @@ interface TsFixtures {
   tsClient: Client;
   /** Deep-link to the auth route with creds prefilled, submit, and wait for the dashboard. */
   login: (creds?: E2eCreds) => Promise<void>;
+  /**
+   * Name of a freshly seeded collection unique to this test. Tests run fully
+   * parallel against a shared cluster, so destructive tests must never share
+   * a collection. Cleaned up after the test.
+   */
+  seededCollection: string;
 }
 
 export const test = base.extend<TsOptions & TsFixtures>({
@@ -35,6 +42,19 @@ export const test = base.extend<TsOptions & TsFixtures>({
         connectionTimeoutSeconds: 10,
       })
     );
+  },
+
+  seededCollection: async ({ tsClient }, use, testInfo) => {
+    const name = `e2e_products_${testInfo.workerIndex}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    await seedProducts(tsClient, name);
+    await use(name);
+    try {
+      await tsClient.collections(name).delete();
+    } catch {
+      // already deleted by the test — fine
+    }
   },
 
   login: async ({ page, tsCreds }, use) => {
