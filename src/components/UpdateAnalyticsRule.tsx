@@ -103,7 +103,7 @@ function AnalyticsRuleFormComponent({
       const collections = await client.collections().retrieve();
       const aliasRes = await client.aliases().retrieve();
 
-      const collectionNames = collections.map((c: { name: string }) => c.name);
+      const collectionNames = collections?.map((c: { name: string }) => c.name);
       const aliasNames = aliasRes.aliases.map((a: { name: string }) => a.name);
 
       return [...aliasNames, ...collectionNames];

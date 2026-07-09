@@ -143,7 +143,7 @@ export function MenuContent() {
   // better to pull up selected collection to context provider ??
   const [selectedCollection, setSelectedCollection] = useState<string>(() => {
     const colId = getParamCollectionId();
-    if (colId && collections.map((c) => c.name).includes(colId)) {
+    if (colId && collections?.map((c) => c.name).includes(colId)) {
       return colId;
     }
     return Boolean(collections.length) ? collections[0].name : '';
@@ -175,7 +175,7 @@ export function MenuContent() {
   useEffect(() => {
     if (clusterId !== prevClusterId && prevClusterId) {
       const colId = getParamCollectionId();
-      if (colId && collections.map((c) => c.name).includes(colId)) {
+      if (colId && collections?.map((c) => c.name).includes(colId)) {
         setSelectedCollection(colId);
       } else {
         setSelectedCollection(

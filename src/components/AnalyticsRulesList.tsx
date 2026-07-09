@@ -373,7 +373,7 @@ function NewRulePanelV29() {
       const aliasRes = await client.aliases().retrieve();
       return [
         ...aliasRes.aliases.map((a: { name: string }) => a.name),
-        ...collections.map((c: { name: string }) => c.name),
+        ...(collections ?? []).map((c: { name: string }) => c.name),
       ];
     },
   });
@@ -523,7 +523,7 @@ function NewRulePanelV30() {
       const aliasRes = await client.aliases().retrieve();
       return [
         ...aliasRes.aliases.map((a: { name: string }) => a.name),
-        ...collections.map((c: { name: string }) => c.name),
+        ...(collections ?? []).map((c: { name: string }) => c.name),
       ];
     },
   });

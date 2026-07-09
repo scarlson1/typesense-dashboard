@@ -208,7 +208,7 @@ export function Sidebar() {
 
   const [selectedCollection, setSelectedCollection] = useState<string>(() => {
     const colId = getParamCollectionId();
-    if (colId && collections.map((c) => c.name).includes(colId)) {
+    if (colId && collections?.map((c) => c.name).includes(colId)) {
       return colId;
     }
     return collections.length ? collections[0].name : '';
@@ -218,7 +218,7 @@ export function Sidebar() {
   useEffect(() => {
     if (clusterId !== prevClusterId && prevClusterId) {
       const colId = getParamCollectionId();
-      if (colId && collections.map((c) => c.name).includes(colId)) {
+      if (colId && collections?.map((c) => c.name).includes(colId)) {
         setSelectedCollection(colId);
       } else {
         setSelectedCollection(collections.length ? collections[0].name : '');
@@ -433,7 +433,7 @@ export function Sidebar() {
               <MenuItem value='' sx={{ fontSize: 12 }}>
                 —
               </MenuItem>
-              {collections.map((c) => (
+              {collections?.map((c) => (
                 <MenuItem
                   key={c.name}
                   value={c.name}

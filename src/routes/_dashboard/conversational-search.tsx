@@ -523,7 +523,7 @@ function RouteComponent() {
           icon={<ChatBubbleOutlineRounded sx={{ fontSize: 13 }} />}
           label='Retrieve from'
           value={collectionName}
-          options={retrievableCollections.map((c) => c.name)}
+          options={retrievableCollections?.map((c) => c.name)}
           onChange={(v) => {
             setCollectionName(v);
             handleNewConversation();
