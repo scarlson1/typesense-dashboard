@@ -72,6 +72,25 @@ jobs:
                     echo 'PROMPT_EOF'
                   } >> "$GITHUB_OUTPUT"
 
+            # Write the Sentry MCP config to a file rather than passing inline JSON in
+            # claude_args: the action shell-tokenizes claude_args and strips the quotes
+            # out of inline JSON, producing invalid config. The token is injected here at
+            # runtime (never committed). Hosted Sentry MCP at https://mcp.sentry.dev;
+            # skills= narrows the tool surface to inspection + triage + Seer root-cause.
+            - name: Write Sentry MCP config
+              env:
+                  SENTRY_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN_ACTIONS }}
+              run: |
+                  jq -n --arg token "$SENTRY_TOKEN" '{
+                    mcpServers: {
+                      sentry: {
+                        type: "http",
+                        url: "https://mcp.sentry.dev/mcp?skills=inspect,triage,seer",
+                        headers: { "Sentry-Bearer": $token }
+                      }
+                    }
+                  }' > "${{ github.workspace }}/sentry-mcp.json"
+
             - name: Triage Sentry issues
               uses: anthropics/claude-code-action@v1
               env:
@@ -80,13 +99,11 @@ jobs:
                   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for `gh` used inside the prompt
               with:
-                  anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  # Pro/Max subscription auth. Generate locally with `claude setup-token`.
+                  # (Swap to `anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}` for pay-per-use API billing.)
+                  claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   prompt: ${{ steps.prompt.outputs.text }}
-                  # Hosted Sentry MCP (https://mcp.sentry.dev) with a token passed as a header.
-                  # skills= narrows the tool surface to inspection + triage + Seer root-cause.
-                  # Dedicated internal-integration token with Issue&Event read/write.
-                  # Distinct from SENTRY_AUTH_TOKEN (upload-only, injected at build time).
                   claude_args: |
-                      --mcp-config {"mcpServers":{"sentry":{"type":"http","url":"https://mcp.sentry.dev/mcp?skills=inspect,triage,seer","headers":{"Sentry-Bearer":"${{ secrets.SENTRY_AUTH_TOKEN_ACTIONS }}"}}}}
+                      --mcp-config ${{ github.workspace }}/sentry-mcp.json
                       --allowedTools "mcp__sentry__find_issues,mcp__sentry__get_issue_details,mcp__sentry__update_issue,mcp__sentry__analyze_issue_with_seer,Bash(gh:*),Bash(git:*),Read,Grep,Glob"

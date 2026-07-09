@@ -220,7 +220,7 @@ function HomeSubtitle() {
     retry: false,
   });
   if (!collections) return null;
-  const docs = collections.reduce((acc, c) => acc + (c.num_documents ?? 0), 0);
+  const docs = collections?.reduce((acc, c) => acc + (c.num_documents ?? 0), 0);
   return (
     <Typography
       sx={{ fontSize: 13.5, color: designTokens.textMuted, mt: 0.75 }}

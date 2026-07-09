@@ -94,6 +94,18 @@ function CollectionSettings() {
   const { data } = useSchema(collectionId);
 
   const mutation = useUpdateCollection({
+    // toastEnabled: false,
+    // onMutate: (vars, ctx) => {
+    //   toast.loading('saving...', { id: 'update-schema' });
+    // },
+    // onSuccess: (data, vars, result, ctx) => {
+    //     toast.success(`collection updated`, { id: 'update-schema' });
+    // },
+    // onError(err, vars, result, ctx) {
+    //   console.log('ERROR: ', err);
+    //   const msg = err.message ?? 'failed to update collection schema';
+    //   toast.error(msg, { id: 'update-schema' });
+    // },
     onSettled: () => {
       setOptions((o) => ({ ...o, readOnly: false }));
     },

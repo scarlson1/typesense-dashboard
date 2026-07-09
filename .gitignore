@@ -56,3 +56,5 @@ crash.log
 override.tf
 override.tf.json
 tfplan
+# Runtime-generated Sentry MCP config (contains a token; never commit)
+sentry-mcp.json

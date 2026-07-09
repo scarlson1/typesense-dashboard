@@ -1,13 +1,13 @@
 import { ErrorFallback } from '@/components';
 import { CollectionsTable } from '@/components/CollectionsTable';
-import { collectionQueryKeys } from '@/constants';
 import {
   Badge,
   PageHeader,
-  StatCard,
-  smallButtonSx,
   primaryButtonSx,
+  smallButtonSx,
+  StatCard,
 } from '@/components/redesign';
+import { collectionQueryKeys } from '@/constants';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { formatBytes } from '@/utils';
@@ -16,13 +16,24 @@ import {
   DownloadRounded,
   FiberManualRecordRounded,
 } from '@mui/icons-material';
-import { Box, Button, Stack, Typography, useMediaQuery, type Theme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Stack,
+  Typography,
+  useMediaQuery,
+  type Theme,
+} from '@mui/material';
 import { captureException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link as RouterLink, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from '@tanstack/react-router';
+import { formatDistanceToNow } from 'date-fns';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { formatDistanceToNow } from 'date-fns';
 
 export const Route = createFileRoute('/_dashboard/collections/')({
   component: CollectionsComponent,
@@ -199,7 +210,7 @@ function StatStrip() {
     queryFn: () => client.stats.retrieve(),
     refetchInterval: 5000,
   });
-  const totalDocs = collections.reduce(
+  const totalDocs = collections?.reduce(
     (a, c) => a + (c.num_documents ?? 0),
     0,
   );
@@ -240,11 +251,7 @@ function StatStrip() {
         delta='healthy'
         deltaPositive
       />
-      <StatCard
-        label='Search QPS'
-        value={qps.toFixed(1)}
-        sub='requests/sec'
-      />
+      <StatCard label='Search QPS' value={qps.toFixed(1)} sub='requests/sec' />
     </Box>
   );
 }
@@ -261,7 +268,7 @@ function MobileCollectionList() {
 
   return (
     <Stack sx={{ gap: 1.25 }}>
-      {collections.map((c) => {
+      {collections?.map((c) => {
         const docs = c.num_documents ?? 0;
         const created = (c as { created_at?: number }).created_at;
         const updatedLabel = created
@@ -288,12 +295,20 @@ function MobileCollectionList() {
           >
             <Stack
               direction='row'
-              sx={{ alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}
+              sx={{
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                gap: 1,
+              }}
             >
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Stack direction='row' sx={{ alignItems: 'center', gap: 0.75 }}>
                   <FiberManualRecordRounded
-                    sx={{ fontSize: 8, color: designTokens.success, flexShrink: 0 }}
+                    sx={{
+                      fontSize: 8,
+                      color: designTokens.success,
+                      flexShrink: 0,
+                    }}
                   />
                   <Typography
                     noWrap
@@ -351,4 +366,3 @@ function MobileCollectionList() {
     </Stack>
   );
 }
-

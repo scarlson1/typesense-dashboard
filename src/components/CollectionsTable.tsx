@@ -113,7 +113,7 @@ export function CollectionsTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {collections.map((c, i) => (
+          {collections?.map((c, i) => (
             <CollectionRow
               key={c.name}
               collection={c}
