@@ -85,6 +85,8 @@ jobs:
                   prompt: ${{ steps.prompt.outputs.text }}
                   # Hosted Sentry MCP (https://mcp.sentry.dev) with a token passed as a header.
                   # skills= narrows the tool surface to inspection + triage + Seer root-cause.
+                  # Dedicated internal-integration token with Issue&Event read/write.
+                  # Distinct from SENTRY_AUTH_TOKEN (upload-only, injected at build time).
                   claude_args: |
-                      --mcp-config {"mcpServers":{"sentry":{"type":"http","url":"https://mcp.sentry.dev/mcp?skills=inspect,triage,seer","headers":{"Sentry-Bearer":"${{ secrets.SENTRY_AUTH_TOKEN }}"}}}}
+                      --mcp-config {"mcpServers":{"sentry":{"type":"http","url":"https://mcp.sentry.dev/mcp?skills=inspect,triage,seer","headers":{"Sentry-Bearer":"${{ secrets.SENTRY_AUTH_TOKEN_ACTIONS }}"}}}}
                       --allowedTools "mcp__sentry__find_issues,mcp__sentry__get_issue_details,mcp__sentry__update_issue,mcp__sentry__analyze_issue_with_seer,Bash(gh:*),Bash(git:*),Read,Grep,Glob"
