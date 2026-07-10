@@ -1,5 +1,5 @@
 import type { JsonEditorProps } from '@/components/JsonEditor';
-import { type OnMount } from '@monaco-editor/react';
+import type { OnMount } from '@monaco-editor/react';
 import { useColorScheme } from '@mui/material';
 import Color from 'color';
 import * as monaco from 'monaco-editor';

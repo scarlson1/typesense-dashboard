@@ -1,8 +1,8 @@
-import { type JsonEditorProps } from '@/components/JsonEditor';
+import type { JsonEditorProps } from '@/components/JsonEditor';
 import { DEFAULT_MONACO_OPTIONS } from '@/constants';
 import type { EditorProps, OnMount } from '@monaco-editor/react';
 import { Skeleton } from '@mui/material';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import {
   lazy,
   Suspense,

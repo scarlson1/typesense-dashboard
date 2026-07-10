@@ -44,6 +44,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_APP_VERSION: ${{ steps.vars.outputs.tag }}
+          # The renderer bundle (deck.gl + monaco + MUI) exhausts Node's default
+          # ~2GB heap during `vite build`, OOM-killing the job. Raise the limit.
+          NODE_OPTIONS: --max-old-space-size=4096
           # No VITE_MAPBOX_TOKEN here: released installers ship without a baked
           # token so they don't leak the maintainer's key. Each user supplies
           # their own Mapbox token in-app (stored locally) to enable geosearch.

@@ -52,7 +52,7 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { DocumentImportParameters } from 'typesense/lib/Typesense/Documents';
 import { useStore } from 'zustand';

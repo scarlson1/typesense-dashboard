@@ -41,7 +41,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useStore } from '@tanstack/react-form';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { Client } from 'typesense';
 
@@ -683,7 +683,7 @@ function DeleteByFilter({
   return (
     <Stack sx={{ gap: 1.25 }}>
       <TextField
-        // label='Delete filter (filter_by)'
+        label='Delete filter (filter_by)'
         placeholder='e.g. num_employees:<10'
         value={deleteFilter}
         onChange={(e) => setDeleteFilter(e.target.value)}

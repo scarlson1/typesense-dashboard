@@ -4,7 +4,7 @@ import { useInitMonaco } from '@/hooks/useInitMonaco';
 import { createCollectionSchema, type CollectionSchema } from '@/types';
 import { Editor, type EditorProps } from '@monaco-editor/react';
 import { Box, Button, Paper, Skeleton, useColorScheme } from '@mui/material';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import { useId, useMemo, useState } from 'react';
 import { toJSONSchema } from 'zod/v4';
 

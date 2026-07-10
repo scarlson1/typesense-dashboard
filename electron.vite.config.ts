@@ -59,6 +59,19 @@ export default defineConfig(({ command }) => ({
       outDir: 'out/renderer',
       rollupOptions: {
         input: { index: resolve(__dirname, 'index.html') },
+        output: {
+          // Mirrors vite.config.ts: keep monaco-editor's full language set out
+          // of the entry chunk. It's only reached via the lazy JSON editors, so
+          // isolating it shrinks first load and caps the largest chunk, which
+          // is what was OOM-killing `electron-vite build` in CI. The vite
+          // preload helper must get its own chunk first, or it co-locates into
+          // the monaco chunk and the entry then statically pulls monaco again.
+          manualChunks: (id: string) => {
+            if (id.includes('vite/preload-helper')) return 'vite-preload';
+            if (id.includes('node_modules/monaco-editor')) return 'monaco';
+            return undefined;
+          },
+        },
       },
     },
   },

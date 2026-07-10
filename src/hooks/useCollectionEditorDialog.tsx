@@ -1,7 +1,7 @@
-import { type JsonEditorProps } from '@/components/JsonEditor';
+import type { JsonEditorProps } from '@/components/JsonEditor';
 import { COLLECTION_SCHEMA, DEFAULT_MONACO_OPTIONS } from '@/constants';
 import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
-import { type EditorProps, type OnMount } from '@monaco-editor/react';
+import type { EditorProps, OnMount } from '@monaco-editor/react';
 import { OpenInNewRounded } from '@mui/icons-material';
 import {
   Button,
@@ -11,7 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import {
   lazy,
   Suspense,
