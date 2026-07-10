@@ -1,5 +1,5 @@
 import { collectionSchema } from '@/types';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import { z } from 'zod/v4';
 
 export const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions =

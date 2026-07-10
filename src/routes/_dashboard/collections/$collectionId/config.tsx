@@ -48,7 +48,7 @@ import {
 } from '@mui/material';
 import { captureException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import {
   lazy,
   Suspense,

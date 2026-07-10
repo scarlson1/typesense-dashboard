@@ -38,6 +38,26 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     sourcemap: mode === 'sentry',
+    rollupOptions: {
+      output: {
+        // monaco-editor bundles its full language set (~1.3MB gzip) and is only
+        // reached through the lazily-loaded JSON editors. Without an explicit
+        // chunk it gets hoisted into the entry bundle (shared across many lazy
+        // import sites), bloating first load and producing a single ~5MB chunk
+        // that exhausts Node's heap during the production build. Isolate it.
+        //
+        // The vite preload helper must get its own chunk first: otherwise it
+        // co-locates into the monaco chunk, and every chunk that dynamically
+        // imports anything (incl. the entry) then statically pulls monaco just
+        // to reach the helper — eagerly preloading all 4MB. Splitting it out
+        // keeps monaco loaded only when a JSON editor actually mounts.
+        manualChunks: (id) => {
+          if (id.includes('vite/preload-helper')) return 'vite-preload';
+          if (id.includes('node_modules/monaco-editor')) return 'monaco';
+          return undefined;
+        },
+      },
+    },
   },
 }));
 
