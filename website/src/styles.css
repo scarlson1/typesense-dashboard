@@ -1426,6 +1426,53 @@ h3 {
 .term-body[hidden] {
   display: none;
 }
+.cmd-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.copy-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #8a93a3;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.cmd-row:hover .copy-btn,
+.copy-btn:focus-visible {
+  opacity: 1;
+}
+.copy-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.copy-btn.copied {
+  opacity: 1;
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+@media (hover: none) {
+  .copy-btn {
+    opacity: 1;
+  }
+}
 /* .term-cursor {
   display: inline-block;
   width: 8px;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { DEMO_URL, DEMO_URL_NO_CREDS } from '#/components/landing/links';
+import { Check, ContentCopy } from '@mui/icons-material';
 import { Box } from '@mui/material';
 
 type Term = 'docker' | 'static' | 'desktop';
@@ -10,6 +11,32 @@ const tabs: { key: Term; label: string }[] = [
   { key: 'static', label: 'Static build' },
   { key: 'desktop', label: 'Desktop' },
 ];
+
+const CopyButton = ({ command }: { command: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard permission denied / unavailable — ignore
+    }
+  };
+
+  return (
+    <button
+      type='button'
+      className={`copy-btn${copied ? ' copied' : ''}`}
+      onClick={handleCopy}
+      aria-label={copied ? 'Copied to clipboard' : `Copy "${command}"`}
+      title={copied ? 'Copied!' : 'Copy to clipboard'}
+    >
+      {copied ? <Check fontSize='inherit' /> : <ContentCopy fontSize='inherit' />}
+    </button>
+  );
+};
 
 export const GetStarted = () => {
   const [term, setTerm] = useState<Term>('docker');
@@ -65,28 +92,36 @@ export const GetStarted = () => {
             </div>
             <div className='term-body' hidden={term !== 'docker'}>
               <div className='cmt'># Pull and run the prebuilt image</div>
-              <div>
-                <span className='pmt'>$</span> docker pull
-                spencercarlson/typesense-dashboard
+              <div className='cmd-row'>
+                <span>
+                  <span className='pmt'>$</span> docker pull
+                  spencercarlson/typesense-dashboard
+                </span>
+                <CopyButton command='docker pull spencercarlson/typesense-dashboard' />
               </div>
-              <div>
-                <span className='pmt'>$</span> docker run{' '}
-                <span className='flag'>-d</span>{' '}
-                <span className='flag'>-p</span> 8108:8108 \
-              </div>
-              <div>
-                &nbsp;&nbsp;&nbsp;&nbsp;spencercarlson/typesense-dashboard
-                {/* <span className='term-cursor' aria-hidden='true' /> */}
-                <Box
-                  component='span'
-                  sx={{
-                    // animation: 'port-pulse 2.2s ease-in-out infinite'
-                    animation: 'p-blink 1.75s steps(1) infinite',
-                  }}
-                >
-                  {' '}
-                  _
-                </Box>
+              <div className='cmd-row'>
+                <div>
+                  <div>
+                    <span className='pmt'>$</span> docker run{' '}
+                    <span className='flag'>-d</span>{' '}
+                    <span className='flag'>-p</span> 8108:8108 \
+                  </div>
+                  <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;spencercarlson/typesense-dashboard
+                    {/* <span className='term-cursor' aria-hidden='true' /> */}
+                    <Box
+                      component='span'
+                      sx={{
+                        // animation: 'port-pulse 2.2s ease-in-out infinite'
+                        animation: 'p-blink 1.75s steps(1) infinite',
+                      }}
+                    >
+                      {' '}
+                      _
+                    </Box>
+                  </div>
+                </div>
+                <CopyButton command='docker run -d -p 8108:8108 spencercarlson/typesense-dashboard' />
               </div>
               <div className='cmt'># → open http://localhost:8108</div>
             </div>
@@ -94,18 +129,27 @@ export const GetStarted = () => {
               <div className='cmt'>
                 # Hash-routed SPA — no redirect rules needed
               </div>
-              <div>
-                <span className='pmt'>$</span> git clone{' '}
-                <span className='str'>
-                  github.com/scarlson1/typesense-dashboard
+              <div className='cmd-row'>
+                <span>
+                  <span className='pmt'>$</span> git clone{' '}
+                  <span className='str'>
+                    github.com/scarlson1/typesense-dashboard
+                  </span>
                 </span>
+                <CopyButton command='git clone https://github.com/scarlson1/typesense-dashboard' />
               </div>
-              <div>
-                <span className='pmt'>$</span> pnpm install
+              <div className='cmd-row'>
+                <span>
+                  <span className='pmt'>$</span> pnpm install
+                </span>
+                <CopyButton command='pnpm install' />
               </div>
-              <div>
-                <span className='pmt'>$</span> pnpm build{' '}
-                <span className='cmt'># publish ./dist anywhere</span>
+              <div className='cmd-row'>
+                <span>
+                  <span className='pmt'>$</span> pnpm build{' '}
+                  <span className='cmt'># publish ./dist anywhere</span>
+                </span>
+                <CopyButton command='pnpm build' />
               </div>
               <div className='cmt'>
                 # Deploy to Vercel · Netlify · Cloudflare Pages
@@ -116,9 +160,12 @@ export const GetStarted = () => {
                 # Native app talks to HTTP nodes directly —
               </div>
               <div className='cmt'># no TLS, no --enable-cors, no ngrok.</div>
-              <div>
-                <span className='pmt'>$</span> pnpm electron:pack:mac{' '}
-                <span className='cmt'># or :win / :linux</span>
+              <div className='cmd-row'>
+                <span>
+                  <span className='pmt'>$</span> pnpm electron:pack:mac{' '}
+                  <span className='cmt'># or :win / :linux</span>
+                </span>
+                <CopyButton command='pnpm electron:pack:mac' />
               </div>
               <div className='cmt'># → installer lands in ./release</div>
               <div className='cmt'>
