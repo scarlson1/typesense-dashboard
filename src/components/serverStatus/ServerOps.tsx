@@ -137,8 +137,8 @@ export function ServerOps() {
           Re-election
         </Typography>
         <Typography variant='body2' sx={{ pb: 2 }}>
-          Trigger a leader re-election within the cluster. This is disruptive and
-          rarely needed — only run it when recovering a degraded cluster.{' '}
+          Trigger a leader re-election within the cluster. This is disruptive
+          and rarely needed — only run it when recovering a degraded cluster.{' '}
           <Link
             href='https://typesense.org/docs/29.0/api/cluster-operations.html#re-elect-leader'
             target='_blank'
@@ -329,7 +329,9 @@ function TriggerVote() {
     },
     onError: (err) => {
       console.log(err);
-      toast.error(err.message || `error triggering re-election`, { id: 'vote' });
+      toast.error(err.message || `error triggering re-election`, {
+        id: 'vote',
+      });
     },
   });
 
@@ -431,8 +433,7 @@ function SchemaUpdatesInProgress() {
     queryFn: () => client.apiCall.get('/operations/schema_changes'), // client.operations.perform('schema_changes'),
     staleTime: 1000 * 4,
     // Stop polling once we hit the expected auth error; keep it live otherwise.
-    refetchInterval: (query) =>
-      isAuthError(query.state.error) ? false : 5000,
+    refetchInterval: (query) => (isAuthError(query.state.error) ? false : 5000),
     retry: (failureCount, err) => !isAuthError(err) && failureCount < 2,
     // Let genuine errors reach the ErrorBoundary; handle 401/403 inline.
     throwOnError: (err) => !isAuthError(err),
@@ -446,7 +447,7 @@ function SchemaUpdatesInProgress() {
     );
   }
 
-  return Boolean(data?.length) ? (
+  return data && Boolean(data?.length) ? (
     <>
       {data.map((update) => (
         <Grid container columnSpacing={2} rowSpacing={1}>
