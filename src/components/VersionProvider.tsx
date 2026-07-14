@@ -1,8 +1,9 @@
 import { VersionContext, type VersionInfo } from '@/context/VersionContext';
 import { getTypesenseClient, typesenseStore } from '@/utils';
 import { Box, CircularProgress } from '@mui/material';
+import * as Sentry from '@sentry/react';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 import { useStore } from 'zustand';
 
 // Search-only keys can't read /debug, so the server answers 401/403. We can't
@@ -49,6 +50,19 @@ export const VersionProvider = ({ children }: { children: ReactNode }) => {
       return version;
     },
   });
+
+  // Tag Sentry events with the connected server's Typesense version, so
+  // errors can be filtered/triaged by version. Cleared when there's no
+  // client (signed out / no cluster) so stale tags don't linger.
+  useEffect(() => {
+    if (!client) {
+      Sentry.setTag('typesense_version', undefined);
+      return;
+    }
+    if (query.isSuccess) {
+      Sentry.setTag('typesense_version', query.data);
+    }
+  }, [client, query.isSuccess, query.data]);
 
   const versionInfo = useMemo<VersionInfo>(() => {
     if (query.isSuccess) {
