@@ -1,8 +1,12 @@
 import type { JsonEditorProps } from '@/components/JsonEditor';
+// Side-effect import: configures @monaco-editor/react's loader to use the
+// bundled Monaco (+ workers) instead of the CDN. Must run before <Editor>
+// mounts; both editors that use this hook are lazy, so it lands in their chunk.
+import '@/monaco/setup';
 import type { OnMount } from '@monaco-editor/react';
 import { useColorScheme } from '@mui/material';
 import Color from 'color';
-import * as monaco from 'monaco-editor';
+import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useCallback, useRef } from 'react';
 
 const LIGHT_THEME = 'custom-theme-light';

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/redesign';
 import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
+import { hasItems } from '@/utils';
 import { ChatBubbleOutlineRounded, CloseRounded } from '@mui/icons-material';
 import {
   Box,
@@ -171,7 +172,7 @@ export function ConversationHistoryDrawer({
           </Stack>
         ) : isError ? (
           <DrawerNote text="Couldn't load conversation history." />
-        ) : !conversations?.length ? (
+        ) : !hasItems(conversations) ? (
           <DrawerNote text='No previous conversations yet. Threads appear here once you start chatting.' />
         ) : (
           <Stack sx={{ gap: 0.5 }}>

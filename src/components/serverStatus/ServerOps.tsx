@@ -1,7 +1,7 @@
 import { ErrorFallback } from '@/components';
 import { dangerButtonSx } from '@/components/redesign';
 import { useAsyncToast, useDialog, useTypesenseClient } from '@/hooks';
-import { queryClient } from '@/utils';
+import { hasItems, queryClient } from '@/utils';
 import { OpenInNewRounded } from '@mui/icons-material';
 import {
   Box,
@@ -447,7 +447,7 @@ function SchemaUpdatesInProgress() {
     );
   }
 
-  return data && Boolean(data?.length) ? (
+  return hasItems<SchemaUpdate>(data) ? (
     <>
       {data.map((update) => (
         <Grid container columnSpacing={2} rowSpacing={1}>

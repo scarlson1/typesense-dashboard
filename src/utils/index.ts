@@ -65,6 +65,18 @@ export function removeStartEndMatches(str: string, matchStr: string) {
   return result;
 }
 
+/**
+ * Narrow an unknown value to a non-empty array.
+ *
+ * Prefer this over `!!value?.length` when guarding a `.map()` over data that
+ * came from an API. A `.length` truthiness check passes for any value carrying
+ * a truthy `length` — a string most notably — so a malformed response reaches
+ * `.map()` and throws "x.map is not a function". React Query's generics assert
+ * the response shape but never validate it at runtime, so the guard has to.
+ */
+export const hasItems = <T,>(value: unknown): value is T[] =>
+  Array.isArray(value) && value.length > 0;
+
 export const formatDollar = (
   val: number,
   options: Intl.NumberFormatOptions = {}

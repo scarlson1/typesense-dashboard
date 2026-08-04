@@ -23,6 +23,7 @@ import {
   useUpdateCollection,
 } from '@/hooks';
 import { useConfirmDelete } from '@/hooks/useConfirmDelete';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { designTokens } from '@/theme/themePrimitives';
 import { getCollectionUpdates } from '@/utils/getCollectionUpdates';
 import type { EditorProps, OnMount } from '@monaco-editor/react';
@@ -78,6 +79,7 @@ type SchemaView = 'table' | 'json';
 function CollectionSettings() {
   const { collectionId } = Route.useParams();
   const toast = useAsyncToast();
+  const [, copyToClipboard] = useCopyToClipboard();
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
   const [options, setOptions] = useState<EditorProps['options']>(
     DEFAULT_MONACO_OPTIONS,
@@ -199,11 +201,12 @@ function CollectionSettings() {
     editorRef.current?.getAction('editor.action.formatDocument')?.run();
   }, [data]);
 
-  const handleCopyJSON = useCallback(() => {
+  const handleCopyJSON = useCallback(async () => {
     const value = editorRef.current?.getValue() ?? JSON.stringify(data);
-    void navigator.clipboard.writeText(value);
-    toast.success('Schema copied');
-  }, [data, toast]);
+    // Go through the hook rather than navigator.clipboard directly: the API is
+    // absent outside a secure context, so the bare call throws on insecure origins.
+    if (await copyToClipboard(value)) toast.success('Schema copied');
+  }, [data, copyToClipboard, toast]);
 
   const fieldsCount = data.fields?.length ?? 0;
 

@@ -11,6 +11,7 @@ import {
   useDeleteConversationModel,
 } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
+import { hasItems } from '@/utils';
 import {
   AddRounded,
   ChatBubbleOutlineRounded,
@@ -94,7 +95,7 @@ function RouteComponent() {
         >
           {isLoading ? (
             <Skeleton variant='rounded' height={160} sx={{ m: 2 }} />
-          ) : !models?.length ? (
+          ) : !hasItems(models) ? (
             <Box sx={{ px: 2.5, py: 4, textAlign: 'center' }}>
               <ChatBubbleOutlineRounded
                 sx={{ fontSize: 22, color: designTokens.textFaint, mb: 1 }}

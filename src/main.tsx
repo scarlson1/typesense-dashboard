@@ -52,8 +52,17 @@ const scrub = (input: unknown, secrets: string[]): unknown => {
 
 Sentry.init({
   dsn: 'https://b293b3e281f37fe75bbdea7a52489a24@o4509429931442176.ingest.us.sentry.io/4509673463808000',
+  // The DSN ships in the bundle, so any clone running `pnpm dev` reports into
+  // this project. Gate on PROD so only real builds send events. Init still runs
+  // in dev, which keeps Sentry.captureException/setTag call sites as no-ops.
+  enabled: import.meta.env.PROD,
   sendDefaultPii: false,
   environment: import.meta.env.DEV ? 'development' : 'production',
+  // Monaco cancels in-flight work (completions, formatting, tokenization) as a
+  // matter of course and surfaces it as a bare `Canceled` error. It is control
+  // flow, not a fault. Anchored so it can't swallow real errors that merely
+  // mention cancellation.
+  ignoreErrors: [/^Canceled$/],
   beforeSend: (event) => scrub(event, secretValues()) as typeof event,
   beforeBreadcrumb: (crumb) => scrub(crumb, secretValues()) as typeof crumb,
   // release: "<release_name>",
@@ -64,6 +73,42 @@ Sentry.init({
   // ],
   // replaysSessionSampleRate: 0.05,
   // replaysOnErrorSampleRate: 0.5,
+});
+
+// A deploy replaces the hashed chunk files that an already-loaded index.html
+// points at, so the next lazy import (monaco, split routes) rejects with
+// "Importing a module script failed" / "Failed to fetch dynamically imported
+// module". Reloading picks up the new manifest.
+const STALE_CHUNK_RE =
+  /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i;
+
+const CHUNK_RELOAD_KEY = 'chunk-reload-attempted';
+
+// One reload per tab session, deliberately never cleared: a chunk that is
+// genuinely unreachable (offline, blocked, bad deploy) would otherwise reload
+// forever. After the single attempt the error falls through to the boundary.
+const reloadOnceForStaleChunk = (reason: unknown) => {
+  const message = reason instanceof Error ? reason.message : String(reason);
+  if (!STALE_CHUNK_RE.test(message)) return;
+  try {
+    if (sessionStorage.getItem(CHUNK_RELOAD_KEY)) return;
+    sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now()));
+  } catch {
+    // Storage can be unavailable (private mode, blocked cookies). Without a
+    // loop guard, don't reload at all.
+    return;
+  }
+  window.location.reload();
+};
+
+// Vite dispatches a plain Event carrying the original error on `.payload`, and
+// rethrows it when nothing calls preventDefault — so the rejection listener
+// below may see it too. The one-shot guard makes the duplicate harmless.
+window.addEventListener('vite:preloadError', (event) => {
+  reloadOnceForStaleChunk((event as Event & { payload?: unknown }).payload);
+});
+window.addEventListener('unhandledrejection', (event) => {
+  reloadOnceForStaleChunk(event.reason);
 });
 
 const hashHistory = createHashHistory();
