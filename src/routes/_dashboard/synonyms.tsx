@@ -8,15 +8,13 @@ import {
   type SynonymRowForEdit,
 } from '@/components/SynonymsGridV30';
 import { collectionQueryKeys } from '@/constants';
-import { useAppForm, useAsyncToast, useTypesenseClient } from '@/hooks';
+import { useAppForm, useTypesenseClient, useUpsertSynonymItem } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { queryClient } from '@/utils';
 import { DownloadRounded, OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import type { SynonymSetCreateSchema } from 'typesense';
+import { useEffect, useMemo, useState } from 'react';
 
 export const Route = createFileRoute('/_dashboard/synonyms')({
   component: RouteComponent,
@@ -92,57 +90,37 @@ interface AddSynonymProps {
 
 function AddSynonym({ editingSynonym, onCancel }: AddSynonymProps) {
   const [client, clusterId] = useTypesenseClient();
-  const toast = useAsyncToast();
 
-  const mutation = useMutation({
-    mutationFn: ({
-      synonymSetName,
-      synonymSet,
-    }: {
-      synonymSetName: string;
-      synonymSet: SynonymSetCreateSchema;
-    }) => client.synonymSets(synonymSetName).upsert(synonymSet),
-    onMutate: () => {
-      toast.loading('saving synonym rule', { id: 'synonyms' });
-    },
-    onSuccess: () => {
-      toast.success('synonym rule saved', { id: 'synonyms' });
-    },
-    onError: (err) => {
-      const msg = err?.message ?? 'An error occurred saving synonym rule';
-      toast.error(msg, { id: 'synonyms' });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.synonymSets(clusterId),
-      });
-    },
+  const { data: sets } = useQuery({
+    queryKey: collectionQueryKeys.synonymSets(clusterId),
+    queryFn: () => client.synonymSets().retrieve(),
   });
+  const setNames = useMemo(() => sets?.map((s) => s.name) ?? [], [sets]);
+
+  const mutation = useUpsertSynonymItem();
 
   const form = useAppForm({
     ...synonymsFormOptsV30,
     onSubmit: async ({ value }) => {
-      const synonymSet: SynonymSetCreateSchema = {
-        items: [
-          {
-            id: value.name,
-            synonyms: value.synonyms
-              .split(',')
-              .map((s) => s.trim())
-              .filter(Boolean),
+      const splitList = (val: string) =>
+        val
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+      try {
+        await mutation.mutateAsync({
+          setName: value.setName,
+          itemId: value.name,
+          item: {
+            synonyms: splitList(value.synonyms),
             root: value.root || undefined,
             locale: value.locale || undefined,
             symbols_to_index: value.symbols_to_index
-              ? value.symbols_to_index
-                  .split(',')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
+              ? splitList(value.symbols_to_index)
               : undefined,
           },
-        ],
-      };
-      try {
-        await mutation.mutateAsync({ synonymSetName: value.name, synonymSet });
+        });
         form.reset();
         onCancel?.();
       } catch (_) {
@@ -153,7 +131,8 @@ function AddSynonym({ editingSynonym, onCancel }: AddSynonymProps) {
 
   useEffect(() => {
     if (editingSynonym) {
-      form.setFieldValue('name', editingSynonym.setName);
+      form.setFieldValue('setName', editingSynonym.setName);
+      form.setFieldValue('name', editingSynonym.itemId);
       form.setFieldValue('synonyms', editingSynonym.synonyms);
       form.setFieldValue('root', editingSynonym.root);
       form.setFieldValue('symbols_to_index', editingSynonym.symbols_to_index);
@@ -162,7 +141,7 @@ function AddSynonym({ editingSynonym, onCancel }: AddSynonymProps) {
       form.reset();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editingSynonym?.setName]);
+  }, [editingSynonym?.setName, editingSynonym?.itemId]);
 
   return (
     <Box
@@ -175,7 +154,12 @@ function AddSynonym({ editingSynonym, onCancel }: AddSynonymProps) {
       noValidate
       sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
     >
-      <SynonymsFormV30 form={form} isEditing={!!editingSynonym} onCancel={onCancel} />
+      <SynonymsFormV30
+        form={form}
+        isEditing={!!editingSynonym}
+        onCancel={onCancel}
+        setNames={setNames}
+      />
     </Box>
   );
 }
