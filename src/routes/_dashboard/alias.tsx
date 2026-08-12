@@ -8,7 +8,7 @@ import { designTokens } from '@/theme/themePrimitives';
 import { queryClient } from '@/utils';
 import { LinkRounded, OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import {
   useMutation,
   useSuspenseQuery,
@@ -68,7 +68,7 @@ function RouteComponent() {
       >
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => captureException(err)}
+          onError={captureReactException}
         >
           <Suspense>
             <AliasCountChip />
@@ -175,7 +175,7 @@ function RouteComponent() {
         >
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <Suspense>
               <AliasGrid />
@@ -193,7 +193,7 @@ function RouteComponent() {
           >
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense>
                 <AddAlias />

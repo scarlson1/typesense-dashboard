@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -47,9 +47,7 @@ export function ServerOps() {
         </Typography>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <ClearCache />
         </ErrorBoundary>
@@ -81,9 +79,7 @@ export function ServerOps() {
         </Typography>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <CompactDatabase />
         </ErrorBoundary>
@@ -115,9 +111,7 @@ export function ServerOps() {
         </Typography>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <CreateSnapshot />
         </ErrorBoundary>
@@ -149,9 +143,7 @@ export function ServerOps() {
         </Typography>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <TriggerVote />
         </ErrorBoundary>
@@ -183,9 +175,7 @@ export function ServerOps() {
         </Typography>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <RuntimeConfig />
         </ErrorBoundary>
@@ -196,9 +186,7 @@ export function ServerOps() {
         </Typography>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <SchemaUpdatesInProgress />
         </ErrorBoundary>

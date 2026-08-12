@@ -10,7 +10,7 @@ import {
 import { designTokens } from '@/theme/themePrimitives';
 import { OpenInNewRounded } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -58,7 +58,7 @@ function RouteComponent() {
       >
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => captureException(err)}
+          onError={captureReactException}
         >
           <Suspense>
             <CurationList collectionId={collectionId} />

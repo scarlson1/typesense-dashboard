@@ -54,7 +54,7 @@ Sentry.init({
   dsn: 'https://b293b3e281f37fe75bbdea7a52489a24@o4509429931442176.ingest.us.sentry.io/4509673463808000',
   // The DSN ships in the bundle, so any clone running `pnpm dev` reports into
   // this project. Gate on PROD so only real builds send events. Init still runs
-  // in dev, which keeps Sentry.captureException/setTag call sites as no-ops.
+  // in dev, which keeps Sentry.captureReactException/setTag call sites as no-ops.
   enabled: import.meta.env.PROD,
   sendDefaultPii: false,
   environment: import.meta.env.DEV ? 'development' : 'production',
@@ -168,9 +168,7 @@ if (!rootElement.innerHTML) {
       <ErrorBoundary
         FallbackComponent={LastResortErrorBoundary}
         // TODO: log errors to cloud project (Google)
-        onError={(err: unknown) => {
-          Sentry.captureException(err);
-        }}
+        onError={Sentry.captureReactException}
       >
         {/* <DialogProvider> */}
         <RouterProvider router={router} />

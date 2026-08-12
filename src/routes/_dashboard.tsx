@@ -9,7 +9,7 @@ import { VersionProvider } from '@/components/VersionProvider';
 import { designTokens } from '@/theme/themePrimitives';
 import { typesenseStore } from '@/utils';
 import { Box } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import {
   createFileRoute,
   Outlet,
@@ -75,9 +75,7 @@ function RouteComponent() {
           </Box>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
+            onError={captureReactException}
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Outlet />

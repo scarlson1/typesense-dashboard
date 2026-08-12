@@ -36,7 +36,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { lazy, Suspense, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -343,7 +343,7 @@ export function AnalyticsRulesList() {
       <Box sx={{ width: { xs: '100%', lg: 300 }, flexShrink: 0 }}>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => captureException(err)}
+          onError={captureReactException}
         >
           <Suspense>
             <NewRulePanel />

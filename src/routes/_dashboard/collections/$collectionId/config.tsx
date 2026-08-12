@@ -47,7 +47,7 @@ import {
   useTheme,
   type ButtonProps,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { createFileRoute } from '@tanstack/react-router';
 import type { editor } from 'monaco-editor';
 import {
@@ -327,14 +327,14 @@ function CollectionSettings() {
           <IndexingHealthCard totalDocs={data.num_documents} />
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <BulkDocumentOpsCard collectionId={collectionId} />
           </ErrorBoundary>
           <SchemaUpdateGuideCard />
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <DangerZoneCard />
           </ErrorBoundary>
