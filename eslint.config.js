@@ -5,7 +5,10 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  // Build output — gitignored, but `eslint .` would otherwise lint the
+  // bundled vendor sources in out/renderer (152 phantom errors from VS Code's
+  // internal eslint-disable comments inside monaco).
+  { ignores: ['dist', 'out', 'release', 'build', 'coverage', 'test-results'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

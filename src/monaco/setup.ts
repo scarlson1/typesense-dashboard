@@ -4,7 +4,10 @@ import { loader } from '@monaco-editor/react';
 // ~90 other language grammars, keeping the (lazy) monaco chunk ~2-3MB instead
 // of ~4.2MB.
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import 'monaco-editor/esm/vs/language/json/monaco.contribution';
+// `jsonDefaults` must come from the contribution module itself: on this narrow
+// entry point `monaco.languages.json` is undefined — only Monaco's full
+// `editor.main` entry re-attaches the language services onto `languages`.
+import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 
@@ -30,4 +33,4 @@ self.MonacoEnvironment = {
 // synchronously against `monaco` without any network request.
 loader.config({ monaco });
 
-export { monaco };
+export { jsonDefaults, monaco };

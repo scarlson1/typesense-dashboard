@@ -1,5 +1,6 @@
 import { CheckIcon } from '#/components/icons';
 import { useResolvedMode } from '#/hooks/useResolvedMode';
+import { ShotImage, SPLIT_MEDIA_SIZES } from './ShotImage';
 
 export const SearchHighlight = () => {
   const mode = useResolvedMode();
@@ -44,17 +45,11 @@ export const SearchHighlight = () => {
             <div className='media-cap'>
               <i /> Dashboard › Search · airbnb_listings
             </div>
-            {mode === 'light' ? (
-              <img
-                src='/assets/shots/search-light.png'
-                alt='Typesense Dashboard search interface with faceted results and query parameters'
-              />
-            ) : (
-              <img
-                src='/assets/shots/search-dark.png'
-                alt='Typesense Dashboard search interface with faceted results and query parameters'
-              />
-            )}
+            <ShotImage
+              name={mode === 'light' ? 'search-light' : 'search-dark'}
+              sizes={SPLIT_MEDIA_SIZES}
+              alt='Typesense Dashboard search interface with faceted results and query parameters'
+            />
           </div>
         </div>
       </div>
@@ -104,17 +99,11 @@ export const GeoHighlight = () => {
             <div className='media-cap'>
               <i /> Dashboard › Search › Map
             </div>
-            {mode === 'light' ? (
-              <img
-                src='/assets/shots/map-light.png'
-                alt='Typesense Dashboard geosearch map view with result pins on a Mapbox map'
-              />
-            ) : (
-              <img
-                src='/assets/shots/map-dark.png'
-                alt='Typesense Dashboard geosearch map view with result pins on a Mapbox map'
-              />
-            )}
+            <ShotImage
+              name={mode === 'light' ? 'map-light' : 'map-dark'}
+              sizes={SPLIT_MEDIA_SIZES}
+              alt='Typesense Dashboard geosearch map view with result pins on a Mapbox map'
+            />
           </div>
         </div>
       </div>

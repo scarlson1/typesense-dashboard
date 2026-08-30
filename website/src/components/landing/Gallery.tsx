@@ -8,6 +8,9 @@ import {
   useTheme,
 } from '@mui/material';
 import { useState } from 'react';
+import { ShotImage } from './ShotImage';
+import type { ShotName } from './shots.gen';
+import { shots as shotAssets } from './shots.gen';
 
 type Filter = 'all' | 'dark' | 'light' | 'mobile';
 
@@ -18,7 +21,7 @@ interface Shot {
   cat: Exclude<Filter, 'all'>;
   title: string;
   tag: string;
-  src: string;
+  name: ShotName;
   delay?: string;
 }
 
@@ -28,7 +31,7 @@ const shots: Shot[] = [
     cat: 'dark',
     title: 'Cluster overview',
     tag: 'Dark',
-    src: '/assets/shots/cluster-dark.png',
+    name: 'cluster-dark',
     cols: 2,
     rows: 1,
   },
@@ -37,7 +40,7 @@ const shots: Shot[] = [
     cat: 'mobile',
     title: 'Geosearch',
     tag: 'Mobile',
-    src: '/assets/shots/map-mobile-dark.png',
+    name: 'map-mobile-dark',
     delay: 'd1',
     cols: 1,
     rows: 2,
@@ -47,7 +50,7 @@ const shots: Shot[] = [
     cat: 'dark',
     title: 'Schema editor',
     tag: 'Dark',
-    src: '/assets/shots/schema-dark.png',
+    name: 'schema-dark',
     delay: 'd1',
     cols: 1,
     rows: 1,
@@ -57,7 +60,7 @@ const shots: Shot[] = [
     cat: 'light',
     title: 'API keys',
     tag: 'Light',
-    src: '/assets/shots/keys-light.png',
+    name: 'keys-light',
     cols: 1,
     rows: 1,
   },
@@ -66,7 +69,7 @@ const shots: Shot[] = [
     cat: 'mobile',
     title: 'Schema',
     tag: 'Mobile',
-    src: '/assets/shots/schema-mobile-light.png',
+    name: 'schema-mobile-light',
     delay: 'd1',
     cols: 1,
     rows: 2,
@@ -76,7 +79,7 @@ const shots: Shot[] = [
     cat: 'light',
     title: 'Search & facets',
     tag: 'Light',
-    src: '/assets/shots/search-light.png',
+    name: 'search-light',
     cols: 2,
     rows: 1,
   },
@@ -85,7 +88,7 @@ const shots: Shot[] = [
     cat: 'light',
     title: 'Add documents',
     tag: 'Light',
-    src: '/assets/shots/add-docs-light.png',
+    name: 'add-docs-light',
     delay: 'd1',
     cols: 1,
     rows: 1,
@@ -95,11 +98,44 @@ const shots: Shot[] = [
     cat: 'dark',
     title: 'API keys',
     tag: 'Dark',
-    src: '/assets/shots/keys-dark.png',
+    name: 'keys-dark',
     cols: 1,
     rows: 1,
   },
 ];
+
+const GAP = 16;
+/** (1180px `.wrap` - 56px inline padding - 2 * 16px gap) / 3 columns. */
+const DESKTOP_COL = 364;
+const DESKTOP_ROW = 340;
+const MOBILE_ROW = 200;
+
+/**
+ * Tiles crop with `object-fit: cover`, so the width the browser actually
+ * paints is `max(boxWidth, boxHeight * sourceAspect)` — a short tile fed a
+ * landscape screenshot renders up to ~30% wider than its own box. Handing
+ * `sizes` the box width alone would pick a candidate that small and look soft.
+ */
+const tileSizes = ({ name, cols, rows }: Shot) => {
+  const asset = shotAssets[name];
+  const aspect = asset.width / asset.height;
+  const cover = (rowHeight: number) =>
+    Math.round((rows * rowHeight + (rows - 1) * GAP) * aspect);
+
+  // < 900px: MUI switches the quilted grid to 2 columns with 200px rows.
+  const mobileBox =
+    cols >= 2 ? 'calc(100vw - 56px)' : 'calc((100vw - 72px) / 2)';
+  // 900-1180px: 3 columns, `.wrap` still fluid.
+  const midBox = `calc((100vw - 88px) / 3 * ${cols} + ${(cols - 1) * GAP}px)`;
+  // >= 1180px: `.wrap` is capped, so the tile is a fixed width.
+  const wideBox = cols * DESKTOP_COL + (cols - 1) * GAP;
+
+  return (
+    `(max-width: 899px) max(${mobileBox}, ${cover(MOBILE_ROW)}px),` +
+    ` (max-width: 1179px) max(${midBox}, ${cover(DESKTOP_ROW)}px),` +
+    ` ${Math.max(wideBox, cover(DESKTOP_ROW))}px`
+  );
+};
 
 const tabs: Filter[] = ['all', 'dark', 'light', 'mobile'];
 const tabLabel: Record<Filter, string> = {
@@ -146,13 +182,13 @@ export const Gallery = () => {
             const hidden = filter !== 'all' && item.cat !== filter;
             return (
               <ImageListItem
-                key={`${item.src}-${i}`}
+                key={`${item.name}-${i}`}
                 cols={item.cols}
                 rows={item.rows}
                 className={`gcard reveal${item.delay ? ` ${item.delay}` : ''}${hidden ? ' hidden' : ''}`}
                 data-cat={item.cat}
                 sx={{
-                  display: hidden ? 'hidden' : 'block',
+                  display: hidden ? 'none' : 'block',
                   border: '1px solid var(--mui-palette-design-border)',
                   borderRadius: 2,
                   background: 'var(--mui-palette-design-surface)',
@@ -161,13 +197,23 @@ export const Gallery = () => {
                   '&:hover': {
                     border: '1px solid var(--mui-palette-design-borderStrong)',
                   },
+                  // ImageListItem only tags a *direct* `img` child with the
+                  // class carrying its cover styles, and ShotImage wraps the
+                  // img in a <picture>. Restate them here (the descendant
+                  // selector also outranks `.gcard img` in styles.css).
+                  '& picture': { display: 'block', height: '100%' },
+                  '& picture > img': {
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  },
                 }}
               >
-                <img
-                  srcSet={`${item.src}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                  src={`${item.src}?w=248&fit=crop&auto=format`}
-                  alt={item.title}
-                  loading='lazy'
+                <ShotImage
+                  name={item.name}
+                  sizes={tileSizes(item)}
+                  alt={`${item.title}, ${item.tag.toLowerCase()} theme`}
                 />
                 <ImageListItemBar
                   position='top'

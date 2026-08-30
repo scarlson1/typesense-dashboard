@@ -1,9 +1,28 @@
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { nitro } from 'nitro/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 
-const config = defineConfig(({ command }) => ({
+// Absolute origin used for canonical/og:url/sitemap. On Vercel,
+// VERCEL_PROJECT_PRODUCTION_URL is injected automatically at build time (the
+// stable production hostname, not the per-deploy preview URL), so the site needs
+// no manual config there. VITE_SITE_URL overrides it for a custom domain.
+// loadEnv with an empty prefix picks these up from both process.env and .env
+// files, so a local `.env` behaves the same as Vercel's build env.
+const resolveSiteUrl = (mode: string): string => {
+  const env = { ...loadEnv(mode, process.cwd(), ''), ...process.env };
+  const url =
+    env.VITE_SITE_URL ||
+    (env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : '');
+  return url.replace(/\/$/, '');
+};
+
+const config = defineConfig(({ command, mode }) => ({
+  define: {
+    __SITE_URL__: JSON.stringify(resolveSiteUrl(mode)),
+  },
   resolve: {
     tsconfigPaths: true,
     dedupe: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],

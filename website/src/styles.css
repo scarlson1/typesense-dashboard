@@ -1164,6 +1164,9 @@ h3 {
   box-shadow: var(--shadow-card);
   background: var(--surface);
 }
+.split-media picture {
+  display: block;
+}
 .split-media img {
   width: 100%;
   height: auto;

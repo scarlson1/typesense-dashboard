@@ -1,3 +1,6 @@
+import { useResolvedMode } from '#/hooks/useResolvedMode';
+import { ShotImage, SPLIT_MEDIA_SIZES } from './ShotImage';
+
 const rows: { label: string; cloud: boolean }[] = [
   { label: 'Works with self-hosted nodes', cloud: false },
   { label: 'Runs fully offline / on your network', cloud: false },
@@ -7,6 +10,8 @@ const rows: { label: string; cloud: boolean }[] = [
 ];
 
 export const OpenSource = () => {
+  const mode = useResolvedMode();
+
   return (
     <section className='section-pad' id='open-source' style={{ paddingTop: 0 }}>
       <div className='wrap'>
@@ -41,8 +46,9 @@ export const OpenSource = () => {
             <div className='media-cap'>
               <i /> Dashboard › Config · Schema
             </div>
-            <img
-              src='/assets/shots/schema-dark.png'
+            <ShotImage
+              name={mode === 'light' ? 'schema-light' : 'schema-dark'}
+              sizes={SPLIT_MEDIA_SIZES}
               alt='Schema editor showing field types and indexing flags'
             />
           </div>
