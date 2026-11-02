@@ -8,6 +8,7 @@ import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import type { ReactNode } from 'react';
 
+import { seoLinks, seoMeta, softwareApplicationLd } from '#/seo';
 import { theme } from '#/setup/theme';
 import appCss from '../styles.css?url';
 
@@ -50,14 +51,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      {
-        title: 'Typesense Dashboard — Open-source UI for self-hosted Typesense',
-      },
-      {
-        name: 'description',
-        content:
-          'A fast, open-source dashboard to manage self-hosted and local Typesense clusters. Search, schema editing, geosearch, API keys — 100% client-side, your keys never leave your browser.',
-      },
+      // Title, description, robots, Open Graph and Twitter card — see src/seo.ts.
+      ...seoMeta(),
     ],
     links: [
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -71,6 +66,7 @@ export const Route = createRootRoute({
         href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap',
       },
       { rel: 'stylesheet', href: appCss },
+      ...seoLinks(),
       {
         rel: 'icon',
         type: 'image/x-icon',
@@ -95,6 +91,12 @@ export const Route = createRootRoute({
       {
         rel: 'manifest',
         href: '/site.webmanifest',
+      },
+    ],
+    scripts: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify(softwareApplicationLd()),
       },
     ],
   }),

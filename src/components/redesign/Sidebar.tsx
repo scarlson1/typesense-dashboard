@@ -38,7 +38,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import type { LinkComponent } from '@tanstack/react-router';
 import {
@@ -651,7 +651,7 @@ export function SidebarBoundary() {
   return (
     <ErrorBoundary
       FallbackComponent={ErrorFallback}
-      onError={(err: unknown) => captureException(err)}
+      onError={captureReactException}
     >
       <Sidebar />
     </ErrorBoundary>

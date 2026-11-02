@@ -19,7 +19,7 @@ import {
   OpenInNewRounded,
 } from '@mui/icons-material';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import { Suspense, useMemo } from 'react';
@@ -34,7 +34,7 @@ function HomeComponent() {
     <Stack sx={{ minWidth: 0 }}>
       <ErrorBoundary
         fallback={<HomeHeader fallback />}
-        onError={(err: unknown) => captureException(err)}
+        onError={captureReactException}
       >
         <HomeHeader />
       </ErrorBoundary>
@@ -58,7 +58,7 @@ function HomeComponent() {
           <Stack sx={{ gap: 1.75, minWidth: 0 }}>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense fallback={<MetricStripFallback />}>
                 <MetricStrip />
@@ -102,7 +102,7 @@ function HomeComponent() {
           <Stack sx={{ gap: 1.75, minWidth: 0 }}>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense fallback={<ClusterStatusFallback />}>
                 <ClusterStatusCard />

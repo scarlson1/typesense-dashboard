@@ -7,6 +7,14 @@
       "runtimeArgs": ["run", "dev", "--", "--port", "5188", "--strictPort"],
       "autoPort": false,
       "port": 5188
+    },
+    {
+      "name": "website",
+      "cwd": "website",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5190", "--strictPort"],
+      "autoPort": false,
+      "port": 5190
     }
   ]
 }

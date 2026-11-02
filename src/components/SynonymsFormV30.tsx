@@ -1,12 +1,20 @@
 import { FormField } from '@/components/redesign';
 import { withForm } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { Box, Grid } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  Grid,
+  TextField as MuiTextField,
+} from '@mui/material';
 import { formOptions } from '@tanstack/react-form';
 import { useState } from 'react';
 import { z } from 'zod/v4';
 
+// A set is a container of many rules, so a rule is addressed by both its set
+// name and its own id — writes target `/synonym_sets/:setName/items/:name`.
 const synonymsSchema = z.object({
+  setName: z.string().min(1),
   name: z.string().min(1),
   synonyms: z.string(),
   root: z.string(),
@@ -16,6 +24,7 @@ const synonymsSchema = z.object({
 
 export const synonymsFormOptsV30 = formOptions({
   defaultValues: {
+    setName: '',
     name: '',
     synonyms: '',
     root: '',
@@ -173,14 +182,49 @@ function ChipInput({
 
 export const SynonymsFormV30 = withForm({
   ...synonymsFormOptsV30,
-  props: {} as { isEditing?: boolean; onCancel?: () => void },
-  render: ({ form, isEditing, onCancel }) => {
+  props: {} as {
+    isEditing?: boolean;
+    onCancel?: () => void;
+    /** Existing set names, offered as suggestions when adding a rule. */
+    setNames?: string[];
+  },
+  render: ({ form, isEditing, onCancel, setNames = [] }) => {
     return (
       <Grid container spacing={1.75}>
         <Grid size={{ xs: 12 }}>
+          <form.Field name='setName'>
+            {({ state, handleChange, handleBlur }) => (
+              <FormField
+                label='Synonym set'
+                hint={isEditing ? undefined : 'new or existing'}
+                required
+              >
+                <Autocomplete
+                  freeSolo
+                  disabled={isEditing}
+                  options={setNames}
+                  value={state.value}
+                  inputValue={state.value}
+                  onInputChange={(_, val) => handleChange(val)}
+                  onChange={(_, val) => handleChange(val ?? '')}
+                  renderInput={(params) => (
+                    <MuiTextField
+                      {...params}
+                      onBlur={handleBlur}
+                      size='small'
+                      variant='outlined'
+                      placeholder='e.g. product_synonyms'
+                    />
+                  )}
+                />
+              </FormField>
+            )}
+          </form.Field>
+        </Grid>
+        <Grid size={{ xs: 12 }}>
           <form.AppField name='name'>
             {({ TextField }) => (
-              <FormField label='Rule name' required htmlFor='name'>
+              <FormField label='Rule ID' required htmlFor='name'>
                 <TextField
                   id='name'
                   required
@@ -188,6 +232,7 @@ export const SynonymsFormV30 = withForm({
                   size='small'
                   variant='outlined'
                   placeholder='e.g. apartment_synonyms'
+                  disabled={isEditing}
                 />
               </FormField>
             )}

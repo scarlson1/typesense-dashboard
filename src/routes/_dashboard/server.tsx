@@ -16,7 +16,7 @@ import { useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
 import { formatBytes } from '@/utils';
 import { Box, Skeleton, Stack, Typography } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
@@ -33,7 +33,7 @@ function RouteComponent() {
     <Stack sx={{ minWidth: 0 }}>
       <ErrorBoundary
         fallback={<ServerHeader />}
-        onError={(err: unknown) => captureException(err)}
+        onError={captureReactException}
       >
         <ServerHeaderConnected />
       </ErrorBoundary>
@@ -48,7 +48,7 @@ function RouteComponent() {
       >
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => captureException(err)}
+          onError={captureReactException}
         >
           <Suspense fallback={<TopStripFallback />}>
             <TopStrip />
@@ -66,7 +66,7 @@ function RouteComponent() {
           <Stack direction='column' spacing={1.75}>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense
                 fallback={
@@ -82,7 +82,7 @@ function RouteComponent() {
             </ErrorBoundary>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense
                 fallback={
@@ -101,7 +101,7 @@ function RouteComponent() {
           <Stack direction='column' spacing={1.75}>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense
                 fallback={
@@ -129,7 +129,7 @@ function RouteComponent() {
           <ServerMetrics />
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <Suspense fallback={null}>
               <TypesenseMetricsAndNodes />

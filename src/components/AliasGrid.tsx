@@ -2,7 +2,7 @@ import { smallButtonSx } from '@/components/redesign';
 import { aliasQueryKeys } from '@/constants';
 import { useAsyncToast, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { queryClient } from '@/utils';
+import { hasItems, queryClient } from '@/utils';
 import {
   ArrowForwardRounded,
   DeleteOutlineRounded,
@@ -71,7 +71,7 @@ export function AliasGrid({ onRepoint }: AliasGridProps) {
     },
   });
 
-  if (!data?.length) {
+  if (!hasItems(data)) {
     return (
       <Box sx={{ px: 1.75, py: 3, textAlign: 'center' }}>
         <Typography sx={{ fontSize: 13, color: designTokens.textMuted }}>

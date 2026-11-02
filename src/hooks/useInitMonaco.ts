@@ -1,8 +1,12 @@
 import type { JsonEditorProps } from '@/components/JsonEditor';
+// Importing this also configures @monaco-editor/react's loader to use the
+// bundled Monaco (+ workers) instead of the CDN. Must run before <Editor>
+// mounts; both editors that use this hook are lazy, so it lands in their chunk.
+import { jsonDefaults } from '@/monaco/setup';
 import type { OnMount } from '@monaco-editor/react';
 import { useColorScheme } from '@mui/material';
 import Color from 'color';
-import * as monaco from 'monaco-editor';
+import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useCallback, useRef } from 'react';
 
 const LIGHT_THEME = 'custom-theme-light';
@@ -38,7 +42,7 @@ export function useInitMonaco({
   const editorPath = `${editorId}.json`; // Unique path per editor instance
 
   const applySchema: OnMount = useCallback(
-    (editor, monaco) => {
+    (editor) => {
       // Both this hook's deferred timer and its focus handler can fire after
       // the editor (and Monaco's services) have been disposed — closing a
       // dialog or changing route tears the webview port down. Guard against a
@@ -46,7 +50,9 @@ export function useInitMonaco({
       if (!editor) return;
       try {
         editor.getAction('editor.action.formatDocument')?.run();
-        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+        // NB: `jsonDefaults` comes from the bundled setup module, not from the
+        // `monaco` argument — the narrow entry point has no `languages.json`.
+        jsonDefaults.setDiagnosticsOptions({
           validate: true,
           schemas: [
             {

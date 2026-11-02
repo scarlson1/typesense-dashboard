@@ -53,6 +53,44 @@ Two Vite config details make MUI SSR work (see
 Note: with MUI v9, system style props (`alignItems`, `maxWidth`, etc.) are no
 longer accepted directly on components — pass them via the `sx` prop.
 
+## SEO
+
+All crawler- and unfurler-facing metadata is centralised in [`src/seo.ts`](src/seo.ts)
+and wired into the document head from
+[`src/routes/__root.tsx`](src/routes/__root.tsx):
+
+- title/description, `robots`, `theme-color`
+- Open Graph + Twitter `summary_large_image` (card art at `public/og.jpg`, 1200x630)
+- `rel=canonical`
+- JSON-LD `SoftwareApplication` for rich results
+
+`robots.txt` and `sitemap.xml` are **server routes**
+([`src/routes/robots[.]txt.ts`](src/routes/robots[.]txt.ts),
+[`src/routes/sitemap[.]xml.ts`](src/routes/sitemap[.]xml.ts)) rather than files in
+`public/`, so the absolute URLs they contain are resolved from the request origin
+and stay correct on preview deploys and custom domains.
+
+### Site URL
+
+Canonical, `og:url`, `og:image` and the sitemap need an absolute origin. It is
+inlined at build time by [`vite.config.ts`](vite.config.ts):
+
+1. `VITE_SITE_URL` if set (use this for a custom domain), else
+2. `VERCEL_PROJECT_PRODUCTION_URL`, which Vercel injects automatically, else
+3. empty - in which case the URL-dependent tags are **omitted**. That is
+   deliberate: no canonical is better than one pointing at a domain we don't own.
+
+So Vercel needs no configuration. For local checks, put
+`VITE_SITE_URL=https://example.com` in a `.env` (gitignored).
+
+### Images and Core Web Vitals
+
+React 19 emits `<link rel=preload as=image>` during SSR for any `<img>` it renders
+without `loading="lazy"`. The below-the-fold screenshots therefore carry explicit
+`loading='lazy'` and intrinsic `width`/`height` - the former keeps several MB of
+screenshots out of the preload set, the latter reserves the aspect ratio so they
+don't shift layout (CLS).
+
 ## Routing
 
 File-based routing in `src/routes`. Add a route by adding a file; the route tree

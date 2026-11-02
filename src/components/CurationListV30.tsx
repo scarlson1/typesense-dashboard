@@ -12,7 +12,7 @@ import {
   SettingsRounded,
 } from '@mui/icons-material';
 import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState, type ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -105,7 +105,7 @@ export const CurationListV30 = () => {
       <Box sx={{ width: { xs: '100%', lg: 320 }, flexShrink: 0 }}>
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => captureException(err)}
+          onError={captureReactException}
         >
           <Suspense>
             {editingKey === '__new__' || !editingEntry ? (

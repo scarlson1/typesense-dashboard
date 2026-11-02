@@ -8,7 +8,7 @@ import {
   styled,
   Typography,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClusterSelect } from './ClusterSelect';
 import { ErrorFallback } from './ErrorFallback';
@@ -65,9 +65,7 @@ export function SideMenu() {
       >
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
-          onError={(err: unknown) => {
-            captureException(err);
-          }}
+          onError={captureReactException}
         >
           <MenuContent />
         </ErrorBoundary>

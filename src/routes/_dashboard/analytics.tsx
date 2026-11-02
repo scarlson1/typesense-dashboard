@@ -28,7 +28,7 @@ import {
   Typography,
   Zoom,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense, useCallback, useMemo, type ReactNode } from 'react';
@@ -76,7 +76,7 @@ function RouteComponent() {
         <Stack spacing={2}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <Suspense>
               <AnalyticsRulesList />
@@ -84,7 +84,7 @@ function RouteComponent() {
           </ErrorBoundary>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <Suspense fallback={<EnableAnalyticsCard />}>
               <AnalyticsInsight />
@@ -92,7 +92,7 @@ function RouteComponent() {
           </ErrorBoundary>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <Suspense fallback={null}>
               <AnalyticsEventsPanel />

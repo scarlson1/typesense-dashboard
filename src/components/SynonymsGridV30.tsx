@@ -1,20 +1,17 @@
 import { collectionQueryKeys } from '@/constants';
-import { useAsyncToast, useTypesenseClient } from '@/hooks';
+import { useDeleteSynonymItem, useTypesenseClient } from '@/hooks';
 import { designTokens } from '@/theme/themePrimitives';
-import { queryClient } from '@/utils';
 import { DeleteRounded, EditRounded, SearchRounded, SwapHorizRounded, TrendingFlatRounded } from '@mui/icons-material';
 import { Box, IconButton, MenuItem, Select, Tooltip, Typography } from '@mui/material';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import type {
-  SynonymItemSchema,
-  SynonymSetSchema,
-} from 'typesense/lib/Typesense/SynonymSets';
+import type { SynonymItemSchema } from 'typesense/lib/Typesense/SynonymSets';
 
 type SynonymRow = SynonymItemSchema & { setName: string };
 
 export interface SynonymRowForEdit {
   setName: string;
+  itemId: string;
   synonyms: string;
   root: string;
   symbols_to_index: string;
@@ -121,7 +118,6 @@ function TermsDisplay({ synonyms, root }: { synonyms: string[]; root?: string })
 
 export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
   const [client, clusterId] = useTypesenseClient();
-  const toast = useAsyncToast();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [page, setPage] = useState(0);
@@ -140,45 +136,7 @@ export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
     [data],
   );
 
-  const mutation = useMutation({
-    mutationFn: (setName: string) => client.synonymSets(setName).delete(),
-    onMutate: async (setName) => {
-      await queryClient.cancelQueries({
-        queryKey: collectionQueryKeys.synonymSets(clusterId),
-      });
-
-      const prev = queryClient.getQueryData<SynonymSetSchema[]>(
-        collectionQueryKeys.synonymSets(clusterId),
-      );
-
-      queryClient.setQueryData(
-        collectionQueryKeys.synonymSets(clusterId),
-        (old: SynonymSetSchema[]) => old.filter((s) => s.name !== setName),
-      );
-
-      toast.loading(`deleting [${setName}]...`, { id: 'delete-synonym' });
-
-      return { setName, prev };
-    },
-    onSuccess: (_, setName) => {
-      toast.success(`synonym deleted [${setName}]`, { id: 'delete-synonym' });
-    },
-    onError: (err, _, ctx) => {
-      const msg = err.message || 'failed to delete synonym';
-      toast.error(msg, { id: 'delete-synonym' });
-      if (ctx?.prev) {
-        queryClient.setQueryData(
-          collectionQueryKeys.synonymSets(clusterId),
-          ctx.prev,
-        );
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: collectionQueryKeys.synonymSets(clusterId),
-      });
-    },
-  });
+  const mutation = useDeleteSynonymItem();
 
   const filtered = useMemo(() => {
     let list = rows;
@@ -191,6 +149,7 @@ export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
       const q = search.toLowerCase();
       list = list.filter(
         (r) =>
+          r.id?.toLowerCase().includes(q) ||
           r.setName?.toLowerCase().includes(q) ||
           r.synonyms?.some((s) => s.toLowerCase().includes(q)) ||
           r.root?.toLowerCase().includes(q),
@@ -305,7 +264,7 @@ export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
           background: designTokens.bg,
         }}
       >
-        {['ID', 'TYPE', 'TERMS', 'LOCALE', ''].map((col) => (
+        {['RULE / SET', 'TYPE', 'TERMS', 'LOCALE', ''].map((col) => (
           <Box key={col} sx={colHeaderSx}>{col}</Box>
         ))}
       </Box>
@@ -335,23 +294,43 @@ export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
                 '&:hover .row-actions': { opacity: 1 },
               }}
             >
-              {/* ID */}
+              {/* RULE (item id + the set it belongs to) */}
               <Box
                 sx={{
                   px: 1.5,
                   py: 1.25,
-                  fontFamily: designTokens.fontMono,
-                  fontSize: 12.5,
-                  fontWeight: 600,
-                  color: designTokens.text,
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  gap: '2px',
                 }}
               >
-                {row.setName}
+                <Box
+                  sx={{
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: designTokens.text,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {row.id}
+                </Box>
+                <Box
+                  sx={{
+                    fontFamily: designTokens.fontMono,
+                    fontSize: 11,
+                    color: designTokens.textFaint,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {row.setName}
+                </Box>
               </Box>
 
               {/* TYPE */}
@@ -399,6 +378,7 @@ export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
                       onClick={() =>
                         onEdit({
                           setName: row.setName,
+                          itemId: row.id,
                           synonyms: row.synonyms?.join(', ') ?? '',
                           root: row.root ?? '',
                           symbols_to_index: row.symbols_to_index?.join(', ') ?? '',
@@ -414,7 +394,12 @@ export const SynonymsGridV30 = ({ onEdit }: SynonymsGridV30Props) => {
                 <Tooltip title='Delete' placement='top'>
                   <IconButton
                     size='small'
-                    onClick={() => mutation.mutate(row.setName)}
+                    onClick={() =>
+                      mutation.mutate({
+                        setName: row.setName,
+                        itemId: row.id,
+                      })
+                    }
                     disabled={mutation.isPending}
                     sx={{ color: designTokens.textFaint, '&:hover': { color: designTokens.danger } }}
                   >

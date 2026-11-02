@@ -3,7 +3,7 @@ import { Badge, SectionCard } from '@/components/redesign';
 import { useTypesenseClient } from '@/hooks';
 import { formatBytes, removeStartEndMatches } from '@/utils';
 import { Box, Stack, Typography } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isObject, round } from 'lodash-es';
 import { Fragment, Suspense, useMemo } from 'react';
@@ -30,9 +30,7 @@ export function TypesenseMetricsAndNodes() {
         <Box sx={{ flex: '1 1 auto' }}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
+            onError={captureReactException}
           >
             <Suspense>
               <TypesenseMetrics />
@@ -42,9 +40,7 @@ export function TypesenseMetricsAndNodes() {
         <Box sx={{ flex: '1 1 auto' }}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
+            onError={captureReactException}
           >
             <Suspense>
               <ServerConfig />
@@ -54,9 +50,7 @@ export function TypesenseMetricsAndNodes() {
         <Box sx={{ flex: '1 1 auto' }}>
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => {
-              captureException(err);
-            }}
+            onError={captureReactException}
           >
             <Suspense>
               <ServerStats />

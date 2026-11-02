@@ -3,10 +3,32 @@ import {
   formatBytes,
   formatDollar,
   getArrayVal,
+  hasItems,
   removeStartEndMatches,
   splitIfString,
   uniqueArr,
 } from './index';
+
+describe('hasItems', () => {
+  it('is true only for a non-empty array', () => {
+    expect(hasItems([1])).toBe(true);
+    expect(hasItems([])).toBe(false);
+  });
+
+  it('is false for nullish input', () => {
+    expect(hasItems(undefined)).toBe(false);
+    expect(hasItems(null)).toBe(false);
+  });
+
+  // The regression this guard exists for: a `.length` truthiness check passes
+  // for these, letting a malformed API response reach `.map()` and throw
+  // "x.map is not a function" (TYPESENSE-DASHBOARD-3B / -3C).
+  it('is false for non-array values carrying a truthy length', () => {
+    expect(hasItems('unexpected string body')).toBe(false);
+    expect(hasItems({ length: 3 })).toBe(false);
+    expect(hasItems('<!doctype html><html>error</html>')).toBe(false);
+  });
+});
 
 describe('splitIfString', () => {
   it('returns an empty array for undefined or empty input', () => {

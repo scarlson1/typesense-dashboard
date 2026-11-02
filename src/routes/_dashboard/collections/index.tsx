@@ -24,7 +24,7 @@ import {
   useMediaQuery,
   type Theme,
 } from '@mui/material';
-import { captureException } from '@sentry/react';
+import { captureReactException } from '@sentry/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
@@ -47,7 +47,7 @@ function CollectionsComponent() {
     <Stack sx={{ minWidth: 0 }}>
       <ErrorBoundary
         FallbackComponent={ErrorFallback}
-        onError={(err: unknown) => captureException(err)}
+        onError={captureReactException}
       >
         <Suspense fallback={<CollectionsHeader count={0} />}>
           <CollectionsHeaderConnected />
@@ -66,7 +66,7 @@ function CollectionsComponent() {
         {mobile ? (
           <ErrorBoundary
             FallbackComponent={ErrorFallback}
-            onError={(err: unknown) => captureException(err)}
+            onError={captureReactException}
           >
             <Suspense fallback={null}>
               <MobileCollectionList />
@@ -76,7 +76,7 @@ function CollectionsComponent() {
           <>
             <ErrorBoundary
               FallbackComponent={ErrorFallback}
-              onError={(err: unknown) => captureException(err)}
+              onError={captureReactException}
             >
               <Suspense fallback={<StatStripFallback />}>
                 <StatStrip />
@@ -93,7 +93,7 @@ function CollectionsComponent() {
             >
               <ErrorBoundary
                 FallbackComponent={ErrorFallback}
-                onError={(err: unknown) => captureException(err)}
+                onError={captureReactException}
               >
                 <Suspense fallback={<CollectionsTableFallback />}>
                   <CollectionsTable />

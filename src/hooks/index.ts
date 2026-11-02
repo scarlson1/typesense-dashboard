@@ -33,6 +33,7 @@ export * from './useSchema';
 export * from './useSearch';
 export * from './useSearchParams';
 export * from './useSearchSlots';
+export * from './useSynonymItems';
 export * from './useTruncateCollection';
 export * from './useTypesenseClient';
 export * from './useUpdateByQuery';
